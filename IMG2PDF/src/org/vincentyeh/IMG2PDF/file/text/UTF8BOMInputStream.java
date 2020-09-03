@@ -15,7 +15,6 @@ public class UTF8BOMInputStream extends InputStream {
 		FileInputStream fis = new FileInputStream(file);
 		byte[] symble = new byte[3];
 		fis.read(symble);
-		bytesPrint(symble);
 		isSameEncodingType = isSameEncodingType(symble);
 		if (isSameEncodingType)
 			this.fis = fis;

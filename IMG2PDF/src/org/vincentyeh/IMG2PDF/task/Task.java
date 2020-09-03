@@ -16,6 +16,7 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.vincentyeh.IMG2PDF.file.FileFilterHelper;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
+import org.vincentyeh.IMG2PDF.util.NameFormatter;
 
 public class Task {
 
@@ -35,7 +36,9 @@ public class Task {
 		this.align = align;
 		this.size = size;
 		file = new File(str_file);
-		destination = name_compute(dst, file);
+		NameFormatter nf=new NameFormatter(dst, file);
+		destination = nf.getConverted();
+		
 		exists = file.exists();
 		if (!exists) {
 			error = file.getAbsolutePath() + " not found.";
@@ -47,10 +50,10 @@ public class Task {
 
 		try {
 			imgs = dir2imgs(file, sortby, order);
-			System.out.printf("DONE\nfound %d files.\n", imgs.size());
+			System.out.printf("\nfound %d files.\n", imgs.size());
 			System.out.print("Sortting files...");
 			Collections.sort(imgs);
-			System.out.print("DONE\n");
+			System.out.print("DONE\n\n");
 		} catch (Exception e) {
 			e.printStackTrace();
 			error = e.getMessage();
@@ -136,23 +139,6 @@ public class Task {
 		return imgs;
 	}
 
-	String name_compute(String raw, File file) {
-		Date date = new Date(file.lastModified());
-
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HHmmss");
-		String buf[] = file.getName().split("\\.");
-
-		String changed = raw.replace("$NAME", buf[0]).replace("$DATE", sdf.format(date));
-		changed = changed.replace("$PARENT{0}", getParentFile(file, 0).getAbsolutePath());
-
-		if (buf.length >= 2) {
-			changed = changed.replace("$EXT", buf[buf.length - 1]);
-		}
-
-		return (changed);
-
-	}
-
 	public void setAlign(int align) {
 		this.align = align;
 	}
@@ -187,15 +173,6 @@ public class Task {
 
 	public String getUser_pwd() {
 		return user_pwd;
-	}
-
-	static File getParentFile(File file, int index) {
-		File buf = new File(file.getAbsolutePath());
-
-		for (int i = 0; i <= index; i++) {
-			buf = buf.getParentFile();
-		}
-		return buf;
 	}
 
 }

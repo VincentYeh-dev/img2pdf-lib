@@ -9,25 +9,22 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class NameFormatter {
+	private String converted_name;
 	public NameFormatter(String format, File file) {
-		// TODO Auto-generated constructor stub
-
 		String changed =format;
 		HashMap<String,Integer> ps=parentFormatter(format);
-		System.out.println(ps);
 		for(String key:ps.keySet()) {
 			int level=ps.get(key);
 			changed=changed.replace(key,getParentFile(file, level).getName());
 		}
-		
-		System.out.println("=======");
 		
 		Date date = new Date(file.lastModified());
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HHmmss");
 		String buf[] = file.getName().split("\\.");
 
 		changed = changed.replace("$NAME", buf[0]).replace("$DATE", sdf.format(date));
-		System.out.println(changed);
+//		System.out.println(changed);
+		converted_name=changed;
 	}
 	HashMap<String,Integer> parentFormatter(String format){
 		Matcher matcher = Pattern.compile(".*?(\\$PARENT\\{[0-9]{1,}\\}).*?").matcher(format);
@@ -42,12 +39,17 @@ public class NameFormatter {
 		}
 		return map;
 	}
+	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		System.out.println("NameFormatter Testing");
-		new NameFormatter("$PARENT{2}\\$PARENT{1}\\$PARENT{0}\\$NAME", new File("test_file\\"));
+		new NameFormatter("$PARENT{2}\\$PARENT{1}\\$PARENT{0}\\$NAME.pdf", new File("test_file\\"));
 	}
-
+	
+	public String getConverted() {
+		return converted_name;
+	}
+	
 	File getParentFile(File file, int index) {
 		File buf = new File(file.getAbsolutePath());
 
