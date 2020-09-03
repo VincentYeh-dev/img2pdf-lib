@@ -29,35 +29,47 @@ public class Task {
 	private final String user_pwd;
 	private File file;
 	ArrayList<ImgFile> imgs;
+	private String error = "#null";
 
-	public Task(String str_file, String dst, String own, String user, int sortby, int order,int align,int size) throws IOException {
-		this.align=align;
-		this.size=size;
+	public Task(String str_file, String dst, String own, String user, int sortby, int order, int align, int size) {
+		this.align = align;
+		this.size = size;
 		file = new File(str_file);
-		destination = name_compute(dst,file);
+		destination = name_compute(dst, file);
 		exists = file.exists();
-		if(!exists)throw new FileNotFoundException(file.getAbsolutePath()+ " not found.");
-		isfile = file.isFile();
+		if (!exists) {
+			error = file.getAbsolutePath() + " not found.";
+		}
+
 		owner_pwd = own != null ? own : "#null";
 		user_pwd = user != null ? user : "#null";
-
-		imgs = dir2imgs(file, sortby, order);
-
-		System.out.printf("DONE\nfound %d files.\n", imgs.size());
-
-		System.out.print("Sortting files...");
-		Collections.sort(imgs);
-		System.out.print("DONE\n");
+		isfile = file.isFile();
+		
+		try {
+			imgs = dir2imgs(file, sortby, order);
+			System.out.printf("DONE\nfound %d files.\n", imgs.size());
+			System.out.print("Sortting files...");
+			Collections.sort(imgs);
+			System.out.print("DONE\n");
+		} catch (Exception e) {
+			error = e.getMessage();
+		}
 
 	}
-
+	public boolean isError() {
+		return !error.equals("#null");
+	}
+	public void setError(String error) {
+		this.error = error;
+	}
+	
 	public Task(Element el_task) {
 
 		destination = el_task.getAttributeValue("destination");
 		file = new File(el_task.getChild("FILES").getAttributeValue("source"));
 		exists = file.exists();
 		isfile = file.isFile();
-		
+
 		ArrayList<Element> files = new ArrayList<Element>(el_task.getChild("FILES").getChildren("FILE"));
 		align = Integer.valueOf(el_task.getAttributeValue("align"));
 		imgs = xml2imgs(files);
@@ -68,14 +80,12 @@ public class Task {
 		user_pwd = user.equals("#null") ? null : user;
 
 	}
-	public Element toXMLTask(int index) throws IOException {
-//		owner_pwd = owner_pwd != null ? owner_pwd : "#null";
-//		user_pwd = user_pwd != null ? user_pwd : "#null";
-		
+
+	public Element toXMLTask() throws IOException {
+
 		Element task = new Element("TASK");
-		task.setAttribute("index", index + "");
 		task.setAttribute("merge", merge ? "1" : "0");
-		task.setAttribute("destination",destination);
+		task.setAttribute("destination", destination);
 		task.setAttribute("size", size + "");
 		task.setAttribute("align", align + "");
 		task.setAttribute("owner", owner_pwd);
@@ -94,7 +104,7 @@ public class Task {
 		return task;
 	}
 
-	ArrayList<ImgFile> dir2imgs(File dir, int sortby, int order) {
+	ArrayList<ImgFile> dir2imgs(File dir, int sortby, int order) throws Exception {
 		FileFilterHelper ffh = new FileFilterHelper(
 				FileFilterHelper.CONDITION_IS_FILE | FileFilterHelper.CONDITION_EXT_EQUALS);
 		ffh.appendExtSLT("JPG");
@@ -105,13 +115,8 @@ public class Task {
 
 		ArrayList<ImgFile> imgs = new ArrayList<ImgFile>();
 		for (File file : files) {
-			try {
-				ImgFile img = new ImgFile(file, sortby, order,false);
-				imgs.add(img);
-
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			ImgFile img = new ImgFile(file, sortby, order, false);
+			imgs.add(img);
 		}
 		return imgs;
 	}
@@ -121,7 +126,7 @@ public class Task {
 		for (Element el : el_files) {
 			try {
 				File f_img = new File(el.getValue());
-				ImgFile img = new ImgFile(f_img, -1, -1,false);
+				ImgFile img = new ImgFile(f_img, -1, -1, false);
 				imgs.add(img);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -146,6 +151,7 @@ public class Task {
 		return (changed);
 
 	}
+
 	public void setAlign(int align) {
 		this.align = align;
 	}
@@ -181,8 +187,6 @@ public class Task {
 	public String getUser_pwd() {
 		return user_pwd;
 	}
-
-
 
 	static File getParentFile(File file, int index) {
 		File buf = new File(file.getAbsolutePath());

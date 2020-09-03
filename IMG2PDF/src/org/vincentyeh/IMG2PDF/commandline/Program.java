@@ -67,7 +67,7 @@ public class Program {
 				try {
 					pdf.process();
 				} catch (IIOException e) {
-					Element err_task = task.toXMLTask(0);
+					Element err_task = task.toXMLTask();
 					Element err = new Element("ERROR");
 					err.addContent(e.getMessage());
 					err_task.addContent(err);

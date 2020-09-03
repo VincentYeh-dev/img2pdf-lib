@@ -2,7 +2,6 @@ package org.vincentyeh.IMG2PDF.commandline;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -15,7 +14,9 @@ import org.jdom2.output.XMLOutputter;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
 import org.vincentyeh.IMG2PDF.file.PDFFile;
 import org.vincentyeh.IMG2PDF.file.text.UTF8InputStream;
+import org.vincentyeh.IMG2PDF.task.ErrorTaskList;
 import org.vincentyeh.IMG2PDF.task.Task;
+import org.vincentyeh.IMG2PDF.task.TaskList;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
@@ -29,41 +30,36 @@ public class TaskListCreator {
 	static String owner_pwd;
 	static String user_pwd;
 	static ArrayList<String> lists;
-	static String list_output=null;
+	static String list_output = null;
+
 	public static void main(String[] args) throws IOException {
 		ArgumentParser parser = createArgParser();
-		Arg2Values(parser,args);
-		
-		Element root=new Element("TASKLIST");
-		Document doc=new Document();
-		for(String list:lists) {
-			ArrayList<Task> tasks=importFromTxt(new File(list));
-			for(int i=0;i<tasks.size();i++) {
-				root.addContent(tasks.get(i).toXMLTask(i));
-			}
+		Arg2Values(parser, args);
+		for (String list : lists) {
+			TaskList tasks = importFromTxt(new File(list));
+			tasks.toXMLFile(new File(list_output));
 		}
-		
-		
-		//Define root element like root
-		doc.setRootElement(root);
-		//Create the XML
-		XMLOutputter outter=new XMLOutputter();
-		outter.setFormat(Format.getPrettyFormat());
-		outter.output(doc, new FileWriter(new File(list_output)));
+
 	}
 
-	static ArrayList<Task> importFromTxt(File file) throws IOException {
-		UTF8InputStream uis=new UTF8InputStream(file);
+	static TaskList importFromTxt(File file) throws IOException {
+		UTF8InputStream uis = new UTF8InputStream(file);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(uis, "UTF-8"));
-		ArrayList<Task> tasks = new ArrayList<Task>();
-
+		TaskList tasks = new TaskList();
+		ErrorTaskList etl = new ErrorTaskList();
 		String buf = "";
 		while (buf != null) {
 			buf = reader.readLine();
 			if (buf != null && !buf.isEmpty()) {
-				tasks.add(new Task(buf,dst, owner_pwd,user_pwd, sortby, order, align, size));
+				Task task=new Task(buf, dst, owner_pwd, user_pwd, sortby, order, align, size);
+				if(!task.isError()) {
+					tasks.add(task);
+				}else {
+					etl.add(task);
+				}
 			}
 		}
+		etl.toXMLFile(new File("tlc_error.xml"));
 		reader.close();
 		return tasks;
 	}
@@ -77,13 +73,13 @@ public class TaskListCreator {
 			System.exit(1);
 		}
 		lists = new ArrayList<String>(ns.<String>getList("source"));
-		
+
 		merge = ns.getString("merge").equals("yes");
 		String str_size = ns.getString("size");
 		size = PDFFile.sizeTranslator(str_size);
 		dst = ns.<String>getList("destination").get(0);
-		list_output= ns.<String>getList("list_output").get(0);
-		
+		list_output = ns.<String>getList("list_output").get(0);
+
 		if (ns.getString("sortby") == null) {
 			System.err.println("sort by rule need to provide");
 			System.exit(0);
@@ -116,7 +112,7 @@ public class TaskListCreator {
 			System.exit(0);
 			break;
 		}
-		
+
 		if (ns.<String>getList("owner_password") != null)
 			owner_pwd = ns.<String>getList("owner_password").get(0);
 		else
@@ -151,8 +147,7 @@ public class TaskListCreator {
 		parser.addArgument("-sz", "--size")
 				.choices("A0", "A1", "A2", "A3", "A4", "A5", "A6", "LEGAL", "LETTER", "DEPEND")
 				.help("PDF each page size.\ntype DEPEND to set each page size depend on each image size");
-		
-		
+
 		parser.addArgument("-ownpwd", "--owner_password").nargs(1).help("PDF owner password");
 		parser.addArgument("-usepwd", "--user_password").nargs(1).help("PDF user password");
 		parser.addArgument("-d", "--destination").nargs(1).help("Destination of converted file");
