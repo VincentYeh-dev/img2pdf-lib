@@ -9,6 +9,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+import org.vincentyeh.IMG2PDF.file.PDFFile;
 
 public class TaskList extends ArrayList<Task>{
 	private Element xml_root;
@@ -23,6 +24,22 @@ public class TaskList extends ArrayList<Task>{
 		xml_root=new Element(name);
 		doc=new Document();
 		
+	}
+	public TaskList(Document doc) {
+		this.doc=doc;
+		xml_root= this.doc.getRootElement();
+		ArrayList<Element> el_tasks = new ArrayList<Element>(xml_root.getChildren("TASK"));
+		ErrorTaskList etl = new ErrorTaskList();
+		for (Element el_task : el_tasks) {
+			this.add(new Task(el_task));
+		}
+		
+		try {
+			etl.toXMLFile(new File("pro_error.xml"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	@Override

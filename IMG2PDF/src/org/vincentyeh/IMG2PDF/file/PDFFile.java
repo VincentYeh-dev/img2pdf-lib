@@ -70,7 +70,7 @@ public class PDFFile {
 		for (int i = 0; i < imgs.size(); i++) {
 			progress += perImg;
 //			System.out.println(imgs.get(i).nameWithExtension);
-			if (progress >= 1) {
+			while (progress >= 1) {
 				System.out.print("=");
 				progress -= 1;
 			}

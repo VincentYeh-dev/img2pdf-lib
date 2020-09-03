@@ -16,9 +16,7 @@ public class ImgFile implements Comparable<ImgFile> {
 	public static final int ORDER_DECREASE=1;
 	public static final int SORTBY_NAME=2;
 	public static final int SORTBY_DATE=3;
-//	public float img_height,img_width,img_size_ratio;
 	private int sortby,order;
-	boolean readImg=false;
 	@Override
 	public int compareTo(ImgFile o) {
 		
@@ -53,7 +51,6 @@ public class ImgFile implements Comparable<ImgFile> {
 		this(raw,readImg);
 		this.sortby=sortby;
 		this.order=order;
-		this.readImg=readImg;
 	}
 
 	public String getName() {

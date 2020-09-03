@@ -44,7 +44,7 @@ public class Task {
 		owner_pwd = own != null ? own : "#null";
 		user_pwd = user != null ? user : "#null";
 		isfile = file.isFile();
-		
+
 		try {
 			imgs = dir2imgs(file, sortby, order);
 			System.out.printf("DONE\nfound %d files.\n", imgs.size());
@@ -52,17 +52,20 @@ public class Task {
 			Collections.sort(imgs);
 			System.out.print("DONE\n");
 		} catch (Exception e) {
+			e.printStackTrace();
 			error = e.getMessage();
 		}
 
 	}
+
 	public boolean isError() {
 		return !error.equals("#null");
 	}
+
 	public void setError(String error) {
 		this.error = error;
 	}
-	
+
 	public Task(Element el_task) {
 
 		destination = el_task.getAttributeValue("destination");
@@ -73,11 +76,9 @@ public class Task {
 		ArrayList<Element> files = new ArrayList<Element>(el_task.getChild("FILES").getChildren("FILE"));
 		align = Integer.valueOf(el_task.getAttributeValue("align"));
 		imgs = xml2imgs(files);
-		String owner = el_task.getAttributeValue("owner");
-		String user = el_task.getAttributeValue("user");
 
-		owner_pwd = owner.equals("#null") ? null : owner;
-		user_pwd = user.equals("#null") ? null : user;
+		owner_pwd = el_task.getAttributeValue("owner");
+		user_pwd = el_task.getAttributeValue("user");
 
 	}
 

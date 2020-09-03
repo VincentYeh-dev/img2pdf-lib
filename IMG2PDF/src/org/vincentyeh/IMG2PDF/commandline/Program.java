@@ -26,7 +26,9 @@ import org.jdom2.output.XMLOutputter;
 import org.vincentyeh.IMG2PDF.file.FileFilterHelper;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
 import org.vincentyeh.IMG2PDF.file.PDFFile;
+import org.vincentyeh.IMG2PDF.task.ErrorTaskList;
 import org.vincentyeh.IMG2PDF.task.Task;
+import org.vincentyeh.IMG2PDF.task.TaskList;
 import org.xml.sax.SAXException;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
@@ -55,30 +57,38 @@ public class Program {
 
 		for (String list : program.lists) {
 			Document xml = getDOMParsedDocument(list);
-			Element root = xml.getRootElement();
-			ArrayList<Element> el_tasks = new ArrayList<Element>(root.getChildren("TASK"));
-
-			Element err_root = new Element("ERRORLIST");
-			Document doc = new Document();
-			for (Element el_task : el_tasks) {
-				Task task = new Task(el_task);
-
+			TaskList tasks=new TaskList(xml);
+			ErrorTaskList etl = new ErrorTaskList();
+			
+			for(Task task:tasks) {
 				PDFFile pdf = new PDFFile(task);
 				try {
 					pdf.process();
-				} catch (IIOException e) {
-					Element err_task = task.toXMLTask();
-					Element err = new Element("ERROR");
-					err.addContent(e.getMessage());
-					err_task.addContent(err);
-					err_root.addContent(err_task);
+				} catch (Exception e) {
+					e.printStackTrace();
+					task.setError(e.getMessage());
+					etl.add(task);
 				}
 			}
-			doc.setRootElement(root);
-			// Create the XML
-			XMLOutputter outter = new XMLOutputter();
-			outter.setFormat(Format.getPrettyFormat());
-			outter.output(doc, new FileWriter(new File("error_list.xml")));
+			
+			etl.toXMLFile(new File("pro_error.xml"));
+			
+//			Element root = xml.getRootElement();
+//			ArrayList<Element> el_tasks = new ArrayList<Element>(root.getChildren("TASK"));
+//			ErrorTaskList etl = new ErrorTaskList();
+//			for (Element el_task : el_tasks) {
+//				Task task = new Task(el_task);
+//
+//				PDFFile pdf = new PDFFile(task);
+//				try {
+//					pdf.process();
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//					task.setError(e.getMessage());
+//					etl.add(task);
+//				}
+//			}
+//			etl.toXMLFile(new File("pro_error.xml"));
 		}
 
 	}
