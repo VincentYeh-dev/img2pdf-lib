@@ -20,16 +20,19 @@ import javax.imageio.stream.ImageInputStream;
 
 public class ImageProcess {
 	private final File file;
-
+	
 	public ImageProcess(File file) {
 		this.file = file;
 	}
-
-//	String newfilename = filename.substring(0, filename.lastIndexOf(".")) + "_rgb"
-//			+ filename.substring(filename.lastIndexOf("."));
-//	File newFile = new File(newfilename);
-//	ImageIO.write(image, "jpg", newFile);
-
+	public Exception tryRGB(){
+		try {
+			ImageIO.read(file);
+		} catch (IOException e) {
+			return e;
+		}
+		return null;
+	}
+	
 	public BufferedImage read() throws IOException {
 		ImageReader reader = findReader(file);
 		String format = reader.getFormatName();
@@ -41,10 +44,9 @@ public class ImageProcess {
 //				try to reading file(including Color Convertion)
 				image = reader.read(0); // RGB
 
-			} catch (IIOException e) {
+			} catch (Exception e) {
 //				Read Raster(no color convertion)
-
-				System.err.println(e.getMessage());
+//				System.err.println(e.getMessage());
 				Raster raster = reader.readRaster(0, null);// CMYK
 				image = YCCK2RGB(raster);
 //				image=null;
@@ -57,7 +59,8 @@ public class ImageProcess {
 			return ImageIO.read(file);
 		}
 	}
-
+	
+	
 	private ImageReader findReader(File file) throws IOException {
 		ImageInputStream input = ImageIO.createImageInputStream(file);
 		Iterator<ImageReader> readers = ImageIO.getImageReaders(input);

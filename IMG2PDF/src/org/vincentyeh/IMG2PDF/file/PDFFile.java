@@ -1,12 +1,9 @@
 package org.vincentyeh.IMG2PDF.file;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-
-import javax.imageio.IIOException;
-import javax.imageio.ImageIO;
+import java.util.Scanner;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -17,6 +14,7 @@ import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
 import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.vincentyeh.IMG2PDF.task.Task;
+import org.vincentyeh.IMG2PDF.util.ImageProcess;
 
 public class PDFFile {
 	public static final int ALIGN_RIGHT = 0x01;
@@ -57,7 +55,7 @@ public class PDFFile {
 
 	}
 
-	public void process() throws IOException {
+	public void process() throws Exception {
 		System.out.printf("Destination:%s\n\n", task.getDestination());
 		ArrayList<ImgFile> imgs = task.getImgs();
 
@@ -75,7 +73,24 @@ public class PDFFile {
 				progress -= 1;
 			}
 			BufferedImage img = null;
-			img = ImageIO.read(imgs.get(i).file.getAbsoluteFile());
+//			img = ImageIO.read();
+			
+			ImageProcess ip=new ImageProcess(imgs.get(i).file);
+			
+//			Exception convert_err=ip.tryRGB();
+//			
+//			if(convert_err!=null) {
+//				System.err.println(convert_err.getMessage());
+////				System.out.println("Do you want to convert YYCK to RGB? :");
+//				String awnser=new Scanner(System.in).nextLine();
+//				if(awnser.contains("N")) {
+//					throw convert_err;
+//				}
+//					
+//			}
+			
+			img=ip.read();
+			
 			doc.addPage(createImgPage(img));
 
 		}
