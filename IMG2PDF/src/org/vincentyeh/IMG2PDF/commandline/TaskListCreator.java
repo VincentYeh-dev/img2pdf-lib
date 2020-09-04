@@ -36,13 +36,13 @@ public class TaskListCreator {
 		ArgumentParser parser = createArgParser();
 		Arg2Values(parser, args);
 		for (String list : lists) {
-			TaskList tasks = importFromTxt(new File(list));
+			TaskList tasks = importTasksFromTXT(new File(list));
 			tasks.toXMLFile(new File(list_output));
 		}
 
 	}
 
-	static TaskList importFromTxt(File file) throws IOException {
+	static TaskList importTasksFromTXT(File file) throws IOException {
 		UTF8InputStream uis = new UTF8InputStream(file);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(uis, "UTF-8"));
 		TaskList tasks = new TaskList();
@@ -51,12 +51,12 @@ public class TaskListCreator {
 		while (buf != null) {
 			buf = reader.readLine();
 			if (buf != null && !buf.isEmpty()) {
-				Task task=new Task(buf, dst, owner_pwd, user_pwd, sortby, order, align, size);
-				if(!task.isError()) {
+				Task task = new Task(buf, dst, owner_pwd, user_pwd, sortby, order, align, size);
+				if (!task.isError())
 					tasks.add(task);
-				}else {
+				else
 					etl.add(task);
-				}
+
 			}
 		}
 		etl.toXMLFile(new File("tlc_error.xml"));

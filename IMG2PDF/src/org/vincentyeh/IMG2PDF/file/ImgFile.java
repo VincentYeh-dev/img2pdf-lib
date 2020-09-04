@@ -38,7 +38,7 @@ public class ImgFile implements Comparable<ImgFile> {
 		
 	}
 
-	public ImgFile(File raw,boolean readImg) throws IOException {
+	public ImgFile(File raw) throws IOException {
 		if(raw.isDirectory()) {
 			throw new RuntimeException(raw.getAbsolutePath()+" is a Folder");
 		}
@@ -47,8 +47,8 @@ public class ImgFile implements Comparable<ImgFile> {
 		name = nameWithExtension.split("\\.")[0];
 		extension = nameWithExtension.split("\\.")[1];
 	}
-	public ImgFile(File raw,int sortby,int order,boolean readImg) throws IOException {
-		this(raw,readImg);
+	public ImgFile(File raw,int sortby,int order) throws IOException {
+		this(raw);
 		this.sortby=sortby;
 		this.order=order;
 	}

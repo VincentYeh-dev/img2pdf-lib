@@ -47,11 +47,11 @@ public class PDFFile {
 		String user_pwd = task.getUser_pwd();
 		AccessPermission ap = new AccessPermission();
 
-		if (owner_pwd == null && user_pwd != null)
+		if (owner_pwd.equals("#null") && !user_pwd.equals("#null"))
 			setProtect("", user_pwd, ap);
-		else if (user_pwd == null && owner_pwd != null)
+		else if (user_pwd.equals("#null") && !owner_pwd.equals("#null"))
 			setProtect(owner_pwd, "", ap);
-		else if (user_pwd != null && owner_pwd != null) {
+		else if (!user_pwd.equals("#null") && !owner_pwd.equals("#null")) {
 			setProtect(owner_pwd, user_pwd, ap);
 		}
 
