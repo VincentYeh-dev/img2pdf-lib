@@ -1,4 +1,6 @@
 package org.vincentyeh.IMG2PDF.file;
+import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -101,4 +103,14 @@ public class ImgFile implements Comparable<ImgFile> {
 		rotateOp.filter(raw, rotatedImage);
 		return rotatedImage;
 	}
+	public static BufferedImage resize(BufferedImage img, int newW, int newH) { 
+	    Image tmp = img.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
+	    BufferedImage dimg = new BufferedImage(newW, newH,img.getType());
+
+	    Graphics2D g2d = dimg.createGraphics();
+	    g2d.drawImage(tmp, 0, 0, null);
+	    g2d.dispose();
+
+	    return dimg;
+	}  
 }

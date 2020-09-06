@@ -73,22 +73,6 @@ public class Program {
 			
 			etl.toXMLFile(new File("pro_error.xml"));
 			
-//			Element root = xml.getRootElement();
-//			ArrayList<Element> el_tasks = new ArrayList<Element>(root.getChildren("TASK"));
-//			ErrorTaskList etl = new ErrorTaskList();
-//			for (Element el_task : el_tasks) {
-//				Task task = new Task(el_task);
-//
-//				PDFFile pdf = new PDFFile(task);
-//				try {
-//					pdf.process();
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//					task.setError(e.getMessage());
-//					etl.add(task);
-//				}
-//			}
-//			etl.toXMLFile(new File("pro_error.xml"));
 		}
 
 	}
@@ -111,21 +95,6 @@ public class Program {
 	static ArgumentParser createArgParser() {
 		ArgumentParser parser = ArgumentParsers.newFor("IMG2PDF").build().defaultHelp(true)
 				.description("Convert or merge image file to PDF");
-
-		parser.addArgument("-m", "--merge").choices("yes", "no").setDefault("no")
-				.help("Merge all image files in Folder");
-
-		parser.addArgument("-s", "--sortby").choices("name", "date").help("Merge all image files in Folder");
-
-		parser.addArgument("-odr", "--order").choices("ics", "dcs")
-				.help("order by increasing(0,1,2,3) or decreasing(3,2,1,0) value");
-
-		parser.addArgument("-sz", "--size")
-				.choices("A0", "A1", "A2", "A3", "A4", "A5", "A6", "LEGAL", "LETTER", "DEPEND")
-				.help("PDF each page size.\ntype DEPEND to set each page size depend on each image size");
-		parser.addArgument("-ownpwd", "--owner_password").nargs(1).help("PDF owner password");
-		parser.addArgument("-usepwd", "--user_password").nargs(1).help("PDF user password");
-		parser.addArgument("-d", "--destination").nargs(1).help("Destination of converted file");
 		parser.addArgument("source").nargs("*").help("File to convert");
 		return parser;
 	}

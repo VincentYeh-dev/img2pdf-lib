@@ -22,6 +22,7 @@ public class PDFFile {
 	public static final int ALIGN_CENTER = 0x33;
 	public static final int ALIGN_TOP = 0x40;
 	public static final int ALIGN_BOTTOM = 0x50;
+	public static final int ALIGN_FILL = 0x66;
 
 	public static final int SIZE_A0 = 0x01;
 	public static final int SIZE_A1 = 0x02;
@@ -73,24 +74,11 @@ public class PDFFile {
 				progress -= 1;
 			}
 			BufferedImage img = null;
-//			img = ImageIO.read();
-			
-			ImageProcess ip=new ImageProcess(imgs.get(i).file);
-			
-//			Exception convert_err=ip.tryRGB();
-//			
-//			if(convert_err!=null) {
-//				System.err.println(convert_err.getMessage());
-////				System.out.println("Do you want to convert YYCK to RGB? :");
-//				String awnser=new Scanner(System.in).nextLine();
-//				if(awnser.contains("N")) {
-//					throw convert_err;
-//				}
-//					
-//			}
-			
-			img=ip.read();
-			
+
+			ImageProcess ip = new ImageProcess(imgs.get(i).file);
+
+			img = ip.read();
+
 			doc.addPage(createImgPage(img));
 
 		}
@@ -140,9 +128,10 @@ public class PDFFile {
 			out_height = received[3];
 
 		}
+
 		PDImageXObject pdImageXObject = LosslessFactory.createFromImage(doc, img);
 
-		PDPageContentStream contentStream = new PDPageContentStream(doc, page, true, false);
+		PDPageContentStream contentStream = new PDPageContentStream(doc, page);
 
 		contentStream.drawImage(pdImageXObject, position_x, position_y, out_width, out_height);
 		contentStream.close();
@@ -164,7 +153,12 @@ public class PDFFile {
 //	*----
 //	 ^^^^^
 //	 position_y
-		if ((1 / img_size_ratio) * page_height <= page_width) {
+
+		if (task.getAlign() == ALIGN_FILL) {
+			position_x = position_y = 0;
+			out_height = page_height;
+			out_width = page_width;
+		} else if ((1 / img_size_ratio) * page_height <= page_width) {
 			out_height = page_height;
 			out_width = (img_width / img_height) * out_height;
 
@@ -183,9 +177,7 @@ public class PDFFile {
 				break;
 
 			}
-		}
-
-		if (img_size_ratio * page_width <= page_height) {
+		} else if (img_size_ratio * page_width <= page_height) {
 			out_width = page_width;
 			out_height = (img_height / img_width) * out_width;
 
@@ -235,8 +227,12 @@ public class PDFFile {
 //	-------*
 //	   ^^^^^
 //	   position_y
-
-		if ((1 / r_img_size_ratio) * r_page_height <= r_page_width) {
+		
+		if (task.getAlign() == ALIGN_FILL) {
+			position_x = position_y = 0;
+			r_out_height = r_page_height;
+			r_out_width = r_page_width;
+		} else if ((1 / r_img_size_ratio) * r_page_height <= r_page_width) {
 			r_out_height = r_page_height;
 			r_out_width = (r_img_width / r_img_height) * r_out_height;
 
@@ -256,9 +252,7 @@ public class PDFFile {
 				break;
 
 			}
-		}
-
-		if (r_img_size_ratio * r_page_width <= r_page_height) {
+		} else if (r_img_size_ratio * r_page_width <= r_page_height) {
 			r_out_width = r_page_width;
 			r_out_height = (r_img_height / r_img_width) * r_out_width;
 
@@ -276,11 +270,10 @@ public class PDFFile {
 			case ALIGN_CENTER & 0xF0:
 				position_y = y_space / 2;
 				break;
-
 			}
 
 		}
-//	position_x=position_y=0;
+
 		out_width = r_out_height;
 		out_height = r_out_width;
 		float buf_y = position_y;

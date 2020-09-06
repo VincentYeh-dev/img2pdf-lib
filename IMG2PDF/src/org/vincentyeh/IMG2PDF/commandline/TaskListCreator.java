@@ -122,8 +122,9 @@ public class TaskListCreator {
 			user_pwd = ns.<String>getList("user_password").get(0);
 		else
 			user_pwd = null;
-		align = (PDFFile.ALIGN_CENTER & 0xf0) | (PDFFile.ALIGN_CENTER & 0x0f);
-
+//		align = (PDFFile.ALIGN_CENTER & 0xf0) | (PDFFile.ALIGN_CENTER & 0x0f);
+		align = PDFFile.ALIGN_FILL;
+		
 		System.out.printf("merge:%s\n", merge ? "yes" : "no");
 		System.out.printf("size:%s\n", str_size);
 		System.out.printf("destination:%s\n", dst);
