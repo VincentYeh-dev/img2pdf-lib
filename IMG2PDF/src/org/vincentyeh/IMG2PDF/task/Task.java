@@ -30,9 +30,8 @@ public class Task {
 	private final String user_pwd;
 	private File file;
 	ArrayList<ImgFile> imgs;
-	private String error = "#null";
 
-	public Task(String str_file, String dst, String own, String user, int sortby, int order, int align, int size) {
+	public Task(String str_file, String dst, String own, String user, int sortby, int order, int align, int size) throws Exception {
 		this.align = align;
 		this.size = size;
 		file = new File(str_file);
@@ -41,13 +40,12 @@ public class Task {
 
 		exists = file.exists();
 		if (!exists) {
-			error = file.getAbsolutePath() + " not found.";
+			throw new FileNotFoundException(file.getAbsolutePath() + " not found.");
 		}
 
 		owner_pwd = own != null ? own : "#null";
 		user_pwd = user != null ? user : "#null";
 		isfile = file.isFile();
-		try {
 			if (isfile) {
 				imgs=new ArrayList<ImgFile>();
 				String[] buf=file.getName().split("\\.");
@@ -67,10 +65,6 @@ public class Task {
 			System.out.print("Sortting files...");
 			Collections.sort(imgs);
 			System.out.print("DONE\n\n");
-		} catch (Exception e) {
-			e.printStackTrace();
-			error = e.getMessage();
-		}
 
 	}
 
@@ -90,7 +84,7 @@ public class Task {
 
 	}
 
-	public Element toXMLTask() throws IOException {
+	public Element toXMLTask(){
 
 		Element task = new Element("TASK");
 		task.setAttribute("merge", merge ? "1" : "0");
@@ -139,13 +133,6 @@ public class Task {
 	}
 
 
-	public boolean isError() {
-		return !error.equals("#null");
-	}
-
-	public void setError(String error) {
-		this.error = error;
-	}
 	public void setAlign(int align) {
 		this.align = align;
 	}

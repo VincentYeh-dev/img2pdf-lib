@@ -58,7 +58,6 @@ public class Program {
 		for (String list : program.lists) {
 			Document xml = getDOMParsedDocument(list);
 			TaskList tasks=new TaskList(xml);
-			ErrorTaskList etl = new ErrorTaskList();
 			
 			for(Task task:tasks) {
 				PDFFile pdf = new PDFFile(task);
@@ -66,12 +65,8 @@ public class Program {
 					pdf.process();
 				} catch (Exception e) {
 					e.printStackTrace();
-					task.setError(e.getMessage());
-					etl.add(task);
 				}
 			}
-			
-			etl.toXMLFile(new File("pro_error.xml"));
 			
 		}
 

@@ -11,29 +11,30 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.vincentyeh.IMG2PDF.file.PDFFile;
 
-public class TaskList extends ArrayList<Task>{
+public class TaskList extends ArrayList<Task> {
 	private Element xml_root;
 	private Document doc;
-	
+
 	public TaskList() {
-		xml_root=new Element("TASKLIST");
-		doc=new Document();
+		xml_root = new Element("TASKLIST");
+		doc = new Document();
 	}
-	
+
 	public TaskList(String name) {
-		xml_root=new Element(name);
-		doc=new Document();
-		
+		xml_root = new Element(name);
+		doc = new Document();
+
 	}
+
 	public TaskList(Document doc) {
-		this.doc=doc;
-		xml_root= this.doc.getRootElement();
+		this.doc = doc;
+		xml_root = this.doc.getRootElement();
 		ArrayList<Element> el_tasks = new ArrayList<Element>(xml_root.getChildren("TASK"));
 		ErrorTaskList etl = new ErrorTaskList();
 		for (Element el_task : el_tasks) {
 			this.add(new Task(el_task));
 		}
-		
+
 		try {
 			etl.toXMLFile(new File("pro_error.xml"));
 		} catch (IOException e) {
@@ -41,39 +42,29 @@ public class TaskList extends ArrayList<Task>{
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Override
 	public void add(int index, Task element) {
-		try {
-			xml_root.addContent(element.toXMLTask());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		xml_root.addContent(element.toXMLTask());
 		super.add(index, element);
 	}
-	
+
 	@Override
 	public boolean add(Task element) {
-		try {
-			xml_root.addContent(element.toXMLTask());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+		xml_root.addContent(element.toXMLTask());
 		return super.add(element);
 	}
+
 	@Override
 	public Task remove(int index) {
 		xml_root.removeContent(index);
 		return super.remove(index);
 	}
-	
+
 	public void toXMLFile(File file) throws IOException {
 		doc.setRootElement(xml_root);
-		//Create the XML
-		XMLOutputter outter=new XMLOutputter();
+		// Create the XML
+		XMLOutputter outter = new XMLOutputter();
 		outter.setFormat(Format.getPrettyFormat());
 		outter.output(doc, new FileWriter(file));
 	}

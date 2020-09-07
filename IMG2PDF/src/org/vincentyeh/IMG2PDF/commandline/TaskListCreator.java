@@ -32,7 +32,7 @@ public class TaskListCreator {
 	static ArrayList<String> lists;
 	static String list_output = null;
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws Exception {
 		ArgumentParser parser = createArgParser();
 		Arg2Values(parser, args);
 		for (String list : lists) {
@@ -42,24 +42,19 @@ public class TaskListCreator {
 
 	}
 
-	static TaskList importTasksFromTXT(File file) throws IOException {
+	static TaskList importTasksFromTXT(File file) throws Exception {
 		UTF8InputStream uis = new UTF8InputStream(file);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(uis, "UTF-8"));
 		TaskList tasks = new TaskList();
-		ErrorTaskList etl = new ErrorTaskList();
 		String buf = "";
 		while (buf != null) {
 			buf = reader.readLine();
 			if (buf != null && !buf.isEmpty()) {
 				Task task = new Task(buf, dst, owner_pwd, user_pwd, sortby, order, align, size);
-				if (!task.isError())
-					tasks.add(task);
-				else
-					etl.add(task);
+				tasks.add(task);
 
 			}
 		}
-		etl.toXMLFile(new File("tlc_error.xml"));
 		reader.close();
 		return tasks;
 	}
@@ -124,7 +119,7 @@ public class TaskListCreator {
 			user_pwd = null;
 //		align = (PDFFile.ALIGN_CENTER & 0xf0) | (PDFFile.ALIGN_CENTER & 0x0f);
 		align = PDFFile.ALIGN_FILL;
-		
+
 		System.out.printf("merge:%s\n", merge ? "yes" : "no");
 		System.out.printf("size:%s\n", str_size);
 		System.out.printf("destination:%s\n", dst);
