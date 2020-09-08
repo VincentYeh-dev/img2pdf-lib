@@ -75,7 +75,7 @@ public class PDFFile {
 			}
 			BufferedImage img = null;
 
-			ImageProcess ip = new ImageProcess(imgs.get(i).file);
+			ImageProcess ip = new ImageProcess(imgs.get(i));
 
 			img = ip.read();
 

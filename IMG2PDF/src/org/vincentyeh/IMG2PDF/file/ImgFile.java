@@ -7,71 +7,73 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-import javax.imageio.ImageIO;
 
-public class ImgFile implements Comparable<ImgFile> {
-
-	public final File file;
-	final protected String nameWithExtension,name;
-	protected String extension="";
+public class ImgFile extends File implements Comparable<File> {
 	public static final int ORDER_INCREASE=0;
 	public static final int ORDER_DECREASE=1;
 	public static final int SORTBY_NAME=2;
 	public static final int SORTBY_DATE=3;
 	private int sortby,order;
+	
+	public ImgFile(String pathname) {
+		super(pathname);
+		sortby=order=-1;
+	}
+	public ImgFile(File file) {
+		this(file.getAbsolutePath());
+	}	
+
+	public ImgFile(String pathname, int sortby, int order) throws IOException {
+		this(pathname);
+		this.sortby = sortby;
+		this.order = order;
+
+		if (this.isDirectory()) {
+			throw new RuntimeException(this.getAbsolutePath() + " is a Folder");
+		}
+	}
+	public ImgFile(File file, int sortby, int order) throws IOException {
+		this(file.getAbsolutePath(),sortby,order);
+	}
+	
+	
 	@Override
-	public int compareTo(ImgFile o) {
-		
+	public int compareTo(File o) {
 		switch(sortby) {
 		case SORTBY_NAME:
 			if(order==ORDER_INCREASE)
-				return this.file.getName().compareTo(o.file.getName());
+				return this.getName().compareTo(o.getName());
 			else if(order==ORDER_DECREASE)
-				return o.file.getName().compareTo(this.file.getName());
+				return o.getName().compareTo(this.getName());
 		case SORTBY_DATE:
 			if(order==ORDER_INCREASE)
-				return (this.file.lastModified()-o.file.lastModified()>0)?1:-1;
+				return (this.lastModified()-o.lastModified()>0)?1:-1;
 			
 			else if(order==ORDER_DECREASE)
-				return (this.file.lastModified()-o.file.lastModified()>0)?-1:1;
+				return (this.lastModified()-o.lastModified()>0)?-1:1;
 		default:
 				throw new RuntimeException("Files in folder need to be ordered.");
 		}
 		
 	}
 
-	public ImgFile(File raw) throws IOException {
-		if(raw.isDirectory()) {
-			throw new RuntimeException(raw.getAbsolutePath()+" is a Folder");
-		}
-		file=raw;
-		nameWithExtension =file.getName();
-		name = nameWithExtension.split("\\.")[0];
-		extension = nameWithExtension.split("\\.")[1];
-	}
-	public ImgFile(File raw,int sortby,int order) throws IOException {
-		this(raw);
-		this.sortby=sortby;
-		this.order=order;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public String getExtension() {
-		return extension;
-	}
-
-	public String getNameWithExtension() {
-		return nameWithExtension;
-	}
-	public File toFile() {
-		return file;
-	}
-	private BufferedImage toBufferedImage() throws IOException {
-		return ImageIO.read(this.file);
-	}
+//	public ImgFile(File raw) throws IOException {
+//		if(raw.isDirectory()) {
+//			throw new RuntimeException(raw.getAbsolutePath()+" is a Folder");
+//		}
+//		file=raw;
+//		nameWithExtension =file.getName();
+//		name = nameWithExtension.split("\\.")[0];
+//		extension = nameWithExtension.split("\\.")[1];
+//	}
+//	public ImgFile(File raw,int sortby,int order) throws IOException {
+//		this(raw);
+//		this.sortby=sortby;
+//		this.order=order;
+//	}
+//	public File toFile() {
+//		return file;
+//	}
 	
 	public void setOrder(int order) {
 		this.order = order;

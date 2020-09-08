@@ -99,7 +99,7 @@ public class Task {
 		for (int i = 0; i < imgs.size(); i++) {
 			Element file = new Element("FILE");
 			file.setAttribute("index", i + "");
-			file.addContent(imgs.get(i).file.getAbsolutePath());
+			file.addContent(imgs.get(i).getAbsolutePath());
 			xml_files.addContent(file);
 		}
 
@@ -123,7 +123,7 @@ public class Task {
 		for (Element el : el_files) {
 			try {
 				File f_img = new File(el.getValue());
-				ImgFile img = new ImgFile(f_img, -1, -1);
+				ImgFile img = new ImgFile(f_img);
 				imgs.add(img);
 			} catch (Exception e) {
 				e.printStackTrace();
