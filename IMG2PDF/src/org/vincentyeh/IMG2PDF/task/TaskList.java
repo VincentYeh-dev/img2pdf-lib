@@ -30,28 +30,21 @@ public class TaskList extends ArrayList<Task> {
 		this.doc = doc;
 		xml_root = this.doc.getRootElement();
 		ArrayList<Element> el_tasks = new ArrayList<Element>(xml_root.getChildren("TASK"));
-		ErrorTaskList etl = new ErrorTaskList();
+
 		for (Element el_task : el_tasks) {
 			this.add(new Task(el_task));
-		}
-
-		try {
-			etl.toXMLFile(new File("pro_error.xml"));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 
 	@Override
 	public void add(int index, Task element) {
-		xml_root.addContent(element.toXMLTask());
+		xml_root.addContent(element);
 		super.add(index, element);
 	}
 
 	@Override
 	public boolean add(Task element) {
-		xml_root.addContent(element.toXMLTask());
+		xml_root.addContent(element);
 		return super.add(element);
 	}
 

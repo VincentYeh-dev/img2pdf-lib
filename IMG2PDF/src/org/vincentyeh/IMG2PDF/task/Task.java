@@ -9,7 +9,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
+import org.jdom2.Attribute;
+import org.jdom2.Content;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
@@ -18,7 +21,7 @@ import org.vincentyeh.IMG2PDF.file.FileFilterHelper;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
 import org.vincentyeh.IMG2PDF.util.NameFormatter;
 
-public class Task {
+public class Task extends Element {
 
 	final boolean exists;
 	final boolean isfile;
@@ -31,7 +34,10 @@ public class Task {
 	private File file;
 	ArrayList<ImgFile> imgs;
 
-	public Task(String str_file, String dst, String own, String user, int sortby, int order, int align, int size) throws Exception {
+	public Task(String str_file, String dst, String own, String user, int sortby, int order, int align, int size)
+			throws Exception {
+		super("TASK");
+
 		this.align = align;
 		this.size = size;
 		file = new File(str_file);
@@ -45,76 +51,104 @@ public class Task {
 
 		owner_pwd = own != null ? own : "#null";
 		user_pwd = user != null ? user : "#null";
+
+		super.setAttribute("merge", merge ? "1" : "0");
+		super.setAttribute("destination", destination);
+		super.setAttribute("size", size + "");
+		super.setAttribute("align", align + "");
+		super.setAttribute("owner", owner_pwd);
+		super.setAttribute("user", user_pwd);
+
 		isfile = file.isFile();
-			if (isfile) {
-				imgs=new ArrayList<ImgFile>();
-				String[] buf=file.getName().split("\\.");
-				FileFilterHelper ffh = createImageFilter(FileFilterHelper.CONDITION_NAME_EQUALS);
-				
-				ffh.appendNameSLT(buf[0]);
-				ffh.appendExtSLT(buf[buf.length-1]);
-				
-				File[] files =file.getParentFile().listFiles(ffh);
-				
-				imgs.add(new ImgFile(files[0], sortby, order));
-				
-			} else {
-				imgs = dir2imgs(file, sortby, order);
-			}
-			System.out.printf("\nfound %d files.\n", imgs.size());
-			System.out.print("Sortting files...");
-			Collections.sort(imgs);
-			System.out.print("DONE\n\n");
+		if (isfile) {
+			imgs = new ArrayList<ImgFile>();
+			String[] buf = file.getName().split("\\.");
+			FileFilterHelper ffh = createImageFilter(FileFilterHelper.CONDITION_NAME_EQUALS);
+
+			ffh.appendNameSLT(buf[0]);
+			ffh.appendExtSLT(buf[buf.length - 1]);
+
+			File[] files = file.getParentFile().listFiles(ffh);
+
+			imgs.add(new ImgFile(files[0], sortby, order));
+
+		} else {
+			imgs = dir2imgs(file, sortby, order);
+		}
+		System.out.printf("\nfound %d files.\n", imgs.size());
+		System.out.print("Sortting files...");
+		Collections.sort(imgs);
+		System.out.print("DONE\n\n");
 
 	}
 
 	public Task(Element xml_task) {
-
-		destination = xml_task.getAttributeValue("destination");
-		file = new File(xml_task.getChild("FILES").getAttributeValue("source"));
+		super("TASK");		
+//		detach():Remove parent connection
+		Element elemCopy =xml_task.clone().detach();
+		List<Attribute> atr_list=elemCopy.getAttributes();
+		
+		for(Content c:elemCopy.getContent())
+		{
+			super.addContent(c.clone().detach());
+		}
+		
+		for(Attribute ar:atr_list) {
+			super.setAttribute(ar.clone().detach());
+		}
+		
+		destination = super.getAttributeValue("destination");
+		file = new File(super.getChild("FILES").getAttributeValue("source"));
 		exists = file.exists();
 		isfile = file.isFile();
-
-		ArrayList<Element> xml_files = new ArrayList<Element>(xml_task.getChild("FILES").getChildren("FILE"));
-		align = Integer.valueOf(xml_task.getAttributeValue("align"));
+		ArrayList<Element> xml_files = new ArrayList<Element>(super.getChild("FILES").getChildren("FILE"));
+		align = Integer.valueOf(super.getAttributeValue("align"));
 		imgs = xml2imgs(xml_files);
 
-		owner_pwd = xml_task.getAttributeValue("owner");
-		user_pwd = xml_task.getAttributeValue("user");
+		owner_pwd = super.getAttributeValue("owner");
+		user_pwd = super.getAttributeValue("user");
 
 	}
 
-	public Element toXMLTask(){
-
-		Element task = new Element("TASK");
-		task.setAttribute("merge", merge ? "1" : "0");
-		task.setAttribute("destination", destination);
-		task.setAttribute("size", size + "");
-		task.setAttribute("align", align + "");
-		task.setAttribute("owner", owner_pwd);
-		task.setAttribute("user", user_pwd);
-
-		Element xml_files = new Element("FILES");
-		xml_files.setAttribute("source", file.getAbsolutePath());
-		for (int i = 0; i < imgs.size(); i++) {
-			Element file = new Element("FILE");
-			file.setAttribute("index", i + "");
-			file.addContent(imgs.get(i).getAbsolutePath());
-			xml_files.addContent(file);
-		}
-
-		task.addContent(xml_files);
-		return task;
-	}
+//	public Element toXMLTask() {
+//
+//		Element task = new Element("TASK");
+//		task.setAttribute("merge", merge ? "1" : "0");
+//		task.setAttribute("destination", destination);
+//		task.setAttribute("size", size + "");
+//		task.setAttribute("align", align + "");
+//		task.setAttribute("owner", owner_pwd);
+//		task.setAttribute("user", user_pwd);
+//
+//		Element xml_files = new Element("FILES");
+//		xml_files.setAttribute("source", file.getAbsolutePath());
+//		for (int i = 0; i < imgs.size(); i++) {
+//			Element file = new Element("FILE");
+//			file.setAttribute("index", i + "");
+//			file.addContent(imgs.get(i).getAbsolutePath());
+//			xml_files.addContent(file);
+//		}
+//
+//		task.addContent(xml_files);
+//		return task;
+//	}
 
 	ArrayList<ImgFile> dir2imgs(File dir, int sortby, int order) throws Exception {
+		Element xml_files = new Element("FILES");
+		xml_files.setAttribute("source", dir.getAbsolutePath());
+
 		FileFilterHelper ffh = createImageFilter(0);
 		File[] files = dir.listFiles(ffh);
 		ArrayList<ImgFile> imgs = new ArrayList<ImgFile>();
 		for (File file : files) {
 			ImgFile img = new ImgFile(file, sortby, order);
 			imgs.add(img);
+
+			Element xml_file = new Element("FILE");
+			xml_file.addContent(img.getAbsolutePath());
+			xml_files.addContent(xml_file);
 		}
+		super.addContent(xml_files);
 		return imgs;
 	}
 
@@ -131,7 +165,6 @@ public class Task {
 		}
 		return imgs;
 	}
-
 
 	public void setAlign(int align) {
 		this.align = align;
