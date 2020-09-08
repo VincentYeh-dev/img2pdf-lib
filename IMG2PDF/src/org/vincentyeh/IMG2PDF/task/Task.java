@@ -20,15 +20,29 @@ import org.jdom2.output.XMLOutputter;
 import org.vincentyeh.IMG2PDF.file.FileFilterHelper;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
 import org.vincentyeh.IMG2PDF.util.NameFormatter;
-
+/**
+ * 
+ * @author VincentYeh
+ *
+ */
 public class Task extends Element {
-
 	private int size, align;
 	private final String destination;
 	private final String owner_pwd;
 	private final String user_pwd;
 	private ArrayList<ImgFile> imgs;
-
+	/**
+	 * 
+	 * @param files					Source files.Only can handle files. 
+	 * @param destination			The destination of PDF output 
+	 * @param own					owner password
+	 * @param user					user password
+	 * @param sortby				files will be sorted by Name or Date
+	 * @param order					order by increase or decrease value
+	 * @param align					Where should Images of PDF be located on PDF.
+	 * @param size					Which size of pages of PDF.
+	 * @throws Exception
+	 */
 	public Task(File[] files, String destination, String own, String user, int sortby, int order, int align, int size)
 			throws Exception {
 		super("TASK");

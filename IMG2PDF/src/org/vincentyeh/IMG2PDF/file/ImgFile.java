@@ -7,7 +7,11 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-
+/**
+ * 
+ * @author VincentYeh
+ *
+ */
 public class ImgFile extends File implements Comparable<File> {
 	public static final int ORDER_INCREASE=0;
 	public static final int ORDER_DECREASE=1;

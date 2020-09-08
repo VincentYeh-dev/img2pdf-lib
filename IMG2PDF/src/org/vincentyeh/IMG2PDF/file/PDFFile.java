@@ -3,8 +3,6 @@ package org.vincentyeh.IMG2PDF.file;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Scanner;
-
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -16,6 +14,11 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.util.ImageProcess;
 
+/**
+ * 
+ * @author VincentYeh
+ *
+ */
 public class PDFFile {
 	public static final int ALIGN_RIGHT = 0x01;
 	public static final int ALIGN_LEFT = 0x02;
@@ -97,7 +100,7 @@ public class PDFFile {
 		PDPage page = null;
 		float img_width = img.getWidth();
 		float img_height = img.getHeight();
-		float img_size_ratio = img_height / img_width;
+//		float img_size_ratio = img_height / img_width;
 		float position_x = 0;
 		float position_y = 0;
 		float out_width = 0, out_height = 0;
@@ -112,7 +115,7 @@ public class PDFFile {
 			img = imgRotate(img, page);
 			img_width = img.getWidth();
 			img_height = img.getHeight();
-			img_size_ratio = img_height / img_width;
+//			img_size_ratio = img_height / img_width;
 
 			float[] received = null;
 			if (page.getRotation() == 270) {
@@ -143,7 +146,7 @@ public class PDFFile {
 		float out_width = 0, out_height = 0;
 		float page_height = page.getBBox().getHeight();
 		float page_width = page.getBBox().getWidth();
-		float page_size_ratio = page_height / page_width;
+//		float page_size_ratio = page_height / page_width;
 
 		float img_width = img.getWidth();
 		float img_height = img.getHeight();
@@ -209,11 +212,11 @@ public class PDFFile {
 		float out_width = 0, out_height = 0;
 		float r_page_width = page.getBBox().getHeight();
 		float r_page_height = page.getBBox().getWidth();
-		float r_page_size_ratio = r_page_height / r_page_width;
+//		float r_page_size_ratio = r_page_height / r_page_width;
 
 		float img_width = img.getWidth();
 		float img_height = img.getHeight();
-		float img_size_ratio = img_height / img_width;
+//		float img_size_ratio = img_height / img_width;
 
 		float r_img_width = img_height;
 		float r_img_height = img_width;
@@ -316,10 +319,10 @@ public class PDFFile {
 		StandardProtectionPolicy spp = new StandardProtectionPolicy(owner_pwd, user_pwd, ap);
 		spp.setEncryptionKeyLength(keyLength);
 		spp.setPermissions(ap);
-		this.spp = spp;
+		setProtect(spp);
 	}
 
-	public void setProtect(StandardProtectionPolicy ssp) {
+	public void setProtect(StandardProtectionPolicy spp) {
 		this.spp = spp;
 	}
 

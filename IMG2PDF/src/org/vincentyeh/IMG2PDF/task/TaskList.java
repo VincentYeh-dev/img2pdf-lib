@@ -10,7 +10,11 @@ import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.vincentyeh.IMG2PDF.file.PDFFile;
-
+/**
+ * 
+ * @author VincentYeh
+ *
+ */
 public class TaskList extends ArrayList<Task> {
 	private Element xml_root;
 	private Document doc;
