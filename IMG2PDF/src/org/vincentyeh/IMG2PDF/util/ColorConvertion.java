@@ -18,8 +18,6 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 
-import com.test.common.CMYK;
-
 /**
  * 
  * From Dsmart
