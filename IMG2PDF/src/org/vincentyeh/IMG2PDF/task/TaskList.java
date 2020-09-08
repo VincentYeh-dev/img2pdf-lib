@@ -16,6 +16,7 @@ import org.vincentyeh.IMG2PDF.file.PDFFile;
  *
  */
 public class TaskList extends ArrayList<Task> {
+	
 	private Element xml_root;
 	private Document doc;
 

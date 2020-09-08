@@ -1,6 +1,7 @@
 chcp 65001
+$location=Split-Path $PSScriptRoot -Parent
 $buffer=""
-$PATH_TO_SEARCH="C:\Users\vincent\Desktop\Test\raw\"
+$PATH_TO_SEARCH="$location\test_file\raw\"
 $index=0
 $table=Get-ChildItem -Attributes D "$PATH_TO_SEARCH"
 
@@ -15,6 +16,6 @@ foreach ($row in $table)
 	$index=$index+1
 }
 
-$buffer | Out-File -Encoding utf8 -FilePath .\dirlist.txt
+$buffer | Out-File -Encoding utf8 -FilePath $location\test_file\dirlist.txt
 
 
