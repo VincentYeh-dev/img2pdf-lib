@@ -54,7 +54,7 @@ public class Task extends Element {
 		for (File file : files) {
 			ImgFile img = new ImgFile(file, sortby, order);
 			imgs.add(img);
-
+			
 			Element xml_file = new Element("FILE");
 			xml_file.addContent(img.getAbsolutePath());
 			xml_files.addContent(xml_file);
