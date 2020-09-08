@@ -2,21 +2,16 @@ package org.vincentyeh.IMG2PDF.commandline;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
+import org.vincentyeh.IMG2PDF.file.FileFilterHelper;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
 import org.vincentyeh.IMG2PDF.file.PDFFile;
 import org.vincentyeh.IMG2PDF.file.text.UTF8InputStream;
-import org.vincentyeh.IMG2PDF.task.ErrorTaskList;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskList;
+import org.vincentyeh.IMG2PDF.util.NameFormatter;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
@@ -50,7 +45,11 @@ public class TaskListCreator {
 		while (buf != null) {
 			buf = reader.readLine();
 			if (buf != null && !buf.isEmpty()) {
-				Task task = new Task(buf, dst, owner_pwd, user_pwd, sortby, order, align, size);
+				File dir=new File(buf);
+				NameFormatter nf = new NameFormatter(dst,dir);
+				FileFilterHelper ffh = createImageFilter(0);
+				Task task = new Task(dir.listFiles(ffh),nf.getConverted(), 
+						owner_pwd, user_pwd, sortby, order, align, size);
 				tasks.add(task);
 
 			}
@@ -152,4 +151,13 @@ public class TaskListCreator {
 		return parser;
 	}
 
+	static FileFilterHelper createImageFilter(int condition) {
+		FileFilterHelper ffh = new FileFilterHelper(
+				condition | FileFilterHelper.CONDITION_IS_FILE | FileFilterHelper.CONDITION_EXT_EQUALS);
+		ffh.appendExtSLT("JPG");
+		ffh.appendExtSLT("jpg");
+		ffh.appendExtSLT("PNG");
+		ffh.appendExtSLT("png");
+		return ffh;
+	}
 }

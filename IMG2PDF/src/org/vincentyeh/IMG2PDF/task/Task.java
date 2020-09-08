@@ -23,122 +23,19 @@ import org.vincentyeh.IMG2PDF.util.NameFormatter;
 
 public class Task extends Element {
 
-	final boolean exists;
-	final boolean isfile;
-
 	private int size, align;
-	private boolean merge = true;
 	private final String destination;
 	private final String owner_pwd;
 	private final String user_pwd;
-	private File file;
-	ArrayList<ImgFile> imgs;
+	private ArrayList<ImgFile> imgs;
 
-	public Task(String str_file, String dst, String own, String user, int sortby, int order, int align, int size)
+	public Task(File[] files, String destination, String own, String user, int sortby, int order, int align, int size)
 			throws Exception {
 		super("TASK");
-
 		this.align = align;
 		this.size = size;
-		file = new File(str_file);
-		NameFormatter nf = new NameFormatter(dst, file);
-		destination = nf.getConverted();
-
-		exists = file.exists();
-		if (!exists) {
-			throw new FileNotFoundException(file.getAbsolutePath() + " not found.");
-		}
-
-		owner_pwd = own != null ? own : "#null";
-		user_pwd = user != null ? user : "#null";
-
-		super.setAttribute("merge", merge ? "1" : "0");
-		super.setAttribute("destination", destination);
-		super.setAttribute("size", size + "");
-		super.setAttribute("align", align + "");
-		super.setAttribute("owner", owner_pwd);
-		super.setAttribute("user", user_pwd);
-
-		isfile = file.isFile();
-		if (isfile) {
-			imgs = new ArrayList<ImgFile>();
-			String[] buf = file.getName().split("\\.");
-			FileFilterHelper ffh = createImageFilter(FileFilterHelper.CONDITION_NAME_EQUALS);
-
-			ffh.appendNameSLT(buf[0]);
-			ffh.appendExtSLT(buf[buf.length - 1]);
-
-			File[] files = file.getParentFile().listFiles(ffh);
-
-			imgs.add(new ImgFile(files[0], sortby, order));
-
-		} else {
-			imgs = dir2imgs(file, sortby, order);
-		}
-		System.out.printf("\nfound %d files.\n", imgs.size());
-		System.out.print("Sortting files...");
-		Collections.sort(imgs);
-		System.out.print("DONE\n\n");
-
-	}
-
-	public Task(Element xml_task) {
-		super("TASK");		
-//		detach():Remove parent connection
-		Element elemCopy =xml_task.clone().detach();
-		List<Attribute> atr_list=elemCopy.getAttributes();
-		
-		for(Content c:elemCopy.getContent())
-		{
-			super.addContent(c.clone().detach());
-		}
-		
-		for(Attribute ar:atr_list) {
-			super.setAttribute(ar.clone().detach());
-		}
-		
-		destination = super.getAttributeValue("destination");
-		file = new File(super.getChild("FILES").getAttributeValue("source"));
-		exists = file.exists();
-		isfile = file.isFile();
-		ArrayList<Element> xml_files = new ArrayList<Element>(super.getChild("FILES").getChildren("FILE"));
-		align = Integer.valueOf(super.getAttributeValue("align"));
-		imgs = xml2imgs(xml_files);
-
-		owner_pwd = super.getAttributeValue("owner");
-		user_pwd = super.getAttributeValue("user");
-
-	}
-
-//	public Element toXMLTask() {
-//
-//		Element task = new Element("TASK");
-//		task.setAttribute("merge", merge ? "1" : "0");
-//		task.setAttribute("destination", destination);
-//		task.setAttribute("size", size + "");
-//		task.setAttribute("align", align + "");
-//		task.setAttribute("owner", owner_pwd);
-//		task.setAttribute("user", user_pwd);
-//
-//		Element xml_files = new Element("FILES");
-//		xml_files.setAttribute("source", file.getAbsolutePath());
-//		for (int i = 0; i < imgs.size(); i++) {
-//			Element file = new Element("FILE");
-//			file.setAttribute("index", i + "");
-//			file.addContent(imgs.get(i).getAbsolutePath());
-//			xml_files.addContent(file);
-//		}
-//
-//		task.addContent(xml_files);
-//		return task;
-//	}
-
-	ArrayList<ImgFile> dir2imgs(File dir, int sortby, int order) throws Exception {
+		this.destination = destination;
 		Element xml_files = new Element("FILES");
-		xml_files.setAttribute("source", dir.getAbsolutePath());
-
-		FileFilterHelper ffh = createImageFilter(0);
-		File[] files = dir.listFiles(ffh);
 		ArrayList<ImgFile> imgs = new ArrayList<ImgFile>();
 		for (File file : files) {
 			ImgFile img = new ImgFile(file, sortby, order);
@@ -149,7 +46,44 @@ public class Task extends Element {
 			xml_files.addContent(xml_file);
 		}
 		super.addContent(xml_files);
-		return imgs;
+
+		owner_pwd = own != null ? own : "#null";
+		user_pwd = user != null ? user : "#null";
+
+		super.setAttribute("destination", destination);
+		super.setAttribute("size", size + "");
+		super.setAttribute("align", align + "");
+		super.setAttribute("owner", owner_pwd);
+		super.setAttribute("user", user_pwd);
+		System.out.printf("\nfound %d files.\n", imgs.size());
+		System.out.print("Sortting files...");
+		Collections.sort(imgs);
+		System.out.print("DONE\n\n");
+
+	}
+
+	public Task(Element xml_task) {
+		super("TASK");
+//		detach():Remove parent connection
+		Element elemCopy = xml_task.clone().detach();
+		List<Attribute> atr_list = elemCopy.getAttributes();
+
+		for (Content c : elemCopy.getContent()) {
+			super.addContent(c.clone().detach());
+		}
+
+		for (Attribute ar : atr_list) {
+			super.setAttribute(ar.clone().detach());
+		}
+
+		destination = super.getAttributeValue("destination");
+		ArrayList<Element> xml_files = new ArrayList<Element>(super.getChild("FILES").getChildren("FILE"));
+		align = Integer.valueOf(super.getAttributeValue("align"));
+		imgs = xml2imgs(xml_files);
+
+		owner_pwd = super.getAttributeValue("owner");
+		user_pwd = super.getAttributeValue("user");
+
 	}
 
 	ArrayList<ImgFile> xml2imgs(ArrayList<Element> el_files) {
@@ -168,10 +102,6 @@ public class Task extends Element {
 
 	public void setAlign(int align) {
 		this.align = align;
-	}
-
-	public void setMerge(boolean merge) {
-		this.merge = merge;
 	}
 
 	public void setSize(int size) {
@@ -202,14 +132,6 @@ public class Task extends Element {
 		return user_pwd;
 	}
 
-	FileFilterHelper createImageFilter(int condition) {
-		FileFilterHelper ffh = new FileFilterHelper(
-				condition | FileFilterHelper.CONDITION_IS_FILE | FileFilterHelper.CONDITION_EXT_EQUALS);
-		ffh.appendExtSLT("JPG");
-		ffh.appendExtSLT("jpg");
-		ffh.appendExtSLT("PNG");
-		ffh.appendExtSLT("png");
-		return ffh;
-	}
+	
 
 }
