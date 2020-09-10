@@ -52,7 +52,7 @@ public class Task extends Element {
 		Element xml_files = new Element("FILES");
 		ArrayList<ImgFile> imgs = new ArrayList<ImgFile>();
 		for (File file : files) {
-			ImgFile img = new ImgFile(file, sortby, order);
+			ImgFile img = new ImgFile(file.getAbsolutePath(), sortby, order);
 			imgs.add(img);
 			
 			Element xml_file = new Element("FILE");
@@ -105,7 +105,7 @@ public class Task extends Element {
 		for (Element el : el_files) {
 			try {
 				File f_img = new File(el.getValue());
-				ImgFile img = new ImgFile(f_img);
+				ImgFile img = new ImgFile(f_img.getAbsolutePath());
 				imgs.add(img);
 			} catch (Exception e) {
 				e.printStackTrace();
