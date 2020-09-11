@@ -14,10 +14,12 @@ import java.io.IOException;
  *
  */
 public class ImgFile extends File implements Comparable<File> {
+	public static final int ORDER_NONE=-1;
 	public static final int ORDER_INCREASE=0;
 	public static final int ORDER_DECREASE=1;
-	public static final int SORTBY_NAME=2;
-	public static final int SORTBY_DATE=3;
+	public static final int SORTBY_NONE=-1;
+	public static final int SORTBY_NAME=0;
+	public static final int SORTBY_DATE=1;
 	private final int sortby,order;
 	
 	public ImgFile(String pathname) throws FileNotFoundException {
@@ -28,7 +30,7 @@ public class ImgFile extends File implements Comparable<File> {
 //			throw new RuntimeException(this.getAbsolutePath() + " is a directory");
 //		
 //		sortby=order=-1;
-		this(pathname,-1,-1);
+		this(pathname,ORDER_NONE,SORTBY_NONE);
 	}
 //	public ImgFile(File file) {
 //		this(file.getAbsolutePath());
@@ -43,6 +45,12 @@ public class ImgFile extends File implements Comparable<File> {
 		if(!exists())throw new FileNotFoundException(pathname+" not found.");
 		if (isDirectory())
 			throw new RuntimeException(this.getAbsolutePath() + " is a directory");
+		
+		if(order<-1||order>1)
+			throw new IllegalArgumentException("order value need to be between -1 and 1");
+		if(sortby<-1||sortby>1)
+			throw new IllegalArgumentException("sortby value need to be between -1 and 1");
+		
 		
 		this.sortby=sortby;
 		this.order=order;

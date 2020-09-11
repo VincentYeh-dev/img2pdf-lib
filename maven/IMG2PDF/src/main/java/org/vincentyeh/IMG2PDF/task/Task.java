@@ -19,7 +19,9 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.vincentyeh.IMG2PDF.file.FileFilterHelper;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
+import org.vincentyeh.IMG2PDF.file.PDFFile;
 import org.vincentyeh.IMG2PDF.util.NameFormatter;
+
 /**
  * 
  * @author VincentYeh
@@ -31,30 +33,47 @@ public class Task extends Element {
 	private final String owner_pwd;
 	private final String user_pwd;
 	private ArrayList<ImgFile> imgs;
+
 	/**
 	 * 
-	 * @param files					Source files.Only can handle files. 
-	 * @param destination			The destination of PDF output 
-	 * @param own					owner password
-	 * @param user					user password
-	 * @param sortby				files will be sorted by Name or Date
-	 * @param order					order by increase or decrease value
-	 * @param align					Where should Images of PDF be located on PDF.
-	 * @param size					Which size of pages of PDF.
-	 * @throws Exception
+	 * @param files       Source files.Only can handle files.
+	 * @param destination The destination of PDF output
+	 * @param own         owner password
+	 * @param user        user password
+	 * @param sortby      files will be sorted by Name or Date
+	 * @param order       order by increase or decrease value
+	 * @param align       Where should Images of PDF be located on PDF.
+	 * @param size        Which size of pages of PDF.
+	 * @throws FileNotFoundException 
 	 */
-	public Task(File[] files, String destination, String own, String user, int sortby, int order, int align, int size)
-			throws Exception {
+	public Task(File[] files, String destination, String own, String user, int sortby, int order, int align, int size) throws FileNotFoundException{
 		super("TASK");
+
+		if (files == null)
+			throw new NullPointerException("files is null.");
+
+		if (destination == null)
+			throw new NullPointerException("destination is null.");
+
+		if (!(size >= 0x01 && size <= 0x0A))
+			throw new IllegalArgumentException("Size value need to be between 0x01 and 0x0A");
+
+		if (size != PDFFile.SIZE_DEPEND_ON_IMG)
+			if (!((align & 0xF0) >> 4 > 0 && (align & 0xF0) >> 4 <= 4))
+				throw new IllegalArgumentException("align value need to be between 0x01 and 0x44");
+			else if (!((align & 0x0F) > 0 && (align & 0x0F) <= 4))
+				throw new IllegalArgumentException("align value need to be between 0x01 and 0x44");
+
 		this.align = align;
 		this.size = size;
 		this.destination = destination;
+
 		Element xml_files = new Element("FILES");
 		ArrayList<ImgFile> imgs = new ArrayList<ImgFile>();
 		for (File file : files) {
 			ImgFile img = new ImgFile(file.getAbsolutePath(), sortby, order);
 			imgs.add(img);
-			
+
 			Element xml_file = new Element("FILE");
 			xml_file.addContent(img.getAbsolutePath());
 			xml_files.addContent(xml_file);
@@ -145,7 +164,5 @@ public class Task extends Element {
 	public String getUser_pwd() {
 		return user_pwd;
 	}
-
-	
 
 }

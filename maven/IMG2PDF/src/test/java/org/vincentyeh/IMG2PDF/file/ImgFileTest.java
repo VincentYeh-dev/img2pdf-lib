@@ -1,6 +1,7 @@
-package org.vincentyeh.IMG2PDF.commandline;
+package org.vincentyeh.IMG2PDF.file;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -73,6 +74,51 @@ public class ImgFileTest {
 		String str = "AA";
 		new ImgFile(str, -1, -1);
 
+	}
+	
+	@Test
+	public void testCreateImageFileWithIllegalArgument() throws FileNotFoundException{
+		String str = "test_file\\raw\\TEST\\01.jpg";
+		int i=-2;
+		while(i!=-255) {
+			try {
+				new ImgFile(str,i,ImgFile.ORDER_INCREASE);
+				assertTrue(false);
+			} catch (IllegalArgumentException e) {
+				
+			}
+			i--;
+		}
+		i=2;
+		while(i!=255) {
+			try {
+				new ImgFile(str,i,ImgFile.ORDER_INCREASE);
+				assertTrue(false);
+			} catch (IllegalArgumentException e) {
+				
+			}
+			i++;
+		}
+		i=-2;
+		while(i!=-255) {
+			try {
+				new ImgFile(str,ImgFile.SORTBY_NAME,i);
+				assertTrue(false);
+			} catch (IllegalArgumentException e) {
+				
+			}
+			i--;
+		}
+		i=2;
+		while(i!=255) {
+			try {
+				new ImgFile(str,ImgFile.SORTBY_NAME,i);
+				assertTrue(false);
+			} catch (IllegalArgumentException e) {
+				
+			}
+			i++;
+		}
 	}
 
 	/**

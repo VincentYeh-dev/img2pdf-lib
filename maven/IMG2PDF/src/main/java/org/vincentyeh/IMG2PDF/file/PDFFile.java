@@ -23,9 +23,9 @@ public class PDFFile {
 	public static final int ALIGN_RIGHT = 0x01;
 	public static final int ALIGN_LEFT = 0x02;
 	public static final int ALIGN_CENTER = 0x33;
-	public static final int ALIGN_TOP = 0x40;
-	public static final int ALIGN_BOTTOM = 0x50;
-	public static final int ALIGN_FILL = 0x66;
+	public static final int ALIGN_TOP = 0x10;
+	public static final int ALIGN_BOTTOM = 0x20;
+	public static final int ALIGN_FILL = 0x44;
 
 	public static final int SIZE_A0 = 0x01;
 	public static final int SIZE_A1 = 0x02;
