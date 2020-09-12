@@ -23,7 +23,8 @@ import net.sourceforge.argparse4j.inf.Namespace;
  *
  */
 public class TaskListCreator {
-	static int sortby, order, size, align;
+	static int sortby, order,align;
+	static PDFFile.Size size;
 	static boolean merge;
 	static String dst;
 	static String owner_pwd;
@@ -74,7 +75,7 @@ public class TaskListCreator {
 
 		merge = ns.getString("merge").equals("yes");
 		String str_size = ns.getString("size");
-		size = PDFFile.sizeTranslator(str_size);
+		size = PDFFile.Size.getSizeFromString(str_size);
 		dst = ns.<String>getList("destination").get(0);
 		list_output = ns.<String>getList("list_output").get(0);
 

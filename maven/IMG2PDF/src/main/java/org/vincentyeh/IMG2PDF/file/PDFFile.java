@@ -16,6 +16,7 @@ import org.vincentyeh.IMG2PDF.util.ImageProcess;
 
 /**
  * 
+ * The implement of conversion.It is the core class of conversion.
  * @author VincentYeh
  *
  */
@@ -27,63 +28,16 @@ public class PDFFile {
 	public static final int ALIGN_BOTTOM = 0x20;
 	public static final int ALIGN_FILL = 0x44;
 
-	public enum Size {
-		A0(0x01, "A0"), A1(0x02, "A1"), A2(0x03, "A2"), A3(0x04, "A3"), A4(0x05, "A4"), A5(0x06, "A5"), A6(0x07, "A6"),
-		LEGAL(0x08, "LEGAL"), LETTER(0x09, "LETTER"), DEPEND_ON_IMG(0x0A, "DEPEND_ON_IMG");
-
-		private final int num;
-		private final String str;
-		
-		Size(int num, String str) {
-			this.num = num;
-			this.str = str;
-		}
-		
-		public static Size getSizeFromString(String str) {
-			switch (str) {
-			case "A0":
-				return A0;
-			case "A1":
-				return A1;
-			case "A2":
-				return A2;
-			case "A3":
-				return A3;
-			case "A4":
-				return A4;
-			case "A5":
-				return A5;
-			case "A6":
-				return A6;
-			case "LEGAL":
-				return LEGAL;
-			case "LETTER":
-				return LETTER;
-			case "DEPEND":
-				return DEPEND_ON_IMG;
-			default:
-				throw new RuntimeException();
-			}
-		}
-		int  getSize() {
-			return num;
-		}
-
-		String  getStrSize() {
-			return str;
-		}
-	}
-
-	public static final int SIZE_A0 = 0x01;
-	public static final int SIZE_A1 = 0x02;
-	public static final int SIZE_A2 = 0x03;
-	public static final int SIZE_A3 = 0x04;
-	public static final int SIZE_A4 = 0x05;
-	public static final int SIZE_A5 = 0x06;
-	public static final int SIZE_A6 = 0x07;
-	public static final int SIZE_LEGAL = 0x08;
-	public static final int SIZE_LETTER = 0x09;
-	public static final int SIZE_DEPEND_ON_IMG = 0x0A;
+//	public static final int SIZE_A0 = 0x01;
+//	public static final int SIZE_A1 = 0x02;
+//	public static final int SIZE_A2 = 0x03;
+//	public static final int SIZE_A3 = 0x04;
+//	public static final int SIZE_A4 = 0x05;
+//	public static final int SIZE_A5 = 0x06;
+//	public static final int SIZE_A6 = 0x07;
+//	public static final int SIZE_LEGAL = 0x08;
+//	public static final int SIZE_LETTER = 0x09;
+//	public static final int SIZE_DEPEND_ON_IMG = 0x0A;
 
 	private StandardProtectionPolicy spp = null;
 	private PDDocument doc = null;
@@ -150,14 +104,16 @@ public class PDFFile {
 		float position_x = 0;
 		float position_y = 0;
 		float out_width = 0, out_height = 0;
-		if (task.getSize() == SIZE_DEPEND_ON_IMG) {
+		Size size = task.getSize();
+
+		if (size == Size.DEPEND_ON_IMG) {
 
 			page = new PDPage(new PDRectangle(img_width, img_height));
 			out_width = img_width;
 			out_height = img_height;
 
-		} else if (task.getSize() != SIZE_DEPEND_ON_IMG) {
-			page = new PDPage(sizeTranslator(task.getSize()));
+		} else if (size != Size.DEPEND_ON_IMG) {
+			page = new PDPage(size.getPdrectangle());
 			img = imgRotate(img, page);
 			img_width = img.getWidth();
 			img_height = img.getHeight();
@@ -371,57 +327,59 @@ public class PDFFile {
 	public void setProtect(StandardProtectionPolicy spp) {
 		this.spp = spp;
 	}
+	public enum Size {
+		A0("A0", PDRectangle.A0), A1("A1", PDRectangle.A1), A2("A2", PDRectangle.A2), A3("A3", PDRectangle.A3),
+		A4("A4", PDRectangle.A4), A5("A5", PDRectangle.A5), A6("A6", PDRectangle.A6), LEGAL("LEGAL", PDRectangle.LEGAL),
+		LETTER("LETTER", PDRectangle.LETTER), DEPEND_ON_IMG("DEPEND", null);
 
-	PDRectangle sizeTranslator(int size) {
-		switch (size) {
-		case SIZE_A0:
-			return PDRectangle.A0;
-		case SIZE_A1:
-			return PDRectangle.A1;
-		case SIZE_A2:
-			return PDRectangle.A2;
-		case SIZE_A3:
-			return PDRectangle.A3;
-		case SIZE_A4:
-			return PDRectangle.A4;
-		case SIZE_A5:
-			return PDRectangle.A5;
-		case SIZE_A6:
-			return PDRectangle.A6;
-		case SIZE_LEGAL:
-			return PDRectangle.LEGAL;
-		case SIZE_LETTER:
-			return PDRectangle.LETTER;
-		default:
-			return null;
+		private final String str;
+		private final PDRectangle pdrectangle;
+
+		Size(String str, PDRectangle pdrectangle) {
+			this.str = str;
+			this.pdrectangle = pdrectangle;
+		}
+
+
+		public static Size getSizeFromString(String str) {
+			switch (str) {
+			case "A0":
+				return A0;
+			case "A1":
+				return A1;
+			case "A2":
+				return A2;
+			case "A3":
+				return A3;
+			case "A4":
+				return A4;
+			case "A5":
+				return A5;
+			case "A6":
+				return A6;
+			case "LEGAL":
+				return LEGAL;
+			case "LETTER":
+				return LETTER;
+			case "DEPEND":
+				return DEPEND_ON_IMG;
+			default:
+				throw new RuntimeException();
+			}
+		}
+//
+//		public int getSize() {
+//			return num;
+//		}
+
+		public String getStrSize() {
+			return str;
+		}
+
+		public PDRectangle getPdrectangle() {
+			return pdrectangle;
 		}
 	}
 
-	public static int sizeTranslator(String size) {
-		switch (size) {
-		case "A0":
-			return SIZE_A0;
-		case "A1":
-			return SIZE_A1;
-		case "A2":
-			return SIZE_A2;
-		case "A3":
-			return SIZE_A3;
-		case "A4":
-			return SIZE_A4;
-		case "A5":
-			return SIZE_A5;
-		case "A6":
-			return SIZE_A6;
-		case "LEGAL":
-			return SIZE_LEGAL;
-		case "LETTER":
-			return SIZE_LETTER;
-		case "DEPEND":
-			return SIZE_DEPEND_ON_IMG;
-		default:
-			return -1;
-		}
-	}
 
 }

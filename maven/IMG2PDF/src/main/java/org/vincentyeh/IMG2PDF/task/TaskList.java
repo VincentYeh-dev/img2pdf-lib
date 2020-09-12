@@ -11,26 +11,28 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.vincentyeh.IMG2PDF.file.PDFFile;
 /**
+ * The collection of Task.This class is able to convert between collection and XML format.
  * 
  * @author VincentYeh
- *
  */
 public class TaskList extends ArrayList<Task> {
 	
 	private Element xml_root;
 	private Document doc;
 
+	/**
+	 * Create the empty collection of Task.
+	 */
 	public TaskList() {
 		xml_root = new Element("TASKLIST");
 		doc = new Document();
 	}
 
-	public TaskList(String name) {
-		xml_root = new Element(name);
-		doc = new Document();
-
-	}
-
+	
+	/**
+	 * Create the collection of Task by Document.
+	 * @param doc The XML　document that contain TASKLIST.
+	 */
 	public TaskList(Document doc) {
 		this.doc = doc;
 		xml_root = this.doc.getRootElement();
@@ -59,6 +61,10 @@ public class TaskList extends ArrayList<Task> {
 		return super.remove(index);
 	}
 
+	/**
+	 * Write XML Element to the file.
+	 * @param file destination of output XML file.
+	 */
 	public void toXMLFile(File file) throws IOException {
 		doc.setRootElement(xml_root);
 		// Create the XML

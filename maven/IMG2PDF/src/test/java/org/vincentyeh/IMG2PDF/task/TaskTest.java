@@ -17,28 +17,28 @@ public class TaskTest {
 		String str = "test_file\\raw\\TEST\\";
 		File[] f=(new File(str)).listFiles();
 		
-		new Task(null, null, null, null,ImgFile.SORTBY_NAME,ImgFile.ORDER_INCREASE,PDFFile.ALIGN_CENTER,PDFFile.SIZE_A4);
+		new Task(null, null, null, null,ImgFile.SORTBY_NAME,ImgFile.ORDER_INCREASE,PDFFile.ALIGN_CENTER,PDFFile.Size.A4);
 	}
 	@Test(expected = NullPointerException.class)
 	public void testCreateTaskWithNulls2() throws Exception {
 		String str = "test_file\\raw\\TEST\\";
 		File[] f=(new File(str)).listFiles();
 		
-		new Task(f, null, null, null, ImgFile.SORTBY_NAME,ImgFile.ORDER_INCREASE,PDFFile.ALIGN_CENTER,PDFFile.SIZE_A4);
+		new Task(f, null, null, null, ImgFile.SORTBY_NAME,ImgFile.ORDER_INCREASE,PDFFile.ALIGN_CENTER,PDFFile.Size.A4);
 	}
 	
 	@Test
 	public void testCreateTaskWithNulls3() throws Exception {
 		String str = "test_file\\raw\\TEST\\";
 		File[] f=(new File(str)).listFiles();
-		new Task(f, "test.pdf", null, null,ImgFile.SORTBY_NAME,ImgFile.ORDER_INCREASE,PDFFile.ALIGN_CENTER,PDFFile.SIZE_A4);
+		new Task(f, "test.pdf", null, null,ImgFile.SORTBY_NAME,ImgFile.ORDER_INCREASE,PDFFile.ALIGN_CENTER,PDFFile.Size.A4);
 	}
 
 	@Test
 	public void testCreateTaskWith() throws Exception {
 		String str = "test_file\\raw\\TEST\\";
 		File[] f=(new File(str)).listFiles();
-		new Task(f, "test.pdf", null, null,ImgFile.SORTBY_NAME,ImgFile.ORDER_INCREASE,PDFFile.ALIGN_CENTER,PDFFile.SIZE_A4);
+		new Task(f, "test.pdf", null, null,ImgFile.SORTBY_NAME,ImgFile.ORDER_INCREASE,PDFFile.ALIGN_CENTER,PDFFile.Size.A4);
 	}
 	
 	@Test
@@ -49,7 +49,7 @@ public class TaskTest {
 			for(int j=0x01;j<=0x04;j++) {
 				new Task(f, "test.pdf", null, null,
 						ImgFile.SORTBY_NAME,ImgFile.ORDER_INCREASE,
-						i<<4|j<<0,PDFFile.SIZE_A4);
+						i<<4|j<<0,PDFFile.Size.A4);
 			}
 		}
 	}
@@ -63,7 +63,7 @@ public class TaskTest {
 				try {
 					new Task(f, "test.pdf", null, null,
 							ImgFile.SORTBY_NAME,ImgFile.ORDER_INCREASE,
-							i<<4|j<<0,PDFFile.SIZE_A4);
+							i<<4|j<<0,PDFFile.Size.A4);
 					assertTrue(false);
 				} catch (IllegalArgumentException e) {
 					
