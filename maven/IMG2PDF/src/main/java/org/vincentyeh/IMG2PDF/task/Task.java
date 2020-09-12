@@ -48,7 +48,6 @@ public class Task extends Element {
 	 */
 	public Task(File[] files, String destination, String own, String user, int sortby, int order, int align, int size) throws FileNotFoundException{
 		super("TASK");
-
 		if (files == null)
 			throw new NullPointerException("files is null.");
 

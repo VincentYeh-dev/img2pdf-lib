@@ -58,7 +58,15 @@
 						<goals>
 							<goal>shade</goal>
 						</goals>
+						<configuration>
+							<artifactSet>
+								<excludes>
+								
+								</excludes>
+							</artifactSet>
+						</configuration>
 					</execution>
+
 				</executions>
 			</plugin>
 		</plugins>

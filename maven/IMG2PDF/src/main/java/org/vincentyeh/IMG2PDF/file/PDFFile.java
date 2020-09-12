@@ -27,6 +27,53 @@ public class PDFFile {
 	public static final int ALIGN_BOTTOM = 0x20;
 	public static final int ALIGN_FILL = 0x44;
 
+	public enum Size {
+		A0(0x01, "A0"), A1(0x02, "A1"), A2(0x03, "A2"), A3(0x04, "A3"), A4(0x05, "A4"), A5(0x06, "A5"), A6(0x07, "A6"),
+		LEGAL(0x08, "LEGAL"), LETTER(0x09, "LETTER"), DEPEND_ON_IMG(0x0A, "DEPEND_ON_IMG");
+
+		private final int num;
+		private final String str;
+		
+		Size(int num, String str) {
+			this.num = num;
+			this.str = str;
+		}
+		
+		public static Size getSizeFromString(String str) {
+			switch (str) {
+			case "A0":
+				return A0;
+			case "A1":
+				return A1;
+			case "A2":
+				return A2;
+			case "A3":
+				return A3;
+			case "A4":
+				return A4;
+			case "A5":
+				return A5;
+			case "A6":
+				return A6;
+			case "LEGAL":
+				return LEGAL;
+			case "LETTER":
+				return LETTER;
+			case "DEPEND":
+				return DEPEND_ON_IMG;
+			default:
+				throw new RuntimeException();
+			}
+		}
+		int  getSize() {
+			return num;
+		}
+
+		String  getStrSize() {
+			return str;
+		}
+	}
+
 	public static final int SIZE_A0 = 0x01;
 	public static final int SIZE_A1 = 0x02;
 	public static final int SIZE_A2 = 0x03;
@@ -229,7 +276,7 @@ public class PDFFile {
 //	-------*
 //	   ^^^^^
 //	   position_y
-		
+
 		if (task.getAlign() == ALIGN_FILL) {
 			position_x = position_y = 0;
 			r_out_height = r_page_height;
