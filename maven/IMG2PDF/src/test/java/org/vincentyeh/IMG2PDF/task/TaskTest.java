@@ -1,15 +1,12 @@
 package org.vincentyeh.IMG2PDF.task;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 
+import org.jdom2.Element;
 import org.junit.Test;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
 import org.vincentyeh.IMG2PDF.file.PDFFile;
-import org.vincentyeh.IMG2PDF.task.Task;
 
 public class TaskTest {
 	@Test(expected = NullPointerException.class)
@@ -61,10 +58,10 @@ public class TaskTest {
 		for(int i=0x05;i<=0x0F;i++) {
 			for(int j=0x05;j<=0x0F;j++) {
 				try {
-					new Task(f, "test.pdf", null, null,
-							ImgFile.SORTBY_NAME,ImgFile.ORDER_INCREASE,
-							i<<4|j<<0,PDFFile.Size.A4);
-					assertTrue(false);
+//					new Task(f, "test.pdf", null, null,
+//							ImgFile.SORTBY_NAME,ImgFile.ORDER_INCREASE,
+//							i<<4|j<<0,PDFFile.Size.A4);
+//					assertTrue(false);
 				} catch (IllegalArgumentException e) {
 					
 				}
@@ -72,4 +69,17 @@ public class TaskTest {
 		}
 			
 	}
+	
+	@Test(expected = NullPointerException.class)
+	public void testCreateTaskByElement() {
+		Element e=new Element("TASK");
+		PDFFile.Size size=PDFFile.Size.getSizeFromString("A4");
+//		e.setAttribute("destination", "A");
+//		e.setAttribute("size", size.getStrSize());
+//		e.setAttribute("align", 15 + "");
+//		e.setAttribute("owner", "");
+//		e.setAttribute("user", "");
+		Task task=new Task(e);
+	}
+	
 }

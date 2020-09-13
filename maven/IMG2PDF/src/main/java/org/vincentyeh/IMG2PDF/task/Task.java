@@ -24,16 +24,13 @@ import org.vincentyeh.IMG2PDF.file.PDFFile.Size;
 import org.vincentyeh.IMG2PDF.util.NameFormatter;
 
 /**
- * Task is the pre-work of the conversion.
- * All attributes of PDF file will be define in this step.
- * So the program that convert the images to PDF doesn't need to do pre-work of conversion.
+ * Task is the pre-work of the conversion. All attributes of PDF file will be
+ * define in this step. So the program that convert the images to PDF doesn't
+ * need to do pre-work of conversion.
  * 
- * The function of Task:
- * 	1.	define how to sort files
- * 	2.	define password of PDF
- * 	3.	compute the name of destination file
- * 	4.	convert itself to XML element
- * 	
+ * The function of Task: 1. define how to sort files 2. define password of PDF
+ * 3. compute the name of destination file 4. convert itself to XML element
+ * 
  * @author VincentYeh
  */
 public class Task extends Element {
@@ -55,9 +52,10 @@ public class Task extends Element {
 	 * @param order       order by increase or decrease value
 	 * @param align       Where should Images of PDF be located on PDF.
 	 * @param size        Which size of pages of PDF.
-	 * @throws FileNotFoundException 
+	 * @throws FileNotFoundException
 	 */
-	public Task(File[] files, String destination, String own, String user, int sortby, int order, int align,PDFFile.Size size) throws FileNotFoundException{
+	public Task(File[] files, String destination, String own, String user, int sortby, int order, int align,
+			PDFFile.Size size) throws FileNotFoundException {
 		super("TASK");
 		if (files == null)
 			throw new NullPointerException("files is null.");
@@ -105,7 +103,8 @@ public class Task extends Element {
 	}
 
 	/**
-	 * Create the task by XML Element.The task will inherit element attributes and contains.
+	 * Create the task by XML Element.The task will inherit element attributes and
+	 * contains.
 	 * 
 	 * @param element The XML Element That include information of Task.
 	 */
@@ -123,18 +122,39 @@ public class Task extends Element {
 			super.setAttribute(ar.clone().detach());
 		}
 
-		destination = super.getAttributeValue("destination");
-		ArrayList<Element> xml_files = new ArrayList<Element>(super.getChild("FILES").getChildren("FILE"));
-		align = Integer.valueOf(super.getAttributeValue("align"));
-		imgs.addAll(xml2imgs(xml_files));
+		String attr_destination = super.getAttributeValue("destination");
+		String attr_align = super.getAttributeValue("align");
+		String attr_size = super.getAttributeValue("size");
+		String attr_owner_pwd = super.getAttributeValue("owner");
+		String attr_user_pwd = super.getAttributeValue("user");
 		
-		size=Size.getSizeFromString(super.getAttributeValue("size"));
+		if (attr_destination == null)
+			throw new NullPointerException("destination is null");
+		if (attr_align == null)
+			throw new NullPointerException("align is null");
+		if (attr_size == null)
+			throw new NullPointerException("size is null");
+		if (attr_owner_pwd == null)
+			throw new NullPointerException("owner_pwd is null");
+		if (attr_user_pwd == null)
+			throw new NullPointerException("user_pwd is null");
+		List<Element> contains_files = super.getChild("FILES").getChildren("FILE");
+		
+		if (contains_files == null)
+			throw new NullPointerException("files is null");
+
+		destination = attr_destination;
+		align = Integer.valueOf(super.getAttributeValue("align"));
+		size = Size.getSizeFromString(super.getAttributeValue("size"));
 		owner_pwd = super.getAttributeValue("owner");
 		user_pwd = super.getAttributeValue("user");
 
+		ArrayList<Element> xml_files = new ArrayList<Element>(contains_files);
+		imgs.addAll(elements2imgs(xml_files));
+
 	}
 
-	ArrayList<ImgFile> xml2imgs(ArrayList<Element> el_files) {
+	ArrayList<ImgFile> elements2imgs(ArrayList<Element> el_files) {
 		ArrayList<ImgFile> imgs = new ArrayList<ImgFile>();
 		for (Element el : el_files) {
 			try {

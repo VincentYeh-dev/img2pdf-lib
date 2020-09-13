@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
+ * The ImgFile is a comparable subclass of File.It's can be compared by filename and the last time the file was modified. 
  * 
  * @author VincentYeh
  *
@@ -22,24 +23,25 @@ public class ImgFile extends File implements Comparable<File> {
 	public static final int SORTBY_DATE=1;
 	private final int sortby,order;
 	
+	
+	/**
+	 * Create the ImgFile that no need to sort.
+	 * @param pathname the path of image file 
+	 * @throws FileNotFoundException when file is not exists
+	 */
 	public ImgFile(String pathname) throws FileNotFoundException {
-//		super(pathname);
-//		if(pathname.isEmpty())throw new RuntimeException("Path name is empty.");
-//		if(!exists())throw new FileNotFoundException(pathname+" not found.");
-//		if (isDirectory())
-//			throw new RuntimeException(this.getAbsolutePath() + " is a directory");
-//		
-//		sortby=order=-1;
 		this(pathname,ORDER_NONE,SORTBY_NONE);
 	}
-//	public ImgFile(File file) {
-//		this(file.getAbsolutePath());
-//	}	
 
+	/**
+	 * Create the ImgFile that need to sort.
+	 * 
+	 * @param pathname the path of image file 
+	 * @param sortby sort by name etc..
+	 * @param order
+	 * @throws FileNotFoundException when file is not exists
+	 */
 	public ImgFile(String pathname, int sortby, int order) throws FileNotFoundException{
-//		this(pathname);
-//		this.sortby = sortby;
-//		this.order = order;
 		super(pathname);
 		if(pathname.isEmpty())throw new RuntimeException("Path name is empty.");
 		if(!exists())throw new FileNotFoundException(pathname+" not found.");
@@ -56,11 +58,6 @@ public class ImgFile extends File implements Comparable<File> {
 		this.order=order;
 		
 	}
-	
-//	public ImgFile(File file, int sortby, int order){
-//		this(file.getAbsolutePath(),sortby,order);
-//	}
-	
 	
 	@Override
 	public int compareTo(File o) {

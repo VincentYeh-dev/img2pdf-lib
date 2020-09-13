@@ -40,12 +40,16 @@ public class PDFFile {
 //	public static final int SIZE_DEPEND_ON_IMG = 0x0A;
 
 	private StandardProtectionPolicy spp = null;
-	private PDDocument doc = null;
-	private Task task;
+	private final PDDocument doc;
+	private final Task task;
 
 	public PDFFile(Task task) throws IOException {
+		if(task==null)
+			throw new NullPointerException("task is null.");
+		
 		this.task = task;
 		doc = new PDDocument();
+		
 		String owner_pwd = task.getOwner_pwd();
 		String user_pwd = task.getUser_pwd();
 		AccessPermission ap = new AccessPermission();
@@ -76,13 +80,9 @@ public class PDFFile {
 				System.out.print("=");
 				progress -= 1;
 			}
-			BufferedImage img = null;
-
 			ImageProcess ip = new ImageProcess(imgs.get(i));
 
-			img = ip.read();
-
-			doc.addPage(createImgPage(img));
+			doc.addPage(createImgPage(ip.read()));
 
 		}
 		System.out.print("]%100\n\n\n");

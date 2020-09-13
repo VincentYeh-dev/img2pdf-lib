@@ -2,15 +2,16 @@ package org.vincentyeh.IMG2PDF.commandline;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+
 import org.jdom2.Document;
 import org.jdom2.input.DOMBuilder;
 import org.vincentyeh.IMG2PDF.file.PDFFile;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskList;
-import org.xml.sax.SAXException;
+
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
@@ -65,7 +66,7 @@ public class Program {
 			DocumentBuilder documentBuilder = factory.newDocumentBuilder();
 			org.w3c.dom.Document w3cDocument = documentBuilder.parse(fileName);
 			document = new DOMBuilder().build(w3cDocument);
-		} catch (IOException | SAXException | ParserConfigurationException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return document;

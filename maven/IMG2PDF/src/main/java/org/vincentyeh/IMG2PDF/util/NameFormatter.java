@@ -8,6 +8,12 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * 
+ * 
+ * @author vincent
+ *
+ */
 public class NameFormatter {
 	private String converted_name;
 	public NameFormatter(String format, File file) {
