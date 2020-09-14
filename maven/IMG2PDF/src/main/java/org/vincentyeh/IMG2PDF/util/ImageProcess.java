@@ -24,14 +24,6 @@ public class ImageProcess {
 	public ImageProcess(File file) {
 		this.file = file;
 	}
-	public Exception tryRGB(){
-		try {
-			ImageIO.read(file);
-		} catch (IOException e) {
-			return e;
-		}
-		return null;
-	}
 	
 	public BufferedImage read() throws IOException {
 		ImageReader reader = findReader(file);

@@ -43,7 +43,7 @@ public class PDFFile {
 	private final PDDocument doc;
 	private final Task task;
 
-	public PDFFile(Task task) throws IOException {
+	public PDFFile(Task task){
 		if(task==null)
 			throw new NullPointerException("task is null.");
 		
@@ -64,7 +64,7 @@ public class PDFFile {
 
 	}
 
-	public void process() throws Exception {
+	public void process() throws IOException {
 		System.out.printf("Destination:%s\n\n", task.getDestination());
 		ArrayList<ImgFile> imgs = task.getImgs();
 
