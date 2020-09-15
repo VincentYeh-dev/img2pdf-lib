@@ -66,7 +66,28 @@ public class PDFFile {
 		}
 
 	}
-/*
+
+	/*
+	 * public void process() throws IOException {
+	 * System.out.printf("Destination:%s\n\n", task.getDestination());
+	 * ArrayList<ImgFile> imgs = task.getImgs();
+	 * 
+	 * System.out.print("Start convert process..\n\n"); int all = imgs.size();
+	 * double perImg = (10. / all); double progress = 0;
+	 * 
+	 * System.out.print("0%["); for (int i = 0; i < imgs.size(); i++) { progress +=
+	 * perImg; while (progress >= 1) { System.out.print("="); progress -= 1; }
+	 * ImageProcess ip = new ImageProcess(imgs.get(i));
+	 * 
+	 * doc.addPage(createImgPage(ip.read()));
+	 * 
+	 * } System.out.print("]%100\n\n\n");
+	 * 
+	 * if (spp != null) { System.out.println("Save with password");
+	 * doc.protect(spp); }
+	 * 
+	 * doc.save(task.getDestination()); doc.close(); }
+	 */
 	public void process() throws IOException {
 		System.out.printf("Destination:%s\n\n", task.getDestination());
 		ArrayList<ImgFile> imgs = task.getImgs();
@@ -98,87 +119,42 @@ public class PDFFile {
 		doc.save(task.getDestination());
 		doc.close();
 	}
-*/
-	public void process() throws IOException {
-		System.out.printf("Destination:%s\n\n", task.getDestination());
-		ArrayList<ImgFile> imgs = task.getImgs();
+	/*
+	 * PDPage createImgPage(BufferedImage img) throws IOException { PDPage page =
+	 * null; float img_width = img.getWidth(); float img_height = img.getHeight();
+	 * // float img_size_ratio = img_height / img_width; float position_x = 0; float
+	 * position_y = 0; float out_width = 0, out_height = 0; Size size =
+	 * task.getSize();
+	 * 
+	 * if (size == Size.DEPEND_ON_IMG) {
+	 * 
+	 * page = new PDPage(new PDRectangle(img_width, img_height)); out_width =
+	 * img_width; out_height = img_height;
+	 * 
+	 * } else if (size != Size.DEPEND_ON_IMG) { page = new
+	 * PDPage(size.getPdrectangle()); img = imgRotate(img, page, 90); img_width =
+	 * img.getWidth(); img_height = img.getHeight(); // img_size_ratio = img_height
+	 * / img_width;
+	 * 
+	 * float[] received = null; if (page.getRotation() == 270) { received =
+	 * rotate_position_compute(img, page);
+	 * 
+	 * } else if (page.getRotation() == 0) { received =
+	 * none_rotate_position_compute(img, page); }
+	 * 
+	 * position_x = received[0]; position_y = received[1]; out_width = received[2];
+	 * out_height = received[3];
+	 * 
+	 * }
+	 * 
+	 * PDImageXObject pdImageXObject = LosslessFactory.createFromImage(doc, img);
+	 * 
+	 * PDPageContentStream contentStream = new PDPageContentStream(doc, page);
+	 * 
+	 * contentStream.drawImage(pdImageXObject, position_x, position_y, out_width,
+	 * out_height); contentStream.close(); return page; }
+	 */
 
-		System.out.print("Start convert process..\n\n");
-		int all = imgs.size();
-		double perImg = (10. / all);
-		double progress = 0;
-
-		System.out.print("0%[");
-		for (int i = 0; i < imgs.size(); i++) {
-			progress += perImg;
-			while (progress >= 1) {
-				System.out.print("=");
-				progress -= 1;
-			}
-			ImageProcess ip = new ImageProcess(imgs.get(i));
-
-			doc.addPage(createImgPage(ip.read()));
-
-		}
-		System.out.print("]%100\n\n\n");
-
-		if (spp != null) {
-			System.out.println("Save with password");
-			doc.protect(spp);
-		}
-
-		doc.save(task.getDestination());
-		doc.close();
-	}
-/*
-	PDPage createImgPage(BufferedImage img) throws IOException {
-		PDPage page = null;
-		float img_width = img.getWidth();
-		float img_height = img.getHeight();
-//		float img_size_ratio = img_height / img_width;
-		float position_x = 0;
-		float position_y = 0;
-		float out_width = 0, out_height = 0;
-		Size size = task.getSize();
-
-		if (size == Size.DEPEND_ON_IMG) {
-
-			page = new PDPage(new PDRectangle(img_width, img_height));
-			out_width = img_width;
-			out_height = img_height;
-
-		} else if (size != Size.DEPEND_ON_IMG) {
-			page = new PDPage(size.getPdrectangle());
-			img = imgRotate(img, page, 90);
-			img_width = img.getWidth();
-			img_height = img.getHeight();
-//			img_size_ratio = img_height / img_width;
-
-			float[] received = null;
-			if (page.getRotation() == 270) {
-				received = rotate_position_compute(img, page);
-
-			} else if (page.getRotation() == 0) {
-				received = none_rotate_position_compute(img, page);
-			}
-
-			position_x = received[0];
-			position_y = received[1];
-			out_width = received[2];
-			out_height = received[3];
-
-		}
-
-		PDImageXObject pdImageXObject = LosslessFactory.createFromImage(doc, img);
-
-		PDPageContentStream contentStream = new PDPageContentStream(doc, page);
-
-		contentStream.drawImage(pdImageXObject, position_x, position_y, out_width, out_height);
-		contentStream.close();
-		return page;
-	}
-*/
-	
 	PDPage createImgPage(BufferedImage img) throws IOException {
 		PDPage page = null;
 		float img_width = img.getWidth();
@@ -199,14 +175,14 @@ public class PDFFile {
 			img_width = img.getWidth();
 			img_height = img.getHeight();
 			float img_size_ratio = img_height / img_width;
-			int angle=90;
+			int angle = 90;
 			if (img_size_ratio >= 1) {
 				page.setRotation(0);
 			} else {
 				page.setRotation(angle);
-				img=ImgFile.rotateImg(img, -1*angle);
+				img = ImgFile.rotateImg(img, -1 * angle);
 			}
-			
+
 			float[] received = position_compute(img, page);
 			position_x = received[0];
 			position_y = received[1];
@@ -223,7 +199,7 @@ public class PDFFile {
 		contentStream.close();
 		return page;
 	}
-
+/*
 	float[] position_compute(BufferedImage raw, PDPage page) {
 		PDRectangle rec = page.getBBox();
 		float real_page_width = rec.getWidth();
@@ -235,7 +211,7 @@ public class PDFFile {
 
 		float position_x = 0, position_y = 0;
 		float out_width = 0, out_height = 0;
-		
+
 		if (Math.sin(Math.toRadians(page.getRotation())) == 0) {
 			if (task.getAlign() == ALIGN_FILL) {
 				position_x = position_y = 0;
@@ -279,10 +255,10 @@ public class PDFFile {
 					break;
 
 				}
-			
+
 			}
-				
-		}else {
+
+		} else {
 
 			if (task.getAlign() == ALIGN_FILL) {
 				position_x = position_y = 0;
@@ -334,173 +310,201 @@ public class PDFFile {
 		float[] ret = { position_x, position_y, out_width, out_height };
 		return ret;
 	}
+*/
+	
+	/**
+	 * Compute the position of image by align value;
+	 * 
+	 * @param raw The image that put into this page.
+	 * @param page The Page that contain image.
+	 * @return 
+	 */
+	float[] position_compute(BufferedImage raw, PDPage page) {
+		PDRectangle rec = page.getBBox();
+		float real_page_width = rec.getWidth();
+		float real_page_height = rec.getHeight();
 
-/*
-	float[] none_rotate_position_compute(BufferedImage img, PDPage page) {
+		float img_width = raw.getWidth();
+		float img_height = raw.getHeight();
+		float img_size_ratio = img_height / img_width;
+
 		float position_x = 0, position_y = 0;
 		float out_width = 0, out_height = 0;
-		float page_height = page.getBBox().getHeight();
-		float page_width = page.getBBox().getWidth();
-//		float page_size_ratio = page_height / page_width;
 
-		float img_width = img.getWidth();
-		float img_height = img.getHeight();
-		float img_size_ratio = img_height / img_width;
-//	-----
-//position_x=> |   |
-//	*----
-//	 ^^^^^
-//	 position_y
-
+		int lr = task.getAlign() & 0x0F;
+		int tb = task.getAlign() & 0xF0;
+		
 		if (task.getAlign() == ALIGN_FILL) {
 			position_x = position_y = 0;
-			out_height = page_height;
-			out_width = page_width;
-		} else if ((1 / img_size_ratio) * page_height <= page_width) {
-			out_height = page_height;
+			out_height = real_page_height;
+			out_width = real_page_width;
+		} else if ((1 / img_size_ratio) * real_page_height <= real_page_width) {
+			out_height = real_page_height;
 			out_width = (img_width / img_height) * out_height;
 
-			float x_space = page_width - out_width;
-			int rl = task.getAlign() & 0x0F;
+			float x_space = real_page_width - out_width;
+			if (Math.sin(Math.toRadians(page.getRotation())) == 0) {
+				switch (lr) {
+				case ALIGN_LEFT:
+					position_x = 0;
+					break;
+				case ALIGN_RIGHT:
+					position_x = x_space;
+					break;
+				case ALIGN_CENTER & 0x0F:
+					position_x = x_space / 2;
+					break;
 
-			switch (rl) {
-			case ALIGN_LEFT:
-				position_x = 0;
-				break;
-			case ALIGN_RIGHT:
-				position_x = x_space;
-				break;
-			case ALIGN_CENTER & 0x0F:
-				position_x = x_space / 2;
-				break;
+				}
+			} else {
+				switch (tb) {
+				case ALIGN_BOTTOM:
+					position_x = x_space;
+					break;
+				case ALIGN_TOP:
+					position_x = 0;
+					break;
+				case ALIGN_CENTER & 0xF0:
+					position_x = x_space / 2;
+					break;
 
+				}
 			}
-		} else if (img_size_ratio * page_width <= page_height) {
-			out_width = page_width;
+		} else if (img_size_ratio * real_page_width <= real_page_height) {
+			out_width = real_page_width;
 			out_height = (img_height / img_width) * out_width;
 
-			float y_space = page_height - out_height;
+			float y_space = real_page_height - out_height;
 
-			int tb = task.getAlign() & 0xF0;
-			switch (tb) {
-			case ALIGN_BOTTOM:
-				position_y = 0;
-				break;
-			case ALIGN_TOP:
-				position_y = y_space;
-				break;
-			case ALIGN_CENTER & 0xF0:
-				position_y = y_space / 2;
-				break;
+			if (Math.sin(Math.toRadians(page.getRotation())) == 0) {
+				switch (tb) {
+				case ALIGN_BOTTOM:
+					position_y = 0;
+					break;
+				case ALIGN_TOP:
+					position_y = y_space;
+					break;
+				case ALIGN_CENTER & 0xF0:
+					position_y = y_space / 2;
+					break;
 
+				}
+			} else {
+				switch (lr) {
+				case ALIGN_LEFT:
+					position_y = 0;
+					break;
+				case ALIGN_RIGHT:
+					position_y = y_space;
+					break;
+				case ALIGN_CENTER & 0x0F:
+					position_y = y_space / 2;
+					break;
+				}
 			}
 
 		}
 
 		float[] ret = { position_x, position_y, out_width, out_height };
 		return ret;
-
 	}
 
-	float[] rotate_position_compute(BufferedImage img, PDPage page) {
-		float position_x = 0, position_y = 0;
-		float out_width = 0, out_height = 0;
-		float r_page_width = page.getBBox().getHeight();
-		float r_page_height = page.getBBox().getWidth();
-//		float r_page_size_ratio = r_page_height / r_page_width;
-
-		float img_width = img.getWidth();
-		float img_height = img.getHeight();
-//		float img_size_ratio = img_height / img_width;
-
-		float r_img_width = img_height;
-		float r_img_height = img_width;
-		float r_img_size_ratio = r_img_height / r_img_width;
-
-		float r_out_width = 0;
-		float r_out_height = 0;
-//	
-//	--------
-//	|      |<=position_x
-//	-------*
-//	   ^^^^^
-//	   position_y
-
-		if (task.getAlign() == ALIGN_FILL) {
-			position_x = position_y = 0;
-			r_out_height = r_page_height;
-			r_out_width = r_page_width;
-		} else if ((1 / r_img_size_ratio) * r_page_height <= r_page_width) {
-			r_out_height = r_page_height;
-			r_out_width = (r_img_width / r_img_height) * r_out_height;
-
-			float x_space = r_page_width - r_out_width;
-
-			int lr = task.getAlign() & 0x0F;
-
-			switch (lr) {
-			case ALIGN_LEFT:
-				position_x = x_space;
-				break;
-			case ALIGN_RIGHT:
-				position_x = 0;
-				break;
-			case ALIGN_CENTER & 0x0F:
-				position_x = x_space / 2;
-				break;
-
-			}
-		} else if (r_img_size_ratio * r_page_width <= r_page_height) {
-			r_out_width = r_page_width;
-			r_out_height = (r_img_height / r_img_width) * r_out_width;
-
-			float y_space = r_page_height - r_out_height;
-
-			int tb = task.getAlign() & 0xF0;
-
-			switch (tb) {
-			case ALIGN_BOTTOM:
-				position_y = 0;
-				break;
-			case ALIGN_TOP:
-				position_y = y_space;
-				break;
-			case ALIGN_CENTER & 0xF0:
-				position_y = y_space / 2;
-				break;
-			}
-
-		}
-
-		out_width = r_out_height;
-		out_height = r_out_width;
-		float buf_y = position_y;
-
-		position_y = position_x;
-		position_x = buf_y;
-		float[] ret = { position_x, position_y, out_width, out_height };
-		return ret;
-	}
-
-	BufferedImage imgRotate(BufferedImage img, PDPage page, int angle) {
-
-		float img_width = img.getWidth();
-		float img_height = img.getHeight();
-		float img_size_ratio = img_height / img_width;
-
-		if (img_size_ratio > 1) {
-			page.setRotation(0);
-			return img;
-		} else if (img_size_ratio == 1) {
-			page.setRotation(0);
-			return img;
-		} else {
-			page.setRotation(360 - angle);
-			return ImgFile.rotateImg(img, angle);
-		}
-
-	}
-*/
+	/*
+	 * float[] none_rotate_position_compute(BufferedImage img, PDPage page) { float
+	 * position_x = 0, position_y = 0; float out_width = 0, out_height = 0; float
+	 * page_height = page.getBBox().getHeight(); float page_width =
+	 * page.getBBox().getWidth(); // float page_size_ratio = page_height /
+	 * page_width;
+	 * 
+	 * float img_width = img.getWidth(); float img_height = img.getHeight(); float
+	 * img_size_ratio = img_height / img_width; // ----- //position_x=> | | // *----
+	 * // ^^^^^ // position_y
+	 * 
+	 * if (task.getAlign() == ALIGN_FILL) { position_x = position_y = 0; out_height
+	 * = page_height; out_width = page_width; } else if ((1 / img_size_ratio) *
+	 * page_height <= page_width) { out_height = page_height; out_width = (img_width
+	 * / img_height) * out_height;
+	 * 
+	 * float x_space = page_width - out_width; int rl = task.getAlign() & 0x0F;
+	 * 
+	 * switch (rl) { case ALIGN_LEFT: position_x = 0; break; case ALIGN_RIGHT:
+	 * position_x = x_space; break; case ALIGN_CENTER & 0x0F: position_x = x_space /
+	 * 2; break;
+	 * 
+	 * } } else if (img_size_ratio * page_width <= page_height) { out_width =
+	 * page_width; out_height = (img_height / img_width) * out_width;
+	 * 
+	 * float y_space = page_height - out_height;
+	 * 
+	 * int tb = task.getAlign() & 0xF0; switch (tb) { case ALIGN_BOTTOM: position_y
+	 * = 0; break; case ALIGN_TOP: position_y = y_space; break; case ALIGN_CENTER &
+	 * 0xF0: position_y = y_space / 2; break;
+	 * 
+	 * }
+	 * 
+	 * }
+	 * 
+	 * float[] ret = { position_x, position_y, out_width, out_height }; return ret;
+	 * 
+	 * }
+	 * 
+	 * float[] rotate_position_compute(BufferedImage img, PDPage page) { float
+	 * position_x = 0, position_y = 0; float out_width = 0, out_height = 0; float
+	 * r_page_width = page.getBBox().getHeight(); float r_page_height =
+	 * page.getBBox().getWidth(); // float r_page_size_ratio = r_page_height /
+	 * r_page_width;
+	 * 
+	 * float img_width = img.getWidth(); float img_height = img.getHeight(); //
+	 * float img_size_ratio = img_height / img_width;
+	 * 
+	 * float r_img_width = img_height; float r_img_height = img_width; float
+	 * r_img_size_ratio = r_img_height / r_img_width;
+	 * 
+	 * float r_out_width = 0; float r_out_height = 0; // // -------- // |
+	 * |<=position_x // -------* // ^^^^^ // position_y
+	 * 
+	 * if (task.getAlign() == ALIGN_FILL) { position_x = position_y = 0;
+	 * r_out_height = r_page_height; r_out_width = r_page_width; } else if ((1 /
+	 * r_img_size_ratio) * r_page_height <= r_page_width) { r_out_height =
+	 * r_page_height; r_out_width = (r_img_width / r_img_height) * r_out_height;
+	 * 
+	 * float x_space = r_page_width - r_out_width;
+	 * 
+	 * int lr = task.getAlign() & 0x0F;
+	 * 
+	 * switch (lr) { case ALIGN_LEFT: position_x = x_space; break; case ALIGN_RIGHT:
+	 * position_x = 0; break; case ALIGN_CENTER & 0x0F: position_x = x_space / 2;
+	 * break;
+	 * 
+	 * } } else if (r_img_size_ratio * r_page_width <= r_page_height) { r_out_width
+	 * = r_page_width; r_out_height = (r_img_height / r_img_width) * r_out_width;
+	 * 
+	 * float y_space = r_page_height - r_out_height;
+	 * 
+	 * int tb = task.getAlign() & 0xF0;
+	 * 
+	 * switch (tb) { case ALIGN_BOTTOM: position_y = 0; break; case ALIGN_TOP:
+	 * position_y = y_space; break; case ALIGN_CENTER & 0xF0: position_y = y_space /
+	 * 2; break; }
+	 * 
+	 * }
+	 * 
+	 * out_width = r_out_height; out_height = r_out_width; float buf_y = position_y;
+	 * 
+	 * position_y = position_x; position_x = buf_y; float[] ret = { position_x,
+	 * position_y, out_width, out_height }; return ret; }
+	 * 
+	 * BufferedImage imgRotate(BufferedImage img, PDPage page, int angle) {
+	 * 
+	 * float img_width = img.getWidth(); float img_height = img.getHeight(); float
+	 * img_size_ratio = img_height / img_width;
+	 * 
+	 * if (img_size_ratio > 1) { page.setRotation(0); return img; } else if
+	 * (img_size_ratio == 1) { page.setRotation(0); return img; } else {
+	 * page.setRotation(360 - angle); return ImgFile.rotateImg(img, angle); }
+	 * 
+	 * }
+	 */
 	public void setProtect(String owner_pwd, String user_pwd, AccessPermission ap) {
 		// Define the length of the encryption key.
 		// Possible values are 40 or 128 (256 will be available in PDFBox 2.0).
