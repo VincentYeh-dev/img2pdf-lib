@@ -24,12 +24,11 @@ import org.vincentyeh.IMG2PDF.file.PDFFile.Size;
 import org.vincentyeh.IMG2PDF.util.NameFormatter;
 
 /**
- * Task is the pre-work of the conversion. All attributes of PDF file will be
+ * <b>Task is the pre-work of the conversion</b>. All attributes of PDF file will be
  * define in this step. So the program that convert the images to PDF doesn't
  * need to do pre-work of conversion.
  * 
- * The function of Task: 1. define how to sort files 2. define password of PDF
- * 3. compute the name of destination file 4. convert itself to XML element
+ * The function of Task:<ol><li>define how to sort files</li><li>define password of PDF</li><li>compute the name of destination file </li><li>convert itself to XML element</li></ol>  
  * 
  * @author VincentYeh
  */
