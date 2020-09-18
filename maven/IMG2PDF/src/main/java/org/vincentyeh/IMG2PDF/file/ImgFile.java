@@ -43,8 +43,8 @@ public class ImgFile extends File implements Comparable<File> {
 	 * Create the ImgFile that need to sort.
 	 * 
 	 * @param pathname the path of image file
-	 * @param sortby
-	 * @param order
+	 * @param sortby sortby
+	 * @param order order
 	 * @throws FileNotFoundException when file is not exists
 	 */
 	public ImgFile(String pathname, Sortby sortby, Order order) throws FileNotFoundException {

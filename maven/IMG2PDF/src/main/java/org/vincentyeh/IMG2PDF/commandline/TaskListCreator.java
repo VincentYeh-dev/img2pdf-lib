@@ -2,6 +2,7 @@ package org.vincentyeh.IMG2PDF.commandline;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
@@ -21,15 +22,14 @@ import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
 /**
  * 
+ * 
  * @author VincentYeh
- *
  */
 public class TaskListCreator {
 	static int align;
 	static Sortby sortby;
 	static Order order;
-	static PDFFile.Size size;
-	static boolean merge;
+	static Size size;
 	static String dst;
 	static String owner_pwd;
 	static String user_pwd;
@@ -46,7 +46,15 @@ public class TaskListCreator {
 
 	}
 
-	static TaskList importTasksFromTXT(File file) throws Exception {
+	/**
+	 * Import multiple path of each directory,and convert it to task.  
+	 * 
+	 * @param file Source file.
+	 * @return The List of Task.
+	 * @throws IOException None description.
+	 */
+	static TaskList importTasksFromTXT(File file) throws IOException  {
+		
 		UTF8InputStream uis = new UTF8InputStream(file);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(uis, "UTF-8"));
 		TaskList tasks = new TaskList();
@@ -54,13 +62,16 @@ public class TaskListCreator {
 		while (buf != null) {
 			buf = reader.readLine();
 			if (buf != null && !buf.isEmpty()) {
-				File dir=new File(buf);
+//				trim():	private invisible character pass to the constructor 
+//				of File and make file not exists.
+				File dir=new File(buf.trim());
+				
 				NameFormatter nf = new NameFormatter(dst,dir);
 				FileFilterHelper ffh = createImageFilter(0);
 				Task task = new Task(dir.listFiles(ffh),nf.getConverted(), 
 						owner_pwd, user_pwd,sortby,order, align, size);
 				tasks.add(task);
-
+				
 			}
 		}
 		reader.close();
@@ -76,9 +87,9 @@ public class TaskListCreator {
 			System.exit(1);
 		}
 		lists = new ArrayList<String>(ns.<String>getList("source"));
-
-		merge = ns.getString("merge").equals("yes");
+		
 		String str_size = ns.getString("size");
+		
 		size = PDFFile.Size.getSizeFromString(str_size);
 		dst = ns.<String>getList("destination").get(0);
 		list_output = ns.<String>getList("list_output").get(0);
@@ -107,24 +118,28 @@ public class TaskListCreator {
 			user_pwd = null;
 		align = (PDFFile.ALIGN_CENTER & 0xf0) | (PDFFile.ALIGN_CENTER & 0x0f);
 //		align = PDFFile.ALIGN_FILL;
+		
+		for(String source:lists) {
+			System.out.printf("source:%s\n",source);
+		}
 
-		System.out.printf("merge:%s\n", merge ? "yes" : "no");
-		System.out.printf("size:%s\n", str_size);
-		System.out.printf("destination:%s\n", dst);
-		System.out.printf("owner password:%s\n", owner_pwd);
-		System.out.printf("user password:%s\n", user_pwd);
+		System.out.printf("output:%s\n",list_output);
+		System.out.printf("\tsize:%s\n",size.getStr());
+		System.out.printf("\tdestination:%s\n", dst);
+		System.out.printf("\towner password:%s\n", owner_pwd);
+		System.out.printf("\tuser password:%s\n", user_pwd);
+		System.out.printf("---------------------\n");
 
 	}
 
 	static ArgumentParser createArgParser() {
+		
 		ArgumentParser parser = ArgumentParsers.newFor("TASKCREATOR").build().defaultHelp(true)
 				.description("Create PDF Task");
-
-		parser.addArgument("-m", "--merge").choices("yes", "no").setDefault("no")
-				.help("Merge all image files in Folder");
-
+		
+		
 		parser.addArgument("-s", "--sortby").choices(Sortby.valuesStr()).help("Merge all image files in Folder");
-
+		
 		parser.addArgument("-odr", "--order").choices(Order.valuesStr())
 				.help("order by increasing(0,1,2,3) or decreasing(3,2,1,0) value");
 
@@ -132,10 +147,10 @@ public class TaskListCreator {
 				.choices(Size.valuesStr())
 				.help("PDF each page size.\ntype DEPEND to set each page size depend on each image size");
 
-		parser.addArgument("-ownpwd", "--owner_password").nargs(1).help("PDF owner password");
-		parser.addArgument("-usepwd", "--user_password").nargs(1).help("PDF user password");
-		parser.addArgument("-d", "--destination").nargs(1).help("Destination of converted file");
-		parser.addArgument("-lo", "--list_output").nargs(1).help("Output task list(*.XML)");
+		parser.addArgument("-ownpwd", "--owner_password").metavar("ownerpassword").nargs(1).help("PDF owner password");
+		parser.addArgument("-usepwd", "--user_password").metavar("userpassword").nargs(1).help("PDF user password");
+		parser.addArgument("-d", "--destination").metavar("destination").nargs(1).help("destination of converted file");
+		parser.addArgument("-lo", "--list_output").metavar("destination").nargs(1).help("Output task list(*.XML)");
 		parser.addArgument("source").nargs("*").help("File to convert");
 		return parser;
 	}

@@ -5,17 +5,20 @@ import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.jdom2.Document;
 import org.jdom2.input.DOMBuilder;
 import org.vincentyeh.IMG2PDF.file.PDFFile;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskList;
+import org.xml.sax.SAXException;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
+
 /**
  * The Main Program
  * 
@@ -42,36 +45,43 @@ public class Program {
 		Program program = new Program(parser, args);
 
 		for (String list : program.lists) {
-			Document xml = getDOMParsedDocument(list);
-			TaskList tasks=new TaskList(xml);
+			Document xml=null;
+			try {
+				xml = getDOMParsedDocument(list);
+			} catch (ParserConfigurationException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (SAXException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			
-			for(Task task:tasks) {
+			TaskList tasks = new TaskList(xml);
+
+			for (Task task : tasks) {
 				PDFFile pdf = new PDFFile(task);
 				try {
 					pdf.setMaxDiff(0.15f);
 					pdf.process();
-					
+
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
-			
+
 		}
 
 	}
 
-	private static Document getDOMParsedDocument(final String fileName) {
+	private static Document getDOMParsedDocument(final String fileName) throws ParserConfigurationException, SAXException, IOException {
 		Document document = null;
-		try {
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			// If want to make namespace aware.
-			// factory.setNamespaceAware(true);
-			DocumentBuilder documentBuilder = factory.newDocumentBuilder();
-			org.w3c.dom.Document w3cDocument = documentBuilder.parse(fileName);
-			document = new DOMBuilder().build(w3cDocument);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		// If want to make namespace aware.
+		// factory.setNamespaceAware(true);
+		DocumentBuilder documentBuilder = factory.newDocumentBuilder();
+		org.w3c.dom.Document w3cDocument = documentBuilder.parse(fileName);
+		document = new DOMBuilder().build(w3cDocument);
+
 		return document;
 	}
 

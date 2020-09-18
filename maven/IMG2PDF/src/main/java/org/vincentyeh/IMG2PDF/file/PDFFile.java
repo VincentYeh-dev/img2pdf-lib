@@ -11,7 +11,6 @@ import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
 import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
-import org.vincentyeh.IMG2PDF.file.ImgFile.Order;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.util.ImageProcess;
 
@@ -42,13 +41,13 @@ public class PDFFile {
 	
 	/**
 	 * <h3>The calculation of diff</h3>
-	 * diff=abs((image height/image width)-(page height/page width))
+	 * <p>diff=abs((image height/image width)-(page height/page width))</p>
 	 * 
 	 * <h3>Feature</h3>
-	 * <b>max_diff is the variable that can be set to prevent raw image over-deformed.</b><br \>
-	 * The default value is <b>less than 0</b>.It do nothing when you don't set it to the value that more than 0<br \>
-	 * <br \>If you do that before execution of process() method,<br \>the program will throw a Exception that warn a user the sub is out of range <b>when the diff>max_diff</b>.
-	 *<br \>	
+	 * <p>max_diff is the variable that can be set to prevent raw image over-deformed.</p>
+	 * <p>The default value is less than 0.It do nothing when you don't set it to the value that more than 0.</p>
+	 * <p>If you do that before execution of process() method,the program will throw a Exception that warn a user the sub is out of range when the diff larger than max_diff.</p>
+	 *	
 	 */
 	private float max_diff=-1f;
 	
@@ -77,6 +76,11 @@ public class PDFFile {
 
 	}
 	
+	/**
+	 * Start the conversion of PDF.
+	 * 
+	 * @throws IOException When creating the image page.
+	 */
 	public void process() throws IOException {
 		System.out.printf("Destination:%s\n\n", task.getDestination());
 		ArrayList<ImgFile> imgs = task.getImgs();
@@ -110,9 +114,10 @@ public class PDFFile {
 	}
 
 	/**
+	 * Draw Image to Page
 	 * @param img The image written to the page
 	 * @return The page contain image
-	 * @throws IOException
+	 * @throws IOException Failure of drawing image to page
 	 */
 	PDPage createImgPage(BufferedImage img) throws IOException {
 		PDPage page = null;
@@ -286,24 +291,40 @@ public class PDFFile {
 		setProtect(spp);
 	}
 
+	/**
+	 * Set the Protection of PDF File
+	 * @param spp StandardProtectionPolicy
+	 */
 	public void setProtect(StandardProtectionPolicy spp) {
 		this.spp = spp;
 	}
+	
+	/**
+	 * set the limitation of image resizing
+	 * @param max_diff the max value to limit diff
+	 */
 	public void setMaxDiff(float max_diff) {
 		this.max_diff = max_diff;
 	}
 	
 	/**
-	 * Size is the variable that define size of pages of PDFFile. 
-	 * 
-	 * @author vincent
+	 * <p>Size is the variable that define size of pages of PDFFile.</p> 
+	 * <p>It only can be create by using getSizeFromString(str) or directly specify enum</p>
+	 * @author VincetYeh
 	 */
 	public enum Size {
 		A0("A0", PDRectangle.A0), A1("A1", PDRectangle.A1), A2("A2", PDRectangle.A2), A3("A3", PDRectangle.A3),
 		A4("A4", PDRectangle.A4), A5("A5", PDRectangle.A5), A6("A6", PDRectangle.A6), LEGAL("LEGAL", PDRectangle.LEGAL),
 		LETTER("LETTER", PDRectangle.LETTER), DEPEND_ON_IMG("DEPEND", null);
 
+		/**
+		 * <p>This is the String constant of Size.</p>
+		 */
 		private final String str;
+		
+		/**
+		 * <p>This is the constant  used to create the PDF.</p>
+		 */
 		private final PDRectangle pdrectangle;
 
 		Size(String str, PDRectangle pdrectangle) {
@@ -311,6 +332,11 @@ public class PDFFile {
 			this.pdrectangle = pdrectangle;
 		}
 
+		/**
+		 * Create Size by String
+		 * @param str The String contain definition of Size. 
+		 * @return Size
+		 */
 		public static Size getSizeFromString(String str) {
 			switch (str) {
 			case "A0":
@@ -346,6 +372,10 @@ public class PDFFile {
 			return pdrectangle;
 		}
 		
+		/**
+		 * List all item of enum in String.
+		 * @return The array of enum in String.
+		 */
 		public static String[] valuesStr() {
 			Size[] size_list=Size.values();
 			String[] str_list=new String[size_list.length];
