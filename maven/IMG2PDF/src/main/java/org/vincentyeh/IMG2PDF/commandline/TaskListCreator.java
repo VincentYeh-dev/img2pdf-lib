@@ -6,8 +6,10 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 import org.vincentyeh.IMG2PDF.file.FileFilterHelper;
-import org.vincentyeh.IMG2PDF.file.ImgFile;
+import org.vincentyeh.IMG2PDF.file.ImgFile.Order;
+import org.vincentyeh.IMG2PDF.file.ImgFile.Sortby;
 import org.vincentyeh.IMG2PDF.file.PDFFile;
+import org.vincentyeh.IMG2PDF.file.PDFFile.Size;
 import org.vincentyeh.IMG2PDF.file.text.UTF8InputStream;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskList;
@@ -23,7 +25,9 @@ import net.sourceforge.argparse4j.inf.Namespace;
  *
  */
 public class TaskListCreator {
-	static int sortby, order,align;
+	static int align;
+	static Sortby sortby;
+	static Order order;
 	static PDFFile.Size size;
 	static boolean merge;
 	static String dst;
@@ -54,7 +58,7 @@ public class TaskListCreator {
 				NameFormatter nf = new NameFormatter(dst,dir);
 				FileFilterHelper ffh = createImageFilter(0);
 				Task task = new Task(dir.listFiles(ffh),nf.getConverted(), 
-						owner_pwd, user_pwd, sortby, order, align, size);
+						owner_pwd, user_pwd,sortby,order, align, size);
 				tasks.add(task);
 
 			}
@@ -83,35 +87,15 @@ public class TaskListCreator {
 			System.err.println("sort by rule need to provide");
 			System.exit(0);
 		}
-
-		switch (ns.getString("sortby")) {
-		case "name":
-			sortby = ImgFile.SORTBY_NAME;
-			break;
-		case "date":
-			sortby = ImgFile.SORTBY_DATE;
-			break;
-		default:
-			System.err.println("sort by rule need to provide");
-			sortby = -1;
-			System.exit(0);
-			break;
-		}
-
-		switch (ns.getString("order")) {
-		case "ics":
-			order = ImgFile.ORDER_INCREASE;
-			break;
-		case "dcs":
-			order = ImgFile.ORDER_DECREASE;
-			break;
-		default:
-			System.err.println("order by rule need to provide");
-			order = -1;
-			System.exit(0);
-			break;
-		}
-
+		
+		String ns_sortby=ns.getString("sortby");
+		String ns_order=ns.getString("order");
+		
+		sortby=Sortby.getByStr(ns_sortby);
+		order=Order.getByStr(ns_order);
+		
+		
+		
 		if (ns.<String>getList("owner_password") != null)
 			owner_pwd = ns.<String>getList("owner_password").get(0);
 		else
@@ -121,8 +105,8 @@ public class TaskListCreator {
 			user_pwd = ns.<String>getList("user_password").get(0);
 		else
 			user_pwd = null;
-//		align = (PDFFile.ALIGN_BOTTOM & 0xf0) | (PDFFile.ALIGN_CENTER & 0x0f);
-		align = PDFFile.ALIGN_FILL;
+		align = (PDFFile.ALIGN_CENTER & 0xf0) | (PDFFile.ALIGN_CENTER & 0x0f);
+//		align = PDFFile.ALIGN_FILL;
 
 		System.out.printf("merge:%s\n", merge ? "yes" : "no");
 		System.out.printf("size:%s\n", str_size);
@@ -139,13 +123,13 @@ public class TaskListCreator {
 		parser.addArgument("-m", "--merge").choices("yes", "no").setDefault("no")
 				.help("Merge all image files in Folder");
 
-		parser.addArgument("-s", "--sortby").choices("name", "date").help("Merge all image files in Folder");
+		parser.addArgument("-s", "--sortby").choices(Sortby.valuesStr()).help("Merge all image files in Folder");
 
-		parser.addArgument("-odr", "--order").choices("ics", "dcs")
+		parser.addArgument("-odr", "--order").choices(Order.valuesStr())
 				.help("order by increasing(0,1,2,3) or decreasing(3,2,1,0) value");
 
 		parser.addArgument("-sz", "--size")
-				.choices("A0", "A1", "A2", "A3", "A4", "A5", "A6", "LEGAL", "LETTER", "DEPEND")
+				.choices(Size.valuesStr())
 				.help("PDF each page size.\ntype DEPEND to set each page size depend on each image size");
 
 		parser.addArgument("-ownpwd", "--owner_password").nargs(1).help("PDF owner password");

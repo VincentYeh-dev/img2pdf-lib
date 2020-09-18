@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.junit.Test;
+import org.vincentyeh.IMG2PDF.file.ImgFile.Order;
+import org.vincentyeh.IMG2PDF.file.ImgFile.Sortby;
 import org.vincentyeh.IMG2PDF.task.Task;
 
 public class PDFFileTest {
@@ -19,7 +21,7 @@ public class PDFFileTest {
 		
 		File[] f = (new File("test_file\\raw\\TEST\\")).listFiles(ffh);
 
-		Task task = new Task(f, "test.pdf", null, null, ImgFile.SORTBY_NAME, ImgFile.ORDER_INCREASE,
+		Task task = new Task(f, "test.pdf", null, null,Sortby.NAME,Order.INCREASE,
 				(PDFFile.ALIGN_CENTER & 0xF0) | (PDFFile.ALIGN_CENTER & 0x0F), PDFFile.Size.A4);
 		
 		PDFFile pdf=new PDFFile(task);

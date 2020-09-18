@@ -2,26 +2,17 @@ package org.vincentyeh.IMG2PDF.task;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-
 import org.jdom2.Attribute;
 import org.jdom2.Content;
-import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
-import org.vincentyeh.IMG2PDF.file.FileFilterHelper;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
+import org.vincentyeh.IMG2PDF.file.ImgFile.Order;
+import org.vincentyeh.IMG2PDF.file.ImgFile.Sortby;
 import org.vincentyeh.IMG2PDF.file.PDFFile;
 import org.vincentyeh.IMG2PDF.file.PDFFile.Size;
-import org.vincentyeh.IMG2PDF.util.NameFormatter;
 
 /**
  * <b>Task is the pre-work of the conversion</b>. All attributes of PDF file will be
@@ -33,6 +24,11 @@ import org.vincentyeh.IMG2PDF.util.NameFormatter;
  * @author VincentYeh
  */
 public class Task extends Element {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7732049453237587003L;
+	
 	private final int align;
 	private final PDFFile.Size size;
 	private final String destination;
@@ -53,7 +49,7 @@ public class Task extends Element {
 	 * @param size        Which size of pages of PDF.
 	 * @throws FileNotFoundException
 	 */
-	public Task(File[] files, String destination, String own, String user, int sortby, int order, int align,
+	public Task(File[] files, String destination, String own, String user, Sortby sortby, Order order, int align,
 			PDFFile.Size size) throws FileNotFoundException {
 		super("TASK");
 		if (files == null)
@@ -61,16 +57,6 @@ public class Task extends Element {
 
 		if (destination == null)
 			throw new NullPointerException("destination is null.");
-
-//		if (!(size >= 0x01 && size <= 0x0A))
-//			throw new IllegalArgumentException("Size value need to be between 0x01 and 0x0A");
-//
-//		if (size != PDFFile.SIZE_DEPEND_ON_IMG)
-//			if (!((align & 0xF0) >> 4 > 0 && (align & 0xF0) >> 4 <= 4))
-//				throw new IllegalArgumentException("align value need to be between 0x01 and 0x44");
-//			else if (!((align & 0x0F) > 0 && (align & 0x0F) <= 4))
-//				throw new IllegalArgumentException("align value need to be between 0x01 and 0x44");
-
 		this.align = align;
 		this.size = size;
 		this.destination = destination;
@@ -79,24 +65,31 @@ public class Task extends Element {
 		for (File file : files) {
 			ImgFile img = new ImgFile(file.getAbsolutePath(), sortby, order);
 			imgs.add(img);
-
+		}
+		
+//		imgs need to be sort before written to element
+		Collections.sort(imgs);
+		
+		for(ImgFile img:imgs) {
 			Element xml_file = new Element("FILE");
 			xml_file.addContent(img.getAbsolutePath());
 			xml_files.addContent(xml_file);
 		}
+		
 		super.addContent(xml_files);
 
 		owner_pwd = own != null ? own : "#null";
 		user_pwd = user != null ? user : "#null";
 
 		super.setAttribute("destination", destination);
-		super.setAttribute("size", size.getStrSize() + "");
+		super.setAttribute("size", size.getStr() + "");
 		super.setAttribute("align", align + "");
 		super.setAttribute("owner", owner_pwd);
 		super.setAttribute("user", user_pwd);
 		System.out.printf("\nfound %d files.\n", imgs.size());
 		System.out.print("Sortting files...");
-		Collections.sort(imgs);
+		
+		
 		System.out.print("DONE\n\n");
 
 	}

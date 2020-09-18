@@ -9,7 +9,6 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.vincentyeh.IMG2PDF.file.PDFFile;
 /**
  * The collection of Task.This class is able to convert between collection and XML format.
  * 
@@ -17,6 +16,10 @@ import org.vincentyeh.IMG2PDF.file.PDFFile;
  */
 public class TaskList extends ArrayList<Task> {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2891486701232492442L;
 	private Element xml_root;
 	private Document doc;
 

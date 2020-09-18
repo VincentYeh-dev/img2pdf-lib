@@ -13,6 +13,8 @@ import javax.imageio.ImageIO;
 
 import org.junit.Test;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
+import org.vincentyeh.IMG2PDF.file.ImgFile.Order;
+import org.vincentyeh.IMG2PDF.file.ImgFile.Sortby;
 
 public class ImgFileTest {
 
@@ -54,7 +56,7 @@ public class ImgFileTest {
 	public void testCreateImageFileWithEmptyArguments() {
 		String str = "";
 		try {
-			new ImgFile(str, -1, -1);
+			new ImgFile(str);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -72,53 +74,15 @@ public class ImgFileTest {
 	@Test(expected = FileNotFoundException.class)
 	public void testCreateImageFileWithNotExistsArguments() throws FileNotFoundException {
 		String str = "AA";
-		new ImgFile(str, -1, -1);
+		new ImgFile(str);
 
 	}
 	
-	@Test
+	@Test(expected = RuntimeException.class)
 	public void testCreateImageFileWithIllegalArgument() throws FileNotFoundException{
 		String str = "test_file\\raw\\TEST\\01.jpg";
-		int i=-2;
-		while(i!=-255) {
-			try {
-				new ImgFile(str,i,ImgFile.ORDER_INCREASE);
-				assertTrue(false);
-			} catch (IllegalArgumentException e) {
-				
-			}
-			i--;
-		}
-		i=2;
-		while(i!=255) {
-			try {
-				new ImgFile(str,i,ImgFile.ORDER_INCREASE);
-				assertTrue(false);
-			} catch (IllegalArgumentException e) {
-				
-			}
-			i++;
-		}
-		i=-2;
-		while(i!=-255) {
-			try {
-				new ImgFile(str,ImgFile.SORTBY_NAME,i);
-				assertTrue(false);
-			} catch (IllegalArgumentException e) {
-				
-			}
-			i--;
-		}
-		i=2;
-		while(i!=255) {
-			try {
-				new ImgFile(str,ImgFile.SORTBY_NAME,i);
-				assertTrue(false);
-			} catch (IllegalArgumentException e) {
-				
-			}
-			i++;
-		}
+		
+		new ImgFile(str,Sortby.getByStr("AA"),Order.getByStr("BB"));
 	}
 
 	/**
@@ -141,14 +105,14 @@ public class ImgFileTest {
 	@Test(expected = RuntimeException.class)
 	public void testCreateImageFileWithDirectoryArguments() throws FileNotFoundException {
 		String str = "test_file";
-		new ImgFile(str, -1, -1);
+		new ImgFile(str);
 
 	}
 
 	@Test
 	public void testCreateImageWithArgumentsAndSort() throws FileNotFoundException {
 		String str = "test_file\\raw\\TEST\\01.jpg";
-		ImgFile a = new ImgFile(str, -1, -1);
+		ImgFile a = new ImgFile(str);
 		ArrayList<ImgFile> list = new ArrayList<ImgFile>();
 		list.add(a);
 		list.add(a);
@@ -163,7 +127,7 @@ public class ImgFileTest {
 	@Test
 	public void testCreateImageWithCorrectArgumentsAndSort() throws FileNotFoundException {
 		String str = "test_file\\raw\\TEST\\01.jpg";
-		ImgFile a = new ImgFile(str, ImgFile.SORTBY_NAME, ImgFile.ORDER_INCREASE);
+		ImgFile a = new ImgFile(str,Sortby.NAME,Order.INCREASE);
 		ArrayList<ImgFile> list = new ArrayList<ImgFile>();
 		list.add(a);
 		list.add(a);

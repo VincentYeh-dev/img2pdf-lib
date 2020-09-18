@@ -8,8 +8,8 @@ import java.io.InputStream;
 public class UTF8NOBOMInputStream extends InputStream {
 
 	byte[] SYMBLE_BOM = { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF };
-	FileInputStream fis;
-	final boolean isSameEncodingType;
+	private FileInputStream fis;
+	private final boolean isSameEncodingType;
 
 	public UTF8NOBOMInputStream(File file) throws IOException {
 		FileInputStream fis = new FileInputStream(file);
@@ -43,11 +43,13 @@ public class UTF8NOBOMInputStream extends InputStream {
 		return true;
 	}
 
-	boolean isSameEncodingType(byte[] symble) {
+	private boolean isSameEncodingType(byte[] symble) {
 		return bytesCompare(symble, SYMBLE_BOM);
 	}
 
 	public static boolean isSameEncodingType(File file) throws IOException {
-		return (new UTF8NOBOMInputStream(file)).isSameEncodingType;
+		UTF8NOBOMInputStream o = new UTF8NOBOMInputStream(file);
+		o.close();
+		return o.isSameEncodingType;
 	}
 }

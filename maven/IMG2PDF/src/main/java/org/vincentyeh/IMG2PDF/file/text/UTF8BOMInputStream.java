@@ -8,8 +8,8 @@ import java.io.InputStream;
 public class UTF8BOMInputStream extends InputStream {
 
 	byte[] SYMBLE_BOM = { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF };
-	FileInputStream fis;
-	final boolean isSameEncodingType;
+	private FileInputStream fis;
+	private final boolean isSameEncodingType;
 
 	public UTF8BOMInputStream(File file) throws IOException {
 		FileInputStream fis = new FileInputStream(file);
@@ -28,11 +28,6 @@ public class UTF8BOMInputStream extends InputStream {
 		return fis.read();
 	}
 
-	void bytesPrint(byte[] b) {
-		for (byte a : b)
-			System.out.printf("%x ", a);
-	}
-
 	boolean bytesCompare(byte[] a, byte[] b) {
 		if (a.length != b.length)
 			return false;
@@ -44,11 +39,13 @@ public class UTF8BOMInputStream extends InputStream {
 		return true;
 	}
 
-	boolean isSameEncodingType(byte[] symble) {
+	private boolean isSameEncodingType(byte[] symble) {
 		return bytesCompare(symble, SYMBLE_BOM);
 	}
 
 	public static boolean isSameEncodingType(File file) throws IOException {
-		return (new UTF8BOMInputStream(file)).isSameEncodingType;
+		UTF8BOMInputStream o=new UTF8BOMInputStream(file);
+		o.close();
+		return o.isSameEncodingType;
 	}
 }

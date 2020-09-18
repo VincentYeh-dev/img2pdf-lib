@@ -1,7 +1,7 @@
 chcp 65001
 $location=Split-Path $PSScriptRoot -Parent
 $buffer=""
-$PATH_TO_SEARCH="$location\test_file\raw\"
+$PATH_TO_SEARCH="$location\test_file\raw2\"
 $index=0
 $table=Get-ChildItem -Attributes D "$PATH_TO_SEARCH"
 

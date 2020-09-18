@@ -1,7 +1,5 @@
 package org.vincentyeh.IMG2PDF.file;
 
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,6 +11,7 @@ import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
 import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.vincentyeh.IMG2PDF.file.ImgFile.Order;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.util.ImageProcess;
 
@@ -36,16 +35,22 @@ public class PDFFile {
 	
 	
 	/**
-	 * Task that need to be process
+	 * Task that need to be process.
+	 * It will be set on constructor.
 	 */
 	private final Task task;
 	
 	/**
-	 * <b>max_sub is the variable that can be set to prevent raw image over-deformed.</b><br \>
-	 * The default value is <b>less than 0</b>.It do nothing when you don't set it to the value that more than 0;<br \>
-	 * <br \>If you do that before execution of process() method,<br \>the program will throw a Exception that warn a user the sub is out of range <b>when the sub>max_sub</b>.
+	 * <h3>The calculation of diff</h3>
+	 * diff=abs((image height/image width)-(page height/page width))
+	 * 
+	 * <h3>Feature</h3>
+	 * <b>max_diff is the variable that can be set to prevent raw image over-deformed.</b><br \>
+	 * The default value is <b>less than 0</b>.It do nothing when you don't set it to the value that more than 0<br \>
+	 * <br \>If you do that before execution of process() method,<br \>the program will throw a Exception that warn a user the sub is out of range <b>when the diff>max_diff</b>.
+	 *<br \>	
 	 */
-	private float max_sub=-1f;
+	private float max_diff=-1f;
 	
 	/**
 	 * Create PDFFile with Task
@@ -71,6 +76,7 @@ public class PDFFile {
 		}
 
 	}
+	
 	public void process() throws IOException {
 		System.out.printf("Destination:%s\n\n", task.getDestination());
 		ArrayList<ImgFile> imgs = task.getImgs();
@@ -103,6 +109,11 @@ public class PDFFile {
 		doc.close();
 	}
 
+	/**
+	 * @param img The image written to the page
+	 * @return The page contain image
+	 * @throws IOException
+	 */
 	PDPage createImgPage(BufferedImage img) throws IOException {
 		PDPage page = null;
 		float img_width = img.getWidth();
@@ -174,7 +185,7 @@ public class PDFFile {
 		if (task.getAlign() == ALIGN_FILL) {
 			position_x = position_y = 0;
 			float sub=Math.abs(img_size_ratio-page_size_ratio);
-			if(max_sub>=0&&sub>max_sub) {
+			if(max_diff>=0&&sub>max_diff) {
 				throw new RuntimeException("sub is out of range.");
 			}
 			
@@ -278,8 +289,8 @@ public class PDFFile {
 	public void setProtect(StandardProtectionPolicy spp) {
 		this.spp = spp;
 	}
-	public void setMaxSub(float max_sub) {
-		this.max_sub = max_sub;
+	public void setMaxDiff(float max_diff) {
+		this.max_diff = max_diff;
 	}
 	
 	/**
@@ -327,13 +338,23 @@ public class PDFFile {
 			}
 		}
 
-		public String getStrSize() {
+		public String getStr() {
 			return str;
 		}
 
 		public PDRectangle getPdrectangle() {
 			return pdrectangle;
 		}
+		
+		public static String[] valuesStr() {
+			Size[] size_list=Size.values();
+			String[] str_list=new String[size_list.length];
+			for(int i=0;i<str_list.length;i++) {
+				str_list[i]=size_list[i].getStr();
+			}
+			return str_list;
+		}
+		
 	}
 
 }
