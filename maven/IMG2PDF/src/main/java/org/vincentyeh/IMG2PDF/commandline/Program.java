@@ -73,16 +73,22 @@ public class Program {
 
 	}
 
-	private static Document getDOMParsedDocument(final String fileName) throws ParserConfigurationException, SAXException, IOException {
-		Document document = null;
+	/**
+	 * create Document from file
+	 * @param filepath path of xml file
+	 * @return Document
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 */
+	private static Document getDOMParsedDocument(final String filepath) throws ParserConfigurationException, SAXException, IOException {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		// If want to make namespace aware.
 		// factory.setNamespaceAware(true);
 		DocumentBuilder documentBuilder = factory.newDocumentBuilder();
-		org.w3c.dom.Document w3cDocument = documentBuilder.parse(fileName);
-		document = new DOMBuilder().build(w3cDocument);
+		org.w3c.dom.Document w3cDocument = documentBuilder.parse(filepath);
 
-		return document;
+		return new DOMBuilder().build(w3cDocument);
 	}
 
 	static ArgumentParser createArgParser() {

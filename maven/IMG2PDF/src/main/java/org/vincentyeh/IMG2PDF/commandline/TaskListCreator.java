@@ -87,10 +87,7 @@ public class TaskListCreator {
 			System.exit(1);
 		}
 		lists = new ArrayList<String>(ns.<String>getList("source"));
-		
-		String str_size = ns.getString("size");
-		
-		size = PDFFile.Size.getSizeFromString(str_size);
+		size = PDFFile.Size.getSizeFromString(ns.getString("size"));
 		dst = ns.<String>getList("destination").get(0);
 		list_output = ns.<String>getList("list_output").get(0);
 
@@ -99,11 +96,8 @@ public class TaskListCreator {
 			System.exit(0);
 		}
 		
-		String ns_sortby=ns.getString("sortby");
-		String ns_order=ns.getString("order");
-		
-		sortby=Sortby.getByStr(ns_sortby);
-		order=Order.getByStr(ns_order);
+		sortby=Sortby.getByStr(ns.getString("sortby"));
+		order=Order.getByStr(ns.getString("order"));
 		
 		
 		
@@ -136,7 +130,7 @@ public class TaskListCreator {
 		
 		ArgumentParser parser = ArgumentParsers.newFor("TASKCREATOR").build().defaultHelp(true)
 				.description("Create PDF Task");
-		
+		parser.version("");
 		
 		parser.addArgument("-s", "--sortby").choices(Sortby.valuesStr()).help("Merge all image files in Folder");
 		
