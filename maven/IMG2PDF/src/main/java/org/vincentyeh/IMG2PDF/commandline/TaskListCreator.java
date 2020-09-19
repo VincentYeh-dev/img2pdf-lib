@@ -6,14 +6,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-import org.vincentyeh.IMG2PDF.file.Align;
 import org.vincentyeh.IMG2PDF.file.FileFilterHelper;
 import org.vincentyeh.IMG2PDF.file.ImgFile.Order;
 import org.vincentyeh.IMG2PDF.file.ImgFile.Sortby;
 import org.vincentyeh.IMG2PDF.file.PDFFile;
-import org.vincentyeh.IMG2PDF.file.PDFFile.LeftRightAlign;
+import org.vincentyeh.IMG2PDF.file.PDFFile.Align;
 import org.vincentyeh.IMG2PDF.file.PDFFile.Size;
-import org.vincentyeh.IMG2PDF.file.PDFFile.TopBottomAlign;
 import org.vincentyeh.IMG2PDF.file.text.UTF8InputStream;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskList;

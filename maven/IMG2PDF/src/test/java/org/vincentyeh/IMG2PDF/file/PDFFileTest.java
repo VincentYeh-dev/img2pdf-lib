@@ -7,9 +7,18 @@ import java.io.IOException;
 import org.junit.Test;
 import org.vincentyeh.IMG2PDF.file.ImgFile.Order;
 import org.vincentyeh.IMG2PDF.file.ImgFile.Sortby;
+import org.vincentyeh.IMG2PDF.file.PDFFile.Align;
 import org.vincentyeh.IMG2PDF.task.Task;
 
 public class PDFFileTest {
+	@Test
+	public void testAlign() {
+		PDFFile.Align a=new PDFFile.Align("CENTER|CENTER");
+		PDFFile.Align b=new PDFFile.Align("CENTER|LEFT");
+		
+		System.out.println(a);
+		System.out.println(b);
+	}
 //
 //	@Test
 //	public void testPDFFile() throws FileNotFoundException {

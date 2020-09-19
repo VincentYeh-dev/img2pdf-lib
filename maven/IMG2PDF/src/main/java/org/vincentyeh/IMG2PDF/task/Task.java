@@ -9,14 +9,12 @@ import java.util.List;
 import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.Element;
-import org.vincentyeh.IMG2PDF.file.Align;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
 import org.vincentyeh.IMG2PDF.file.ImgFile.Order;
 import org.vincentyeh.IMG2PDF.file.ImgFile.Sortby;
 import org.vincentyeh.IMG2PDF.file.PDFFile;
-import org.vincentyeh.IMG2PDF.file.PDFFile.LeftRightAlign;
+import org.vincentyeh.IMG2PDF.file.PDFFile.Align;
 import org.vincentyeh.IMG2PDF.file.PDFFile.Size;
-import org.vincentyeh.IMG2PDF.file.PDFFile.TopBottomAlign;
 
 /**
  * <b>Task is the pre-work of the conversion</b>. All attributes of PDF file
