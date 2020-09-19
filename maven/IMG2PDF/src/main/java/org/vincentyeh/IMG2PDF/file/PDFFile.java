@@ -39,13 +39,14 @@ public class PDFFile {
 	private final Task task;
 	
 	/**
-	 * The calculation of diff
-	 * diff=abs((image height/image width)-(page height/page width))
+	 * <b>The calculation of diff</b>
+	 * <p>diff=abs((image height/image width)-(page height/page width))</p>
 	 * 
-	 * Feature
-	 * max_diff is the variable that can be set to prevent raw image over-deformed.
-	 * The default value is less than 0.It do nothing when you don't set it to the value that more than 0.
-	 * If you do that before execution of process() method,the program will throw a Exception that warn a user the sub is out of range when the diff larger than max_diff.
+	 * <b>Feature</b>
+	 * <p>max_diff is the variable that can be set to prevent raw image over-deformed.</p>
+	 * <p>The default value is less than 0.It do nothing when you don't set it to the value that more than 0.</p>
+	 * <p>If you do that before execution of process() method,the program will throw a Exception that warn a user the sub is out of range when the diff larger than max_diff.</p>
+	 *	
 	 */
 	private float max_diff=-1f;
 	
@@ -162,7 +163,7 @@ public class PDFFile {
 	}
 	
 	/**
-	 * Compute the position of image by align value;
+	 * Compute the position of image by align value.
 	 * 
 	 * @param raw The image that put into this page.
 	 * @param page The Page that contain image.
