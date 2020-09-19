@@ -9,30 +9,43 @@ import java.util.List;
 import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.Element;
+import org.vincentyeh.IMG2PDF.file.Align;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
 import org.vincentyeh.IMG2PDF.file.ImgFile.Order;
 import org.vincentyeh.IMG2PDF.file.ImgFile.Sortby;
 import org.vincentyeh.IMG2PDF.file.PDFFile;
+import org.vincentyeh.IMG2PDF.file.PDFFile.LeftRightAlign;
 import org.vincentyeh.IMG2PDF.file.PDFFile.Size;
+import org.vincentyeh.IMG2PDF.file.PDFFile.TopBottomAlign;
 
 /**
- * <b>Task is the pre-work of the conversion</b>. All attributes of PDF file will be
- * define in this step. So the program that convert the images to PDF doesn't
- * need to do pre-work of conversion.
+ * <b>Task is the pre-work of the conversion</b>. All attributes of PDF file
+ * will be define in this step. So the program that convert the images to PDF
+ * doesn't need to do pre-work of conversion.
  * 
- * The function of Task:<ol><li>define how to sort files</li><li>define password of PDF</li><li>compute the name of destination file </li><li>convert itself to XML element</li></ol>  
+ * The function of Task:
+ * <ol>
+ * <li>define how to sort files</li>
+ * <li>define password of PDF</li>
+ * <li>compute the name of destination file</li>
+ * <li>convert itself to XML element</li>
+ * </ol>
  * 
- * @see 	Element
+ * @see Element
  * 
- * @author	VincentYeh
+ * @author VincentYeh
  */
 public class Task extends Element {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -7732049453237587003L;
-	
-	private final int align;
+
+//	private final int align;
+	private final Align align;
+//	private final LeftRightAlign LRA;
+//	private final TopBottomAlign TBA;
+
 	private final PDFFile.Size size;
 	private final String destination;
 	private final String owner_pwd;
@@ -52,15 +65,15 @@ public class Task extends Element {
 	 * @param size        Which size of pages of PDF.
 	 * @throws FileNotFoundException When file is not exists.
 	 */
-	public Task(File[] files, String destination, String own, String user, Sortby sortby, Order order, int align,
-			PDFFile.Size size) throws FileNotFoundException {
+	public Task(File[] files, String destination, String own, String user, Sortby sortby, Order order,Align align, PDFFile.Size size) throws FileNotFoundException {
 		super("TASK");
 		if (files == null)
 			throw new NullPointerException("files is null.");
 
 		if (destination == null)
 			throw new NullPointerException("destination is null.");
-		this.align = align;
+		this.align=align;
+
 		this.size = size;
 		this.destination = destination;
 
@@ -69,16 +82,16 @@ public class Task extends Element {
 			ImgFile img = new ImgFile(file.getAbsolutePath(), sortby, order);
 			imgs.add(img);
 		}
-		
+
 //		imgs need to be sort before written to element
 		Collections.sort(imgs);
-		
-		for(ImgFile img:imgs) {
+
+		for (ImgFile img : imgs) {
 			Element xml_file = new Element("FILE");
 			xml_file.addContent(img.getAbsolutePath());
 			xml_files.addContent(xml_file);
 		}
-		
+
 		super.addContent(xml_files);
 
 		owner_pwd = own != null ? own : "#null";
@@ -86,13 +99,12 @@ public class Task extends Element {
 
 		super.setAttribute("destination", destination);
 		super.setAttribute("size", size.getStr() + "");
-		super.setAttribute("align", align + "");
+		super.setAttribute("align",align.toString());
 		super.setAttribute("owner", owner_pwd);
 		super.setAttribute("user", user_pwd);
 		System.out.printf("\nfound %d files.\n", imgs.size());
 		System.out.print("Sortting files...");
-		
-		
+
 		System.out.print("DONE\n\n");
 
 	}
@@ -122,7 +134,8 @@ public class Task extends Element {
 		String attr_size = super.getAttributeValue("size");
 		String attr_owner_pwd = super.getAttributeValue("owner");
 		String attr_user_pwd = super.getAttributeValue("user");
-		
+		String elm_align = super.getAttributeValue("align");
+
 		if (attr_destination == null)
 			throw new NullPointerException("destination is null");
 		if (attr_align == null)
@@ -134,12 +147,14 @@ public class Task extends Element {
 		if (attr_user_pwd == null)
 			throw new NullPointerException("user_pwd is null");
 		List<Element> contains_files = super.getChild("FILES").getChildren("FILE");
-		
+
 		if (contains_files == null)
 			throw new NullPointerException("files is null");
 
 		destination = attr_destination;
-		align = Integer.valueOf(super.getAttributeValue("align"));
+
+		align=new Align(elm_align);
+		
 		size = Size.getSizeFromString(super.getAttributeValue("size"));
 		owner_pwd = super.getAttributeValue("owner");
 		user_pwd = super.getAttributeValue("user");
@@ -162,8 +177,7 @@ public class Task extends Element {
 		}
 		return imgs;
 	}
-
-	public int getAlign() {
+	public Align getAlign() {
 		return align;
 	}
 

@@ -6,11 +6,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
+import org.vincentyeh.IMG2PDF.file.Align;
 import org.vincentyeh.IMG2PDF.file.FileFilterHelper;
 import org.vincentyeh.IMG2PDF.file.ImgFile.Order;
 import org.vincentyeh.IMG2PDF.file.ImgFile.Sortby;
 import org.vincentyeh.IMG2PDF.file.PDFFile;
+import org.vincentyeh.IMG2PDF.file.PDFFile.LeftRightAlign;
 import org.vincentyeh.IMG2PDF.file.PDFFile.Size;
+import org.vincentyeh.IMG2PDF.file.PDFFile.TopBottomAlign;
 import org.vincentyeh.IMG2PDF.file.text.UTF8InputStream;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskList;
@@ -26,7 +29,7 @@ import net.sourceforge.argparse4j.inf.Namespace;
  * @author VincentYeh
  */
 public class TaskListCreator {
-	static int align;
+	static Align align;
 	static Sortby sortby;
 	static Order order;
 	static Size size;
@@ -69,7 +72,7 @@ public class TaskListCreator {
 				NameFormatter nf = new NameFormatter(dst,dir);
 				FileFilterHelper ffh = createImageFilter(0);
 				Task task = new Task(dir.listFiles(ffh),nf.getConverted(), 
-						owner_pwd, user_pwd,sortby,order, align, size);
+						owner_pwd, user_pwd,sortby,order,align, size);
 				tasks.add(task);
 				
 			}
@@ -98,7 +101,7 @@ public class TaskListCreator {
 		
 		sortby=Sortby.getByStr(ns.getString("sortby"));
 		order=Order.getByStr(ns.getString("order"));
-		
+		String str_align=ns.<String>getList("align").get(0);
 		
 		
 		if (ns.<String>getList("owner_password") != null)
@@ -110,14 +113,16 @@ public class TaskListCreator {
 			user_pwd = ns.<String>getList("user_password").get(0);
 		else
 			user_pwd = null;
-		align = (PDFFile.ALIGN_CENTER & 0xf0) | (PDFFile.ALIGN_CENTER & 0x0f);
+		
+//		align = (PDFFile.ALIGN_CENTER & 0xf0) | (PDFFile.ALIGN_CENTER & 0x0f);
 //		align = PDFFile.ALIGN_FILL;
+		align=new Align(str_align);
 		
 		for(String source:lists) {
 			System.out.printf("source:%s\n",source);
 		}
-
 		System.out.printf("output:%s\n",list_output);
+		System.out.printf("\talign:%s\n",str_align);
 		System.out.printf("\tsize:%s\n",size.getStr());
 		System.out.printf("\tdestination:%s\n", dst);
 		System.out.printf("\towner password:%s\n", owner_pwd);
@@ -131,7 +136,6 @@ public class TaskListCreator {
 		ArgumentParser parser = ArgumentParsers.newFor("TASKCREATOR").build().defaultHelp(true)
 				.description("Create PDF Task");
 		parser.version("");
-		
 		parser.addArgument("-s", "--sortby").choices(Sortby.valuesStr()).help("Merge all image files in Folder");
 		
 		parser.addArgument("-odr", "--order").choices(Order.valuesStr())
@@ -143,6 +147,8 @@ public class TaskListCreator {
 
 		parser.addArgument("-ownpwd", "--owner_password").metavar("ownerpassword").nargs(1).help("PDF owner password");
 		parser.addArgument("-usepwd", "--user_password").metavar("userpassword").nargs(1).help("PDF user password");
+		
+		parser.addArgument("-a","--align").metavar("TopBottom|LeftRight").nargs(1).help("alignment of page of PDF.");
 		parser.addArgument("-d", "--destination").metavar("destination").nargs(1).help("destination of converted file");
 		parser.addArgument("-lo", "--list_output").metavar("destination").nargs(1).help("Output task list(*.XML)");
 		parser.addArgument("source").nargs("*").help("File to convert");
