@@ -27,13 +27,6 @@ import org.vincentyeh.IMG2PDF.util.ImageProcess;
  */
 public class PDFFile {
 
-//	public static final int ALIGN_RIGHT = 0x01;
-//	public static final int ALIGN_LEFT = 0x02;
-//	public static final int ALIGN_CENTER = 0x03;
-//	public static final int ALIGN_TOP = 0x10;
-//	public static final int ALIGN_BOTTOM = 0x20;
-//	public static final int ALIGN_FILL = 0x44;
-
 	private StandardProtectionPolicy spp = null;
 	private final PDDocument doc;
 
@@ -415,7 +408,51 @@ public class PDFFile {
 		}
 
 	}
-	
+
+	/**
+	 * The class which define Alignment of page of PDF
+	 * @author vincent
+	 */
+	public static class Align {
+		private final LeftRightAlign LRA;
+		private final TopBottomAlign TBA;
+
+		/**
+		 * Create Align by enums.
+		 * @param LRA Left Right Align
+		 * @param TBA Top Bottom Align
+		 */
+		public Align(LeftRightAlign LRA, TopBottomAlign TBA) {
+			this.LRA = LRA;
+			this.TBA = TBA;
+		}
+
+		/**
+		 * Create Align by String.
+		 * The str must be "TopBottomAlign|LeftRightAlign" format.
+		 * @param str Alignment
+		 */
+		public Align(String str) {
+			String[] LR_TB_A = str.split("\\|");
+			TBA = TopBottomAlign.getByStr(LR_TB_A[0]);
+			LRA = LeftRightAlign.getByStr(LR_TB_A[1]);
+		}
+
+		public LeftRightAlign getLRA() {
+			return LRA;
+		}
+
+		public TopBottomAlign getTBA() {
+			return TBA;
+		}
+
+		@Override
+		public String toString() {
+			// TODO Auto-generated method stub
+			return String.format("%s|%s", TBA.getStr(), LRA.getStr());
+		}
+	}
+
 	public enum LeftRightAlign {
 		RIGHT("RIGHT"), LEFT("LEFT"), CENTER("CENTER"), FILL("FILL");
 		private String str;
@@ -489,32 +526,5 @@ public class PDFFile {
 			return str_list;
 		}
 	}
-	
-	public static class Align{
-		private final LeftRightAlign LRA;
-		private final TopBottomAlign TBA;
-		
-		
-		public Align(LeftRightAlign LRA,TopBottomAlign TBA) {
-			this.LRA=LRA;
-			this.TBA=TBA;
-		}
-		
-		public Align(String str) {
-			String[] LR_TB_A = str.split("\\|");
-			TBA = TopBottomAlign.getByStr(LR_TB_A[0]);
-			LRA = LeftRightAlign.getByStr(LR_TB_A[1]);
-		}
-		public LeftRightAlign getLRA() {
-			return LRA;
-		}
-		public TopBottomAlign getTBA() {
-			return TBA;
-		}
-		@Override
-		public String toString() {
-			// TODO Auto-generated method stub
-			return String.format("%s|%s", TBA.getStr(), LRA.getStr());
-		}
-	}
+
 }
