@@ -45,7 +45,6 @@ public class TaskList extends ArrayList<Task> {
 			this.add(new Task(el_task));
 		}
 	}
-
 	@Override
 	public void add(int index, Task element) {
 		xml_root.addContent(element);
@@ -65,8 +64,9 @@ public class TaskList extends ArrayList<Task> {
 	}
 
 	/**
-	 * Write XML Element to the file.
+	 *Write XML Element to the file.
 	 * @param file destination of output XML file.
+	 * @throws IOException Exception of writing PDF
 	 */
 	public void toXMLFile(File file) throws IOException {
 		doc.setRootElement(xml_root);

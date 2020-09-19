@@ -15,7 +15,6 @@ import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.util.ImageProcess;
 
 /**
- * 
  * The implementation of Task.It is the core class of conversion.
  * 
  * @author VincentYeh
@@ -40,14 +39,13 @@ public class PDFFile {
 	private final Task task;
 	
 	/**
-	 * <h3>The calculation of diff</h3>
-	 * <p>diff=abs((image height/image width)-(page height/page width))</p>
+	 * The calculation of diff
+	 * diff=abs((image height/image width)-(page height/page width))
 	 * 
-	 * <h3>Feature</h3>
-	 * <p>max_diff is the variable that can be set to prevent raw image over-deformed.</p>
-	 * <p>The default value is less than 0.It do nothing when you don't set it to the value that more than 0.</p>
-	 * <p>If you do that before execution of process() method,the program will throw a Exception that warn a user the sub is out of range when the diff larger than max_diff.</p>
-	 *	
+	 * Feature
+	 * max_diff is the variable that can be set to prevent raw image over-deformed.
+	 * The default value is less than 0.It do nothing when you don't set it to the value that more than 0.
+	 * If you do that before execution of process() method,the program will throw a Exception that warn a user the sub is out of range when the diff larger than max_diff.
 	 */
 	private float max_diff=-1f;
 	
@@ -308,8 +306,8 @@ public class PDFFile {
 	}
 	
 	/**
-	 * <p>Size is the variable that define size of pages of PDFFile.</p> 
-	 * <p>It only can be create by using getSizeFromString(str) or directly specify enum</p>
+	 * Size is the variable that define size of pages of PDFFile. 
+	 * It only can be create by using getSizeFromString(str) or directly specify enum
 	 * @author VincetYeh
 	 */
 	public enum Size {
@@ -318,12 +316,12 @@ public class PDFFile {
 		LETTER("LETTER", PDRectangle.LETTER), DEPEND_ON_IMG("DEPEND", null);
 
 		/**
-		 * <p>This is the String constant of Size.</p>
+		 * This is the String constant of Size.
 		 */
 		private final String str;
 		
 		/**
-		 * <p>This is the constant  used to create the PDF.</p>
+		 * This is the constant  used to create the PDF.
 		 */
 		private final PDRectangle pdrectangle;
 

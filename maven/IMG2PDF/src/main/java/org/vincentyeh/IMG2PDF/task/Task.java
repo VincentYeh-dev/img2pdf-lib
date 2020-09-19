@@ -21,7 +21,9 @@ import org.vincentyeh.IMG2PDF.file.PDFFile.Size;
  * 
  * The function of Task:<ol><li>define how to sort files</li><li>define password of PDF</li><li>compute the name of destination file </li><li>convert itself to XML element</li></ol>  
  * 
- * @author VincentYeh
+ * @see 	Element
+ * 
+ * @author	VincentYeh
  */
 public class Task extends Element {
 	/**
@@ -47,7 +49,7 @@ public class Task extends Element {
 	 * @param order       order by increase or decrease value
 	 * @param align       Where should Images of PDF be located on PDF.
 	 * @param size        Which size of pages of PDF.
-	 * @throws FileNotFoundException
+	 * @throws FileNotFoundException When file is not exists.
 	 */
 	public Task(File[] files, String destination, String own, String user, Sortby sortby, Order order, int align,
 			PDFFile.Size size) throws FileNotFoundException {
