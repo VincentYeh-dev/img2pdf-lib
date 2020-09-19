@@ -204,11 +204,27 @@ public class PDFFile {
 //		int lr = task.getAlign() & 0x0F;
 //		int tb = task.getAlign() & 0xF0;
 		boolean isRotated = Math.abs(Math.sin(Math.toRadians(page.getRotation()))) == 1;
+		if (TBA == TopBottomAlign.FILL && LRA != LeftRightAlign.FILL) {
+			if (!isRotated) {
+				out_height = real_page_height;
+				out_width = (img_width / img_height) * out_height;
+			} else {
+				out_width = real_page_width;
+				out_height = (img_height / img_width) * out_width;
+			}
 
-		if (LRA == LeftRightAlign.FILL && TBA == TopBottomAlign.FILL) {
+		} else if (LRA == LeftRightAlign.FILL && TBA != TopBottomAlign.FILL) {
+			if (!isRotated) {
+				out_width = real_page_width;
+				out_height = (img_height / img_width) * out_width;
+			} else {
+				out_height = real_page_height;
+				out_width = (img_width / img_height) * out_height;
+			}
+		} else if (LRA == LeftRightAlign.FILL && TBA == TopBottomAlign.FILL) {
 			position_x = position_y = 0;
-			float sub = Math.abs(img_size_ratio - page_size_ratio);
-			if (max_diff >= 0 && sub > max_diff) {
+			float diff = Math.abs(img_size_ratio - page_size_ratio);
+			if (max_diff >= 0 && diff > max_diff) {
 				throw new RuntimeException("sub is out of range.");
 			}
 
@@ -411,6 +427,7 @@ public class PDFFile {
 
 	/**
 	 * The class which define Alignment of page of PDF
+	 * 
 	 * @author vincent
 	 */
 	public static class Align {
@@ -419,6 +436,7 @@ public class PDFFile {
 
 		/**
 		 * Create Align by enums.
+		 * 
 		 * @param LRA Left Right Align
 		 * @param TBA Top Bottom Align
 		 */
@@ -428,8 +446,9 @@ public class PDFFile {
 		}
 
 		/**
-		 * Create Align by String.
-		 * The str must be "TopBottomAlign|LeftRightAlign" format.
+		 * Create Align by String. The str must be "TopBottomAlign|LeftRightAlign"
+		 * format.
+		 * 
 		 * @param str Alignment
 		 */
 		public Align(String str) {

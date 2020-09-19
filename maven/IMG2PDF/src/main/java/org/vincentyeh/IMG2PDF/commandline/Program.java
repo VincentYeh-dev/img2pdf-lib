@@ -61,7 +61,7 @@ public class Program {
 			for (Task task : tasks) {
 				PDFFile pdf = new PDFFile(task);
 				try {
-					pdf.setMaxDiff(0.15f);
+//					pdf.setMaxDiff(0.15f);
 					pdf.process();
 
 				} catch (Exception e) {
