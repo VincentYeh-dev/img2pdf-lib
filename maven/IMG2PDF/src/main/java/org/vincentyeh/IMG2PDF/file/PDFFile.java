@@ -234,11 +234,11 @@ public class PDFFile {
 				}
 			} else {
 				switch (TBA) {
-				case BOTTOM:
-					position_x = x_space;
-					break;
 				case TOP:
 					position_x = 0;
+					break;
+				case BOTTOM:
+					position_x = x_space;
 					break;
 				case CENTER:
 					position_x = x_space / 2;

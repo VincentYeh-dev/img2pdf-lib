@@ -19,13 +19,6 @@ public class ImgFile extends File implements Comparable<File> {
 	 */
 	private static final long serialVersionUID = -6910177315066351680L;
 
-//	public static final int ORDER_NONE=-1;
-//	public static final int ORDER_INCREASE=0;
-//	public static final int ORDER_DECREASE=1;
-//	
-//	public static final int SORTBY_NONE=-1;
-//	public static final int SORTBY_NAME=0;
-//	public static final int SORTBY_DATE=1;
 	private final Sortby sortby;
 	private final Order order;
 
@@ -55,12 +48,6 @@ public class ImgFile extends File implements Comparable<File> {
 			throw new FileNotFoundException(pathname + " not found.");
 		if (isDirectory())
 			throw new RuntimeException(this.getAbsolutePath() + " is a directory");
-//		
-//		if(order<-1||order>1)
-//			throw new IllegalArgumentException("order value need to be between -1 and 1");
-//		if(sortby<-1||sortby>1)
-//			throw new IllegalArgumentException("sortby value need to be between -1 and 1");
-//		
 
 		this.sortby = sortby;
 		this.order = order;
