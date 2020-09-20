@@ -10,7 +10,7 @@ public class QuicklyTester {
 				+ "-odr INCREASE "
 				+ "-lo test_file\\test.xml "
 				+ "-d test_file\\output\\$NAME.pdf "
-				+ "test_file\\dirlist_sample.txt";
+				+ "test_file\\dirlist.txt";
 		System.out.println(str);
 		TaskListCreator.main(str.trim().split("\\s"));
 		Program.main(new String[] {"test_file\\test.xml"});

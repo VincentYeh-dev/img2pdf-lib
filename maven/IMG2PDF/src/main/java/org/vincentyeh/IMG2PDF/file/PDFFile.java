@@ -142,7 +142,7 @@ public class PDFFile {
 			out_width = img_width;
 			out_height = img_height;
 
-		} else if (size != Size.DEPEND_ON_IMG) {
+		} else{
 			page = new PDPage(size.getPdrectangle());
 			img_width = img.getWidth();
 			img_height = img.getHeight();
@@ -155,7 +155,7 @@ public class PDFFile {
 				img = ImgFile.rotateImg(img, -1 * angle);
 			}
 
-			float[] received = position_compute(img, page);
+			float[] received = position(img, page);
 			position_x = received[0];
 			position_y = received[1];
 			out_width = received[2];
@@ -185,7 +185,7 @@ public class PDFFile {
 	 *         <li>image height</li>
 	 *         </ol>
 	 */
-	float[] position_compute(BufferedImage raw, PDPage page) {
+	float[] position(BufferedImage raw, PDPage page) {
 		PDRectangle rec = page.getBBox();
 		float real_page_width = rec.getWidth();
 		float real_page_height = rec.getHeight();
@@ -201,8 +201,6 @@ public class PDFFile {
 		LeftRightAlign LRA = task.getAlign().getLRA();
 		TopBottomAlign TBA = task.getAlign().getTBA();
 
-//		int lr = task.getAlign() & 0x0F;
-//		int tb = task.getAlign() & 0xF0;
 		boolean isRotated = Math.abs(Math.sin(Math.toRadians(page.getRotation()))) == 1;
 		if (TBA == TopBottomAlign.FILL && LRA != LeftRightAlign.FILL) {
 			if (!isRotated) {
@@ -247,6 +245,10 @@ public class PDFFile {
 				case CENTER:
 					position_x = x_space / 2;
 					break;
+				case FILL:
+					break;
+				default:
+					break;
 				}
 			} else {
 				switch (TBA) {
@@ -258,6 +260,10 @@ public class PDFFile {
 					break;
 				case CENTER:
 					position_x = x_space / 2;
+					break;
+				case FILL:
+					break;
+				default:
 					break;
 
 				}
@@ -279,6 +285,10 @@ public class PDFFile {
 				case CENTER:
 					position_y = y_space / 2;
 					break;
+				case FILL:
+					break;
+				default:
+					break;
 
 				}
 			} else {
@@ -291,6 +301,10 @@ public class PDFFile {
 					break;
 				case CENTER:
 					position_y = y_space / 2;
+					break;
+				case FILL:
+					break;
+				default:
 					break;
 				}
 			}
@@ -329,6 +343,7 @@ public class PDFFile {
 	 * 
 	 * @param spp StandardProtectionPolicy
 	 */
+
 	public void setProtect(StandardProtectionPolicy spp) {
 		this.spp = spp;
 	}
@@ -422,7 +437,6 @@ public class PDFFile {
 			}
 			return str_list;
 		}
-
 	}
 
 	/**
@@ -467,7 +481,6 @@ public class PDFFile {
 
 		@Override
 		public String toString() {
-			// TODO Auto-generated method stub
 			return String.format("%s|%s", TBA.getStr(), LRA.getStr());
 		}
 	}

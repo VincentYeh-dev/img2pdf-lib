@@ -112,8 +112,6 @@ public class TaskListCreator {
 		else
 			user_pwd = null;
 		
-//		align = (PDFFile.ALIGN_CENTER & 0xf0) | (PDFFile.ALIGN_CENTER & 0x0f);
-//		align = PDFFile.ALIGN_FILL;
 		align=new Align(str_align);
 		
 		for(String source:lists) {
