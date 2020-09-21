@@ -13,9 +13,8 @@ import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
 import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.vincentyeh.IMG2PDF.file.ImgFile.Order;
-import org.vincentyeh.IMG2PDF.file.PDFFile.Align;
-import org.vincentyeh.IMG2PDF.file.PDFFile.LeftRightAlign;
-import org.vincentyeh.IMG2PDF.file.PDFFile.TopBottomAlign;
+import org.vincentyeh.IMG2PDF.file.PDFFile.Align.LeftRightAlign;
+import org.vincentyeh.IMG2PDF.file.PDFFile.Align.TopBottomAlign;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.util.ImageProcess;
 
@@ -90,10 +89,13 @@ public class PDFFile {
 	 * @throws IOException When creating the image page.
 	 */
 	public void process() throws IOException {
-		System.out.printf("Destination:%s\n\n", task.getDestination());
+		boolean isProtected = spp != null;
+		System.out.printf("Destination:%s\n", task.getDestination());
+		System.out.printf("Protected:%s\n", isProtected);
+
 		ArrayList<ImgFile> imgs = task.getImgs();
 
-		System.out.print("Start convert process..\n\n");
+		System.out.print("\nStart convert process..\n\n");
 		int all = imgs.size();
 		double perImg = (10. / all);
 		double progress = 0;
@@ -110,13 +112,13 @@ public class PDFFile {
 			doc.addPage(createImgPage(ip.read()));
 
 		}
-		System.out.print("]%100\n\n\n");
+		System.out.print("]%100");
 
-		if (spp != null) {
-			System.out.println("Save with password");
+		if (isProtected) {
 			doc.protect(spp);
+			System.out.print(" *");
 		}
-
+		System.out.println("\n\n\n");
 		doc.save(task.getDestination());
 		doc.close();
 	}
@@ -142,7 +144,7 @@ public class PDFFile {
 			out_width = img_width;
 			out_height = img_height;
 
-		} else{
+		} else {
 			page = new PDPage(size.getPdrectangle());
 			img_width = img.getWidth();
 			img_height = img.getHeight();
@@ -328,7 +330,6 @@ public class PDFFile {
 		int keyLength = 128;
 		// Disable printing, everything else is allowed
 		ap.setCanPrint(false);
-
 		// Owner password (to open the file with all permissions) is "12345"
 		// User password (to open the file but with restricted permissions, is empty
 		// here)
@@ -389,7 +390,7 @@ public class PDFFile {
 		 * @param str The String contain definition of Size.
 		 * @return Size
 		 */
-		public static Size getSizeFromString(String str) {
+		public static Size getSizeFromString(String str) throws IllegalSizeException{
 			switch (str) {
 			case "A0":
 				return A0;
@@ -412,7 +413,7 @@ public class PDFFile {
 			case "DEPEND":
 				return DEPEND_ON_IMG;
 			default:
-				throw new RuntimeException();
+				throw new IllegalSizeException(str);
 			}
 		}
 
@@ -437,6 +438,21 @@ public class PDFFile {
 			}
 			return str_list;
 		}
+		
+		public static class IllegalSizeException extends IllegalArgumentException {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 182897419820418934L;
+
+			public IllegalSizeException(String str) {
+				super(str + " isn't a type of size.");
+				// TODO Auto-generated constructor stub
+			}
+
+		}
+
 	}
 
 	/**
@@ -465,10 +481,15 @@ public class PDFFile {
 		 * 
 		 * @param str Alignment
 		 */
-		public Align(String str) {
+		public Align(String str) throws IllegalAlignException {
 			String[] LR_TB_A = str.split("\\|");
-			TBA = TopBottomAlign.getByStr(LR_TB_A[0]);
-			LRA = LeftRightAlign.getByStr(LR_TB_A[1]);
+			try {
+				TBA = TopBottomAlign.getByStr(LR_TB_A[0]);
+				LRA = LeftRightAlign.getByStr(LR_TB_A[1]);
+			} catch (IllegalArgumentException e) {
+				throw new IllegalAlignException(e.getMessage());
+			}
+
 		}
 
 		public LeftRightAlign getLRA() {
@@ -483,79 +504,94 @@ public class PDFFile {
 		public String toString() {
 			return String.format("%s|%s", TBA.getStr(), LRA.getStr());
 		}
-	}
 
-	public enum LeftRightAlign {
-		RIGHT("RIGHT"), LEFT("LEFT"), CENTER("CENTER"), FILL("FILL");
-		private String str;
+		public static class IllegalAlignException extends IllegalArgumentException {
 
-		private LeftRightAlign(String str) {
-			this.str = str;
-		}
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 182897419820418934L;
 
-		public static LeftRightAlign getByStr(String str) {
-			switch (str) {
-			case "RIGHT":
-				return RIGHT;
-			case "LEFT":
-				return LEFT;
-			case "CENTER":
-				return CENTER;
-			case "FILL":
-				return FILL;
-			default:
-				throw new RuntimeException("LeftRightAlign is invalid");
+			public IllegalAlignException(String str) {
+				super(str + " isn't a type of align.");
+				// TODO Auto-generated constructor stub
 			}
+
 		}
 
-		public String getStr() {
-			return str;
-		}
+		public enum LeftRightAlign {
+			RIGHT("RIGHT"), LEFT("LEFT"), CENTER("CENTER"), FILL("FILL");
+			private String str;
 
-		public static String[] valuesStr() {
-			Order[] list = Order.values();
-			String[] str_list = new String[list.length];
-			for (int i = 0; i < str_list.length; i++) {
-				str_list[i] = list[i].getStr();
+			private LeftRightAlign(String str) {
+				this.str = str;
 			}
-			return str_list;
-		}
-	}
 
-	public enum TopBottomAlign {
-		TOP("TOP"), BOTTOM("BOTTOM"), CENTER("CENTER"), FILL("FILL");
-		private String str;
-
-		private TopBottomAlign(String str) {
-			this.str = str;
-		}
-
-		public static TopBottomAlign getByStr(String str) {
-			switch (str) {
-			case "TOP":
-				return TOP;
-			case "BOTTOM":
-				return BOTTOM;
-			case "CENTER":
-				return CENTER;
-			case "FILL":
-				return FILL;
-			default:
-				throw new RuntimeException("TopBottomAlign is invalid");
+			public static LeftRightAlign getByStr(String str) throws IllegalArgumentException {
+				switch (str) {
+				case "RIGHT":
+					return RIGHT;
+				case "LEFT":
+					return LEFT;
+				case "CENTER":
+					return CENTER;
+				case "FILL":
+					return FILL;
+				default:
+					throw new IllegalArgumentException(str);
+				}
 			}
-		}
 
-		public String getStr() {
-			return str;
-		}
-
-		public static String[] valuesStr() {
-			Order[] list = Order.values();
-			String[] str_list = new String[list.length];
-			for (int i = 0; i < str_list.length; i++) {
-				str_list[i] = list[i].getStr();
+			public String getStr() {
+				return str;
 			}
-			return str_list;
+
+			public static String[] valuesStr() {
+				Order[] list = Order.values();
+				String[] str_list = new String[list.length];
+				for (int i = 0; i < str_list.length; i++) {
+					str_list[i] = list[i].getStr();
+				}
+				return str_list;
+			}
+
+		}
+
+		public enum TopBottomAlign {
+			TOP("TOP"), BOTTOM("BOTTOM"), CENTER("CENTER"), FILL("FILL");
+			private String str;
+
+			private TopBottomAlign(String str) {
+				this.str = str;
+			}
+
+			public static TopBottomAlign getByStr(String str) throws IllegalArgumentException {
+				switch (str) {
+				case "TOP":
+					return TOP;
+				case "BOTTOM":
+					return BOTTOM;
+				case "CENTER":
+					return CENTER;
+				case "FILL":
+					return FILL;
+				default:
+					throw new IllegalArgumentException(str);
+				}
+			}
+
+			public String getStr() {
+				return str;
+			}
+
+			public static String[] valuesStr() {
+				Order[] list = Order.values();
+				String[] str_list = new String[list.length];
+				for (int i = 0; i < str_list.length; i++) {
+					str_list[i] = list[i].getStr();
+				}
+				return str_list;
+			}
 		}
 	}
 

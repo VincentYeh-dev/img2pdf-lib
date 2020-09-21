@@ -10,9 +10,13 @@ public class QuicklyTester {
 				+ "-odr INCREASE "
 				+ "-lo test_file\\test.xml "
 				+ "-d test_file\\output\\$NAME.pdf "
+//				+ "-usepwd 1234AAA "
+//				+ "-ownpwd 1234AAA "
 				+ "test_file\\dirlist.txt";
+		String[] help=new String[] {"-h"};
 		System.out.println(str);
 		TaskListCreator.main(str.trim().split("\\s"));
+//		TaskListCreator.main(help);
 		Program.main(new String[] {"test_file\\test.xml"});
 	}
 

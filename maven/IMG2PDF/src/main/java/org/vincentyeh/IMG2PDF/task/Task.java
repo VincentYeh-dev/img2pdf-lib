@@ -44,7 +44,7 @@ public class Task extends Element {
 //	private final LeftRightAlign LRA;
 //	private final TopBottomAlign TBA;
 
-	private final PDFFile.Size size;
+	private final Size size;
 	private final String destination;
 	private final String owner_pwd;
 	private final String user_pwd;

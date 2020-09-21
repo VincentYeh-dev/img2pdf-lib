@@ -8,6 +8,8 @@ import org.junit.Test;
 import org.vincentyeh.IMG2PDF.file.ImgFile.Order;
 import org.vincentyeh.IMG2PDF.file.ImgFile.Sortby;
 import org.vincentyeh.IMG2PDF.file.PDFFile.Align;
+import org.vincentyeh.IMG2PDF.file.PDFFile.Size;
+import org.vincentyeh.IMG2PDF.file.PDFFile.Size.IllegalSizeException;
 import org.vincentyeh.IMG2PDF.task.Task;
 
 public class PDFFileTest {
@@ -19,6 +21,11 @@ public class PDFFileTest {
 		System.out.println(a);
 		System.out.println(b);
 	}
+	@Test(expected = IllegalSizeException.class)
+	public void testIllegalSize() {
+		Size.getSizeFromString("AA");
+	}
+	
 //
 //	@Test
 //	public void testPDFFile() throws FileNotFoundException {

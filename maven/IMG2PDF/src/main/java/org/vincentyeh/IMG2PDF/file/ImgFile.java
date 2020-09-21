@@ -36,8 +36,8 @@ public class ImgFile extends File implements Comparable<File> {
 	 * Create the ImgFile that need to sort.
 	 * 
 	 * @param pathname the path of image file
-	 * @param sortby sortby
-	 * @param order order
+	 * @param sortby   sortby
+	 * @param order    order
 	 * @throws FileNotFoundException when file is not exists
 	 */
 	public ImgFile(String pathname, Sortby sortby, Order order) throws FileNotFoundException {
@@ -47,8 +47,8 @@ public class ImgFile extends File implements Comparable<File> {
 		if (!exists())
 			throw new FileNotFoundException(pathname + " not found.");
 		if (isDirectory())
-			throw new RuntimeException(this.getAbsolutePath() + " is a directory");
-
+			throw new FileIsDirectoryException(this);
+		
 		this.sortby = sortby;
 		this.order = order;
 
@@ -158,5 +158,34 @@ public class ImgFile extends File implements Comparable<File> {
 		public String getStr() {
 			return str;
 		}
+	}
+
+	public static class FileIsDirectoryException extends FileNotImageException {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		public FileIsDirectoryException(File f) {
+			super(f.getName()+" is a directory.");
+		}
+
+	}
+
+	public static class FileNotImageException extends RuntimeException {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		public FileNotImageException(String str) {
+			super(str);
+		}
+
+		public FileNotImageException(File f) {
+			super(f.getName() + " is not a image file.");
+		}
+
 	}
 }

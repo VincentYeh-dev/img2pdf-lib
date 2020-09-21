@@ -12,6 +12,7 @@ import javax.imageio.ImageIO;
 
 import org.junit.Test;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
+import org.vincentyeh.IMG2PDF.file.ImgFile.FileIsDirectoryException;
 import org.vincentyeh.IMG2PDF.file.ImgFile.Order;
 import org.vincentyeh.IMG2PDF.file.ImgFile.Sortby;
 
@@ -77,6 +78,7 @@ public class ImgFileTest {
 
 	}
 	
+	
 	@Test(expected = RuntimeException.class)
 	public void testCreateImageFileWithIllegalArgument() throws FileNotFoundException{
 		String str = "test_file\\raw\\TEST\\01.jpg";
@@ -92,9 +94,8 @@ public class ImgFileTest {
 	 * 
 	 * Swap Constructor of ImgFile
 	 * 
-	 * @throws FileNotFoundException
 	 */
-	@Test(expected = RuntimeException.class)
+	@Test(expected = FileIsDirectoryException.class)
 	public void testCreateImageFileWithDirectoryArgument() throws FileNotFoundException {
 		String str = "test_file";
 		new ImgFile(str);
