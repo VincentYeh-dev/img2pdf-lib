@@ -65,7 +65,8 @@ public class TaskListCreator {
 			if (buf != null && !buf.isEmpty()) {
 //				trim():	private invisible character pass to the constructor 
 //				of File and make file not exists.
-				File dir=new File(buf.trim());
+				System.out.println(buf);
+				File dir=new File(buf);
 				
 				NameFormatter nf = new NameFormatter(dst,dir);
 				FileFilterHelper ffh = createImageFilter(0);

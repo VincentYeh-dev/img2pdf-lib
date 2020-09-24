@@ -12,7 +12,7 @@ public class QuicklyTester {
 				+ "-d test_file\\output\\$NAME.pdf "
 //				+ "-usepwd 1234AAA "
 //				+ "-ownpwd 1234AAA "
-				+ "test_file\\dirlist.txt";
+				+ "test_file\\dirlist_cmyk.txt";
 		String[] help=new String[] {"-h"};
 		System.out.println(str);
 		TaskListCreator.main(str.trim().split("\\s"));

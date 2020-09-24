@@ -16,32 +16,42 @@ import java.util.Iterator;
 import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
+import javax.imageio.ImageTypeSpecifier;
+import javax.imageio.event.IIOReadProgressListener;
 import javax.imageio.stream.ImageInputStream;
 
 public class ImageProcess {
 	private final File file;
-	
+//	private boolean convert_ycck_image = false;
+//
+//	public ImageProcess(File file, boolean convert_ycck_image) {
+//		this(file);
+//		this.convert_ycck_image = convert_ycck_image;
+//	}
+
 	public ImageProcess(File file) {
 		this.file = file;
+
 	}
-	
+
 	public BufferedImage read() throws IOException {
 		ImageReader reader = findReader(file);
 		String format = reader.getFormatName();
-		BufferedImage image;
-		
+		BufferedImage image = null;
 		if ("JPEG".equalsIgnoreCase(format) || "JPG".equalsIgnoreCase(format)) {
 
 			try {
 //				try to reading file(including Color Convertion)
 				image = reader.read(0); // RGB
 
-			} catch (Exception e) {
-//				Read Raster(no color convertion)
-//				System.err.println(e.getMessage());
-				Raster raster = reader.readRaster(0, null);// CMYK
-				image = YCCK2RGB(raster);
-//				image=null;
+			} catch (IIOException e) {
+//				e.printStackTrace();
+				
+				if (e.getMessage().equals("Unsupported Image Type")) {
+					System.err.println("Unsupported Image Type");
+					Raster raster = reader.readRaster(0, null);// CMYK
+					image = YCCK2RGB(raster);
+				}
 
 			}
 
@@ -51,8 +61,7 @@ public class ImageProcess {
 			return ImageIO.read(file);
 		}
 	}
-	
-	
+
 	private ImageReader findReader(File file) throws IOException {
 		ImageInputStream input = ImageIO.createImageInputStream(file);
 		Iterator<ImageReader> readers = ImageIO.getImageReaders(input);
@@ -62,8 +71,50 @@ public class ImageProcess {
 
 		ImageReader reader = (ImageReader) readers.next();
 		reader.setInput(input);
+
+//		ColorSpaceDetect(reader);
 		return reader;
 	}
+
+//	private void ColorSpaceDetect(ImageReader reader) throws IOException {
+//		Iterator<ImageTypeSpecifier> types = reader.getImageTypes(0);
+//
+//		ImageTypeSpecifier srgb = null;
+//		ImageTypeSpecifier gray = null;
+//
+//		while (types.hasNext()) {
+//			ImageTypeSpecifier t = types.next();
+//			System.out.print(t.getColorModel().getColorSpace().getType()+" ");
+//			int type=t.getColorModel().getColorSpace().getType();
+//			switch(type) {
+//				case ColorSpace.TYPE_GRAY:
+//					gray = t;
+//					break;
+//				case ColorSpace.TYPE_YCbCr:
+//					System.out.println("FFFFFFFFFFFFFFFFFFFFF");
+//					break;
+//				
+//			}
+//			
+//			if (t.getColorModel().getColorSpace() == ColorSpace.getInstance(ColorSpace.CS_sRGB)) {
+//				srgb = t;
+//			}
+//			
+//
+//		}
+//
+//		if (gray != null) {
+//			System.out.println("gray");
+//		} else {
+//			System.err.println("No gray type available.");
+//		}
+//		if (srgb != null) {
+//			System.out.println("srgb");
+//		} else {
+//			System.err.println("No srgb type available.");
+//		}
+//		
+//	}
 
 	private BufferedImage YCCK2RGB(Raster raster) {
 		int w = raster.getWidth();
@@ -99,4 +150,5 @@ public class ImageProcess {
 		ColorModel cm = new ComponentColorModel(cs, false, true, Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
 		return new BufferedImage(cm, (WritableRaster) raster, true, null);
 	}
+
 }
