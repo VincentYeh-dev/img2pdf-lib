@@ -1,5 +1,6 @@
 package org.vincentyeh.IMG2PDF.commandline;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -7,6 +8,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.imaging.icc.IccProfileInfo;
+import org.apache.commons.imaging.icc.IccProfileParser;
 import org.jdom2.Document;
 import org.jdom2.input.DOMBuilder;
 import org.vincentyeh.IMG2PDF.file.PDFFile;
@@ -40,7 +43,6 @@ public class Program {
 	}
 
 	public static void main(String[] args) throws IOException {
-
 		ArgumentParser parser = createArgParser();
 		Program program = new Program(parser, args);
 

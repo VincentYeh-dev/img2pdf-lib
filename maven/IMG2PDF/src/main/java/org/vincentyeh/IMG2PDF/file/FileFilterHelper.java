@@ -87,7 +87,6 @@ public class FileFilterHelper implements FileFilter {
 		if (file.isFile()) {
 			for(int i=0;i<ext_selector.size();i++) {
 				String sel=ext_selector.get(i);
-//				System.out.printf("%s:%s\n",buf[1],sel);
 				if (ext_content == CONDITION_EXT_CONTENT && !buf[1].contains(sel))
 					continue;
 				else if (ext_content == ~CONDITION_EXT_CONTENT && buf[1].contains(sel))
