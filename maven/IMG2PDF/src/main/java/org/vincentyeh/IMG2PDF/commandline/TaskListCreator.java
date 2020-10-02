@@ -37,7 +37,7 @@ public class TaskListCreator {
 	private String user_pwd;
 	private ArrayList<String> lists;
 	private String list_output = null;
-	private TaskList tasks=new TaskList();
+	TaskList tasks=new TaskList();
 	
 	TaskListCreator(String args) throws IOException {
 		this(args.trim().split("\\s"));
@@ -46,14 +46,13 @@ public class TaskListCreator {
 	TaskListCreator(String[] args) throws IOException {
 		ArgumentParser parser = createArgParser();
 		Arg2Values(parser, args);
+		
 		for (String list : lists) {
-			TaskList a=importTasksFromTXT(new File(list));
-			
-			tasks.addAll(a);
+			tasks.addAll(importTasksFromTXT(new File(list)));
 		}
 		
 		tasks.toXMLFile(new File(list_output));
-		
+
 	}
 
 	public static void main(String[] args) throws Exception {
