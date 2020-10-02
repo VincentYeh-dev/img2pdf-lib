@@ -31,43 +31,38 @@ import net.sourceforge.argparse4j.inf.Namespace;
 public class TaskProcessor {
 	private ArrayList<String> lists;
 
-	TaskProcessor(String args) throws IOException{
+	public TaskProcessor(String args) throws IOException, ParserConfigurationException, SAXException {
 		this(args.trim().split("\\s"));
 	}
-	
-	TaskProcessor(String[] args) throws IOException {
+
+	public TaskProcessor(String[] args) throws IOException, ParserConfigurationException, SAXException {
 		ArgumentParser parser = createArgParser();
 		Arg2Values(parser, args);
 
 		for (String list : lists) {
-			Document xml = null;
-			try {
-				xml = getDOMParsedDocument(list);
-			} catch (ParserConfigurationException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (SAXException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-
-			TaskList tasks = new TaskList(xml);
-
-			for (Task task : tasks) {
-				PDFFile pdf = new PDFFile(task);
-				try {
-//					pdf.setMaxDiff(0.15f);
-					pdf.process();
-
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-
+			Document xml = getDOMParsedDocument(list);
+			start(new TaskList(xml));
 		}
 	}
 
-	public static void main(String[] args) throws IOException {
+	public TaskProcessor(TaskList tasks) {
+		start(tasks);
+	}
+
+	private void start(TaskList tasks) {
+		for (Task task : tasks) {
+			PDFFile pdf = new PDFFile(task);
+			try {
+//				pdf.setMaxDiff(0.15f);
+				pdf.process();
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public static void main(String[] args) throws IOException, ParserConfigurationException, SAXException {
 		new TaskProcessor(args);
 	}
 

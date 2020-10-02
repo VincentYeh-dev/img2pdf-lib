@@ -55,10 +55,15 @@ public class TaskListCreator {
 
 	}
 
+	
 	public static void main(String[] args) throws Exception {
 		new TaskListCreator(args);
 	}
 
+	public TaskList getTaskList() {
+		return tasks;
+	}
+	
 	/**
 	 * Import multiple path of each directory,and convert it to task.
 	 * 
@@ -162,7 +167,7 @@ public class TaskListCreator {
 		return parser;
 	}
 
-	FileFilterHelper createImageFilter(int condition) {
+	private FileFilterHelper createImageFilter(int condition) {
 		FileFilterHelper ffh = new FileFilterHelper(
 				condition | FileFilterHelper.CONDITION_IS_FILE | FileFilterHelper.CONDITION_EXT_EQUALS);
 		ffh.appendExtSLT("JPG");
