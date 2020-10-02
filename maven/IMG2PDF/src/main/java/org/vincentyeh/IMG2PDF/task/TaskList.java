@@ -20,8 +20,9 @@ public class TaskList extends ArrayList<Task> {
 	 * 
 	 */
 	private static final long serialVersionUID = -2891486701232492442L;
-	private Element xml_root;
-	private Document doc;
+	
+	Element xml_root;
+	Document doc;
 
 	/**
 	 * Create the empty collection of Task.

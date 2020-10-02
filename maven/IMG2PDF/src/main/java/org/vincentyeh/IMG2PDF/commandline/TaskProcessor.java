@@ -28,26 +28,19 @@ import net.sourceforge.argparse4j.inf.Namespace;
  * @author VincentYeh
  *
  */
-public class Program {
-	final ArrayList<String> lists;
+public class TaskProcessor {
+	private ArrayList<String> lists;
 
-	Program(ArgumentParser parser, String[] args) {
-		Namespace ns = null;
-		try {
-			ns = parser.parseArgs(args);
-		} catch (ArgumentParserException e) {
-			parser.handleError(e);
-			System.exit(1);
-		}
-		lists = new ArrayList<String>(ns.<String>getList("source"));
+	TaskProcessor(String args) throws IOException{
+		this(args.trim().split("\\s"));
 	}
-
-	public static void main(String[] args) throws IOException {
+	
+	TaskProcessor(String[] args) throws IOException {
 		ArgumentParser parser = createArgParser();
-		Program program = new Program(parser, args);
+		Arg2Values(parser, args);
 
-		for (String list : program.lists) {
-			Document xml=null;
+		for (String list : lists) {
+			Document xml = null;
 			try {
 				xml = getDOMParsedDocument(list);
 			} catch (ParserConfigurationException e1) {
@@ -57,7 +50,7 @@ public class Program {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			
+
 			TaskList tasks = new TaskList(xml);
 
 			for (Task task : tasks) {
@@ -72,18 +65,23 @@ public class Program {
 			}
 
 		}
+	}
 
+	public static void main(String[] args) throws IOException {
+		new TaskProcessor(args);
 	}
 
 	/**
 	 * create Document from file
+	 * 
 	 * @param filepath path of xml file
 	 * @return Document
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	private static Document getDOMParsedDocument(final String filepath) throws ParserConfigurationException, SAXException, IOException {
+	private Document getDOMParsedDocument(final String filepath)
+			throws ParserConfigurationException, SAXException, IOException {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		// If want to make namespace aware.
 		// factory.setNamespaceAware(true);
@@ -93,11 +91,21 @@ public class Program {
 		return new DOMBuilder().build(w3cDocument);
 	}
 
-	static ArgumentParser createArgParser() {
+	private ArgumentParser createArgParser() {
 		ArgumentParser parser = ArgumentParsers.newFor("IMG2PDF").build().defaultHelp(true)
 				.description("Convert or merge image file to PDF");
 		parser.addArgument("source").nargs("*").help("File to convert");
 		return parser;
 	}
 
+	private void Arg2Values(ArgumentParser parser, String[] args) {
+		Namespace ns = null;
+		try {
+			ns = parser.parseArgs(args);
+		} catch (ArgumentParserException e) {
+			parser.handleError(e);
+			System.exit(1);
+		}
+		lists = new ArrayList<String>(ns.<String>getList("source"));
+	}
 }

@@ -17,7 +17,7 @@ public class QuicklyTester {
 		System.out.println(str);
 		TaskListCreator.main(str.trim().split("\\s"));
 //		TaskListCreator.main(help);
-		Program.main(new String[] {"test_file\\test.xml"});
+		TaskProcessor.main(new String[] {"test_file\\test.xml"});
 	}
 
 }
