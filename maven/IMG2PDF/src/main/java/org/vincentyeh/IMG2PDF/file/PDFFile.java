@@ -130,50 +130,6 @@ public class PDFFile {
 	 * @return The page contain image
 	 * @throws IOException Failure of drawing image to page
 	 */
-//	PDPage createImgPage(BufferedImage img) throws IOException {
-//		PDPage page = null;
-//		float img_width = img.getWidth();
-//		float img_height = img.getHeight();
-//		float position_x = 0, position_y = 0;
-//		float out_width = 0, out_height = 0;
-//		Size size = task.getSize();
-//
-//		if (size == Size.DEPEND_ON_IMG) {
-//
-//			page = new PDPage(new PDRectangle(img_width, img_height));
-//			out_width = img_width;
-//			out_height = img_height;
-//
-//		} else {
-//			page = new PDPage(size.getPdrectangle());
-//			img_width = img.getWidth();
-//			img_height = img.getHeight();
-//			float img_size_ratio = img_height / img_width;
-//			int angle = 90;
-//			if (img_size_ratio >= 1) {
-//				page.setRotation(0);
-//			} else {
-//				page.setRotation(angle);
-//				img = ImgFile.rotateImg(img, -1 * angle);
-//			}
-//			
-//			float[] received = position(img, page);
-//			position_x = received[0];
-//			position_y = received[1];
-//			out_width = received[2];
-//			out_height = received[3];
-//
-//		}
-//
-//		PDImageXObject pdImageXObject = LosslessFactory.createFromImage(doc, img);
-//
-//		PDPageContentStream contentStream = new PDPageContentStream(doc, page);
-//
-//		contentStream.drawImage(pdImageXObject, position_x, position_y, out_width, out_height);
-//		contentStream.close();
-//		return page;
-//	}
-
 	PDPage createImgPage(BufferedImage img) throws IOException {
 		PDPage page = null;
 		float img_width = img.getWidth();
@@ -203,7 +159,7 @@ public class PDFFile {
 			} else {
 				page.setRotation(angle);
 				img = ImgFile.rotateImg(img, -1 * angle);
-				isRotated=true;
+				isRotated = true;
 			}
 
 			img_width = img.getWidth();
@@ -228,6 +184,36 @@ public class PDFFile {
 		return page;
 	}
 
+	/*
+	 * PDPage createImgPage(BufferedImage img) throws IOException { PDPage page =
+	 * null; float img_width = img.getWidth(); float img_height = img.getHeight();
+	 * float position_x = 0, position_y = 0; float out_width = 0, out_height = 0;
+	 * Size size = task.getSize();
+	 * 
+	 * if (size == Size.DEPEND_ON_IMG) {
+	 * 
+	 * page = new PDPage(new PDRectangle(img_width, img_height)); out_width =
+	 * img_width; out_height = img_height;
+	 * 
+	 * } else { page = new PDPage(size.getPdrectangle()); img_width =
+	 * img.getWidth(); img_height = img.getHeight(); float img_size_ratio =
+	 * img_height / img_width; int angle = 90; if (img_size_ratio >= 1) {
+	 * page.setRotation(0); } else { page.setRotation(angle); img =
+	 * ImgFile.rotateImg(img, -1 * angle); }
+	 * 
+	 * float[] received = position(img, page); position_x = received[0]; position_y
+	 * = received[1]; out_width = received[2]; out_height = received[3];
+	 * 
+	 * }
+	 * 
+	 * PDImageXObject pdImageXObject = LosslessFactory.createFromImage(doc, img);
+	 * 
+	 * PDPageContentStream contentStream = new PDPageContentStream(doc, page);
+	 * 
+	 * contentStream.drawImage(pdImageXObject, position_x, position_y, out_width,
+	 * out_height); contentStream.close(); return page; }
+	 */
+
 	/**
 	 * Compute the position of image by align value.
 	 * 
@@ -241,139 +227,6 @@ public class PDFFile {
 	 *         <li>image height</li>
 	 *         </ol>
 	 */
-//	float[] position(BufferedImage raw, PDPage page) {
-//		PDRectangle rec = page.getBBox();
-//		float real_page_width = rec.getWidth();
-//		float real_page_height = rec.getHeight();
-////		float page_size_ratio = real_page_height / real_page_width;
-//
-//		float img_width = raw.getWidth();
-//		float img_height = raw.getHeight();
-////		float img_size_ratio = img_height / img_width;
-//
-//		float position_x = 0, position_y = 0;
-//		float out_width = 0, out_height = 0;
-//
-//		LeftRightAlign LRA = task.getAlign().getLRA();
-//		TopBottomAlign TBA = task.getAlign().getTBA();
-//
-//		boolean isRotated = Math.abs(Math.sin(Math.toRadians(page.getRotation()))) == 1;
-//
-////		Not stable----------------------------------
-//		if (TBA == TopBottomAlign.FILL && LRA != LeftRightAlign.FILL) {
-//			if (!isRotated) {
-//				out_height = real_page_height;
-//				out_width = (img_width / img_height) * out_height;
-//			} else {
-//				out_width = real_page_width;
-//				out_height = (img_height / img_width) * out_width;
-//			}
-//
-//		} else if (LRA == LeftRightAlign.FILL && TBA != TopBottomAlign.FILL) {
-//			if (!isRotated) {
-//				out_width = real_page_width;
-//				out_height = (img_height / img_width) * out_width;
-//			} else {
-//				out_height = real_page_height;
-//				out_width = (img_width / img_height) * out_height;
-//			}
-////			Not stable----------------------------------
-//		} else if (LRA == LeftRightAlign.FILL && TBA == TopBottomAlign.FILL) {
-//			position_x = position_y = 0;
-//			float diff = Math.abs((img_height / img_width) - (real_page_height / real_page_width));
-//			if (max_diff >= 0 && diff > max_diff) {
-//				throw new RuntimeException("sub is out of range.");
-//			}
-//
-//			out_height = real_page_height;
-//			out_width = real_page_width;
-//		} else if ((img_width / img_height) * real_page_height <= real_page_width) {
-//			out_height = real_page_height;
-//			out_width = (img_width / img_height) * out_height;
-//
-//			float x_space = real_page_width - out_width;
-//
-//			if (!isRotated) {
-//				switch (LRA) {
-//				case LEFT:
-//					position_x = 0;
-//					break;
-//				case RIGHT:
-//					position_x = x_space;
-//					break;
-//				case CENTER:
-//					position_x = x_space / 2;
-//					break;
-//				case FILL:
-//					break;
-//				default:
-//					break;
-//				}
-//			} else {
-//				switch (TBA) {
-//				case TOP:
-//					position_x = 0;
-//					break;
-//				case BOTTOM:
-//					position_x = x_space;
-//					break;
-//				case CENTER:
-//					position_x = x_space / 2;
-//					break;
-//				case FILL:
-//					break;
-//				default:
-//					break;
-//
-//				}
-//			}
-//		} else if ((img_height / img_width) * real_page_width <= real_page_height) {
-//			out_width = real_page_width;
-//			out_height = (img_height / img_width) * out_width;
-//
-//			float y_space = real_page_height - out_height;
-//
-//			if (!isRotated) {
-//				switch (TBA) {
-//				case BOTTOM:
-//					position_y = 0;
-//					break;
-//				case TOP:
-//					position_y = y_space;
-//					break;
-//				case CENTER:
-//					position_y = y_space / 2;
-//					break;
-//				case FILL:
-//					break;
-//				default:
-//					break;
-//
-//				}
-//			} else {
-//				switch (LRA) {
-//				case LEFT:
-//					position_y = 0;
-//					break;
-//				case RIGHT:
-//					position_y = y_space;
-//					break;
-//				case CENTER:
-//					position_y = y_space / 2;
-//					break;
-//				case FILL:
-//					break;
-//				default:
-//					break;
-//				}
-//			}
-//
-//		}
-//
-//		float[] ret = { position_x, position_y, out_width, out_height };
-//		return ret;
-//	}
-
 	float[] positionCalculate(boolean isRotated, float img_height, float img_width, float page_height,
 			float page_width) {
 
@@ -477,6 +330,70 @@ public class PDFFile {
 
 		return new float[] { out_height, out_width };
 	}
+	/*
+	 * float[] position(BufferedImage raw, PDPage page) { PDRectangle rec =
+	 * page.getBBox(); float real_page_width = rec.getWidth(); float
+	 * real_page_height = rec.getHeight(); // float page_size_ratio =
+	 * real_page_height / real_page_width;
+	 * 
+	 * float img_width = raw.getWidth(); float img_height = raw.getHeight(); //
+	 * float img_size_ratio = img_height / img_width;
+	 * 
+	 * float position_x = 0, position_y = 0; float out_width = 0, out_height = 0;
+	 * 
+	 * LeftRightAlign LRA = task.getAlign().getLRA(); TopBottomAlign TBA =
+	 * task.getAlign().getTBA();
+	 * 
+	 * boolean isRotated = Math.abs(Math.sin(Math.toRadians(page.getRotation()))) ==
+	 * 1;
+	 * 
+	 * // Not stable---------------------------------- if (TBA ==
+	 * TopBottomAlign.FILL && LRA != LeftRightAlign.FILL) { if (!isRotated) {
+	 * out_height = real_page_height; out_width = (img_width / img_height) *
+	 * out_height; } else { out_width = real_page_width; out_height = (img_height /
+	 * img_width) * out_width; }
+	 * 
+	 * } else if (LRA == LeftRightAlign.FILL && TBA != TopBottomAlign.FILL) { if
+	 * (!isRotated) { out_width = real_page_width; out_height = (img_height /
+	 * img_width) * out_width; } else { out_height = real_page_height; out_width =
+	 * (img_width / img_height) * out_height; } // Not
+	 * stable---------------------------------- } else if (LRA ==
+	 * LeftRightAlign.FILL && TBA == TopBottomAlign.FILL) { position_x = position_y
+	 * = 0; float diff = Math.abs((img_height / img_width) - (real_page_height /
+	 * real_page_width)); if (max_diff >= 0 && diff > max_diff) { throw new
+	 * RuntimeException("sub is out of range."); }
+	 * 
+	 * out_height = real_page_height; out_width = real_page_width; } else if
+	 * ((img_width / img_height) * real_page_height <= real_page_width) { out_height
+	 * = real_page_height; out_width = (img_width / img_height) * out_height;
+	 * 
+	 * float x_space = real_page_width - out_width;
+	 * 
+	 * if (!isRotated) { switch (LRA) { case LEFT: position_x = 0; break; case
+	 * RIGHT: position_x = x_space; break; case CENTER: position_x = x_space / 2;
+	 * break; case FILL: break; default: break; } } else { switch (TBA) { case TOP:
+	 * position_x = 0; break; case BOTTOM: position_x = x_space; break; case CENTER:
+	 * position_x = x_space / 2; break; case FILL: break; default: break;
+	 * 
+	 * } } } else if ((img_height / img_width) * real_page_width <=
+	 * real_page_height) { out_width = real_page_width; out_height = (img_height /
+	 * img_width) * out_width;
+	 * 
+	 * float y_space = real_page_height - out_height;
+	 * 
+	 * if (!isRotated) { switch (TBA) { case BOTTOM: position_y = 0; break; case
+	 * TOP: position_y = y_space; break; case CENTER: position_y = y_space / 2;
+	 * break; case FILL: break; default: break;
+	 * 
+	 * } } else { switch (LRA) { case LEFT: position_y = 0; break; case RIGHT:
+	 * position_y = y_space; break; case CENTER: position_y = y_space / 2; break;
+	 * case FILL: break; default: break; } }
+	 * 
+	 * }
+	 * 
+	 * float[] ret = { position_x, position_y, out_width, out_height }; return ret;
+	 * }
+	 */
 
 	/**
 	 * Set password to the PDFFile.
