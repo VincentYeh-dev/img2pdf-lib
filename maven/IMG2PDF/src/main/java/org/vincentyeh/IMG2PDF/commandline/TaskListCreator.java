@@ -2,6 +2,7 @@ package org.vincentyeh.IMG2PDF.commandline;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -20,8 +21,6 @@ import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.annotation.Arg;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
-import net.sourceforge.argparse4j.inf.Subparser;
-import net.sourceforge.argparse4j.inf.Subparsers;
 
 /**
  * 
@@ -49,11 +48,11 @@ public class TaskListCreator {
 			align = new Align(opt.align.get(0));
 			size = opt.size;
 			dst = opt.destination.get(0);
-			
-			owner_pwd =opt.owner_password==null?null:opt.owner_password.get(0);
-			user_pwd = opt.user_password==null?null:opt.user_password.get(0);
+
+			owner_pwd = opt.owner_password == null ? null : opt.owner_password.get(0);
+			user_pwd = opt.user_password == null ? null : opt.user_password.get(0);
 		}
-		
+
 		private static class ArgumentContainer {
 
 			@Arg(dest = "sortby")
@@ -87,7 +86,7 @@ public class TaskListCreator {
 
 	}
 
-	TaskList tasks = new TaskList();
+	private TaskList tasks = new TaskList();
 
 	TaskListCreator(String args) throws IOException {
 		this(args.trim().split("\\s"));
@@ -95,9 +94,9 @@ public class TaskListCreator {
 
 	TaskListCreator(String[] args) throws IOException {
 		ArgumentParser parser = createArgParser();
-		TaskArgument taskArgs=Arg2Values(parser, args);
-		for (String list : taskArgs.sources) {
-			tasks.addAll(importTasksFromTXT(new File(list),taskArgs));
+		TaskArgument taskArgs = Arg2Values(parser, args);
+		for (String source : taskArgs.sources) {
+			tasks.addAll(importTasksFromTXT(new File(source), taskArgs));
 		}
 
 		tasks.toXMLFile(new File(taskArgs.list_output));
@@ -136,6 +135,11 @@ public class TaskListCreator {
 //				of File and make file not exists.
 				System.out.println(buf);
 				File dir = new File(buf);
+				if (!dir.exists())
+					throw new FileNotFoundException(dir.getName() + " not found.");
+
+				if (!dir.isDirectory())
+					throw new RuntimeException(dir.getName() + " is not the directory.");
 
 				NameFormatter nf = new NameFormatter(arguments.dst, dir);
 				FileFilterHelper ffh = createImageFilter(0);
@@ -150,7 +154,7 @@ public class TaskListCreator {
 	}
 
 	private TaskArgument Arg2Values(ArgumentParser parser, String[] args) {
-		TaskArgument.ArgumentContainer opt=new TaskArgument.ArgumentContainer();
+		TaskArgument.ArgumentContainer opt = new TaskArgument.ArgumentContainer();
 
 		try {
 			parser.parseArgs(args, opt);
@@ -159,7 +163,7 @@ public class TaskListCreator {
 			parser.handleError(e);
 			System.exit(1);
 		}
-		TaskArgument arguments=new TaskArgument(opt);
+		TaskArgument arguments = new TaskArgument(opt);
 
 		System.out.printf("source:%s\n", arguments.sources);
 		System.out.printf("output:%s\n", arguments.list_output);
@@ -233,7 +237,6 @@ public class TaskListCreator {
 		return parser;
 	}
 
-	
 	private FileFilterHelper createImageFilter(int condition) {
 		FileFilterHelper ffh = new FileFilterHelper(
 				condition | FileFilterHelper.CONDITION_IS_FILE | FileFilterHelper.CONDITION_EXT_EQUALS);

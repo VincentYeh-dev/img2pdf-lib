@@ -39,9 +39,8 @@ public class TaskProcessor {
 		ArgumentParser parser = createArgParser();
 		Arg2Values(parser, args);
 
-		for (String list : lists) {
-			Document xml = getDOMParsedDocument(list);
-			start(new TaskList(xml));
+		for (String filepath : lists) {
+			start(new TaskList(filepath));
 		}
 	}
 
@@ -66,25 +65,25 @@ public class TaskProcessor {
 		new TaskProcessor(args);
 	}
 
-	/**
-	 * create Document from file
-	 * 
-	 * @param filepath path of xml file
-	 * @return Document
-	 * @throws ParserConfigurationException
-	 * @throws SAXException
-	 * @throws IOException
-	 */
-	private Document getDOMParsedDocument(final String filepath)
-			throws ParserConfigurationException, SAXException, IOException {
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		// If want to make namespace aware.
-		// factory.setNamespaceAware(true);
-		DocumentBuilder documentBuilder = factory.newDocumentBuilder();
-		org.w3c.dom.Document w3cDocument = documentBuilder.parse(filepath);
-
-		return new DOMBuilder().build(w3cDocument);
-	}
+//	/**
+//	 * create Document from file
+//	 * 
+//	 * @param filepath path of xml file
+//	 * @return Document
+//	 * @throws ParserConfigurationException
+//	 * @throws SAXException
+//	 * @throws IOException
+//	 */
+//	private Document getDOMParsedDocument(final String filepath)
+//			throws ParserConfigurationException, SAXException, IOException {
+//		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+//		// If want to make namespace aware.
+//		// factory.setNamespaceAware(true);
+//		DocumentBuilder documentBuilder = factory.newDocumentBuilder();
+//		org.w3c.dom.Document w3cDocument = documentBuilder.parse(filepath);
+//
+//		return new DOMBuilder().build(w3cDocument);
+//	}
 
 	private ArgumentParser createArgParser() {
 		ArgumentParser parser = ArgumentParsers.newFor("IMG2PDF").build().defaultHelp(true)
