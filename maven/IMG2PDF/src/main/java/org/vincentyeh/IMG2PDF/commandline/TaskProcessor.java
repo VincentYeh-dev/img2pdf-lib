@@ -33,6 +33,9 @@ public class TaskProcessor {
 
 	public TaskProcessor(String args) throws IOException, ParserConfigurationException, SAXException {
 		this(args.trim().split("\\s"));
+		for (String filepath : lists) {
+			start(new TaskList(filepath));
+		}
 	}
 
 	public TaskProcessor(String[] args) throws IOException, ParserConfigurationException, SAXException {

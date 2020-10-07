@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -84,7 +85,8 @@ public class TaskList extends ArrayList<Task> {
 		elementsData.removeContent(index);
 		return super.remove(index);
 	}
-
+	
+	
 	public boolean addAll(TaskList c) {
 		// TODO Auto-generated method stub
 
@@ -94,7 +96,14 @@ public class TaskList extends ArrayList<Task> {
 
 		return super.addAll(c);
 	}
-
+	
+	@Override
+	public void clear() {
+		elementsData=new Element("TASKLIST");
+		super.clear();
+	}
+	
+	
 	/**
 	 * Write XML Element to the file.
 	 * 
@@ -108,7 +117,7 @@ public class TaskList extends ArrayList<Task> {
 		outter.setFormat(Format.getPrettyFormat());
 		outter.output(doc, new FileWriter(file));
 	}
-
+	
 	/**
 	 * create Document from file
 	 * 

@@ -15,8 +15,11 @@ public class QuicklyTester {
 				+ "test_file\\dirlist_cmyk.txt "
 				+ "test_file\\dirlist_raw2.txt";
 		
+//		TaskListCreator creator=new TaskListCreator(str);
+//		new TaskProcessor(creator.getTaskList());
+
 		TaskListCreator creator=new TaskListCreator(str);
-		new TaskProcessor(creator.getTaskList());
+		new TaskProcessor("test_file\\test.xml");
 		
 	}
 
