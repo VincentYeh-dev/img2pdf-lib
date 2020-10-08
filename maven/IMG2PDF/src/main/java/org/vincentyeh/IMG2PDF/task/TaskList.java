@@ -31,78 +31,27 @@ public class TaskList extends ArrayList<Task> {
 	 */
 	private static final long serialVersionUID = -2891486701232492442L;
 
-	private Element elementsData;
-	private Document doc;
-
 	/**
 	 * Create the empty collection of Task.
 	 */
 	public TaskList() {
-		elementsData = new Element("TASKLIST");
-		doc = new Document();
+
 	}
 
-	/**
-	 * Create the collection of Task by xml file.
-	 * @param filepath
-	 * @throws ParserConfigurationException
-	 * @throws SAXException
-	 * @throws IOException
-	 */
 	public TaskList(String filepath) throws ParserConfigurationException, SAXException, IOException {
 		this(getDOMParsedDocument(filepath));
 	}
 
-	/**
-	 * Create the collection of Task by Document.
-	 * 
-	 * @param doc The XML document that contain TASKLIST.
-	 */
 	public TaskList(Document doc) {
-		this.doc = doc;
-		elementsData = this.doc.getRootElement();
-		ArrayList<Element> el_tasks = new ArrayList<Element>(elementsData.getChildren("TASK"));
-
-		for (Element el_task : el_tasks) {
-			this.add(new Task(el_task));
+		this(doc.getRootElement());
+	}
+	
+	public TaskList(Element root) {
+		ArrayList<Element> importedTaskList = new ArrayList<Element>(root.getChildren("TASK"));
+		for (Element task : importedTaskList) {
+			this.add(new Task(task));
 		}
 	}
-
-	@Override
-	public void add(int index, Task element) {
-		elementsData.addContent(element);
-		super.add(index, element);
-	}
-
-	@Override
-	public boolean add(Task element) {
-		elementsData.addContent(element);
-		return super.add(element);
-	}
-
-	@Override
-	public Task remove(int index) {
-		elementsData.removeContent(index);
-		return super.remove(index);
-	}
-	
-	
-	public boolean addAll(TaskList c) {
-		// TODO Auto-generated method stub
-
-		for (Content con : c.elementsData.clone().detach().getContent()) {
-			this.elementsData.addContent(con.clone().detach());
-		}
-
-		return super.addAll(c);
-	}
-	
-	@Override
-	public void clear() {
-		elementsData=new Element("TASKLIST");
-		super.clear();
-	}
-	
 	
 	/**
 	 * Write XML Element to the file.
@@ -111,13 +60,23 @@ public class TaskList extends ArrayList<Task> {
 	 * @throws IOException Exception of writing PDF
 	 */
 	public void toXMLFile(File file) throws IOException {
-		doc.setRootElement(elementsData);
+		Document doc = new Document();
+		Element root = toElement();
+		doc.setRootElement(root);
 		// Create the XML
 		XMLOutputter outter = new XMLOutputter();
 		outter.setFormat(Format.getPrettyFormat());
 		outter.output(doc, new FileWriter(file));
 	}
-	
+
+	public Element toElement() {
+		Element root = new Element("TASKLIST");
+		for (Task task : this) {
+			root.addContent(task.toElement());
+		}
+		return root;
+	}
+
 	/**
 	 * create Document from file
 	 * 

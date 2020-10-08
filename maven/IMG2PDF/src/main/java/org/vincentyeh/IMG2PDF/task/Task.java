@@ -33,7 +33,7 @@ import org.vincentyeh.IMG2PDF.file.PDFFile.Size;
  * 
  * @author VincentYeh
  */
-public class Task extends Element {
+public class Task {
 	/**
 	 * 
 	 */
@@ -64,7 +64,6 @@ public class Task extends Element {
 	 * @throws FileNotFoundException When file is not exists.
 	 */
 	public Task(File[] files, String destination, String own, String user, Sortby sortby, Order order,Align align, PDFFile.Size size) throws FileNotFoundException {
-		super("TASK");
 		if (files == null)
 			throw new NullPointerException("files is null.");
 
@@ -75,7 +74,6 @@ public class Task extends Element {
 		this.size = size;
 		this.destination = destination;
 
-		Element xml_files = new Element("FILES");
 		for (File file : files) {
 			ImgFile img = new ImgFile(file.getAbsolutePath(), sortby, order);
 			imgs.add(img);
@@ -84,22 +82,9 @@ public class Task extends Element {
 //		imgs need to be sort before written to element
 		Collections.sort(imgs);
 
-		for (ImgFile img : imgs) {
-			Element xml_file = new Element("FILE");
-			xml_file.addContent(img.getAbsolutePath());
-			xml_files.addContent(xml_file);
-		}
-
-		super.addContent(xml_files);
-
 		owner_pwd = own != null ? own : "#null";
 		user_pwd = user != null ? user : "#null";
-
-		super.setAttribute("destination", destination);
-		super.setAttribute("size", size.getStr() + "");
-		super.setAttribute("align",align.toString());
-		super.setAttribute("owner", owner_pwd);
-		super.setAttribute("user", user_pwd);
+		
 		System.out.printf("\nfound %d files.\n", imgs.size());
 		System.out.print("Sortting files...");
 
@@ -114,25 +99,14 @@ public class Task extends Element {
 	 * @param element The XML Element That include information of Task.
 	 */
 	public Task(Element element) {
-		super("TASK");
 //		detach():Remove parent connection
-		Element elemCopy = element.clone().detach();
-		List<Attribute> atr_list = elemCopy.getAttributes();
 
-		for (Content c : elemCopy.getContent()) {
-			super.addContent(c.clone().detach());
-		}
-
-		for (Attribute ar : atr_list) {
-			super.setAttribute(ar.clone().detach());
-		}
-
-		String attr_destination = super.getAttributeValue("destination");
-		String attr_align = super.getAttributeValue("align");
-		String attr_size = super.getAttributeValue("size");
-		String attr_owner_pwd = super.getAttributeValue("owner");
-		String attr_user_pwd = super.getAttributeValue("user");
-		String elm_align = super.getAttributeValue("align");
+		String attr_destination = element.getAttributeValue("destination");
+		String attr_align = element.getAttributeValue("align");
+		String attr_size = element.getAttributeValue("size");
+		String attr_owner_pwd = element.getAttributeValue("owner");
+		String attr_user_pwd = element.getAttributeValue("user");
+		String elm_align = element.getAttributeValue("align");
 
 		if (attr_destination == null)
 			throw new NullPointerException("destination is null");
@@ -144,7 +118,7 @@ public class Task extends Element {
 			throw new NullPointerException("owner_pwd is null");
 		if (attr_user_pwd == null)
 			throw new NullPointerException("user_pwd is null");
-		List<Element> contains_files = super.getChild("FILES").getChildren("FILE");
+		List<Element> contains_files = element.getChild("FILES").getChildren("FILE");
 
 		if (contains_files == null)
 			throw new NullPointerException("files is null");
@@ -153,16 +127,16 @@ public class Task extends Element {
 
 		align=new Align(elm_align);
 		
-		size = Size.getSizeFromString(super.getAttributeValue("size"));
-		owner_pwd = super.getAttributeValue("owner");
-		user_pwd = super.getAttributeValue("user");
+		size = Size.getSizeFromString(element.getAttributeValue("size"));
+		owner_pwd = element.getAttributeValue("owner");
+		user_pwd = element.getAttributeValue("user");
 
 		ArrayList<Element> xml_files = new ArrayList<Element>(contains_files);
 		imgs.addAll(elements2imgs(xml_files));
 
 	}
 
-	ArrayList<ImgFile> elements2imgs(ArrayList<Element> el_files) {
+	private ArrayList<ImgFile> elements2imgs(ArrayList<Element> el_files) {
 		ArrayList<ImgFile> imgs = new ArrayList<ImgFile>();
 		for (Element el : el_files) {
 			try {
@@ -175,6 +149,25 @@ public class Task extends Element {
 		}
 		return imgs;
 	}
+	
+	public Element toElement() {
+		Element task=new Element("TASK");
+		Element xml_files = new Element("FILES");
+		for (ImgFile img : imgs) {
+			Element xml_file = new Element("FILE");
+			xml_file.addContent(img.getAbsolutePath());
+			xml_files.addContent(xml_file);
+		}
+		task.addContent(xml_files);
+		
+		task.setAttribute("destination", destination);
+		task.setAttribute("size", size.getStr() + "");
+		task.setAttribute("align",align.toString());
+		task.setAttribute("owner", owner_pwd);
+		task.setAttribute("user", user_pwd);
+		return task;
+	}
+	
 	public Align getAlign() {
 		return align;
 	}
