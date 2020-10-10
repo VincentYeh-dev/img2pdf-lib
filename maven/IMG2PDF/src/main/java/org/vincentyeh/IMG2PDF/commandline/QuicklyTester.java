@@ -12,8 +12,8 @@ public class QuicklyTester {
 				+ "-d test_file\\output\\$NAME.pdf "
 //				+ "-usepwd 1234AAA "
 //				+ "-ownpwd 1234AAA "
-				+ "test_file\\dirlist_cmyk.txt "
-				+ "test_file\\dirlist_mul.txt";
+				+ "test_file\\dirlist.txt "
+				+ "test_file\\dirlist_raw2.txt";
 		
 //		TaskListCreator creator=new TaskListCreator(str);
 //		new TaskProcessor(creator.getTaskList());

@@ -125,7 +125,7 @@ public class TaskListCreator {
 	private ConfigureTaskList importTasksFromTXT(File file, TaskArgument arguments) throws IOException {
 
 		UTF8InputStream uis = new UTF8InputStream(file);
-		BufferedReader reader = new BufferedReader(new InputStreamReader(uis, "UTF-8"));
+		BufferedReader reader = new BufferedReader(new InputStreamReader(uis.getInputStream(), "UTF-8"));
 		ConfigureTaskList tasks = new ConfigureTaskList();
 		String buf = "";
 		while (buf != null) {
@@ -149,6 +149,7 @@ public class TaskListCreator {
 
 			}
 		}
+		uis.close();
 		reader.close();
 		return tasks;
 	}
