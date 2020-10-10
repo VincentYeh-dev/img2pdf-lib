@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.imageio.IIOException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -55,8 +56,11 @@ public class TaskProcessor {
 //				pdf.setMaxDiff(0.15f);
 				pdf.process();
 
-			} catch (Exception e) {
-				e.printStackTrace();
+			} catch (IOException e) {
+				if(e.getMessage().equals("Unsupported Image Type")) {
+					System.err.println("\nUnsupported Image Type\n");
+					
+				}
 			}
 		}
 	}

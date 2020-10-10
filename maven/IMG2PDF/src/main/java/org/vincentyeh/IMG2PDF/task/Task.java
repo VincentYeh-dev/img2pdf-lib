@@ -37,13 +37,7 @@ public class Task {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -7732049453237587003L;
-
-//	private final int align;
 	private final Align align;
-//	private final LeftRightAlign LRA;
-//	private final TopBottomAlign TBA;
-
 	private final Size size;
 	private final String destination;
 	private final String owner_pwd;
@@ -85,7 +79,7 @@ public class Task {
 		owner_pwd = own != null ? own : "#null";
 		user_pwd = user != null ? user : "#null";
 		
-		System.out.printf("\nfound %d files.\n", imgs.size());
+		System.out.printf("found %d files\n", imgs.size());
 		System.out.print("Sortting files...");
 
 		System.out.print("DONE\n\n");
