@@ -13,8 +13,8 @@ import org.vincentyeh.IMG2PDF.file.ImgFile.Sortby;
 import org.vincentyeh.IMG2PDF.file.PDFFile.Align;
 import org.vincentyeh.IMG2PDF.file.PDFFile.Size;
 import org.vincentyeh.IMG2PDF.file.text.UTF8InputStream;
-import org.vincentyeh.IMG2PDF.task.Task;
-import org.vincentyeh.IMG2PDF.task.TaskList;
+import org.vincentyeh.IMG2PDF.task.setup.SetupTask;
+import org.vincentyeh.IMG2PDF.task.setup.SetupTaskList;
 import org.vincentyeh.IMG2PDF.util.NameFormatter;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
@@ -86,7 +86,7 @@ public class TaskListCreator {
 
 	}
 
-	private TaskList tasks = new TaskList();
+	private SetupTaskList tasks = new SetupTaskList();
 
 	TaskListCreator(String args) throws IOException {
 		this(args.trim().split("\\s"));
@@ -111,7 +111,7 @@ public class TaskListCreator {
 		new TaskListCreator(str);
 	}
 
-	public TaskList getTaskList() {
+	public SetupTaskList getTaskList() {
 		return tasks;
 	}
 
@@ -122,11 +122,11 @@ public class TaskListCreator {
 	 * @return The List of Task.
 	 * @throws IOException None description.
 	 */
-	private TaskList importTasksFromTXT(File file, TaskArgument arguments) throws IOException {
+	private SetupTaskList importTasksFromTXT(File file, TaskArgument arguments) throws IOException {
 
 		UTF8InputStream uis = new UTF8InputStream(file);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(uis, "UTF-8"));
-		TaskList tasks = new TaskList();
+		SetupTaskList tasks = new SetupTaskList();
 		String buf = "";
 		while (buf != null) {
 			buf = reader.readLine();
@@ -143,7 +143,7 @@ public class TaskListCreator {
 
 				NameFormatter nf = new NameFormatter(arguments.dst, dir);
 				FileFilterHelper ffh = createImageFilter(0);
-				Task task = new Task(dir.listFiles(ffh), nf.getConverted(), arguments.owner_pwd, arguments.user_pwd,
+				SetupTask task = new SetupTask(dir.listFiles(ffh), nf.getConverted(), arguments.owner_pwd, arguments.user_pwd,
 						arguments.sortby, arguments.order, arguments.align, arguments.size);
 				tasks.add(task);
 
@@ -178,41 +178,6 @@ public class TaskListCreator {
 		return arguments;
 	}
 
-	/*
-	 * private void Arg2Values(ArgumentParser parser, String[] args) { Namespace ns
-	 * = null; try { ns = parser.parseArgs(args); } catch (ArgumentParserException
-	 * e) { parser.handleError(e); System.exit(1); } sources = new
-	 * ArrayList<String>(ns.<String>getList("source")); size =
-	 * PDFFile.Size.getSizeFromString(ns.getString("size")); dst =
-	 * ns.<String>getList("destination").get(0); list_output =
-	 * ns.<String>getList("list_output").get(0);
-	 * 
-	 * if (ns.getString("sortby") == null) {
-	 * System.err.println("sort by rule need to provide"); System.exit(0); }
-	 * 
-	 * sortby = Sortby.getByStr(ns.getString("sortby")); order =
-	 * Order.getByStr(ns.getString("order")); String str_align =
-	 * ns.<String>getList("align").get(0);
-	 * 
-	 * if (ns.<String>getList("owner_password") != null) owner_pwd =
-	 * ns.<String>getList("owner_password").get(0); else owner_pwd = null;
-	 * 
-	 * if (ns.<String>getList("user_password") != null) user_pwd =
-	 * ns.<String>getList("user_password").get(0); else user_pwd = null;
-	 * 
-	 * align = new Align(str_align);
-	 * 
-	 * for (String source : sources) { System.out.printf("source:%s\n", source); }
-	 * System.out.printf("output:%s\n", list_output);
-	 * System.out.printf("\talign:%s\n", str_align);
-	 * System.out.printf("\tsize:%s\n", size.getStr());
-	 * System.out.printf("\tdestination:%s\n", dst);
-	 * System.out.printf("\towner password:%s\n", owner_pwd);
-	 * System.out.printf("\tuser password:%s\n", user_pwd);
-	 * System.out.printf("---------------------\n");
-	 * 
-	 * }
-	 */
 	private ArgumentParser createArgParser() {
 
 		ArgumentParser parser = ArgumentParsers.newFor("TASKCREATOR").build().defaultHelp(true)

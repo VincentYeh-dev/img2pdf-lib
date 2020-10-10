@@ -1,6 +1,7 @@
 package org.vincentyeh.IMG2PDF.file;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -16,6 +17,7 @@ import org.vincentyeh.IMG2PDF.file.ImgFile.Order;
 import org.vincentyeh.IMG2PDF.file.PDFFile.Align.LeftRightAlign;
 import org.vincentyeh.IMG2PDF.file.PDFFile.Align.TopBottomAlign;
 import org.vincentyeh.IMG2PDF.task.Task;
+import org.vincentyeh.IMG2PDF.task.formatted.FormattedTask;
 import org.vincentyeh.IMG2PDF.util.ImageProcess;
 
 /**
@@ -32,7 +34,7 @@ public class PDFFile {
 	/**
 	 * Task that need to be process. It will be set on constructor.
 	 */
-	private final Task task;
+	private final FormattedTask task;
 
 	/**
 	 * <b>The calculation of diff</b>
@@ -62,7 +64,7 @@ public class PDFFile {
 	 * 
 	 * @param task The task to do on PDFFile.
 	 */
-	public PDFFile(Task task) {
+	public PDFFile(FormattedTask task) {
 		if (task == null)
 			throw new NullPointerException("task is null.");
 
@@ -92,7 +94,7 @@ public class PDFFile {
 		boolean isProtected = spp != null;
 		System.out.printf("Destination:%s\n", task.getDestination());
 
-		ArrayList<ImgFile> imgs = task.getImgs();
+		ArrayList<File> imgs = task.getImgs();
 
 		int all = imgs.size();
 		double perImg = (10. / all);

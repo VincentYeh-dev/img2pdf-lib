@@ -1,21 +1,13 @@
 package org.vincentyeh.IMG2PDF.commandline;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.imageio.IIOException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.imaging.icc.IccProfileInfo;
-import org.apache.commons.imaging.icc.IccProfileParser;
-import org.jdom2.Document;
-import org.jdom2.input.DOMBuilder;
 import org.vincentyeh.IMG2PDF.file.PDFFile;
-import org.vincentyeh.IMG2PDF.task.Task;
-import org.vincentyeh.IMG2PDF.task.TaskList;
+import org.vincentyeh.IMG2PDF.task.formatted.FormattedTask;
+import org.vincentyeh.IMG2PDF.task.formatted.FormattedTaskList;
 import org.xml.sax.SAXException;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
@@ -41,16 +33,16 @@ public class TaskProcessor {
 		Arg2Values(parser, args);
 
 		for (String filepath : lists) {
-			start(new TaskList(filepath));
+			start(new FormattedTaskList(filepath));
 		}
 	}
 
-	public TaskProcessor(TaskList tasks) {
+	public TaskProcessor(FormattedTaskList tasks) {
 		start(tasks);
 	}
 
-	private void start(TaskList tasks) {
-		for (Task task : tasks) {
+	private void start(FormattedTaskList tasks) {
+		for (FormattedTask task : tasks) {
 			PDFFile pdf = new PDFFile(task);
 			try {
 //				pdf.setMaxDiff(0.15f);
@@ -59,7 +51,6 @@ public class TaskProcessor {
 			} catch (IOException e) {
 				if(e.getMessage().equals("Unsupported Image Type")) {
 					System.err.println("\nUnsupported Image Type\n");
-					
 				}
 			}
 		}

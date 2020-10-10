@@ -1,27 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <class-diagram version="1.2.4" icons="true" automaticImage="PNG" always-add-relationships="false" generalizations="true" 
   realizations="true" associations="true" dependencies="true" nesting-relationships="true" router="FAN">  
-  <class id="1" language="java" name="org.vincentyeh.IMG2PDF.commandline.TaskListCreator" project="IMG2PDF" 
-    file="/IMG2PDF/src/main/java/org/vincentyeh/IMG2PDF/commandline/TaskListCreator.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="171" width="229" x="748" y="37"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="false"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="2" language="java" name="org.vincentyeh.IMG2PDF.commandline.TaskProcessor" project="IMG2PDF" 
-    file="/IMG2PDF/src/main/java/org/vincentyeh/IMG2PDF/commandline/TaskProcessor.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="153" width="233" x="1017" y="37"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="false"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="3" language="java" name="org.vincentyeh.IMG2PDF.file.FileFilterHelper" project="IMG2PDF" 
+  <class id="1" language="java" name="org.vincentyeh.IMG2PDF.file.FileFilterHelper" project="IMG2PDF" 
     file="/IMG2PDF/src/main/java/org/vincentyeh/IMG2PDF/file/FileFilterHelper.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="225" width="202" x="41" y="248"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
@@ -30,7 +10,7 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="4" language="java" name="org.vincentyeh.IMG2PDF.file.ImgFile" project="IMG2PDF" 
+  <class id="2" language="java" name="org.vincentyeh.IMG2PDF.file.ImgFile" project="IMG2PDF" 
     file="/IMG2PDF/src/main/java/org/vincentyeh/IMG2PDF/file/ImgFile.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="297" width="237" x="798" y="958"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
@@ -39,7 +19,7 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="5" language="java" name="org.vincentyeh.IMG2PDF.file.PDFFile" project="IMG2PDF" 
+  <class id="3" language="java" name="org.vincentyeh.IMG2PDF.file.PDFFile" project="IMG2PDF" 
     file="/IMG2PDF/src/main/java/org/vincentyeh/IMG2PDF/file/PDFFile.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="279" width="323" x="1017" y="248"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
@@ -48,7 +28,7 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="6" language="java" name="org.vincentyeh.IMG2PDF.file.text.UTF8BOMInputStream" project="IMG2PDF" 
+  <class id="4" language="java" name="org.vincentyeh.IMG2PDF.file.text.UTF8BOMInputStream" project="IMG2PDF" 
     file="/IMG2PDF/src/main/java/org/vincentyeh/IMG2PDF/file/text/UTF8BOMInputStream.java" binary="false" 
     corner="BOTTOM_RIGHT">    
     <position height="225" width="204" x="405" y="567"/>    
@@ -58,7 +38,7 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="7" language="java" name="org.vincentyeh.IMG2PDF.file.text.UTF8NOBOMInputStream" project="IMG2PDF" 
+  <class id="5" language="java" name="org.vincentyeh.IMG2PDF.file.text.UTF8NOBOMInputStream" project="IMG2PDF" 
     file="/IMG2PDF/src/main/java/org/vincentyeh/IMG2PDF/file/text/UTF8NOBOMInputStream.java" binary="false" 
     corner="BOTTOM_RIGHT">    
     <position height="225" width="204" x="161" y="567"/>    
@@ -68,7 +48,7 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="8" language="java" name="org.vincentyeh.IMG2PDF.file.text.UTF8InputStream" project="IMG2PDF" 
+  <class id="6" language="java" name="org.vincentyeh.IMG2PDF.file.text.UTF8InputStream" project="IMG2PDF" 
     file="/IMG2PDF/src/main/java/org/vincentyeh/IMG2PDF/file/text/UTF8InputStream.java" binary="false" 
     corner="BOTTOM_RIGHT">    
     <position height="117" width="151" x="283" y="248"/>    
@@ -78,7 +58,7 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="9" language="java" name="org.vincentyeh.IMG2PDF.task.Task" project="IMG2PDF" 
+  <class id="7" language="java" name="org.vincentyeh.IMG2PDF.task.Task" project="IMG2PDF" 
     file="/IMG2PDF/src/main/java/org/vincentyeh/IMG2PDF/task/Task.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="351" width="264" x="798" y="567"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
@@ -87,7 +67,7 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="10" language="java" name="org.vincentyeh.IMG2PDF.task.TaskList" project="IMG2PDF" 
+  <class id="8" language="java" name="org.vincentyeh.IMG2PDF.task.TaskList" project="IMG2PDF" 
     file="/IMG2PDF/src/main/java/org/vincentyeh/IMG2PDF/task/TaskList.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="225" width="137" x="819" y="248"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
@@ -96,7 +76,7 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="11" language="java" name="org.vincentyeh.IMG2PDF.util.ImageProcess" project="IMG2PDF" 
+  <class id="9" language="java" name="org.vincentyeh.IMG2PDF.util.ImageProcess" project="IMG2PDF" 
     file="/IMG2PDF/src/main/java/org/vincentyeh/IMG2PDF/util/ImageProcess.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="171" width="197" x="1123" y="567"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
@@ -105,7 +85,7 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="12" language="java" name="org.vincentyeh.IMG2PDF.util.NameFormatter" project="IMG2PDF" 
+  <class id="10" language="java" name="org.vincentyeh.IMG2PDF.util.NameFormatter" project="IMG2PDF" 
     file="/IMG2PDF/src/main/java/org/vincentyeh/IMG2PDF/util/NameFormatter.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="171" width="263" x="474" y="248"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
@@ -114,17 +94,25 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <dependency id="13">    
+  <dependency id="11">    
     <bendpoint x="1092" y="567"/>    
-    <end type="SOURCE" refId="5"/>    
-    <end type="TARGET" refId="4"/>  
+    <end type="SOURCE" refId="3"/>    
+    <end type="TARGET" refId="2"/>  
+  </dependency>  
+  <dependency id="12">    
+    <end type="SOURCE" refId="3"/>    
+    <end type="TARGET" refId="9"/>  
+  </dependency>  
+  <dependency id="13">    
+    <end type="SOURCE" refId="8"/>    
+    <end type="TARGET" refId="7"/>  
   </dependency>  
   <dependency id="14">    
-    <end type="SOURCE" refId="2"/>    
-    <end type="TARGET" refId="5"/>  
+    <end type="SOURCE" refId="6"/>    
+    <end type="TARGET" refId="4"/>  
   </dependency>  
   <association id="15">    
-    <end type="SOURCE" refId="5" navigable="false">      
+    <end type="SOURCE" refId="3" navigable="false">      
       <attribute id="16" name="task">        
         <position height="0" width="0" x="0" y="0"/>      
       </attribute>      
@@ -132,66 +120,12 @@
         <position height="0" width="0" x="0" y="0"/>      
       </multiplicity>    
     </end>    
-    <end type="TARGET" refId="9" navigable="true"/>    
+    <end type="TARGET" refId="7" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
   <dependency id="18">    
-    <end type="SOURCE" refId="8"/>    
-    <end type="TARGET" refId="7"/>  
-  </dependency>  
-  <dependency id="19">    
-    <end type="SOURCE" refId="1"/>    
-    <end type="TARGET" refId="10"/>  
-  </dependency>  
-  <dependency id="20">    
-    <bendpoint x="788" y="248"/>    
-    <end type="SOURCE" refId="1"/>    
-    <end type="TARGET" refId="9"/>  
-  </dependency>  
-  <dependency id="21">    
-    <end type="SOURCE" refId="5"/>    
-    <end type="TARGET" refId="11"/>  
-  </dependency>  
-  <dependency id="22">    
-    <end type="SOURCE" refId="10"/>    
-    <end type="TARGET" refId="9"/>  
-  </dependency>  
-  <dependency id="23">    
-    <end type="SOURCE" refId="1"/>    
-    <end type="TARGET" refId="8"/>  
-  </dependency>  
-  <dependency id="24">    
-    <end type="SOURCE" refId="1"/>    
-    <end type="TARGET" refId="3"/>  
-  </dependency>  
-  <dependency id="25">    
-    <end type="SOURCE" refId="1"/>    
-    <end type="TARGET" refId="12"/>  
-  </dependency>  
-  <dependency id="26">    
-    <bendpoint x="986" y="248"/>    
-    <end type="SOURCE" refId="2"/>    
-    <end type="TARGET" refId="9"/>  
-  </dependency>  
-  <association id="27">    
-    <end type="SOURCE" refId="9" navigable="false">      
-      <attribute id="28" name="imgs">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </attribute>      
-      <multiplicity id="29" minimum="0" maximum="2147483647">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </multiplicity>    
-    </end>    
-    <end type="TARGET" refId="4" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <dependency id="30">    
-    <end type="SOURCE" refId="2"/>    
-    <end type="TARGET" refId="10"/>  
-  </dependency>  
-  <dependency id="31">    
-    <end type="SOURCE" refId="8"/>    
-    <end type="TARGET" refId="6"/>  
+    <end type="SOURCE" refId="6"/>    
+    <end type="TARGET" refId="5"/>  
   </dependency>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="true" signature="true" 
     sort-features="false" accessors="true" visibility="true">    
