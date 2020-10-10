@@ -13,7 +13,7 @@ public class QuicklyTester {
 //				+ "-usepwd 1234AAA "
 //				+ "-ownpwd 1234AAA "
 				+ "test_file\\dirlist_cmyk.txt "
-				+ "test_file\\dirlist_raw2.txt";
+				+ "test_file\\dirlist_mul.txt";
 		
 //		TaskListCreator creator=new TaskListCreator(str);
 //		new TaskProcessor(creator.getTaskList());

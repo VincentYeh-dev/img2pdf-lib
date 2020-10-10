@@ -67,16 +67,7 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="8" language="java" name="org.vincentyeh.IMG2PDF.task.TaskList" project="IMG2PDF" 
-    file="/IMG2PDF/src/main/java/org/vincentyeh/IMG2PDF/task/TaskList.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="225" width="137" x="819" y="248"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true" static="false"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="9" language="java" name="org.vincentyeh.IMG2PDF.util.ImageProcess" project="IMG2PDF" 
+  <class id="8" language="java" name="org.vincentyeh.IMG2PDF.util.ImageProcess" project="IMG2PDF" 
     file="/IMG2PDF/src/main/java/org/vincentyeh/IMG2PDF/util/ImageProcess.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="171" width="197" x="1123" y="567"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
@@ -85,7 +76,7 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="10" language="java" name="org.vincentyeh.IMG2PDF.util.NameFormatter" project="IMG2PDF" 
+  <class id="9" language="java" name="org.vincentyeh.IMG2PDF.util.NameFormatter" project="IMG2PDF" 
     file="/IMG2PDF/src/main/java/org/vincentyeh/IMG2PDF/util/NameFormatter.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="171" width="263" x="474" y="248"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
@@ -94,38 +85,22 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <dependency id="11">    
+  <dependency id="10">    
     <bendpoint x="1092" y="567"/>    
     <end type="SOURCE" refId="3"/>    
     <end type="TARGET" refId="2"/>  
   </dependency>  
-  <dependency id="12">    
-    <end type="SOURCE" refId="3"/>    
-    <end type="TARGET" refId="9"/>  
-  </dependency>  
-  <dependency id="13">    
-    <end type="SOURCE" refId="8"/>    
-    <end type="TARGET" refId="7"/>  
-  </dependency>  
-  <dependency id="14">    
+  <dependency id="11">    
     <end type="SOURCE" refId="6"/>    
     <end type="TARGET" refId="4"/>  
   </dependency>  
-  <association id="15">    
-    <end type="SOURCE" refId="3" navigable="false">      
-      <attribute id="16" name="task">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </attribute>      
-      <multiplicity id="17" minimum="0" maximum="1">        
-        <position height="0" width="0" x="0" y="0"/>      
-      </multiplicity>    
-    </end>    
-    <end type="TARGET" refId="7" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <dependency id="18">    
+  <dependency id="12">    
     <end type="SOURCE" refId="6"/>    
     <end type="TARGET" refId="5"/>  
+  </dependency>  
+  <dependency id="13">    
+    <end type="SOURCE" refId="3"/>    
+    <end type="TARGET" refId="8"/>  
   </dependency>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="true" signature="true" 
     sort-features="false" accessors="true" visibility="true">    

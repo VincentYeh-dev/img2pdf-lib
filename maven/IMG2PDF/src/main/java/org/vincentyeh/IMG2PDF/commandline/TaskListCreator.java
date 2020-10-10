@@ -13,8 +13,8 @@ import org.vincentyeh.IMG2PDF.file.ImgFile.Sortby;
 import org.vincentyeh.IMG2PDF.file.PDFFile.Align;
 import org.vincentyeh.IMG2PDF.file.PDFFile.Size;
 import org.vincentyeh.IMG2PDF.file.text.UTF8InputStream;
-import org.vincentyeh.IMG2PDF.task.setup.SetupTask;
-import org.vincentyeh.IMG2PDF.task.setup.SetupTaskList;
+import org.vincentyeh.IMG2PDF.task.configure.ConfigureTask;
+import org.vincentyeh.IMG2PDF.task.configure.ConfigureTaskList;
 import org.vincentyeh.IMG2PDF.util.NameFormatter;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
@@ -86,7 +86,7 @@ public class TaskListCreator {
 
 	}
 
-	private SetupTaskList tasks = new SetupTaskList();
+	private ConfigureTaskList tasks = new ConfigureTaskList();
 
 	TaskListCreator(String args) throws IOException {
 		this(args.trim().split("\\s"));
@@ -111,7 +111,7 @@ public class TaskListCreator {
 		new TaskListCreator(str);
 	}
 
-	public SetupTaskList getTaskList() {
+	public ConfigureTaskList getTaskList() {
 		return tasks;
 	}
 
@@ -122,11 +122,11 @@ public class TaskListCreator {
 	 * @return The List of Task.
 	 * @throws IOException None description.
 	 */
-	private SetupTaskList importTasksFromTXT(File file, TaskArgument arguments) throws IOException {
+	private ConfigureTaskList importTasksFromTXT(File file, TaskArgument arguments) throws IOException {
 
 		UTF8InputStream uis = new UTF8InputStream(file);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(uis, "UTF-8"));
-		SetupTaskList tasks = new SetupTaskList();
+		ConfigureTaskList tasks = new ConfigureTaskList();
 		String buf = "";
 		while (buf != null) {
 			buf = reader.readLine();
@@ -143,7 +143,7 @@ public class TaskListCreator {
 
 				NameFormatter nf = new NameFormatter(arguments.dst, dir);
 				FileFilterHelper ffh = createImageFilter(0);
-				SetupTask task = new SetupTask(dir.listFiles(ffh), nf.getConverted(), arguments.owner_pwd, arguments.user_pwd,
+				ConfigureTask task = new ConfigureTask(dir.listFiles(ffh), nf.getConverted(), arguments.owner_pwd, arguments.user_pwd,
 						arguments.sortby, arguments.order, arguments.align, arguments.size);
 				tasks.add(task);
 

@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.task.formatted;
+package org.vincentyeh.IMG2PDF.task.configured;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,10 +16,8 @@ import org.vincentyeh.IMG2PDF.file.PDFFile.Size;
 import org.vincentyeh.IMG2PDF.file.PDFFile.Size.IllegalSizeException;
 import org.vincentyeh.IMG2PDF.task.Task;
 
-public class FormattedTask extends Task {
-	protected final ArrayList<File> imgs = new ArrayList<File>();
-
-	public FormattedTask(Element element) throws FileNotFoundException {
+public class ConfiguredTask extends Task {
+	public ConfiguredTask(Element element) throws FileNotFoundException {
 		super(element.getAttributeValue("destination"), element.getAttributeValue("owner"),
 				element.getAttributeValue("user"), new Align(element.getAttributeValue("align")),
 				Size.getSizeFromString(element.getAttributeValue("size")));
@@ -30,15 +28,16 @@ public class FormattedTask extends Task {
 
 	}
 
-	private ArrayList<File> elements2imgs(ArrayList<Element> el_files) {
-		ArrayList<File> imgs = new ArrayList<File>();
+	private ArrayList<ImgFile> elements2imgs(ArrayList<Element> el_files) throws FileNotFoundException {
+		ArrayList<ImgFile> imgs = new ArrayList<ImgFile>();
 		for (Element el : el_files) {
-			imgs.add(new File(el.getValue()));
+			ImgFile img = new ImgFile(new File(el.getValue()).getAbsolutePath());
+			imgs.add(img);
 		}
 		return imgs;
 	}
 
-	public ArrayList<File> getImgs() {
+	public ArrayList<ImgFile> getImgs() {
 		return imgs;
 	}
 }

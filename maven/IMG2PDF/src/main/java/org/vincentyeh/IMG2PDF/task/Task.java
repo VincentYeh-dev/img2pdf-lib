@@ -42,6 +42,8 @@ public abstract class Task {
 	protected final String destination;
 	protected final String owner_pwd;
 	protected final String user_pwd;
+	protected final ArrayList<ImgFile> imgs = new ArrayList<ImgFile>();
+	
 	
 	/**
 	 * Create the task by arguments.

@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.task.formatted;
+package org.vincentyeh.IMG2PDF.task.configured;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,7 +17,7 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.xml.sax.SAXException;
 
-public class FormattedTaskList extends ArrayList<FormattedTask> {
+public class ConfiguredTaskList extends ArrayList<ConfiguredTask> {
 
 	/**
 	 * 
@@ -25,18 +25,18 @@ public class FormattedTaskList extends ArrayList<FormattedTask> {
 	private static final long serialVersionUID = 1L;
 	
 
-	public FormattedTaskList(String filepath) throws ParserConfigurationException, SAXException, IOException {
+	public ConfiguredTaskList(String filepath) throws ParserConfigurationException, SAXException, IOException {
 		this(getDOMParsedDocument(filepath));
 	}
 
-	public FormattedTaskList(Document doc) throws FileNotFoundException {
+	public ConfiguredTaskList(Document doc) throws FileNotFoundException {
 		this(doc.getRootElement());
 	}
 	
-	public FormattedTaskList(Element root) throws FileNotFoundException {
+	public ConfiguredTaskList(Element root) throws FileNotFoundException {
 		ArrayList<Element> importedTaskList = new ArrayList<Element>(root.getChildren("TASK"));
 		for (Element task : importedTaskList) {
-			this.add(new FormattedTask(task));
+			this.add(new ConfiguredTask(task));
 		}
 	}
 	

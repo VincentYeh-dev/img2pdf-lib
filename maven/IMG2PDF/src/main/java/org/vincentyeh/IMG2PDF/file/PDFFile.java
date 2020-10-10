@@ -17,7 +17,7 @@ import org.vincentyeh.IMG2PDF.file.ImgFile.Order;
 import org.vincentyeh.IMG2PDF.file.PDFFile.Align.LeftRightAlign;
 import org.vincentyeh.IMG2PDF.file.PDFFile.Align.TopBottomAlign;
 import org.vincentyeh.IMG2PDF.task.Task;
-import org.vincentyeh.IMG2PDF.task.formatted.FormattedTask;
+import org.vincentyeh.IMG2PDF.task.configured.ConfiguredTask;
 import org.vincentyeh.IMG2PDF.util.ImageProcess;
 
 /**
@@ -34,7 +34,7 @@ public class PDFFile {
 	/**
 	 * Task that need to be process. It will be set on constructor.
 	 */
-	private final FormattedTask task;
+	private final ConfiguredTask task;
 
 	/**
 	 * <b>The calculation of diff</b>
@@ -64,7 +64,7 @@ public class PDFFile {
 	 * 
 	 * @param task The task to do on PDFFile.
 	 */
-	public PDFFile(FormattedTask task) {
+	public PDFFile(ConfiguredTask task) {
 		if (task == null)
 			throw new NullPointerException("task is null.");
 
@@ -94,7 +94,7 @@ public class PDFFile {
 		boolean isProtected = spp != null;
 		System.out.printf("Destination:%s\n", task.getDestination());
 
-		ArrayList<File> imgs = task.getImgs();
+		ArrayList<ImgFile> imgs = task.getImgs();
 
 		int all = imgs.size();
 		double perImg = (10. / all);
@@ -163,7 +163,7 @@ public class PDFFile {
 				page.setRotation(0);
 			} else {
 				page.setRotation(angle);
-				img = ImgFile.rotateImg(img, -1 * angle);
+				img = ImageProcess.rotateImg(img, -1 * angle);
 				isRotated = true;
 			}
 

@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.task.setup;
+package org.vincentyeh.IMG2PDF.task.configure;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,10 +13,8 @@ import org.vincentyeh.IMG2PDF.file.PDFFile.Align;
 import org.vincentyeh.IMG2PDF.file.PDFFile.Size;
 import org.vincentyeh.IMG2PDF.task.Task;
 
-public class SetupTask extends Task {
-	protected final ArrayList<ImgFile> imgs = new ArrayList<ImgFile>();
-	
-	public SetupTask(File[] files, String destination, String own, String user, Sortby sortby, Order order, Align align,
+public class ConfigureTask extends Task {
+	public ConfigureTask(File[] files, String destination, String own, String user, Sortby sortby, Order order, Align align,
 			Size size) throws FileNotFoundException {
 		super(destination, own, user, align, size);
 		

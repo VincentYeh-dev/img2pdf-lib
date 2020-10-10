@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.vincentyeh.IMG2PDF.file.PDFFile;
-import org.vincentyeh.IMG2PDF.task.formatted.FormattedTask;
-import org.vincentyeh.IMG2PDF.task.formatted.FormattedTaskList;
+import org.vincentyeh.IMG2PDF.task.configured.ConfiguredTask;
+import org.vincentyeh.IMG2PDF.task.configured.ConfiguredTaskList;
 import org.xml.sax.SAXException;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
@@ -33,16 +33,16 @@ public class TaskProcessor {
 		Arg2Values(parser, args);
 
 		for (String filepath : lists) {
-			start(new FormattedTaskList(filepath));
+			start(new ConfiguredTaskList(filepath));
 		}
 	}
 
-	public TaskProcessor(FormattedTaskList tasks) {
+	public TaskProcessor(ConfiguredTaskList tasks) {
 		start(tasks);
 	}
 
-	private void start(FormattedTaskList tasks) {
-		for (FormattedTask task : tasks) {
+	private void start(ConfiguredTaskList tasks) {
+		for (ConfiguredTask task : tasks) {
 			PDFFile pdf = new PDFFile(task);
 			try {
 //				pdf.setMaxDiff(0.15f);

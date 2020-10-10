@@ -1,25 +1,16 @@
 package org.vincentyeh.IMG2PDF.util;
 
-import java.awt.Transparency;
-import java.awt.color.ColorSpace;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.ComponentColorModel;
-import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferByte;
-import java.awt.image.Raster;
-import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
 
-import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
 
 public class ImageProcess {
 	private final File file;
+
 	public ImageProcess(File file) {
 		this.file = file;
 	}
@@ -101,4 +92,19 @@ public class ImageProcess {
 //		return new BufferedImage(cm, (WritableRaster) raster, true, null);
 //	}
 
+	public static BufferedImage rotateImg(BufferedImage raw, int rotate_angle) {
+		final double rads = Math.toRadians(rotate_angle);
+		final double sin = Math.abs(Math.sin(rads));
+		final double cos = Math.abs(Math.cos(rads));
+		final int w = (int) Math.floor(raw.getWidth() * cos + raw.getHeight() * sin);
+		final int h = (int) Math.floor(raw.getHeight() * cos + raw.getWidth() * sin);
+		final BufferedImage rotatedImage = new BufferedImage(w, h, raw.getType());
+		final AffineTransform at = new AffineTransform();
+		at.translate(w / 2, h / 2);
+		at.rotate(rads, 0, 0);
+		at.translate(-raw.getWidth() / 2, -raw.getHeight() / 2);
+		AffineTransformOp rotateOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
+		rotateOp.filter(raw, rotatedImage);
+		return rotatedImage;
+	}
 }
