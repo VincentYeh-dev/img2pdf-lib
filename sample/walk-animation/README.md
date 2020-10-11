@@ -16,7 +16,7 @@ Please save dirlist.txt as UTF-8 encoding-type.
 
 **dirlist.txt**
 ```
-path\to\IMG2PDF\sample-imgs\walk_animation
+path\to\IMG2PDF\sample\walk-animation\image-sources
 ```
 
 **java code**
