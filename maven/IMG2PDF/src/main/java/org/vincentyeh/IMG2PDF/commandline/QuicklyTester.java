@@ -9,11 +9,11 @@ public class QuicklyTester {
 				+ "-a CENTER|CENTER "
 				+ "-odr INCREASE "
 				+ "-lo test_file\\test.xml "
-				+ "-d test_file\\output\\$NAME.pdf "
+				+ "-d D:\\Project\\git\\IMG2PDF\\sample\\$NAME.pdf "
 //				+ "-usepwd 1234AAA "
 //				+ "-ownpwd 1234AAA "
 //				+ "test_file\\dirlist_mul.txt "
-				+ "test_file\\\\dirlist_walk.txt";
+				+ "D:\\Project\\git\\IMG2PDF\\sample\\sample-dirlist\\dirlist_walk.txt";
 		
 //		TaskListCreator creator=new TaskListCreator(str);
 //		new TaskProcessor(creator.getTaskList());
