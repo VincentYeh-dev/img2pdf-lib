@@ -3,17 +3,12 @@ package org.vincentyeh.IMG2PDF.task.configured;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.jdom2.Element;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
-import org.vincentyeh.IMG2PDF.file.ImgFile.Order;
-import org.vincentyeh.IMG2PDF.file.ImgFile.Sortby;
-import org.vincentyeh.IMG2PDF.file.PDFFile.Align;
-import org.vincentyeh.IMG2PDF.file.PDFFile.Align.IllegalAlignException;
-import org.vincentyeh.IMG2PDF.file.PDFFile.Size;
-import org.vincentyeh.IMG2PDF.file.PDFFile.Size.IllegalSizeException;
+import org.vincentyeh.IMG2PDF.pdf.Align;
+import org.vincentyeh.IMG2PDF.pdf.Size;
 import org.vincentyeh.IMG2PDF.task.Task;
 
 public class ConfiguredTask extends Task {

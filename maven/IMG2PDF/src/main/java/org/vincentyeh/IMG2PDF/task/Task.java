@@ -1,20 +1,12 @@
 package org.vincentyeh.IMG2PDF.task;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
-import org.jdom2.Attribute;
-import org.jdom2.Content;
 import org.jdom2.Element;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
-import org.vincentyeh.IMG2PDF.file.ImgFile.Order;
-import org.vincentyeh.IMG2PDF.file.ImgFile.Sortby;
-import org.vincentyeh.IMG2PDF.file.PDFFile;
-import org.vincentyeh.IMG2PDF.file.PDFFile.Align;
-import org.vincentyeh.IMG2PDF.file.PDFFile.Size;
+import org.vincentyeh.IMG2PDF.pdf.Align;
+import org.vincentyeh.IMG2PDF.pdf.Size;
 
 /**
  * <b>Task is the pre-work of the conversion</b>. All attributes of PDF file
@@ -43,8 +35,7 @@ public abstract class Task {
 	protected final String owner_pwd;
 	protected final String user_pwd;
 	protected final ArrayList<ImgFile> imgs = new ArrayList<ImgFile>();
-	
-	
+
 	/**
 	 * Create the task by arguments.
 	 * 
@@ -58,10 +49,10 @@ public abstract class Task {
 	 * @param size        Which size of pages of PDF.
 	 * @throws FileNotFoundException When file is not exists.
 	 */
-	public Task(String destination, String own, String user,Align align, PDFFile.Size size) throws FileNotFoundException {
+	public Task(String destination, String own, String user, Align align, Size size) throws FileNotFoundException {
 		if (destination == null)
 			throw new NullPointerException("destination is null.");
-		this.align=align;
+		this.align = align;
 		this.size = size;
 		this.destination = destination;
 		owner_pwd = own != null ? own : "#null";
@@ -74,9 +65,7 @@ public abstract class Task {
 	 * 
 	 * @param element The XML Element That include information of Task.
 	 */
-	
-	
-	
+
 	public Align getAlign() {
 		return align;
 	}
@@ -85,7 +74,7 @@ public abstract class Task {
 		return destination;
 	}
 
-	public PDFFile.Size getSize() {
+	public Size getSize() {
 		return size;
 	}
 
@@ -96,5 +85,5 @@ public abstract class Task {
 	public String getUser_pwd() {
 		return user_pwd;
 	}
-	
+
 }

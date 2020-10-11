@@ -14,7 +14,6 @@ import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.vincentyeh.IMG2PDF.pdf.Align.LeftRightAlign;
 import org.vincentyeh.IMG2PDF.pdf.Align.TopBottomAlign;
-import org.vincentyeh.IMG2PDF.pdf.ImagePage;
 import org.vincentyeh.IMG2PDF.pdf.Size;
 import org.vincentyeh.IMG2PDF.task.configured.ConfiguredTask;
 import org.vincentyeh.IMG2PDF.util.ImageProcess;
@@ -25,7 +24,7 @@ import org.vincentyeh.IMG2PDF.util.ImageProcess;
  * @author VincentYeh
  *
  */
-public class PDFFile {
+public class PDFFile2 {
 
 	private StandardProtectionPolicy spp = null;
 	private final PDDocument doc;
@@ -63,7 +62,7 @@ public class PDFFile {
 	 * 
 	 * @param task The task to do on PDFFile.
 	 */
-	public PDFFile(ConfiguredTask task) {
+	public PDFFile2(ConfiguredTask task) {
 		if (task == null)
 			throw new NullPointerException("task is null.");
 
@@ -113,9 +112,6 @@ public class PDFFile {
 				doc.close();
 				System.out.print("FAIL]");
 				throw e;
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 
 		}
@@ -137,71 +133,59 @@ public class PDFFile {
 	 * @return The page contain image
 	 * @throws IOException Failure of drawing image to page
 	 */
-	PDPage createImgPage(BufferedImage img) throws Exception{
-		Size size=task.getSize();
-		ImagePage imgpage=null;
-		if(size==Size.DEPEND_ON_IMG) {
-			imgpage=new ImagePage(task.getAlign(),img.getHeight(),img.getWidth());
-		}else {
-			imgpage=new ImagePage(task.getAlign(),task.getSize());
+	PDPage createImgPage(BufferedImage img) throws IOException {
+		PDPage page = null;
+		float img_width = img.getWidth();
+		float img_height = img.getHeight();
+
+		float position_x = 0, position_y = 0;
+		float out_width = 0, out_height = 0;
+		Size size = task.getSize();
+
+		if (size == Size.DEPEND_ON_IMG) {
+
+			page = new PDPage(new PDRectangle(img_width, img_height));
+			out_width = img_width;
+			out_height = img_height;
+
+		} else {
+			page = new PDPage(size.getPdrectangle());
+
+			PDRectangle rec = page.getBBox();
+			float page_height = rec.getHeight();
+			float page_width = rec.getWidth();
+
+			int angle = 90;
+			boolean isRotated = false;
+			if ((img_height / img_width) >= 1) {
+				page.setRotation(0);
+			} else {
+				page.setRotation(angle);
+				img = ImageProcess.rotateImg(img, -1 * angle);
+				isRotated = true;
+			}
+
+			img_width = img.getWidth();
+			img_height = img.getHeight();
+
+			float[] f_size = sizeCalculate(img_height, img_width, page_height, page_width);
+			out_height = f_size[0];
+			out_width = f_size[1];
+
+			float[] f_position = positionCalculate(isRotated, out_height, out_width, page_height, page_width);
+			position_y = f_position[0];
+			position_x = f_position[1];
+
 		}
-		imgpage.setImage(img);
-		imgpage.drawImageToPage(doc);
-		return imgpage;
+
+		PDImageXObject pdImageXObject = LosslessFactory.createFromImage(doc, img);
+
+		PDPageContentStream contentStream = new PDPageContentStream(doc, page);
+
+		contentStream.drawImage(pdImageXObject, position_x, position_y, out_width, out_height);
+		contentStream.close();
+		return page;
 	}
-//	PDPage createImgPage(BufferedImage img) throws IOException {
-//		PDPage page = null;
-//		float img_width = img.getWidth();
-//		float img_height = img.getHeight();
-//
-//		float position_x = 0, position_y = 0;
-//		float out_width = 0, out_height = 0;
-//		Size size = task.getSize();
-//
-//		if (size == Size.DEPEND_ON_IMG) {
-//
-//			page = new PDPage(new PDRectangle(img_width, img_height));
-//			out_width = img_width;
-//			out_height = img_height;
-//
-//		} else {
-//			page = new PDPage(size.getPdrectangle());
-//
-//			PDRectangle rec = page.getBBox();
-//			float page_height = rec.getHeight();
-//			float page_width = rec.getWidth();
-//
-//			int angle = 90;
-//			boolean isRotated = false;
-//			if ((img_height / img_width) >= 1) {
-//				page.setRotation(0);
-//			} else {
-//				page.setRotation(angle);
-//				img = ImageProcess.rotateImg(img, -1 * angle);
-//				isRotated = true;
-//			}
-//
-//			img_width = img.getWidth();
-//			img_height = img.getHeight();
-//
-//			float[] f_size = sizeCalculate(img_height, img_width, page_height, page_width);
-//			out_height = f_size[0];
-//			out_width = f_size[1];
-//
-//			float[] f_position = positionCalculate(isRotated, out_height, out_width, page_height, page_width);
-//			position_y = f_position[0];
-//			position_x = f_position[1];
-//
-//		}
-//
-//		PDImageXObject pdImageXObject = LosslessFactory.createFromImage(doc, img);
-//
-//		PDPageContentStream contentStream = new PDPageContentStream(doc, page);
-//
-//		contentStream.drawImage(pdImageXObject, position_x, position_y, out_width, out_height);
-//		contentStream.close();
-//		return page;
-//	}
 
 	/**
 	 * Compute the position of image by align value.
