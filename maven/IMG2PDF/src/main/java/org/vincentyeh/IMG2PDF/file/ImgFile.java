@@ -2,6 +2,8 @@ package org.vincentyeh.IMG2PDF.file;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The ImgFile is a comparable subclass of File.It's can be compared by filename
@@ -45,7 +47,7 @@ public class ImgFile extends File implements Comparable<File> {
 			throw new FileNotFoundException(pathname + " not found.");
 		if (isDirectory())
 			throw new FileIsDirectoryException(this);
-		
+
 		this.sortby = sortby;
 		this.order = order;
 
@@ -65,6 +67,30 @@ public class ImgFile extends File implements Comparable<File> {
 
 			else if (order == Order.DECREASE)
 				return (this.lastModified() - o.lastModified() > 0) ? -1 : 1;
+//		case NUMERTIC:
+//			String ThisStr=this.getName();
+//			String OStr=o.getName();
+//			
+//			String noNumThisStr = ThisStr.replace("[0-9]", "*");
+//			String noNumOStr = OStr.replace("[0-9]", "*");
+//			
+//			String noMulStarThisStr = noNumThisStr.replace("\\*{1,}", "*");
+//			String noMulStarOStr = noNumOStr.replace("\\*{1,}", "*");
+//
+//			if (!noMulStarThisStr.equals(noMulStarOStr)) {
+//				if (order == Order.INCREASE)
+//					return noMulStarThisStr.compareTo(noMulStarOStr);
+//				else if (order == Order.DECREASE)
+//					return noMulStarOStr.compareTo(noMulStarThisStr);
+//			}else {
+//				Matcher thisMatcher = Pattern.compile(".*?(\\*{1,}).*?").matcher(noNumThisStr);
+//				while(thisMatcher.find()) {
+//					String a=thisMatcher.group(1);
+//					ThisStr.substring(noNumThisStr.indexOf(a),noNumThisStr.indexOf(a)+a.length()+1);
+//				
+//				}
+//			}
+
 		default:
 			throw new RuntimeException("Multiple files need to be sorted by sort and order arguments.");
 		}
@@ -107,7 +133,7 @@ public class ImgFile extends File implements Comparable<File> {
 	}
 
 	public enum Sortby {
-		NONE("NONE"), NAME("NAME"), DATE("DATE");
+		NONE("NONE"), NAME("NAME"), DATE("DATE"), NUMERTIC("NUMERTIC");
 		private String str;
 
 		private Sortby(String str) {
@@ -149,7 +175,7 @@ public class ImgFile extends File implements Comparable<File> {
 		private static final long serialVersionUID = 1L;
 
 		public FileIsDirectoryException(File f) {
-			super(f.getName()+" is a directory.");
+			super(f.getName() + " is a directory.");
 		}
 
 	}
