@@ -2,6 +2,7 @@ package org.vincentyeh.IMG2PDF.file;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -67,30 +68,14 @@ public class ImgFile extends File implements Comparable<File> {
 
 			else if (order == Order.DECREASE)
 				return (this.lastModified() - o.lastModified() > 0) ? -1 : 1;
-//		case NUMERTIC:
-//			String ThisStr=this.getName();
-//			String OStr=o.getName();
-//			
-//			String noNumThisStr = ThisStr.replace("[0-9]", "*");
-//			String noNumOStr = OStr.replace("[0-9]", "*");
-//			
-//			String noMulStarThisStr = noNumThisStr.replace("\\*{1,}", "*");
-//			String noMulStarOStr = noNumOStr.replace("\\*{1,}", "*");
-//
-//			if (!noMulStarThisStr.equals(noMulStarOStr)) {
-//				if (order == Order.INCREASE)
-//					return noMulStarThisStr.compareTo(noMulStarOStr);
-//				else if (order == Order.DECREASE)
-//					return noMulStarOStr.compareTo(noMulStarThisStr);
-//			}else {
-//				Matcher thisMatcher = Pattern.compile(".*?(\\*{1,}).*?").matcher(noNumThisStr);
-//				while(thisMatcher.find()) {
-//					String a=thisMatcher.group(1);
-//					ThisStr.substring(noNumThisStr.indexOf(a),noNumThisStr.indexOf(a)+a.length()+1);
-//				
-//				}
-//			}
+		case NUMERTIC:
+			if (order == Order.INCREASE)
+				return compareTo(this.getName(), o.getName());
 
+			else if (order == Order.DECREASE)
+				return compareTo(o.getName(), this.getName());
+
+			
 		default:
 			throw new RuntimeException("Multiple files need to be sorted by sort and order arguments.");
 		}
@@ -194,5 +179,35 @@ public class ImgFile extends File implements Comparable<File> {
 			super(f.getName() + " is not a image file.");
 		}
 
+	}
+
+	int compareTo(String ThisStr, String OStr) {
+		String noNumThis = ThisStr.replaceAll("[0-9]{1,}", "*");
+		String noNumO = OStr.replaceAll("[0-9]{1,}", "*");
+
+		if (noNumThis.equals(noNumO)) {
+			ArrayList<Integer> a = getNum(ThisStr);
+			ArrayList<Integer> b = getNum(OStr);
+			for (int i = 0; i < a.size(); i++) {
+				int r = a.get(i) - b.get(i);
+				if (r != 0) {
+					return r;
+				}
+			}
+			return 0;
+		} else {
+			return ThisStr.compareTo(OStr);
+		}
+	}
+
+	ArrayList<Integer> getNum(String str) {
+		String s[] = str.split("[^0-9]{1,}");
+		ArrayList<Integer> buf = new ArrayList<Integer>();
+		for (int i = 0; i < s.length; i++) {
+			if (!s[i].isEmpty()) {
+				buf.add(Integer.valueOf(s[i]));
+			}
+		}
+		return buf;
 	}
 }

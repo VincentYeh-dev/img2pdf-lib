@@ -1,37 +1,47 @@
 package org.vincentyeh.IMG2PDF.commandline;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
 
 import org.junit.Test;
-import org.vincentyeh.IMG2PDF.file.ImgFile.Order;
 
 public class DefaultTest {
-	
+
 	@Test
 	public void RTest() {
-		
-		String ThisStr="AA1";
-		String OStr="AA11";
-		
-		String noNumThisStr = ThisStr.replaceAll("[0-9]", "*");
-		String noNumOStr = OStr.replaceAll("[0-9]", "*");
-		System.out.println(noNumThisStr);
-		System.out.println(noNumOStr);
 
-		System.out.println();
-		
-		String noMulStarThisStr = noNumThisStr.replaceAll("\\*{1,}", "*");
-		String noMulStarOStr = noNumOStr.replaceAll("\\*{1,}", "*");
+		System.out.println(compareTo("walka1", "walka10"));
 
-		System.out.println(noMulStarThisStr);
-		System.out.println(noMulStarOStr);
-		
-		if (!noMulStarThisStr.equals(noMulStarOStr)) {
-			
+	}
+
+	int compareTo(String ThisStr, String OStr) {
+		String noNumThis = ThisStr.replaceAll("[0-9]{1,}", "*");
+		String noNumO = OStr.replaceAll("[0-9]{1,}", "*");
+
+		if (noNumThis.equals(noNumO)) {
+			ArrayList<Integer> a = getNum(ThisStr);
+			ArrayList<Integer> b = getNum(OStr);
+			for (int i = 0; i < a.size(); i++) {
+				int r = a.get(i) - b.get(i);
+				if (r != 0) {
+					return r;
+				}
+			}
+			return 0;
 		}else {
-			ThisStr.substring(noNumThisStr.indexOf("*"),
-					noNumThisStr.indexOf("*"));
+			return ThisStr.compareTo(OStr);
 		}
+	}
+
+	ArrayList<Integer> getNum(String str) {
+		String s[] = str.split("[^0-9]{1,}");
+		ArrayList<Integer> buf = new ArrayList<Integer>();
+		for (int i = 0; i < s.length; i++) {
+			if (!s[i].isEmpty()) {
+				buf.add(Integer.valueOf(s[i]));
+			}
+		}
+
+		System.out.println(buf.toString());
+		return buf;
 	}
 }

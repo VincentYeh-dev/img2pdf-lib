@@ -5,7 +5,7 @@ public class QuicklyTester {
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
 		String str="-sz A4 "
-				+ "-s NAME "
+				+ "-s NUMERTIC "
 				+ "-a CENTER|CENTER "
 				+ "-odr INCREASE "
 				+ "-lo test_file\\test.xml "
