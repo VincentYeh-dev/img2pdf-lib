@@ -12,12 +12,7 @@ public class QuicklyTester {
 				+ "-d D:\\Project\\git\\IMG2PDF\\sample\\walk-animation\\output\\$PARENT{0}.pdf "
 //				+ "-usepwd 1234AAA "
 //				+ "-ownpwd 1234AAA "
-//				+ "test_file\\dirlist_mul.txt "
 				+ "D:\\Project\\git\\IMG2PDF\\sample\\walk-animation\\dirlist.txt";
-		
-//		TaskListCreator creator=new TaskListCreator(str);
-//		new TaskProcessor(creator.getTaskList());
-
 		new TaskListCreator(str);
 		new TaskProcessor("test_file\\test.xml");
 		

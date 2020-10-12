@@ -5,7 +5,7 @@
 
 	<groupId>org.vincentyeh</groupId>
 	<artifactId>IMG2PDF</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>IMG2PDF</name>
@@ -59,7 +59,7 @@
 			<version>1.0-alpha2</version>
 		</dependency>
 
-		
+
 	</dependencies>
 
 	<build>
@@ -107,7 +107,23 @@
 
 				</executions>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<configuration>
+					<useReleaseProfile>false</useReleaseProfile>
+					<tagNameFormat>v@{version}</tagNameFormat>
+				</configuration>
+			</plugin>
+
 		</plugins>
 	</build>
 
+	<scm>
+		<connection>scm:git:git@github.com:VincentYeh-dev/IMG2PDF</connection>
+		<url>scm:giz:git:git@github.com:VincentYeh-dev/IMG2PDF</url>
+		<developerConnection>scm:git:git@github.com:VincentYeh-dev/IMG2PDF</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
 </project>

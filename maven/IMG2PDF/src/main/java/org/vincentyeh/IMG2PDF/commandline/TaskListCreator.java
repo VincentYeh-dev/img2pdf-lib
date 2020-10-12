@@ -88,7 +88,7 @@ public class TaskListCreator {
 
 	private ConfigureTaskList tasks = new ConfigureTaskList();
 
-	TaskListCreator(String args) throws IOException {
+	public TaskListCreator(String args) throws IOException {
 		this(args.trim().split("\\s"));
 	}
 
