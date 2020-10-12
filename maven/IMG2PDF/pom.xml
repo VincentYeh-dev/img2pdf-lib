@@ -1,11 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.vincentyeh</groupId>
 	<artifactId>IMG2PDF</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.1</version>
 	<packaging>jar</packaging>
 
 	<name>IMG2PDF</name>
@@ -120,10 +118,4 @@
 		</plugins>
 	</build>
 
-	<scm>
-		<connection>scm:git:git@github.com:VincentYeh-dev/IMG2PDF</connection>
-		<url>scm:giz:git:git@github.com:VincentYeh-dev/IMG2PDF</url>
-		<developerConnection>scm:git:git@github.com:VincentYeh-dev/IMG2PDF</developerConnection>
-		<tag>HEAD</tag>
-	</scm>
 </project>
