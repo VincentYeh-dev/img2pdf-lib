@@ -78,10 +78,6 @@ public class PDFConverter implements Callable<ImagesPDFDocument>{
 		}
 		System.out.print("]%100");
 
-//		if (isProtected) {
-//			doc.protect(spp);
-//			System.out.print(" *");
-//		}
 		System.out.println("\n\n");
 		return doc;
 	}
@@ -102,6 +98,7 @@ public class PDFConverter implements Callable<ImagesPDFDocument>{
 		}else {
 			imgpage=new ImagePage(doc.getAlign(),doc.getSize());
 		}
+		imgpage.setAutoRotate(true);
 		imgpage.setImage(img);
 		imgpage.drawImageToPage(doc);
 		return imgpage;

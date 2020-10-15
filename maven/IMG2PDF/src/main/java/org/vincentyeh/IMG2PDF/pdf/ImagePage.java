@@ -17,6 +17,7 @@ public class ImagePage extends PDPage{
 	private final float page_height;
 	private final float page_width;
 	private final Size size;
+	private boolean autoRotate=true;
 	
 	/**
 	 * <b>The calculation of diff</b>
@@ -84,14 +85,21 @@ public class ImagePage extends PDPage{
 			int angle = 90;
 			boolean isRotated = false;
 			BufferedImage rotatedImage = null;
-			if ((img_height / img_width) >= 1) {
+			
+			if(autoRotate) {
+				if ((img_height / img_width) >= 1) {
+					this.setRotation(0);
+					rotatedImage=image;
+				} else {
+					this.setRotation(angle);
+					rotatedImage = ImageProcess.rotateImg(image, -1 * angle);
+					isRotated = true;
+				}
+			}else {
 				this.setRotation(0);
 				rotatedImage=image;
-			} else {
-				this.setRotation(angle);
-				rotatedImage = ImageProcess.rotateImg(image, -1 * angle);
-				isRotated = true;
 			}
+			
 			outImage=rotatedImage;
 			img_width = rotatedImage.getWidth();
 			img_height = rotatedImage.getHeight();
@@ -229,6 +237,14 @@ public class ImagePage extends PDPage{
 	
 	public void setMaxResize(float max_resize) {
 		this.max_resize = max_resize;
+	}
+	
+	/**
+	 * Rotate the image when image is horizontal.
+	 * @param enable enable or disable rotation.
+	 */
+	public void setAutoRotate(boolean enable) {
+		this.autoRotate = enable;
 	}
 	
 }
