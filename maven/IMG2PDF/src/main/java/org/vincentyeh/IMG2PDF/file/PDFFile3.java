@@ -25,7 +25,7 @@ import org.vincentyeh.IMG2PDF.util.ImageProcess;
  * @author VincentYeh
  *
  */
-public class PDFFile {
+public class PDFFile3 {
 
 	private StandardProtectionPolicy spp = null;
 	private final PDDocument doc;
@@ -63,7 +63,7 @@ public class PDFFile {
 	 * 
 	 * @param task The task to do on PDFFile.
 	 */
-	public PDFFile(ConfiguredTask task) {
+	public PDFFile3(ConfiguredTask task) {
 		if (task == null)
 			throw new NullPointerException("task is null.");
 

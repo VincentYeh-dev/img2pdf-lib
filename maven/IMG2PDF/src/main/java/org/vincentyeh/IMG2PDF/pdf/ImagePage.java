@@ -17,7 +17,31 @@ public class ImagePage extends PDPage{
 	private final float page_height;
 	private final float page_width;
 	private final Size size;
-
+	
+	/**
+	 * <b>The calculation of diff</b>
+	 * <p>
+	 * resize=abs((image height/image width)-(page height/page width))
+	 * </p>
+	 * 
+	 * <b>Feature</b>
+	 * <p>
+	 * resize is the variable that can be set to prevent raw image over-deformed.
+	 * </p>
+	 * <p>
+	 * The default value is less than 0.It do nothing when you don't set it to the
+	 * value that more than 0.
+	 * </p>
+	 * <p>
+	 * If you do that before execution of process() method,the program will throw a
+	 * Exception that warn a user the sub is out of range when the resize larger than
+	 * max_resize.
+	 * </p>
+	 * 
+	 */
+	private float max_resize;
+	
+	
 	public ImagePage(Align align, Size size, float height, float width) {
 		this.align = align;
 		this.size = size;
@@ -202,5 +226,9 @@ public class ImagePage extends PDPage{
 
 		return new float[] { out_height, out_width };
 	}
-
+	
+	public void setMaxResize(float max_resize) {
+		this.max_resize = max_resize;
+	}
+	
 }

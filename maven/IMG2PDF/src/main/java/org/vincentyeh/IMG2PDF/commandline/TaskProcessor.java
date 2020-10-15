@@ -2,10 +2,15 @@ package org.vincentyeh.IMG2PDF.commandline;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.vincentyeh.IMG2PDF.file.PDFFile;
+import org.vincentyeh.IMG2PDF.file.PDFConverter;
+import org.vincentyeh.IMG2PDF.pdf.ImagesPDFDocument;
 import org.vincentyeh.IMG2PDF.task.configured.ConfiguredTask;
 import org.vincentyeh.IMG2PDF.task.configured.ConfiguredTaskList;
 import org.xml.sax.SAXException;
@@ -42,18 +47,24 @@ public class TaskProcessor {
 	}
 
 	private void start(ConfiguredTaskList tasks) {
+		ExecutorService executor = Executors.newSingleThreadExecutor();
 		for (ConfiguredTask task : tasks) {
-			PDFFile pdf = new PDFFile(task);
 			try {
-//				pdf.setMaxDiff(0.15f);
-				pdf.process();
+				PDFConverter pdf = new PDFConverter(task);
+				Future<ImagesPDFDocument> future=executor.submit(pdf);
+				ImagesPDFDocument result=future.get();
+				result.save();
+				result.close();
+				
+//				pdf.process();
 
-			} catch (IOException e) {
+			} catch (Exception e) {
 				if(e.getMessage().equals("Unsupported Image Type")) {
 					System.err.println("\nUnsupported Image Type\n");
 				}
 			}
 		}
+		executor.shutdown();
 	}
 
 	public static void main(String[] args) throws IOException, ParserConfigurationException, SAXException {
