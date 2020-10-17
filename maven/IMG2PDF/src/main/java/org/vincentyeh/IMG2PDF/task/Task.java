@@ -26,9 +26,6 @@ import org.vincentyeh.IMG2PDF.pdf.Size;
  * @author VincentYeh
  */
 public abstract class Task {
-	/**
-	 * 
-	 */
 	protected final Align align;
 	protected final Size size;
 	protected final String destination;

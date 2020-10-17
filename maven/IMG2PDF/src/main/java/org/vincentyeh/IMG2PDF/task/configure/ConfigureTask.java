@@ -23,7 +23,6 @@ public class ConfigureTask extends Task {
 		}
 		System.out.printf("found %d files\n", imgs.size());
 		System.out.print("Sortting files...");
-//		imgs need to be sort before written to element
 		Collections.sort(imgs);
 		System.out.print("DONE\n\n");
 		// TODO Auto-generated constructor stub

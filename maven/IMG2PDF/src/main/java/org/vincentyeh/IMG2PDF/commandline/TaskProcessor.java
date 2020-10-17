@@ -9,8 +9,8 @@ import java.util.concurrent.FutureTask;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.vincentyeh.IMG2PDF.file.PDFConverter;
 import org.vincentyeh.IMG2PDF.pdf.ImagesPDFDocument;
+import org.vincentyeh.IMG2PDF.pdf.PDFConverter;
 import org.vincentyeh.IMG2PDF.task.configured.ConfiguredTask;
 import org.vincentyeh.IMG2PDF.task.configured.ConfiguredTaskList;
 import org.xml.sax.SAXException;

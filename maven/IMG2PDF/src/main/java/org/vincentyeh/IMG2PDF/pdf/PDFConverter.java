@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.file;
+package org.vincentyeh.IMG2PDF.pdf;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -7,9 +7,7 @@ import java.util.concurrent.Callable;
 
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
-import org.vincentyeh.IMG2PDF.pdf.ImagePage;
-import org.vincentyeh.IMG2PDF.pdf.ImagesPDFDocument;
-import org.vincentyeh.IMG2PDF.pdf.Size;
+import org.vincentyeh.IMG2PDF.file.ImgFile;
 import org.vincentyeh.IMG2PDF.task.configured.ConfiguredTask;
 import org.vincentyeh.IMG2PDF.util.ImageProcess;
 
@@ -19,7 +17,7 @@ import org.vincentyeh.IMG2PDF.util.ImageProcess;
  * @author VincentYeh
  *
  */
-public class PDFConverter implements Callable<ImagesPDFDocument>{
+public class PDFConverter implements Callable<ImagesPDFDocument> {
 
 	private final ImagesPDFDocument doc;
 
@@ -28,24 +26,23 @@ public class PDFConverter implements Callable<ImagesPDFDocument>{
 	 */
 //	private final ConfiguredTask task;
 	private ArrayList<ImgFile> imgs;
-	
+
 	/**
 	 * Create PDFFile with Task
 	 * 
 	 * @param task The task to do on PDFFile.
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public PDFConverter(ConfiguredTask task) throws IOException {
 		if (task == null)
 			throw new NullPointerException("task is null.");
-//		this.task=task;
 		AccessPermission ap = new AccessPermission();
-		doc = new ImagesPDFDocument(task.getSize(),task.getAlign());
-		doc.protect(createProtectionPolicy(task.getOwner_pwd(),task.getUser_pwd(),ap));
+		doc = new ImagesPDFDocument(task.getSize(), task.getAlign());
+		doc.protect(createProtectionPolicy(task.getOwner_pwd(), task.getUser_pwd(), ap));
 		doc.setDestination(task.getDestination());
-		imgs=task.getImgs();
+		imgs = task.getImgs();
 	}
-	
+
 	/**
 	 * Start the conversion of PDF.
 	 * 
@@ -59,7 +56,7 @@ public class PDFConverter implements Callable<ImagesPDFDocument>{
 		double progress = 0;
 
 		System.out.print("0%[");
-		for (int i = 0; i < imgs.size(); i++) {
+		for (int i = 0; i < all; i++) {
 			progress += perImg;
 			while (progress >= 1) {
 				System.out.print("=");
@@ -69,7 +66,7 @@ public class PDFConverter implements Callable<ImagesPDFDocument>{
 				ImageProcess ip = new ImageProcess(imgs.get(i));
 //				doc.addImgPage(ip.read());
 				doc.addPage(createImgPage(ip.read()));
-			}catch (Exception e) {
+			} catch (Exception e) {
 				doc.close();
 				System.out.print("FAIL]");
 				throw e;
@@ -81,7 +78,6 @@ public class PDFConverter implements Callable<ImagesPDFDocument>{
 		System.out.println("\n\n");
 		return doc;
 	}
-	
 
 	/**
 	 * Draw Image to Page
@@ -90,13 +86,13 @@ public class PDFConverter implements Callable<ImagesPDFDocument>{
 	 * @return The page contain image
 	 * @throws IOException Failure of drawing image to page
 	 */
-	ImagePage createImgPage(BufferedImage img) throws Exception{
-		Size size=doc.getSize();
-		ImagePage imgpage=null;
-		if(size==Size.DEPEND_ON_IMG) {
-			imgpage=new ImagePage(doc.getAlign(),img.getHeight(),img.getWidth());
-		}else {
-			imgpage=new ImagePage(doc.getAlign(),doc.getSize());
+	ImagePage createImgPage(BufferedImage img) throws Exception {
+		Size size = doc.getSize();
+		ImagePage imgpage = null;
+		if (size == Size.DEPEND_ON_IMG) {
+			imgpage = new ImagePage(doc.getAlign(), img.getHeight(), img.getWidth());
+		} else {
+			imgpage = new ImagePage(doc.getAlign(), doc.getSize());
 		}
 		imgpage.setAutoRotate(true);
 		imgpage.setImage(img);
@@ -112,8 +108,8 @@ public class PDFConverter implements Callable<ImagesPDFDocument>{
 	 * @param ap        Access Permission
 	 */
 	private StandardProtectionPolicy createProtectionPolicy(String owner_pwd, String user_pwd, AccessPermission ap) {
-		owner_pwd=owner_pwd.replace("#null","");
-		user_pwd=user_pwd.replace("#null","");
+		owner_pwd = owner_pwd.replace("#null", "");
+		user_pwd = user_pwd.replace("#null", "");
 		// Define the length of the encryption key.
 		// Possible values are 40 or 128 (256 will be available in PDFBox 2.0).
 		int keyLength = 128;
@@ -122,8 +118,5 @@ public class PDFConverter implements Callable<ImagesPDFDocument>{
 		spp.setPermissions(ap);
 		return spp;
 	}
-
-	
-
 
 }
