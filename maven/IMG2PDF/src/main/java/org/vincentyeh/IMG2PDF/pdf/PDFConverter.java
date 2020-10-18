@@ -17,15 +17,16 @@ import org.vincentyeh.IMG2PDF.util.ImageProcess;
  * @author VincentYeh
  *
  */
-public class PDFConverter implements Callable<ImagesPDFDocument> {
+public abstract class PDFConverter implements Callable<ImagesPDFDocument> {
 
-	private final ImagesPDFDocument doc;
-
-	/**
-	 * Task that need to be process. It will be set on constructor.
-	 */
-//	private final ConfiguredTask task;
-	private ArrayList<ImgFile> imgs;
+	public abstract void before();
+	public abstract void convert(int index)throws Exception;
+	public abstract void fail(int index,Exception e);
+	public abstract void done();
+	
+	protected final ImagesPDFDocument doc;
+	protected ArrayList<ImgFile> imgs;
+	protected boolean isProtectedByPwd;
 
 	/**
 	 * Create PDFFile with Task
@@ -38,6 +39,7 @@ public class PDFConverter implements Callable<ImagesPDFDocument> {
 			throw new NullPointerException("task is null.");
 		AccessPermission ap = new AccessPermission();
 		doc = new ImagesPDFDocument(task.getSize(), task.getAlign());
+		
 		doc.protect(createProtectionPolicy(task.getOwner_pwd(), task.getUser_pwd(), ap));
 		doc.setDestination(task.getDestination());
 		imgs = task.getImgs();
@@ -50,32 +52,24 @@ public class PDFConverter implements Callable<ImagesPDFDocument> {
 	 */
 	@Override
 	public ImagesPDFDocument call() throws Exception {
-		System.out.printf("Destination:%s\n", doc.getDestination());
-		int all = imgs.size();
-		double perImg = (10. / all);
-		double progress = 0;
-
-		System.out.print("0%[");
-		for (int i = 0; i < all; i++) {
-			progress += perImg;
-			while (progress >= 1) {
-				System.out.print("=");
-				progress -= 1;
-			}
+		before();
+//		System.out.printf("Destination:%s\n", doc.getDestination());
+//		int all = imgs.size();
+//		double perImg = (10. / all);
+//		double progress = 0;
+		for (int i = 0; i < imgs.size(); i++) {
+			convert(i);
 			try {
 				ImageProcess ip = new ImageProcess(imgs.get(i));
-//				doc.addImgPage(ip.read());
 				doc.addPage(createImgPage(ip.read()));
 			} catch (Exception e) {
+				fail(i,e);
 				doc.close();
-				System.out.print("FAIL]");
 				throw e;
 			}
-
 		}
-		System.out.print("]%100");
-
-		System.out.println("\n\n");
+		
+		done();
 		return doc;
 	}
 
@@ -86,7 +80,7 @@ public class PDFConverter implements Callable<ImagesPDFDocument> {
 	 * @return The page contain image
 	 * @throws IOException Failure of drawing image to page
 	 */
-	ImagePage createImgPage(BufferedImage img) throws Exception {
+	protected ImagePage createImgPage(BufferedImage img) throws Exception {
 		Size size = doc.getSize();
 		ImagePage imgpage = null;
 		if (size == Size.DEPEND_ON_IMG) {
@@ -110,6 +104,7 @@ public class PDFConverter implements Callable<ImagesPDFDocument> {
 	private StandardProtectionPolicy createProtectionPolicy(String owner_pwd, String user_pwd, AccessPermission ap) {
 		owner_pwd = owner_pwd.replace("#null", "");
 		user_pwd = user_pwd.replace("#null", "");
+		isProtectedByPwd=!(owner_pwd+user_pwd).isEmpty();
 		// Define the length of the encryption key.
 		// Possible values are 40 or 128 (256 will be available in PDFBox 2.0).
 		int keyLength = 128;

@@ -5,12 +5,10 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.vincentyeh.IMG2PDF.pdf.ImagesPDFDocument;
-import org.vincentyeh.IMG2PDF.pdf.PDFConverter;
 import org.vincentyeh.IMG2PDF.task.configured.ConfiguredTask;
 import org.vincentyeh.IMG2PDF.task.configured.ConfiguredTaskList;
 import org.xml.sax.SAXException;
@@ -50,7 +48,7 @@ public class TaskProcessor {
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		for (ConfiguredTask task : tasks) {
 			try {
-				PDFConverter pdf = new PDFConverter(task);
+				CustomPDFConveter pdf = new CustomPDFConveter(task);
 				Future<ImagesPDFDocument> future=executor.submit(pdf);
 				ImagesPDFDocument result=future.get();
 				result.save();
