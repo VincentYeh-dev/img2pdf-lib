@@ -88,7 +88,7 @@ public abstract class PDFConverter implements Callable<ImagesPDFDocument> {
 		} else {
 			imgpage = new ImagePage(doc.getAlign(), doc.getSize());
 		}
-		imgpage.setAutoRotate(true);
+//		imgpage.setAutoRotate(true);
 		imgpage.setImage(img);
 		imgpage.drawImageToPage(doc);
 		return imgpage;

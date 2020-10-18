@@ -8,6 +8,7 @@ import java.util.concurrent.Future;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.vincentyeh.IMG2PDF.pdf.CustomPDFConveter;
 import org.vincentyeh.IMG2PDF.pdf.ImagesPDFDocument;
 import org.vincentyeh.IMG2PDF.task.configured.ConfiguredTask;
 import org.vincentyeh.IMG2PDF.task.configured.ConfiguredTaskList;

@@ -93,6 +93,7 @@ public class ImageProcess {
 //	}
 
 	public static BufferedImage rotateImg(BufferedImage raw, int rotate_angle) {
+		if(rotate_angle==0)return raw;
 		final double rads = Math.toRadians(rotate_angle);
 		final double sin = Math.abs(Math.sin(rads));
 		final double cos = Math.abs(Math.cos(rads));

@@ -1,9 +1,7 @@
-package org.vincentyeh.IMG2PDF.commandline;
+package org.vincentyeh.IMG2PDF.pdf;
 
 import java.io.IOException;
 
-import org.vincentyeh.IMG2PDF.pdf.ImagesPDFDocument;
-import org.vincentyeh.IMG2PDF.pdf.PDFConverter;
 import org.vincentyeh.IMG2PDF.task.configured.ConfiguredTask;
 import org.vincentyeh.IMG2PDF.util.ImageProcess;
 

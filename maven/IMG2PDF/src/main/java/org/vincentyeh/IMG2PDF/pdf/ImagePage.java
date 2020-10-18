@@ -11,13 +11,14 @@ import org.vincentyeh.IMG2PDF.pdf.Align.LeftRightAlign;
 import org.vincentyeh.IMG2PDF.pdf.Align.TopBottomAlign;
 import org.vincentyeh.IMG2PDF.util.ImageProcess;
 
-public class ImagePage extends PDPage{
+public class ImagePage extends PDPage {
 	private final Align align;
 	private BufferedImage image;
 	private final float page_height;
 	private final float page_width;
 	private final Size size;
-	private boolean autoRotate=true;
+	private boolean autoRotate = true;
+	PageDirection direction=PageDirection.Vertical;
 	
 	/**
 	 * <b>The calculation of diff</b>
@@ -35,14 +36,13 @@ public class ImagePage extends PDPage{
 	 * </p>
 	 * <p>
 	 * If you do that before execution of process() method,the program will throw a
-	 * Exception that warn a user the sub is out of range when the resize larger than
-	 * max_resize.
+	 * Exception that warn a user the sub is out of range when the resize larger
+	 * than max_resize.
 	 * </p>
 	 * 
 	 */
 	private float max_resize;
-	
-	
+
 	public ImagePage(Align align, Size size, float height, float width) {
 		this.align = align;
 		this.size = size;
@@ -51,7 +51,7 @@ public class ImagePage extends PDPage{
 			this.page_width = width;
 			this.page_height = height;
 		} else {
-			PDRectangle rect=size.getPdrectangle();
+			PDRectangle rect = size.getPdrectangle();
 			setMediaBox(rect);
 			this.page_width = rect.getWidth();
 			this.page_height = rect.getHeight();
@@ -59,11 +59,11 @@ public class ImagePage extends PDPage{
 	}
 
 	public ImagePage(Align align, Size size) {
-		this(align,size,-1,-1);
+		this(align, size, -1, -1);
 	}
-	
-	public ImagePage(Align algin,float height, float width) {
-		this(algin,Size.DEPEND_ON_IMG,height,width);
+
+	public ImagePage(Align algin, float height, float width) {
+		this(algin, Size.DEPEND_ON_IMG, height, width);
 	}
 
 	public void setImage(BufferedImage image) {
@@ -76,31 +76,39 @@ public class ImagePage extends PDPage{
 		float img_height = image.getHeight();
 		float position_x = 0, position_y = 0;
 		float out_width = 0, out_height = 0;
-		BufferedImage outImage=null;
+		BufferedImage outImage = null;
 		if (size == Size.DEPEND_ON_IMG) {
 			out_width = img_width;
 			out_height = img_height;
-			outImage=image;
+			outImage = image;
 		} else {
-			int angle = 90;
-			boolean isRotated = false;
-			BufferedImage rotatedImage = null;
+//			int angle = 90;
+//			boolean isRotated = false;
+//			BufferedImage rotatedImage = null;
 			
-			if(autoRotate) {
-				if ((img_height / img_width) >= 1) {
-					this.setRotation(0);
-					rotatedImage=image;
-				} else {
-					this.setRotation(angle);
-					rotatedImage = ImageProcess.rotateImg(image, -1 * angle);
-					isRotated = true;
-				}
-			}else {
-				this.setRotation(0);
-				rotatedImage=image;
+			if (autoRotate) {
+				direction = ((img_height / img_width) < 1) ? PageDirection.Horizontal
+						: PageDirection.Vertical;
 			}
 			
-			outImage=rotatedImage;
+			this.setRotation(direction.getPageRotateAngle());
+			BufferedImage rotatedImage=ImageProcess.rotateImg(image,direction.getImageRotateAngle());
+			
+//			if (autoRotate) {
+//				if ((img_height / img_width) >= 1) {
+//					this.setRotation(0);
+//					rotatedImage = image;
+//				} else {
+//					this.setRotation(angle);
+//					rotatedImage = ImageProcess.rotateImg(image, -1 * angle);
+//					isRotated = true;
+//				}
+//			} else {
+//				this.setRotation(0);
+//				rotatedImage = image;
+//			}
+
+			outImage = rotatedImage;
 			img_width = rotatedImage.getWidth();
 			img_height = rotatedImage.getHeight();
 
@@ -108,7 +116,7 @@ public class ImagePage extends PDPage{
 			out_height = f_size[0];
 			out_width = f_size[1];
 
-			float[] f_position = positionCalculate(isRotated, out_height, out_width, page_height, page_width);
+			float[] f_position = positionCalculate(this.getRotation()!=0, out_height, out_width, page_height, page_width);
 			position_y = f_position[0];
 			position_x = f_position[1];
 		}
@@ -234,17 +242,18 @@ public class ImagePage extends PDPage{
 
 		return new float[] { out_height, out_width };
 	}
-	
+
 	public void setMaxResize(float max_resize) {
 		this.max_resize = max_resize;
 	}
-	
+
 	/**
 	 * Rotate the image when image is horizontal.
+	 * 
 	 * @param enable enable or disable rotation.
 	 */
 	public void setAutoRotate(boolean enable) {
 		this.autoRotate = enable;
 	}
-	
+
 }
