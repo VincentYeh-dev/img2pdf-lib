@@ -8,6 +8,9 @@ import java.util.concurrent.Callable;
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
+import org.vincentyeh.IMG2PDF.pdf.page.ImagePage;
+import org.vincentyeh.IMG2PDF.pdf.page.PageDirection;
+import org.vincentyeh.IMG2PDF.pdf.page.Size;
 import org.vincentyeh.IMG2PDF.task.configured.ConfiguredTask;
 import org.vincentyeh.IMG2PDF.util.ImageProcess;
 
@@ -84,12 +87,10 @@ public abstract class PDFConverter implements Callable<ImagesPDFDocument> {
 		Size size = doc.getSize();
 		ImagePage imgpage = null;
 		if (size == Size.DEPEND_ON_IMG) {
-			imgpage = new ImagePage(doc.getAlign(), img.getHeight(), img.getWidth());
+			imgpage = new ImagePage(doc.getAlign(),img);
 		} else {
-			imgpage = new ImagePage(doc.getAlign(), doc.getSize());
+			imgpage = new ImagePage(doc.getAlign(), doc.getSize(),false,PageDirection.Horizontal,img);
 		}
-//		imgpage.setAutoRotate(true);
-		imgpage.setImage(img);
 		imgpage.drawImageToPage(doc);
 		return imgpage;
 	}

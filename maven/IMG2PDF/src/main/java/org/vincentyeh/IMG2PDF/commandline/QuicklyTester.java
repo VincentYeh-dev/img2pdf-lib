@@ -12,10 +12,10 @@ public class QuicklyTester {
 				+ "-a CENTER|CENTER "
 				+ "-odr INCREASE "
 				+ "-lo test_file\\test.xml "
-				+ "-d D:\\Project\\git\\IMG2PDF\\sample\\walk-animation\\output\\$PARENT{0}.pdf "
+				+ "-d D:\\$PARENT{0}.pdf "
 //				+ "-usepwd 1234AAA "
 //				+ "-ownpwd 1234AAA "
-				+ "D:\\Project\\git\\IMG2PDF\\sample\\walk-animation\\dirlist.txt";
+				+ "test_file\\club_dirlist.txt";
 		new TaskListCreator(str);
 		new TaskProcessor("test_file\\test.xml");
 		

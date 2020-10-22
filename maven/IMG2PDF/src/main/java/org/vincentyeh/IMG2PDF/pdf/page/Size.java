@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.pdf;
+package org.vincentyeh.IMG2PDF.pdf.page;
 
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 /**

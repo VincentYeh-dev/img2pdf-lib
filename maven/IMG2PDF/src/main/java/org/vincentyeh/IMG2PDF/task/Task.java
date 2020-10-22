@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 import org.jdom2.Element;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
-import org.vincentyeh.IMG2PDF.pdf.Align;
-import org.vincentyeh.IMG2PDF.pdf.Size;
+import org.vincentyeh.IMG2PDF.pdf.page.Align;
+import org.vincentyeh.IMG2PDF.pdf.page.Size;
 
 /**
  * <b>Task is the pre-work of the conversion</b>. All attributes of PDF file

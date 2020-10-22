@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
+import org.vincentyeh.IMG2PDF.pdf.page.Align;
+import org.vincentyeh.IMG2PDF.pdf.page.Size;
 
 public class ImagesPDFDocument extends PDDocument {
 	private final Size size;

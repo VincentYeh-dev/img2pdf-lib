@@ -8,8 +8,8 @@ import org.jdom2.Element;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
 import org.vincentyeh.IMG2PDF.file.ImgFile.Order;
 import org.vincentyeh.IMG2PDF.file.ImgFile.Sortby;
-import org.vincentyeh.IMG2PDF.pdf.Align;
-import org.vincentyeh.IMG2PDF.pdf.Size;
+import org.vincentyeh.IMG2PDF.pdf.page.Align;
+import org.vincentyeh.IMG2PDF.pdf.page.Size;
 import org.vincentyeh.IMG2PDF.task.Task;
 
 public class ConfigureTask extends Task {

@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.pdf;
+package org.vincentyeh.IMG2PDF.pdf.page;
 
 import java.awt.image.BufferedImage;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -7,19 +7,20 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
-import org.vincentyeh.IMG2PDF.pdf.Align.LeftRightAlign;
-import org.vincentyeh.IMG2PDF.pdf.Align.TopBottomAlign;
+import org.vincentyeh.IMG2PDF.pdf.page.Align.LeftRightAlign;
+import org.vincentyeh.IMG2PDF.pdf.page.Align.TopBottomAlign;
 import org.vincentyeh.IMG2PDF.util.ImageProcess;
 
 public class ImagePage extends PDPage {
 	private final Align align;
-	private BufferedImage image;
+	private final BufferedImage image;
 	private final float page_height;
 	private final float page_width;
+	private final float img_height;
+	private final float img_width;
 	private final Size size;
 	private boolean autoRotate = true;
-	PageDirection direction=PageDirection.Vertical;
-	
+
 	/**
 	 * <b>The calculation of diff</b>
 	 * <p>
@@ -43,86 +44,90 @@ public class ImagePage extends PDPage {
 	 */
 	private float max_resize;
 
-	public ImagePage(Align align, Size size, float height, float width) {
+	public ImagePage(Align align, Size size, boolean autoRotate, PageDirection direction, BufferedImage image) {
 		this.align = align;
 		this.size = size;
 		if (size == Size.DEPEND_ON_IMG) {
-			setMediaBox(new PDRectangle(width, height));
-			this.page_width = width;
-			this.page_height = height;
+			this.img_width = image.getWidth();
+			this.img_height = image.getHeight();
+			this.page_width = this.img_width;
+			this.page_height = this.img_height;
+
+			this.image = image;
+
+			setMediaBox(new PDRectangle(page_width, page_height));
 		} else {
+			if (autoRotate) {
+				direction = PageDirection.getDirection(image);
+			}
+			
 			PDRectangle rect = size.getPdrectangle();
-			setMediaBox(rect);
 			this.page_width = rect.getWidth();
 			this.page_height = rect.getHeight();
+			this.setRotation(direction.getPageRotateAngle());
+			this.image = ImageProcess.rotateImg(image, direction.getImageRotateAngle());
+			
+			float rotated_img_width = this.image.getWidth();
+			float rotated_img_height = this.image.getHeight();
+
+			float[] f_size = sizeCalculate(rotated_img_height, rotated_img_width, page_height, page_width);
+			this.img_height = f_size[0];
+			this.img_width = f_size[1];
+
+			setMediaBox(rect);
 		}
+
 	}
 
-	public ImagePage(Align align, Size size) {
-		this(align, size, -1, -1);
+	public ImagePage(Align align, Size size, BufferedImage image) {
+		this(align, size,true,PageDirection.Vertical,image);
+	}
+	
+	public ImagePage(Align align, BufferedImage image) {
+		this(align,Size.DEPEND_ON_IMG,false,PageDirection.Vertical,image);
 	}
 
-	public ImagePage(Align algin, float height, float width) {
-		this(algin, Size.DEPEND_ON_IMG, height, width);
-	}
-
-	public void setImage(BufferedImage image) {
-		this.image = image;
-	}
+//	public void setImage(BufferedImage image) {
+//		this.image = image;
+//	}
 
 	public void drawImageToPage(PDDocument doc) throws Exception {
 
-		float img_width = image.getWidth();
-		float img_height = image.getHeight();
-		float position_x = 0, position_y = 0;
-		float out_width = 0, out_height = 0;
-		BufferedImage outImage = null;
-		if (size == Size.DEPEND_ON_IMG) {
-			out_width = img_width;
-			out_height = img_height;
-			outImage = image;
-		} else {
-//			int angle = 90;
-//			boolean isRotated = false;
-//			BufferedImage rotatedImage = null;
-			
-			if (autoRotate) {
-				direction = ((img_height / img_width) < 1) ? PageDirection.Horizontal
-						: PageDirection.Vertical;
-			}
-			
-			this.setRotation(direction.getPageRotateAngle());
-			BufferedImage rotatedImage=ImageProcess.rotateImg(image,direction.getImageRotateAngle());
-			
+//		float img_width = image.getWidth();
+//		float img_height = image.getHeight();
+//		float position_x = 0, position_y = 0;
+//		float out_width = 0, out_height = 0;
+//		BufferedImage outImage = null;
+
+//		if (size == Size.DEPEND_ON_IMG) {
+//			out_width = img_width;
+//			out_height = img_height;
+//			outImage = image;
+//		} else {
 //			if (autoRotate) {
-//				if ((img_height / img_width) >= 1) {
-//					this.setRotation(0);
-//					rotatedImage = image;
-//				} else {
-//					this.setRotation(angle);
-//					rotatedImage = ImageProcess.rotateImg(image, -1 * angle);
-//					isRotated = true;
-//				}
-//			} else {
-//				this.setRotation(0);
-//				rotatedImage = image;
+//				direction=PageDirection.getDirection(img_height, img_width);
 //			}
+//			this.setRotation(direction.getPageRotateAngle());
+//
+//			BufferedImage rotatedImage=ImageProcess.rotateImg(image,direction.getImageRotateAngle());
+//			outImage = rotatedImage;
+//			img_width = rotatedImage.getWidth();
+//			img_height = rotatedImage.getHeight();
+//			float[] f_size = sizeCalculate(img_height, img_width, page_height, page_width);
+//			out_height = f_size[0];
+//			out_width = f_size[1];
+//			float[] f_position = positionCalculate(this.getRotation()!=0, out_height, out_width, page_height, page_width);
+//			position_y = f_position[0];
+//			position_x = f_position[1];
+//		}
 
-			outImage = rotatedImage;
-			img_width = rotatedImage.getWidth();
-			img_height = rotatedImage.getHeight();
+		float[] f_position = positionCalculate(this.getRotation() != 0, img_height, img_width, page_height, page_width);
+		float position_y = f_position[0];
+		float position_x = f_position[1];
 
-			float[] f_size = sizeCalculate(img_height, img_width, page_height, page_width);
-			out_height = f_size[0];
-			out_width = f_size[1];
-
-			float[] f_position = positionCalculate(this.getRotation()!=0, out_height, out_width, page_height, page_width);
-			position_y = f_position[0];
-			position_x = f_position[1];
-		}
-		PDImageXObject pdImageXObject = LosslessFactory.createFromImage(doc, outImage);
+		PDImageXObject pdImageXObject = LosslessFactory.createFromImage(doc, image);
 		PDPageContentStream contentStream = new PDPageContentStream(doc, this);
-		contentStream.drawImage(pdImageXObject, position_x, position_y, out_width, out_height);
+		contentStream.drawImage(pdImageXObject, position_x, position_y, img_width, img_height);
 		contentStream.close();
 	}
 
