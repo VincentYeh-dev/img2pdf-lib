@@ -42,7 +42,6 @@ public abstract class PDFConverter implements Callable<ImagesPDFDocument> {
 			throw new NullPointerException("task is null.");
 		AccessPermission ap = new AccessPermission();
 		doc = new ImagesPDFDocument(task.getSize(), task.getAlign());
-		
 		doc.protect(createProtectionPolicy(task.getOwner_pwd(), task.getUser_pwd(), ap));
 		doc.setDestination(task.getDestination());
 		imgs = task.getImgs();
@@ -56,10 +55,6 @@ public abstract class PDFConverter implements Callable<ImagesPDFDocument> {
 	@Override
 	public ImagesPDFDocument call() throws Exception {
 		before();
-//		System.out.printf("Destination:%s\n", doc.getDestination());
-//		int all = imgs.size();
-//		double perImg = (10. / all);
-//		double progress = 0;
 		for (int i = 0; i < imgs.size(); i++) {
 			convert(i);
 			try {
@@ -89,7 +84,7 @@ public abstract class PDFConverter implements Callable<ImagesPDFDocument> {
 		if (size == Size.DEPEND_ON_IMG) {
 			imgpage = new ImagePage(doc.getAlign(),img);
 		} else {
-			imgpage = new ImagePage(doc.getAlign(), doc.getSize(),false,PageDirection.Horizontal,img);
+			imgpage = new ImagePage(doc.getAlign(), doc.getSize(),true,PageDirection.Horizontal,img);
 		}
 		imgpage.drawImageToPage(doc);
 		return imgpage;

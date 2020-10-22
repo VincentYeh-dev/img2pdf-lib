@@ -37,6 +37,13 @@ public class CustomPDFConveter extends PDFConverter {
 		if(isProtectedByPwd)
 			System.out.print(" *");
 		System.out.println("\n\n");
+		
+		try {
+			Runtime.getRuntime().exec("explorer.exe /select," + doc.getDestination());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override

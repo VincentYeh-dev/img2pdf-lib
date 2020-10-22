@@ -25,17 +25,6 @@ public class ImagesPDFDocument extends PDDocument {
 		this.size = size;
 		this.align = align;
 	}
-//	public void addImgPage(BufferedImage img) throws Exception {
-//		ImagePage imgpage = null;
-//		if (size == Size.DEPEND_ON_IMG) {
-//			imgpage = new ImagePage(align, img.getHeight(), img.getWidth());
-//		} else {
-//			imgpage = new ImagePage(align, size);
-//		}
-//		imgpage.setImage(img);
-//		imgpage.drawImageToPage(this);
-//		super.addPage(imgpage);
-//	}
 	public void setDestination(String destination) {
 		setDestination(new File(destination));
 	}

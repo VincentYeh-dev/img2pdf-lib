@@ -20,7 +20,8 @@ public class ImagePage extends PDPage {
 	private final float img_width;
 	private final Size size;
 	private boolean autoRotate = true;
-
+	private final float position_y;
+	private final float position_x;
 	/**
 	 * <b>The calculation of diff</b>
 	 * <p>
@@ -76,6 +77,10 @@ public class ImagePage extends PDPage {
 
 			setMediaBox(rect);
 		}
+		
+		float[] f_position = positionCalculate(this.getRotation() != 0, img_height, img_width, page_height, page_width);
+		position_y = f_position[0];
+		position_x = f_position[1];
 
 	}
 
@@ -121,9 +126,9 @@ public class ImagePage extends PDPage {
 //			position_x = f_position[1];
 //		}
 
-		float[] f_position = positionCalculate(this.getRotation() != 0, img_height, img_width, page_height, page_width);
-		float position_y = f_position[0];
-		float position_x = f_position[1];
+//		float[] f_position = positionCalculate(this.getRotation() != 0, img_height, img_width, page_height, page_width);
+//		float position_y = f_position[0];
+//		float position_x = f_position[1];
 
 		PDImageXObject pdImageXObject = LosslessFactory.createFromImage(doc, image);
 		PDPageContentStream contentStream = new PDPageContentStream(doc, this);
