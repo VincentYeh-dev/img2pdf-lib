@@ -18,8 +18,8 @@ public class ImagePage extends PDPage {
 	private final float page_width;
 	private final float img_height;
 	private final float img_width;
-	private final Size size;
-	private boolean autoRotate = true;
+//	private final Size size;
+//	private boolean autoRotate = true;
 	private final float position_y;
 	private final float position_x;
 	/**
@@ -47,7 +47,6 @@ public class ImagePage extends PDPage {
 
 	public ImagePage(Align align, Size size, boolean autoRotate, PageDirection direction, BufferedImage image) {
 		this.align = align;
-		this.size = size;
 		if (size == Size.DEPEND_ON_IMG) {
 			this.img_width = image.getWidth();
 			this.img_height = image.getHeight();
@@ -92,44 +91,7 @@ public class ImagePage extends PDPage {
 		this(align,Size.DEPEND_ON_IMG,false,PageDirection.Vertical,image);
 	}
 
-//	public void setImage(BufferedImage image) {
-//		this.image = image;
-//	}
-
 	public void drawImageToPage(PDDocument doc) throws Exception {
-
-//		float img_width = image.getWidth();
-//		float img_height = image.getHeight();
-//		float position_x = 0, position_y = 0;
-//		float out_width = 0, out_height = 0;
-//		BufferedImage outImage = null;
-
-//		if (size == Size.DEPEND_ON_IMG) {
-//			out_width = img_width;
-//			out_height = img_height;
-//			outImage = image;
-//		} else {
-//			if (autoRotate) {
-//				direction=PageDirection.getDirection(img_height, img_width);
-//			}
-//			this.setRotation(direction.getPageRotateAngle());
-//
-//			BufferedImage rotatedImage=ImageProcess.rotateImg(image,direction.getImageRotateAngle());
-//			outImage = rotatedImage;
-//			img_width = rotatedImage.getWidth();
-//			img_height = rotatedImage.getHeight();
-//			float[] f_size = sizeCalculate(img_height, img_width, page_height, page_width);
-//			out_height = f_size[0];
-//			out_width = f_size[1];
-//			float[] f_position = positionCalculate(this.getRotation()!=0, out_height, out_width, page_height, page_width);
-//			position_y = f_position[0];
-//			position_x = f_position[1];
-//		}
-
-//		float[] f_position = positionCalculate(this.getRotation() != 0, img_height, img_width, page_height, page_width);
-//		float position_y = f_position[0];
-//		float position_x = f_position[1];
-
 		PDImageXObject pdImageXObject = LosslessFactory.createFromImage(doc, image);
 		PDPageContentStream contentStream = new PDPageContentStream(doc, this);
 		contentStream.drawImage(pdImageXObject, position_x, position_y, img_width, img_height);
@@ -257,13 +219,5 @@ public class ImagePage extends PDPage {
 		this.max_resize = max_resize;
 	}
 
-	/**
-	 * Rotate the image when image is horizontal.
-	 * 
-	 * @param enable enable or disable rotation.
-	 */
-	public void setAutoRotate(boolean enable) {
-		this.autoRotate = enable;
-	}
 
 }

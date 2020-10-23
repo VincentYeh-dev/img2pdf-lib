@@ -30,6 +30,9 @@ public abstract class PDFConverter implements Callable<ImagesPDFDocument> {
 	protected final ImagesPDFDocument doc;
 	protected ArrayList<ImgFile> imgs;
 	protected boolean isProtectedByPwd;
+	
+	private final PageDirection defaultDirection;
+	private final boolean autoRotate;
 
 	/**
 	 * Create PDFFile with Task
@@ -45,6 +48,11 @@ public abstract class PDFConverter implements Callable<ImagesPDFDocument> {
 		doc.protect(createProtectionPolicy(task.getOwner_pwd(), task.getUser_pwd(), ap));
 		doc.setDestination(task.getDestination());
 		imgs = task.getImgs();
+//		not included in task------------------------------------
+		defaultDirection=PageDirection.Vertical;
+		autoRotate=true;
+		
+//		------------------------------------
 	}
 
 	/**
@@ -84,7 +92,7 @@ public abstract class PDFConverter implements Callable<ImagesPDFDocument> {
 		if (size == Size.DEPEND_ON_IMG) {
 			imgpage = new ImagePage(doc.getAlign(),img);
 		} else {
-			imgpage = new ImagePage(doc.getAlign(), doc.getSize(),true,PageDirection.Horizontal,img);
+			imgpage = new ImagePage(doc.getAlign(), doc.getSize(),autoRotate,defaultDirection,img);
 		}
 		imgpage.drawImageToPage(doc);
 		return imgpage;
@@ -106,7 +114,7 @@ public abstract class PDFConverter implements Callable<ImagesPDFDocument> {
 		int keyLength = 128;
 		StandardProtectionPolicy spp = new StandardProtectionPolicy(owner_pwd, user_pwd, ap);
 		spp.setEncryptionKeyLength(keyLength);
-		spp.setPermissions(ap);
+//		spp.setPermissions(ap);
 		return spp;
 	}
 
