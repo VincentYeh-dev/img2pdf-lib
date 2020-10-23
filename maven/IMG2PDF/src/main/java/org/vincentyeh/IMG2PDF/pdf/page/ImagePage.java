@@ -18,8 +18,8 @@ public class ImagePage extends PDPage {
 	private final float page_width;
 	private final float img_height;
 	private final float img_width;
-	private final Size size;
-	private boolean autoRotate = true;
+//	private final Size size;
+//	private boolean autoRotate = true;
 	private final float position_y;
 	private final float position_x;
 	/**
@@ -47,7 +47,6 @@ public class ImagePage extends PDPage {
 
 	public ImagePage(Align align, Size size, boolean autoRotate, PageDirection direction, BufferedImage image) {
 		this.align = align;
-		this.size = size;
 		if (size == Size.DEPEND_ON_IMG) {
 			this.img_width = image.getWidth();
 			this.img_height = image.getHeight();
@@ -262,8 +261,8 @@ public class ImagePage extends PDPage {
 	 * 
 	 * @param enable enable or disable rotation.
 	 */
-	public void setAutoRotate(boolean enable) {
-		this.autoRotate = enable;
-	}
+//	public void setAutoRotate(boolean enable) {
+//		this.autoRotate = enable;
+//	}
 
 }
