@@ -7,6 +7,7 @@ import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 import org.jdom2.Element;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
 import org.vincentyeh.IMG2PDF.pdf.page.Align;
+import org.vincentyeh.IMG2PDF.pdf.page.PageDirection;
 import org.vincentyeh.IMG2PDF.pdf.page.Size;
 
 /**
@@ -30,11 +31,12 @@ public abstract class Task {
 	protected final Align align;
 	protected final Size size;
 	protected final String destination;
-	protected final String owner_pwd;
-	protected final String user_pwd;
+//	protected final String owner_pwd;
+//	protected final String user_pwd;
 	protected final ArrayList<ImgFile> imgs = new ArrayList<ImgFile>();
-	
-	
+	protected final PageDirection defaultDirection;
+	protected final boolean autoRotate;
+
 	/**
 	 * Create the task by arguments.
 	 * 
@@ -48,22 +50,16 @@ public abstract class Task {
 	 * @param size        Which size of pages of PDF.
 	 * @throws FileNotFoundException When file is not exists.
 	 */
-	public Task(String destination, String own, String user, Align align, Size size) throws FileNotFoundException {
+	public Task(String destination, Align align, Size size, PageDirection defaultDirection, boolean autoRotate)
+			throws FileNotFoundException {
 		if (destination == null)
 			throw new NullPointerException("destination is null.");
 		this.align = align;
 		this.size = size;
 		this.destination = destination;
-		owner_pwd = own != null ? own : "#null";
-		user_pwd = user != null ? user : "#null";
+		this.defaultDirection = defaultDirection;
+		this.autoRotate = autoRotate;
 	}
-
-	/**
-	 * Create the task by XML Element.The task will inherit element attributes and
-	 * contains.
-	 * 
-	 * @param element The XML Element That include information of Task.
-	 */
 
 	public Align getAlign() {
 		return align;
@@ -77,12 +73,10 @@ public abstract class Task {
 		return size;
 	}
 
-	public String getOwner_pwd() {
-		return owner_pwd;
+	public PageDirection getDefaultDirection() {
+		return defaultDirection;
 	}
-
-	public String getUser_pwd() {
-		return user_pwd;
+	public boolean getAutoRotate() {
+		return autoRotate;
 	}
-
 }

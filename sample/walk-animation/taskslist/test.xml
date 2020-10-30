@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TASKLIST>
-  <TASK destination="D:\Project\git\IMG2PDF\sample\walk-animation\output\walk-animation.pdf" size="A4" align="CENTER|CENTER" owner="#null" user="#null">
+  <TASK destination="D:\Project\git\IMG2PDF\sample\walk-animation\output\walk-animation.pdf" size="A4" align="CENTER|CENTER" owner="#null" user="#null" default-direction="Vertical" auto-rotate="true">
     <FILES>
       <FILE>D:\Project\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
       <FILE>D:\Project\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
@@ -15,5 +15,6 @@
       <FILE>D:\Project\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
       <FILE>D:\Project\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
     </FILES>
+    <PERMISSION canPrint="true" canModify="true" />
   </TASK>
 </TASKLIST>

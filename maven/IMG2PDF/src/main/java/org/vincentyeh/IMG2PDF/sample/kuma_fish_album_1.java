@@ -28,10 +28,12 @@ public class kuma_fish_album_1 {
 		writer.write(image_sources_dir.getAbsolutePath()+"\n\n");
 		writer.close();
 		
-		String str="-sz DEPEND_ON_IMG "
+		String str="-sz A4 "
 				+ "-s NUMERTIC "
 				+ "-a CENTER|CENTER "
 				+ "-odr INCREASE "
+				+ "-dd Vertical "
+				+ "-rot true "
 				+ "-lo "+taskslist_destination.getAbsolutePath()+" "
 				+ "-d "+sample_root.getAbsolutePath()+"\\output\\$PARENT{0}.pdf "
 //				+ "-usepwd 1234AAA "

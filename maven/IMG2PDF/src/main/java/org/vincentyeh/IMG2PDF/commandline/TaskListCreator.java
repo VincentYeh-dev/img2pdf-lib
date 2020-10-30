@@ -11,7 +11,9 @@ import org.vincentyeh.IMG2PDF.file.FileFilterHelper;
 import org.vincentyeh.IMG2PDF.file.ImgFile.Order;
 import org.vincentyeh.IMG2PDF.file.ImgFile.Sortby;
 import org.vincentyeh.IMG2PDF.file.text.UTF8InputStream;
+import org.vincentyeh.IMG2PDF.pdf.DocumentAccessPermission;
 import org.vincentyeh.IMG2PDF.pdf.page.Align;
+import org.vincentyeh.IMG2PDF.pdf.page.PageDirection;
 import org.vincentyeh.IMG2PDF.pdf.page.Size;
 import org.vincentyeh.IMG2PDF.task.configure.ConfigureTask;
 import org.vincentyeh.IMG2PDF.task.configure.ConfigureTaskList;
@@ -39,7 +41,10 @@ public class TaskListCreator {
 		final String user_pwd;
 		final ArrayList<String> sources;
 		final String list_output;
-
+		final PageDirection defaultDirection;
+		final boolean autoRotate;
+		final DocumentAccessPermission dap;
+		
 		public TaskArgument(ArgumentContainer opt) {
 			sources = opt.source;
 			list_output = opt.list_output.get(0);
@@ -48,7 +53,9 @@ public class TaskListCreator {
 			align = new Align(opt.align.get(0));
 			size = opt.size;
 			dst = opt.destination.get(0);
-
+			defaultDirection = opt.defaultDirection;
+			dap=parsePermissionString(opt.permission);
+			autoRotate = opt.autoRotate;
 			owner_pwd = opt.owner_password == null ? null : opt.owner_password.get(0);
 			user_pwd = opt.user_password == null ? null : opt.user_password.get(0);
 		}
@@ -81,9 +88,25 @@ public class TaskListCreator {
 
 			@Arg(dest = "source")
 			public ArrayList<String> source;
+			
+			@Arg(dest = "permission")
+			public ArrayList<String> permission;
+
+			@Arg(dest = "direction")
+			public PageDirection defaultDirection;
+
+			@Arg(dest = "auto_rotate")
+			public boolean autoRotate;
+			
 
 		}
-
+		private DocumentAccessPermission parsePermissionString(ArrayList<String> str) {
+			DocumentAccessPermission dap=new DocumentAccessPermission();
+			if(str==null)return dap;
+			dap.setCanPrint(str.get(0).contains("p"));
+			dap.setCanModify(str.get(0).contains("m"));
+			return dap;
+		}
 	}
 
 	private ConfigureTaskList tasks = new ConfigureTaskList();
@@ -101,14 +124,6 @@ public class TaskListCreator {
 
 		tasks.toXMLFile(new File(taskArgs.list_output));
 
-	}
-
-	public static void main(String[] args) throws Exception {
-//		new TaskListCreator("--help");
-		String str = "-sz A4 " + "-s NAME " + "-a CENTER|CENTER " + "-odr INCREASE " + "-lo test_file\\test.xml "
-				+ "-d test_file\\output\\$NAME.pdf " + "-usepwd 1234AAA " + "-ownpwd 1234AAA "
-				+ "test_file\\dirlist_cmyk.txt " + "test_file\\dirlist_raw2.txt";
-		new TaskListCreator(str);
 	}
 
 	public ConfigureTaskList getTaskList() {
@@ -143,10 +158,10 @@ public class TaskListCreator {
 
 				NameFormatter nf = new NameFormatter(arguments.dst, dir);
 				FileFilterHelper ffh = createImageFilter(0);
-				ConfigureTask task = new ConfigureTask(dir.listFiles(ffh), nf.getConverted(), arguments.owner_pwd, arguments.user_pwd,
-						arguments.sortby, arguments.order, arguments.align, arguments.size);
+				ConfigureTask task = new ConfigureTask(dir.listFiles(ffh), nf.getConverted(), arguments.owner_pwd,
+						arguments.user_pwd,arguments.dap, arguments.sortby, arguments.order, arguments.align, arguments.size,
+						arguments.defaultDirection, arguments.autoRotate);
 				tasks.add(task);
-
 			}
 		}
 		uis.close();
@@ -187,6 +202,10 @@ public class TaskListCreator {
 
 		parser.addArgument("-s", "--sortby").type(Sortby.class).help("Merge all image files in Folder");
 
+		parser.addArgument("-dd", "--direction").type(PageDirection.class).help("Direction of each page");
+
+		parser.addArgument("-rot", "--auto_rotate").type(Boolean.class).help("auto rotate each page.");
+
 		parser.addArgument("-odr", "--order").type(Order.class)
 				.help("order by increasing(0,1,2,3) or decreasing(3,2,1,0) value");
 
@@ -199,6 +218,8 @@ public class TaskListCreator {
 		parser.addArgument("-a", "--align").metavar("TopBottom|LeftRight").nargs(1).help("alignment of page of PDF.");
 		parser.addArgument("-d", "--destination").metavar("destination").nargs(1).help("destination of converted file");
 		parser.addArgument("-lo", "--list_output").metavar("destination").nargs(1).help("Output task list(*.XML)");
+		parser.addArgument("-p", "--permission").nargs(1).help("permission of document.");
+
 		parser.addArgument("source").nargs("*").help("File to convert");
 		return parser;
 	}

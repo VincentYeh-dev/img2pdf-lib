@@ -43,14 +43,13 @@ public abstract class PDFConverter implements Callable<ImagesPDFDocument> {
 	public PDFConverter(ConfiguredTask task) throws IOException {
 		if (task == null)
 			throw new NullPointerException("task is null.");
-		AccessPermission ap = new AccessPermission();
 		doc = new ImagesPDFDocument(task.getSize(), task.getAlign());
-		doc.protect(createProtectionPolicy(task.getOwner_pwd(), task.getUser_pwd(), ap));
+		doc.protect(task.getSpp());
 		doc.setDestination(task.getDestination());
 		imgs = task.getImgs();
+		defaultDirection=task.getDefaultDirection();
+		autoRotate=task.getAutoRotate();
 //		not included in task------------------------------------
-		defaultDirection=PageDirection.Vertical;
-		autoRotate=true;
 		
 //		------------------------------------
 	}
@@ -105,17 +104,17 @@ public abstract class PDFConverter implements Callable<ImagesPDFDocument> {
 	 * @param user_pwd  User password
 	 * @param ap        Access Permission
 	 */
-	private StandardProtectionPolicy createProtectionPolicy(String owner_pwd, String user_pwd, AccessPermission ap) {
-		owner_pwd = owner_pwd.replace("#null", "");
-		user_pwd = user_pwd.replace("#null", "");
-		isProtectedByPwd=!(owner_pwd+user_pwd).isEmpty();
-		// Define the length of the encryption key.
-		// Possible values are 40 or 128 (256 will be available in PDFBox 2.0).
-		int keyLength = 128;
-		StandardProtectionPolicy spp = new StandardProtectionPolicy(owner_pwd, user_pwd, ap);
-		spp.setEncryptionKeyLength(keyLength);
-//		spp.setPermissions(ap);
-		return spp;
-	}
+//	private StandardProtectionPolicy createProtectionPolicy(String owner_pwd, String user_pwd, AccessPermission ap) {
+//		owner_pwd = owner_pwd.replace("#null", "");
+//		user_pwd = user_pwd.replace("#null", "");
+//		isProtectedByPwd=!(owner_pwd+user_pwd).isEmpty();
+//		// Define the length of the encryption key.
+//		// Possible values are 40 or 128 (256 will be available in PDFBox 2.0).
+//		int keyLength = 128;
+//		StandardProtectionPolicy spp = new StandardProtectionPolicy(owner_pwd, user_pwd, ap);
+//		spp.setEncryptionKeyLength(keyLength);
+////		spp.setPermissions(ap);
+//		return spp;
+//	}
 
 }

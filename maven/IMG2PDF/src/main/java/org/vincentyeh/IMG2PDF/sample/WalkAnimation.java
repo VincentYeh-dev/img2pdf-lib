@@ -24,14 +24,21 @@ public class WalkAnimation {
 		writer.write(image_sources_dir.getAbsolutePath()+"\n\n");
 		writer.close();
 		
+		
+
+//		new TaskListCreator("-h");
+		
 		String str="-sz A4 "
 				+ "-s NUMERTIC "
 				+ "-a CENTER|CENTER "
 				+ "-odr INCREASE "
 				+ "-lo "+taskslist_destination.getAbsolutePath()+" "
 				+ "-d "+sample_root.getAbsolutePath()+"\\output\\$PARENT{0}.pdf "
-//				+ "-usepwd 1234AAA "
-//				+ "-ownpwd 1234AAA "
+				+ "-dd Vertical "
+				+ "-rot true "
+//				+ "-p pm "
+//				+ "-usepwd userpwd "
+//				+ "-ownpwd ownerpwd "
 				+ sources_list.getAbsolutePath();
 		new TaskListCreator(str);
 		new TaskProcessor(taskslist_destination.getAbsolutePath());
