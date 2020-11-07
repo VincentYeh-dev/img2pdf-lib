@@ -8,6 +8,7 @@ import java.io.OutputStreamWriter;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.vincentyeh.IMG2PDF.commandline.MainProgram;
 import org.vincentyeh.IMG2PDF.commandline.TaskListCreator;
 import org.vincentyeh.IMG2PDF.commandline.TaskProcessor;
 import org.xml.sax.SAXException;
@@ -28,19 +29,26 @@ public class kuma_fish_album_1 {
 		writer.write(image_sources_dir.getAbsolutePath()+"\n\n");
 		writer.close();
 		
-		String str="-sz A4 "
-				+ "-s NUMERTIC "
-				+ "-a CENTER|CENTER "
-				+ "-odr INCREASE "
-				+ "-dd Vertical "
-				+ "-rot true "
-				+ "-lo "+taskslist_destination.getAbsolutePath()+" "
-				+ "-d "+sample_root.getAbsolutePath()+"\\output\\$PARENT{0}.pdf "
-//				+ "-usepwd 1234AAA "
-//				+ "-ownpwd 1234AAA "
+		String create_command = "create " 
+				+ "-pz A4 " 
+				+ "-ps NUMERTIC " 
+				+ "-pa CENTER|CENTER " 
+				+ "-pdi Vertical "
+				+ "-par yes " 
+				+ "-po INCREASE " 
+//				+ "-pupwd 1234AAA " 
+//				+ "-popwd 1234AAA " 
+				+ "-pp 11 "
+				+ "-pdst "+ sample_root.getAbsolutePath()+ "\\output\\$PARENT{0}.pdf " 
+				+ "-pdi Vertical " 
+				+ "-ldst "+ taskslist_destination.getAbsolutePath()+ " " 
+				+ "import -s " 
 				+ sources_list.getAbsolutePath();
-		new TaskListCreator(str);
-		new TaskProcessor(taskslist_destination.getAbsolutePath());
+
+		String convert_command = "convert "+ taskslist_destination.getAbsolutePath();
+		
+		MainProgram.main(create_command.split("\\s"));
+		MainProgram.main(convert_command.split("\\s"));
 		
 	}
 

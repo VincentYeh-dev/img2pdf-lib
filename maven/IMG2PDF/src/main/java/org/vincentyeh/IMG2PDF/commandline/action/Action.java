@@ -1,5 +1,7 @@
 package org.vincentyeh.IMG2PDF.commandline.action;
 
+import java.io.IOException;
+
 import net.sourceforge.argparse4j.inf.Namespace;
 
 public interface Action {

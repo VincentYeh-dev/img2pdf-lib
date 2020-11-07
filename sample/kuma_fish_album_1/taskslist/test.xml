@@ -11,5 +11,6 @@
       <FILE>D:\Project\git\IMG2PDF\sample\kuma_fish_album_1\image-sources\Vertical_5.jpg</FILE>
       <FILE>D:\Project\git\IMG2PDF\sample\kuma_fish_album_1\image-sources\Vertical_6.jpg</FILE>
     </FILES>
+    <PERMISSION canPrint="true" canModify="true" />
   </TASK>
 </TASKLIST>

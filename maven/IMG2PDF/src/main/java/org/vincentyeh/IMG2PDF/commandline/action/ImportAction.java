@@ -21,6 +21,8 @@ import org.vincentyeh.IMG2PDF.util.NameFormatter;
 
 import net.sourceforge.argparse4j.annotation.Arg;
 import net.sourceforge.argparse4j.inf.Namespace;
+import net.sourceforge.argparse4j.inf.Subparser;
+import net.sourceforge.argparse4j.inf.Subparsers;
 
 public class ImportAction extends CreateAction {
 
@@ -31,22 +33,6 @@ public class ImportAction extends CreateAction {
 
 	}
 
-//	public ImportAction(Namespace ns) {
-//		super.pdf_size = (Size) ns.get("pdf_size");
-//		super.pdf_align = (Align) ns.get("pdf_align");
-//		super.pdf_direction = (PageDirection) ns.get("pdf_direction");
-//		super.pdf_auto_rotate = ns.getBoolean("pdf_auto_rotate");
-//		super.pdf_sortby = (Sortby) ns.get("pdf_sortby");
-//		super.pdf_order = (Order) ns.get("pdf_order");
-//		super.pdf_owner_password = ns.getString("pdf_owner_password");
-//		super.pdf_user_password = ns.getString("pdf_user_password");
-//		super.pdf_permission = (DocumentAccessPermission) ns.get("pdf_permission");
-//		super.pdf_destination = ns.getString("pdf_destination");
-//		super.list_destination = ns.getString("list_destination");
-//		this.sources = (ArrayList<String>) ns.get("source");
-//	}
-
-
 	@Override
 	public void start() {
 		try {
@@ -56,20 +42,10 @@ public class ImportAction extends CreateAction {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Override
 	public void setupByNamespace(Namespace ns) {
-		super.pdf_size = (Size) ns.get("pdf_size");
-		super.pdf_align = (Align) ns.get("pdf_align");
-		super.pdf_direction = (PageDirection) ns.get("pdf_direction");
-		super.pdf_auto_rotate = ns.getBoolean("pdf_auto_rotate");
-		super.pdf_sortby = (Sortby) ns.get("pdf_sortby");
-		super.pdf_order = (Order) ns.get("pdf_order");
-		super.pdf_owner_password = ns.getString("pdf_owner_password");
-		super.pdf_user_password = ns.getString("pdf_user_password");
-		super.pdf_permission = (DocumentAccessPermission) ns.get("pdf_permission");
-		super.pdf_destination = ns.getString("pdf_destination");
-		super.list_destination = ns.getString("list_destination");
+		super.setupByNamespace(ns);
 		this.sources = (ArrayList<String>) ns.get("source");
 	}
 
@@ -121,5 +97,11 @@ public class ImportAction extends CreateAction {
 		ffh.appendExtSLT("PNG");
 		ffh.appendExtSLT("png");
 		return ffh;
+	}
+
+	public static void setupParser(Subparsers subparsers) {
+		Subparser import_parser = subparsers.addParser("import").help("Type \"create -h\" to get more help.");
+		import_parser.setDefault("action", new ImportAction());
+		import_parser.addArgument("-s", "--source").nargs("*");
 	}
 }
