@@ -13,13 +13,13 @@ import net.sourceforge.argparse4j.inf.ArgumentType;
 public class DocumentAccessPermission extends AccessPermission implements ArgumentType<DocumentAccessPermission> {
 	
 	public DocumentAccessPermission() {
-
+		
 	}
 
 	public DocumentAccessPermission(String str) {
-		String[] permission=str.split(".");
-		setCanPrint(str.contains("p"));
-		setCanModify(str.contains("m"));
+		char[] permissions=str.toCharArray();
+		setCanPrint(permissions[0]!='0');
+		setCanModify(permissions[0]!='0');
 	}
 
 	@Override

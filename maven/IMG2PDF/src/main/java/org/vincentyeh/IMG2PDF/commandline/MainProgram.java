@@ -1,8 +1,13 @@
 package org.vincentyeh.IMG2PDF.commandline;
 
+import java.io.BufferedWriter;
 import java.io.File;
-import java.util.ArrayList;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 
+import org.vincentyeh.IMG2PDF.commandline.action.Action;
+import org.vincentyeh.IMG2PDF.commandline.action.ImportAction;
 import org.vincentyeh.IMG2PDF.file.ImgFile.Order;
 import org.vincentyeh.IMG2PDF.file.ImgFile.Sortby;
 import org.vincentyeh.IMG2PDF.pdf.DocumentAccessPermission;
@@ -11,79 +16,43 @@ import org.vincentyeh.IMG2PDF.pdf.page.PageDirection;
 import org.vincentyeh.IMG2PDF.pdf.page.Size;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
-import net.sourceforge.argparse4j.annotation.Arg;
 import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
+import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 import net.sourceforge.argparse4j.inf.Subparsers;
 
 public class MainProgram {
-	private static class Argsss {
 
-// 		for PDF----START---------------------
-		@Arg(dest = "pdf_size")
-		public Size size;
+	public static void main(String[] args) throws IOException {
 
-		@Arg(dest = "pdf_align")
-		public String align;
+		File project_root = new File("").getAbsoluteFile().getParentFile().getParentFile();
+		File sample_root = new File(project_root, "sample\\walk-animation");
+		File taskslist_destination = new File(sample_root, "taskslist\\test.xml");
+		File image_sources_dir = new File(sample_root, "image-sources").getAbsoluteFile();
 
-		@Arg(dest = "pdf_direction")
-		public PageDirection defaultDirection;
+		File sources_list = new File(sample_root, "dirlist.txt").getAbsoluteFile();
+		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(sources_list), "UTF-8"));
+		writer.write(image_sources_dir.getAbsolutePath() + "\n\n");
+		writer.close();
 
-		@Arg(dest = "pdf_auto_rotate")
-		public boolean autoRotate;
+//		new TaskListCreator("-h");
 
-		@Arg(dest = "pdf_sortby")
-		public Sortby sortby;
-
-		@Arg(dest = "pdf_order")
-		public Order order;
-
-		@Arg(dest = "pdf_destination")
-		public String destination;
-
-		@Arg(dest = "pdf_owner_password")
-		public String owner_password;
-
-		@Arg(dest = "pdf_user_password")
-		public String user_password;
-
-		@Arg(dest = "pdf_permission")
-		public String permission;
-
-// 		for PDF----END---------------------
-
-		@Arg(dest = "list_output")
-		public String list_output;
-
-		@Arg(dest = "source")
-		public ArrayList<File> source;
-
-	}
-
-	public static void main(String[] args) {
-
-//		String str = "create import "
-//				+ "-t test_file\\club_dirlist.txt " 
-//				+ "-pz A4 " 
-//				+ "-ps NUMERTIC " 
-//				+ "-pa CENTER|CENTER " 
-//				+ "-pdi Vertical " 
-//				+ "-par true"
-//				+ "-po INCREASE " 
-//				+ "-pdest D:\\$PARENT{0}.pdf " 
-//				+ "-pupwd 1234AAA " 
-//				+ "-popwd 1234AAA " 
-//				+ "-pp pm "
-//				+ "-lo test_file\\test.xml" ;
-		String str = "create -pz A4 -pa CENTER|LEFT import -s test_file\\club_dirlist.txt";
-		System.out.println(str);
+		String str = "create " + "-pz A4 " + "-ps NUMERTIC " + "-pa CENTER|CENTER " + "-pdi Vertical " + "-par yes "
+				+ "-po INCREASE " + "-pupwd 1234AAA " + "-popwd 1234AAA " + "-pp 11 " + "-pdst "
+				+ sample_root.getAbsolutePath() + "\\output\\$PARENT{0}.pdf " + "-pdi Vertical " + "-ldst "
+				+ taskslist_destination.getAbsolutePath() + " " + "import -s " + sources_list.getAbsolutePath();
 		ArgumentParser parser = ArgumentParsers.newFor("prog").build();
-		setupCreateParser(parser);
+		setupCreateParser(parser.addSubparsers().help("sub-command help"));
 
+		Namespace ns = null;
 		try {
-			System.out.println(parser.parseArgs(str.split("\\s")));
+			ns = parser.parseArgs(str.split("\\s"));
+			Action action = (Action) ns.get("action");
+			action.setupByNamespace(ns);
+			action.start();
+
 		} catch (ArgumentParserException e) {
 			parser.handleError(e);
 			System.exit(1);
@@ -100,14 +69,12 @@ public class MainProgram {
 	 * 
 	 * @param parser
 	 */
-	static void setupCreateParser(ArgumentParser parser) {
-		Subparsers subparsers = parser.addSubparsers().help("sub-command help");
+	static void setupCreateParser(Subparsers subparsers) {
 		Subparser create_parser = subparsers.addParser("create").help("Type \"create -h\" to get more help.");
-
 		create_parser.addArgument("-pz", "--pdf_size").required(true).type(Size.class)
 				.help("PDF each page size.\ntype DEPEND to set each page size depend on each image size");
-		create_parser.addArgument("-pa", "--pdf_align").type(Align.class).setDefault(new Align("CENTER|CENTER")).metavar("TopBottom|LeftRight")
-				.help("alignment of page of PDF.");
+		create_parser.addArgument("-pa", "--pdf_align").type(Align.class).setDefault(new Align("CENTER|CENTER"))
+				.metavar("TopBottom|LeftRight").help("alignment of page of PDF.");
 
 		create_parser.addArgument("-pdi", "--pdf_direction").type(PageDirection.class).help("Direction of each page");
 
@@ -123,28 +90,23 @@ public class MainProgram {
 				.help("PDF owner password");
 		create_parser.addArgument("-pupwd", "--pdf_user_password").type(String.class).metavar("userpassword")
 				.help("PDF user password");
-		create_parser.addArgument("-pp", "--pdf_permission").type(DocumentAccessPermission.class).setDefault(new DocumentAccessPermission()).help("permission of document.");
+		create_parser.addArgument("-pp", "--pdf_permission").type(DocumentAccessPermission.class)
+				.setDefault(new DocumentAccessPermission()).help("permission of document.");
 
-		create_parser.addArgument("-pdst", "--pdf_destination").metavar("destination")
+		create_parser.addArgument("-pdst", "--pdf_destination").type(String.class).metavar("destination")
 				.help("destination of converted file");
 
-		create_parser.addArgument("-ldst", "--list_destination").metavar("destination").nargs(1)
+		create_parser.addArgument("-ldst", "--list_destination").type(String.class).metavar("destination")
 				.help("Output task list(*.XML)");
 
-		setupImportParser(create_parser);
-		setupAddParser(create_parser);
+		setupImportParser(create_parser.addSubparsers());
+
 	}
 
-	static void setupImportParser(Subparser createparser) {
-		Subparsers subparsers = createparser.addSubparsers();
+	static void setupImportParser(Subparsers subparsers) {
 		Subparser import_parser = subparsers.addParser("import").help("Type \"create -h\" to get more help.");
-		import_parser.addArgument("-s", "--source");
-	}
-
-	static void setupAddParser(Subparser createparser) {
-		Subparsers subparsers = createparser.addSubparsers();
-		Subparser import_parser = subparsers.addParser("add").help("Type \"add -h\" to get more help.");
-
+		import_parser.setDefault("action", new ImportAction());
+		import_parser.addArgument("-s", "--source").nargs("*");
 	}
 
 }
