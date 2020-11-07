@@ -38,12 +38,12 @@ public class CustomPDFConveter extends PDFConverter {
 			System.out.print(" *");
 		System.out.println("\n\n");
 		
-		try {
-			Runtime.getRuntime().exec("explorer.exe /select," + doc.getDestination());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			Runtime.getRuntime().exec("explorer.exe /select," + doc.getDestination());
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 
 	@Override

@@ -2,15 +2,26 @@ package org.vincentyeh.IMG2PDF.pdf.page;
 
 import org.vincentyeh.IMG2PDF.file.ImgFile.Order;
 
+import net.sourceforge.argparse4j.inf.Argument;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.ArgumentParserException;
+import net.sourceforge.argparse4j.inf.ArgumentType;
+
 /**
  * The class which define Alignment of page of PDF
  * 
  * @author vincent
  */
-public class Align {
+public class Align implements ArgumentType<Align>{
 	private final LeftRightAlign LRA;
 	private final TopBottomAlign TBA;
 
+
+	@Override
+	public Align convert(ArgumentParser parser, Argument arg, String value) throws ArgumentParserException {
+		return new Align(value);
+	}
+	
 	/**
 	 * Create Align by enums.
 	 * 
@@ -140,4 +151,5 @@ public class Align {
 			return str_list;
 		}
 	}
+
 }
