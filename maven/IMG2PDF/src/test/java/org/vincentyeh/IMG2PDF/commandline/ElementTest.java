@@ -10,16 +10,16 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.jdom2.Document;
 import org.jdom2.input.DOMBuilder;
 import org.junit.Test;
-import org.vincentyeh.IMG2PDF.task.UniTask;
-import org.vincentyeh.IMG2PDF.task.UniTaskList;
+import org.vincentyeh.IMG2PDF.task.Task;
+import org.vincentyeh.IMG2PDF.task.TaskList;
 import org.xml.sax.SAXException;
 
 public class ElementTest {
 	@Test
 	public void elementTest() throws ParserConfigurationException, SAXException, IOException {
 		Document doc=getDOMParsedDocument("D:\\Project\\git\\IMG2PDF\\sample\\walk-animation\\taskslist\\test.xml");
-		UniTaskList as=new UniTaskList();
-		UniTask a=new UniTask(doc.getRootElement().getChild("TASK"));
+		TaskList as=new TaskList();
+		Task a=new Task(doc.getRootElement().getChild("TASK"));
 		as.add(a);
 		
 		as.toXMLFile(new File("D:\\aaaaa.xml"));

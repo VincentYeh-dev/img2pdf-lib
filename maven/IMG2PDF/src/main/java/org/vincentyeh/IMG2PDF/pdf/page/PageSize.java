@@ -7,7 +7,7 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
  * 
  * @author VincetYeh
  */
-public enum Size {
+public enum PageSize {
 	A0("A0", PDRectangle.A0), A1("A1", PDRectangle.A1), A2("A2", PDRectangle.A2), A3("A3", PDRectangle.A3),
 	A4("A4", PDRectangle.A4), A5("A5", PDRectangle.A5), A6("A6", PDRectangle.A6), LEGAL("LEGAL", PDRectangle.LEGAL),
 	LETTER("LETTER", PDRectangle.LETTER), DEPEND_ON_IMG("DEPEND", null);
@@ -22,7 +22,7 @@ public enum Size {
 	 */
 	private final PDRectangle pdrectangle;
 
-	Size(String str, PDRectangle pdrectangle) {
+	PageSize(String str, PDRectangle pdrectangle) {
 		this.str = str;
 		this.pdrectangle = pdrectangle;
 	}
@@ -33,7 +33,7 @@ public enum Size {
 	 * @param str The String contain definition of Size.
 	 * @return Size
 	 */
-	public static Size getSizeFromString(String str) throws IllegalSizeException {
+	public static PageSize getSizeFromString(String str) throws IllegalSizeException {
 		switch (str) {
 		case "A0":
 			return A0;
@@ -74,7 +74,7 @@ public enum Size {
 	 * @return The array of enum in String.
 	 */
 	public static String[] valuesStr() {
-		Size[] size_list = Size.values();
+		PageSize[] size_list = PageSize.values();
 		String[] str_list = new String[size_list.length];
 		for (int i = 0; i < str_list.length; i++) {
 			str_list[i] = size_list[i].getStr();

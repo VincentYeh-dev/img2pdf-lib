@@ -12,14 +12,14 @@ import net.sourceforge.argparse4j.inf.ArgumentType;
  * 
  * @author vincent
  */
-public class Align implements ArgumentType<Align>{
+public class PageAlign implements ArgumentType<PageAlign>{
 	private final LeftRightAlign LRA;
 	private final TopBottomAlign TBA;
 
 
 	@Override
-	public Align convert(ArgumentParser parser, Argument arg, String value) throws ArgumentParserException {
-		return new Align(value);
+	public PageAlign convert(ArgumentParser parser, Argument arg, String value) throws ArgumentParserException {
+		return new PageAlign(value);
 	}
 	
 	/**
@@ -28,7 +28,7 @@ public class Align implements ArgumentType<Align>{
 	 * @param LRA Left Right Align
 	 * @param TBA Top Bottom Align
 	 */
-	public Align(LeftRightAlign LRA, TopBottomAlign TBA) {
+	public PageAlign(LeftRightAlign LRA, TopBottomAlign TBA) {
 		this.LRA = LRA;
 		this.TBA = TBA;
 	}
@@ -39,7 +39,7 @@ public class Align implements ArgumentType<Align>{
 	 * 
 	 * @param str Alignment
 	 */
-	public Align(String str) throws IllegalAlignException {
+	public PageAlign(String str) throws IllegalAlignException {
 		String[] LR_TB_A = str.split("\\|");
 		try {
 			TBA = TopBottomAlign.getByStr(LR_TB_A[0]);

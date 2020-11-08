@@ -1,16 +1,15 @@
-package org.vincentyeh.IMG2PDF.pdf;
+package org.vincentyeh.IMG2PDF.pdf.converter;
 
 import java.io.IOException;
 
-import org.vincentyeh.IMG2PDF.task.configured.ConfiguredTask;
-import org.vincentyeh.IMG2PDF.util.ImageProcess;
+import org.vincentyeh.IMG2PDF.task.Task;
 
 public class CustomPDFConveter extends PDFConverter {
 	private final int size_of_imgs;
 	private final double perImg;
 	private double progress = 0;
 
-	public CustomPDFConveter(ConfiguredTask task) throws IOException {
+	public CustomPDFConveter(Task task) throws IOException {
 		super(task);
 		size_of_imgs = imgs.size();
 		perImg = (10. / size_of_imgs);

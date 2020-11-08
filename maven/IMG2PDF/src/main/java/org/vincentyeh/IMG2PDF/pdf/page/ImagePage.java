@@ -7,12 +7,12 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
-import org.vincentyeh.IMG2PDF.pdf.page.Align.LeftRightAlign;
-import org.vincentyeh.IMG2PDF.pdf.page.Align.TopBottomAlign;
+import org.vincentyeh.IMG2PDF.pdf.page.PageAlign.LeftRightAlign;
+import org.vincentyeh.IMG2PDF.pdf.page.PageAlign.TopBottomAlign;
 import org.vincentyeh.IMG2PDF.util.ImageProcess;
 
 public class ImagePage extends PDPage {
-	private final Align align;
+	private final PageAlign align;
 	private final BufferedImage image;
 	private final float page_height;
 	private final float page_width;
@@ -43,9 +43,9 @@ public class ImagePage extends PDPage {
 	 */
 	private float max_resize;
 
-	public ImagePage(Align align, Size size, boolean autoRotate, PageDirection direction, BufferedImage image) {
+	public ImagePage(PageAlign align, PageSize size, boolean autoRotate, PageDirection direction, BufferedImage image) {
 		this.align = align;
-		if (size == Size.DEPEND_ON_IMG) {
+		if (size == PageSize.DEPEND_ON_IMG) {
 			this.img_width = image.getWidth();
 			this.img_height = image.getHeight();
 			this.page_width = this.img_width;
@@ -81,12 +81,12 @@ public class ImagePage extends PDPage {
 
 	}
 
-	public ImagePage(Align align, Size size, BufferedImage image) {
+	public ImagePage(PageAlign align, PageSize size, BufferedImage image) {
 		this(align, size,true,PageDirection.Vertical,image);
 	}
 	
-	public ImagePage(Align align, BufferedImage image) {
-		this(align,Size.DEPEND_ON_IMG,false,PageDirection.Vertical,image);
+	public ImagePage(PageAlign align, BufferedImage image) {
+		this(align,PageSize.DEPEND_ON_IMG,false,PageDirection.Vertical,image);
 	}
 
 	public void drawImageToPage(PDDocument doc) throws Exception {

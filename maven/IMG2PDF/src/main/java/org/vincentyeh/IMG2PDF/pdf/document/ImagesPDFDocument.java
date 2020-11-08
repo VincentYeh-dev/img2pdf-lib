@@ -1,27 +1,24 @@
-package org.vincentyeh.IMG2PDF.pdf;
+package org.vincentyeh.IMG2PDF.pdf.document;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
-import org.vincentyeh.IMG2PDF.file.ImgFile;
-import org.vincentyeh.IMG2PDF.pdf.page.Align;
-import org.vincentyeh.IMG2PDF.pdf.page.Size;
+import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
+import org.vincentyeh.IMG2PDF.pdf.page.PageSize;
 
 public class ImagesPDFDocument extends PDDocument {
-	private final Size size;
-	private final Align align;
+	private final PageSize size;
+	private final PageAlign align;
 	private File destination;
-	public ImagesPDFDocument(Size size, Align align,StandardProtectionPolicy ssp) throws IOException {
+	public ImagesPDFDocument(PageSize size, PageAlign align,StandardProtectionPolicy ssp) throws IOException {
 		this(size,align);
 		if(ssp!=null)
 			protect(ssp);
 	}
 	
-	public ImagesPDFDocument(Size size, Align align){
+	public ImagesPDFDocument(PageSize size, PageAlign align){
 		this.size = size;
 		this.align = align;
 	}
@@ -38,10 +35,10 @@ public class ImagesPDFDocument extends PDDocument {
 		super.save(this.destination);
 	}
 	
-	public Size getSize() {
+	public PageSize getSize() {
 		return size;
 	}
-	public Align getAlign() {
+	public PageAlign getAlign() {
 		return align;
 	}
 	public File getDestination() {

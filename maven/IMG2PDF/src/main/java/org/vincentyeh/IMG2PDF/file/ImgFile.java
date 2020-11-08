@@ -3,8 +3,6 @@ package org.vincentyeh.IMG2PDF.file;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * The ImgFile is a comparable subclass of File.It's can be compared by filename

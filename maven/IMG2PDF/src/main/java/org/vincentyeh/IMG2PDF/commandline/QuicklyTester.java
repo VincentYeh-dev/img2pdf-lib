@@ -16,8 +16,7 @@ public class QuicklyTester {
 //				+ "-usepwd 1234AAA "
 //				+ "-ownpwd 1234AAA "
 				+ "test_file\\club_dirlist.txt";
-		new TaskListCreator(str);
-		new TaskProcessor("test_file\\test.xml");
+		
 		
 	}
 

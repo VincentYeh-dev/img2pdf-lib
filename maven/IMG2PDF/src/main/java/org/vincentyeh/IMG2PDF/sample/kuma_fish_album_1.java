@@ -9,8 +9,6 @@ import java.io.OutputStreamWriter;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.vincentyeh.IMG2PDF.commandline.MainProgram;
-import org.vincentyeh.IMG2PDF.commandline.TaskListCreator;
-import org.vincentyeh.IMG2PDF.commandline.TaskProcessor;
 import org.xml.sax.SAXException;
 
 public class kuma_fish_album_1 {
@@ -46,6 +44,7 @@ public class kuma_fish_album_1 {
 				+ sources_list.getAbsolutePath();
 
 		String convert_command = "convert "+ taskslist_destination.getAbsolutePath();
+		
 		
 		MainProgram.main(create_command.split("\\s"));
 		MainProgram.main(convert_command.split("\\s"));

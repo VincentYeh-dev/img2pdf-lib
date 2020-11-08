@@ -29,13 +29,13 @@ public class WalkAnimation {
 				+ "-pdi Vertical "
 				+ "-par yes " 
 				+ "-po INCREASE " 
-				+ "-pupwd 1234AAA " 
-				+ "-popwd 1234AAA " 
+//				+ "-pupwd 1234AAA " 
+//				+ "-popwd 1234AAA " 
 				+ "-pp 11 " 
 				+ "-pdst "
 				+ sample_root.getAbsolutePath() 
 				+ "\\output\\$PARENT{0}.pdf " 
-				+ "-pdi Vertical " + "-ldst "
+				+ "-ldst "
 				+ taskslist_destination.getAbsolutePath() 
 				+ " " 
 				+ "import -s " 
@@ -46,9 +46,6 @@ public class WalkAnimation {
 		MainProgram.main(create_command.split("\\s"));
 		MainProgram.main(convert_command.split("\\s"));
 		
-//		new TaskListCreator(str);
-//		new TaskProcessor(taskslist_destination.getAbsolutePath());
-
 	}
 
 }

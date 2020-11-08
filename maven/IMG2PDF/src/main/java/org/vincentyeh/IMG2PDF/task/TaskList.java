@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.task.configured;
+package org.vincentyeh.IMG2PDF.task;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,38 +17,56 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.xml.sax.SAXException;
 
-public class ConfiguredTaskList extends ArrayList<ConfiguredTask> {
+public class TaskList extends ArrayList<Task> {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
-	
+	private static final long serialVersionUID = 7305144027050402452L;
 
-	public ConfiguredTaskList(String filepath) throws ParserConfigurationException, SAXException, IOException {
+	public TaskList() {
+
+	}
+
+	public TaskList(String filepath) throws ParserConfigurationException, SAXException, IOException {
 		this(getDOMParsedDocument(filepath));
 	}
 
-	public ConfiguredTaskList(Document doc) throws FileNotFoundException {
+	public TaskList(Document doc) throws FileNotFoundException {
 		this(doc.getRootElement());
 	}
 	
-	public ConfiguredTaskList(Element root) throws FileNotFoundException {
+	public TaskList(Element root) throws FileNotFoundException {
 		ArrayList<Element> importedTaskList = new ArrayList<Element>(root.getChildren("TASK"));
 		for (Element task : importedTaskList) {
-			this.add(new ConfiguredTask(task));
+			this.add(new Task(task));
 		}
 	}
-	
+
 	/**
-	 * create Document from file
+	 * Write XML Element to the file.
 	 * 
-	 * @param filepath path of xml file
-	 * @return Document
-	 * @throws ParserConfigurationException
-	 * @throws SAXException
-	 * @throws IOException
+	 * @param file destination of output XML file.
+	 * @throws IOException Exception of writing PDF
 	 */
+	public void toXMLFile(File file) throws IOException {
+		Document doc = new Document();
+		Element root = toElement();
+		doc.setRootElement(root);
+		// Create the XML
+		XMLOutputter outter = new XMLOutputter();
+		outter.setFormat(Format.getPrettyFormat());
+		outter.output(doc, new FileWriter(file));
+	}
+
+	public Element toElement() {
+		Element root = new Element("TASKLIST");
+		for (Task task : this) {
+			root.addContent(task.toElement());
+		}
+		return root;
+	}
+	
 	private static Document getDOMParsedDocument(final String filepath)
 			throws ParserConfigurationException, SAXException, IOException {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -58,6 +76,5 @@ public class ConfiguredTaskList extends ArrayList<ConfiguredTask> {
 		org.w3c.dom.Document w3cDocument = documentBuilder.parse(filepath);
 		return new DOMBuilder().build(w3cDocument);
 	}
+
 }
-
-
