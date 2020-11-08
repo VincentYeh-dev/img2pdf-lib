@@ -1,14 +1,11 @@
 package org.vincentyeh.IMG2PDF.sample;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 
 import org.vincentyeh.IMG2PDF.commandline.MainProgram;
-import org.vincentyeh.IMG2PDF.commandline.TaskListCreator;
-import org.vincentyeh.IMG2PDF.commandline.TaskProcessor;
 
 public class WalkAnimation {
 
