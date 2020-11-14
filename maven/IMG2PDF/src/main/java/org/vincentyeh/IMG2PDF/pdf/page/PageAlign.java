@@ -40,7 +40,7 @@ public class PageAlign implements ArgumentType<PageAlign>{
 	 * @param str Alignment
 	 */
 	public PageAlign(String str) throws IllegalAlignException {
-		String[] LR_TB_A = str.split("\\|");
+		String[] LR_TB_A = str.split("-");
 		try {
 			TBA = TopBottomAlign.getByStr(LR_TB_A[0]);
 			LRA = LeftRightAlign.getByStr(LR_TB_A[1]);
@@ -60,7 +60,7 @@ public class PageAlign implements ArgumentType<PageAlign>{
 
 	@Override
 	public String toString() {
-		return String.format("%s|%s", TBA.getStr(), LRA.getStr());
+		return String.format("%s-%s", TBA.getStr(), LRA.getStr());
 	}
 
 	public static class IllegalAlignException extends IllegalArgumentException {

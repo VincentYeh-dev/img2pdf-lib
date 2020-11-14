@@ -21,9 +21,10 @@ import net.sourceforge.argparse4j.inf.Subparser;
 import net.sourceforge.argparse4j.inf.Subparsers;
 
 public class AddAction extends CreateAction {
-	@Arg(dest = "source")
+	
 	protected ArrayList<String> sources;
-
+	protected String filter;
+	
 	public AddAction() {
 
 	}
@@ -33,6 +34,7 @@ public class AddAction extends CreateAction {
 	public void setupByNamespace(Namespace ns) {
 		super.setupByNamespace(ns);
 		this.sources = (ArrayList<String>) ns.get("source");
+		this.filter=ns.getString("filter");
 	}
 
 	@Override
@@ -55,16 +57,19 @@ public class AddAction extends CreateAction {
 		TaskList tasks = new TaskList(list_destination);
 
 		for (String source : sources) {
-			tasks.addAll(importTasksFromTXT(new File(source)));
+			tasks.addAll(importTasksFromTXT(new File(source),filter));
 		}
 
 		tasks.toXMLFile(new File(list_destination));
 	}
 	
 	public static void setupParser(Subparsers subparsers) {
-		Subparser import_parser = subparsers.addParser("add").help("Type \"add -h\" to get more help.");
-		import_parser.setDefault("action", new AddAction());
-		import_parser.addArgument("-s", "--source").nargs("*");
+		Subparser parser = subparsers.addParser("add").help(lagug_resource.getString("help_add"));
+		parser.setDefault("action", new AddAction());
+		
+		parser.addArgument("-s", "--source").nargs("*").help(lagug_resource.getString("help_add_source"));
+		parser.addArgument("-f", "--filter").type(String.class).help(lagug_resource.getString("help_add_filter"));
+		
 	}
 	
 }

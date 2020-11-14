@@ -7,7 +7,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
+import org.vincentyeh.IMG2PDF.file.FileFilterHelper;
 import org.vincentyeh.IMG2PDF.file.FileFilterHelper;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
 import org.vincentyeh.IMG2PDF.file.ImgFile.Order;
@@ -29,38 +32,34 @@ import net.sourceforge.argparse4j.inf.Subparsers;
 
 public abstract class CreateAction implements Action {
 
-	@Arg(dest = "pdf_size")
 	protected PageSize pdf_size;
 
-	@Arg(dest = "pdf_align")
 	protected PageAlign pdf_align;
 
-	@Arg(dest = "pdf_direction")
 	protected PageDirection pdf_direction;
 
-	@Arg(dest = "pdf_auto_rotate")
 	protected boolean pdf_auto_rotate;
 
-	@Arg(dest = "pdf_sortby")
 	protected Sortby pdf_sortby;
 
-	@Arg(dest = "pdf_order")
 	protected Order pdf_order;
 
-	@Arg(dest = "pdf_owner_password")
 	protected String pdf_owner_password;
 
-	@Arg(dest = "pdf_user_password")
 	protected String pdf_user_password;
 
-	@Arg(dest = "pdf_permission")
 	protected DocumentAccessPermission pdf_permission;
 
-	@Arg(dest = "pdf_destination")
 	protected String pdf_destination;
 
-	@Arg(dest = "list_destination")
 	protected String list_destination;
+	protected static ResourceBundle lagug_resource;
+
+	static {
+//		lagug_resource = ResourceBundle.getBundle("language_package",new Locale("en","US"));
+		lagug_resource = ResourceBundle.getBundle("language_package", Locale.getDefault());
+		
+	}
 
 	@Override
 	public void setupByNamespace(Namespace ns) {
@@ -78,51 +77,80 @@ public abstract class CreateAction implements Action {
 	}
 
 	public static void setupParser(Subparsers subparsers) {
-		Subparser create_parser = subparsers.addParser("create").help("Type \"create -h\" to get more help.");
-		create_parser.addArgument("-pz", "--pdf_size").required(true).type(PageSize.class)
-				.help("PDF each page size.\ntype DEPEND to set each page size depend on each image size");
-		create_parser.addArgument("-pa", "--pdf_align").type(PageAlign.class).setDefault(new PageAlign("CENTER|CENTER"))
-				.metavar("TopBottom|LeftRight").help("alignment of page of PDF.");
+//		Subparser create_parser = subparsers.addParser("create").help("Type \"create -h\" to get more help.");
+//		
+//		create_parser.addArgument("-pz", "--pdf_size").required(true).type(PageSize.class)
+//				.help("PDF each page size.\ntype DEPEND to set each page size depend on each image size");
+//		create_parser.addArgument("-pa", "--pdf_align").type(PageAlign.class).setDefault(new PageAlign("CENTER|CENTER"))
+//				.metavar("TopBottom|LeftRight").help("alignment of page of PDF.");
+//
+//		create_parser.addArgument("-pdi", "--pdf_direction").type(PageDirection.class).help("Image direction of each page");
+//
+//		create_parser.addArgument("-par", "--pdf_auto_rotate").setDefault(Boolean.TRUE)
+//				.type(Arguments.booleanType("yes", "no")).help("auto rotate each page.");
+//
+//		create_parser.addArgument("-ps", "--pdf_sortby").type(Sortby.class).help("Order files by name or date");
+//
+//		create_parser.addArgument("-po", "--pdf_order").type(Order.class)
+//				.help("order by increasing(0,1,2,3) or decreasing(3,2,1,0) value");
+//
+//		create_parser.addArgument("-popwd", "--pdf_owner_password").type(String.class).metavar("ownerpassword")
+//				.help("PDF owner password");
+//		create_parser.addArgument("-pupwd", "--pdf_user_password").type(String.class).metavar("userpassword")
+//				.help("PDF user password");
+//		create_parser.addArgument("-pp", "--pdf_permission").type(DocumentAccessPermission.class)
+//				.setDefault(new DocumentAccessPermission()).help("access permission of document.");
+//
+//		create_parser.addArgument("-pdst", "--pdf_destination").type(String.class).metavar("destination")
+//				.help("destination of converted file");
+//
+//		create_parser.addArgument("-ldst", "--list_destination").type(String.class).metavar("destination")
+//				.help("Output task list(*.XML)");
 
-		create_parser.addArgument("-pdi", "--pdf_direction").type(PageDirection.class).help("Direction of each page");
+		Subparser create_parser = subparsers.addParser("create").help(lagug_resource.getString("help_create"));
+
+		create_parser.addArgument("-pz", "--pdf_size").required(true).type(PageSize.class)
+				.help(lagug_resource.getString("help_create_pdf_size"));
+		create_parser.addArgument("-pa", "--pdf_align").type(PageAlign.class).setDefault(new PageAlign("CENTER-CENTER"))
+				.metavar("TopBottom|LeftRight").help(lagug_resource.getString("help_create_pdf_align"));
+
+		create_parser.addArgument("-pdi", "--pdf_direction").type(PageDirection.class)
+				.help(lagug_resource.getString("help_create_pdf_direction"));
 
 		create_parser.addArgument("-par", "--pdf_auto_rotate").setDefault(Boolean.TRUE)
-				.type(Arguments.booleanType("yes", "no")).help("auto rotate each page.");
+				.type(Arguments.booleanType("yes", "no")).help(lagug_resource.getString("help_create_pdf_auto_rotate"));
 
-		create_parser.addArgument("-ps", "--pdf_sortby").type(Sortby.class).help("Merge all image files in Folder");
+		create_parser.addArgument("-ps", "--pdf_sortby").type(Sortby.class)
+				.help(lagug_resource.getString("help_create_pdf_sortby"));
 
 		create_parser.addArgument("-po", "--pdf_order").type(Order.class)
-				.help("order by increasing(0,1,2,3) or decreasing(3,2,1,0) value");
+				.help(lagug_resource.getString("help_create_pdf_order"));
 
 		create_parser.addArgument("-popwd", "--pdf_owner_password").type(String.class).metavar("ownerpassword")
-				.help("PDF owner password");
+				.help(lagug_resource.getString("help_create_pdf_owner_password"));
 		create_parser.addArgument("-pupwd", "--pdf_user_password").type(String.class).metavar("userpassword")
-				.help("PDF user password");
+				.help(lagug_resource.getString("help_create_pdf_user_password"));
 		create_parser.addArgument("-pp", "--pdf_permission").type(DocumentAccessPermission.class)
-				.setDefault(new DocumentAccessPermission()).help("permission of document.");
+				.setDefault(new DocumentAccessPermission())
+				.help(lagug_resource.getString("help_create_pdf_permission"));
 
 		create_parser.addArgument("-pdst", "--pdf_destination").type(String.class).metavar("destination")
-				.help("destination of converted file");
+				.help(lagug_resource.getString("help_create_pdf_destination"));
 
 		create_parser.addArgument("-ldst", "--list_destination").type(String.class).metavar("destination")
-				.help("Output task list(*.XML)");
+				.help(lagug_resource.getString("help_create_list_destination"));
 
 		ImportAction.setupParser(create_parser.addSubparsers());
 		AddAction.setupParser(create_parser.addSubparsers());
 
 	}
 
-	protected FileFilterHelper createImageFilter(int condition) {
-		FileFilterHelper ffh = new FileFilterHelper(
-				condition | FileFilterHelper.CONDITION_IS_FILE | FileFilterHelper.CONDITION_EXT_EQUALS);
-		ffh.appendExtSLT("JPG");
-		ffh.appendExtSLT("jpg");
-		ffh.appendExtSLT("PNG");
-		ffh.appendExtSLT("png");
+	protected FileFilterHelper createImageFilter(String regex) {
+		FileFilterHelper ffh = new FileFilterHelper(regex);
 		return ffh;
 	}
 
-	protected TaskList importTasksFromTXT(File file) throws IOException {
+	protected TaskList importTasksFromTXT(File file, String filter) throws IOException {
 		UTF8InputStream uis = new UTF8InputStream(file);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(uis.getInputStream(), "UTF-8"));
 		TaskList tasks = new TaskList();
@@ -139,7 +167,7 @@ public abstract class CreateAction implements Action {
 					throw new RuntimeException(dir.getName() + " is not the directory.");
 
 				NameFormatter nf = new NameFormatter(pdf_destination, dir);
-				FileFilterHelper ffh = createImageFilter(0);
+				FileFilterHelper ffh = createImageFilter(filter);
 				Task task = new Task(pdf_owner_password, pdf_user_password, pdf_permission);
 				String d = nf.getConverted();
 				task.setDestination(d);
@@ -156,11 +184,6 @@ public abstract class CreateAction implements Action {
 				Collections.sort(imgs);
 				task.setImgs(imgs);
 
-				/*
-				 * 
-				 * dir.listFiles(ffh), , pdf_owner_password, pdf_user_password, pdf_permission,
-				 * pdf_sortby, pdf_order, pdf_align, pdf_size, pdf_direction, pdf_auto_rotate
-				 */
 				tasks.add(task);
 			}
 		}

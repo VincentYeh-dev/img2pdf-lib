@@ -66,8 +66,6 @@ public class Task {
 		task.setAttribute("destination", destination);
 		task.setAttribute("size", size.getStr() + "");
 		task.setAttribute("align", align.toString());
-//		task.setAttribute("owner", this.getOwner_pwd());
-//		task.setAttribute("user", this.getUser_pwd());
 		task.setAttribute("default-direction", defaultDirection.toString());
 		task.setAttribute("auto-rotate", String.valueOf(autoRotate));
 

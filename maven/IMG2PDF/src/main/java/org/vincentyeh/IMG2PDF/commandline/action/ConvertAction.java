@@ -2,6 +2,8 @@ package org.vincentyeh.IMG2PDF.commandline.action;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -20,11 +22,15 @@ import net.sourceforge.argparse4j.inf.Subparser;
 import net.sourceforge.argparse4j.inf.Subparsers;
 
 public class ConvertAction implements Action {
-	@Arg(dest = "tasklist_source")
+	
 	protected ArrayList<String> tasklist_sources;
+	
+	protected static ResourceBundle lagug_resource;
 
-	public ConvertAction() {
-
+	static {
+//		lagug_resource = ResourceBundle.getBundle("language_package",new Locale("en","US"));
+		lagug_resource = ResourceBundle.getBundle("language_package", Locale.getDefault());
+		
 	}
 
 	@Override
@@ -72,9 +78,9 @@ public class ConvertAction implements Action {
 	}
 
 	public static void setupParser(Subparsers subparsers) {
-		Subparser convert_parser = subparsers.addParser("convert").help("Type \"convert -h\" to get more help.");
+		Subparser convert_parser = subparsers.addParser("convert").help(lagug_resource.getString("help_convert"));
 		convert_parser.setDefault("action", new ConvertAction());
-		convert_parser.addArgument("tasklist_source").nargs("*");
-
+		convert_parser.addArgument("tasklist_source").nargs("*").help(lagug_resource.getString("help_convert_tasklist_source"));
+		
 	}
 }

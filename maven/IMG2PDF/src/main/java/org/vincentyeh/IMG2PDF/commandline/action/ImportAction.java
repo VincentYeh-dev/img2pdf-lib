@@ -22,9 +22,9 @@ import net.sourceforge.argparse4j.inf.Subparsers;
 
 public class ImportAction extends CreateAction {
 
-	@Arg(dest = "source")
+	
 	protected ArrayList<String> sources;
-
+	protected String filter;
 	public ImportAction() {
 
 	}
@@ -44,6 +44,9 @@ public class ImportAction extends CreateAction {
 	public void setupByNamespace(Namespace ns) {
 		super.setupByNamespace(ns);
 		this.sources = (ArrayList<String>) ns.get("source");
+		this.filter=ns.getString("filter");
+//		https://regex101.com/
+		
 	}
 
 	public void createFile() throws IOException {
@@ -51,14 +54,16 @@ public class ImportAction extends CreateAction {
 		TaskList tasks=new TaskList();
 		
 		for (String source : sources) {
-			tasks.addAll(importTasksFromTXT(new File(source)));
+			tasks.addAll(importTasksFromTXT(new File(source),filter));
 		}
 		tasks.toXMLFile(new File(list_destination));
 	}
 
 	public static void setupParser(Subparsers subparsers) {
-		Subparser import_parser = subparsers.addParser("import").help("Type \"create -h\" to get more help.");
-		import_parser.setDefault("action", new ImportAction());
-		import_parser.addArgument("-s", "--source").nargs("*");
+		Subparser parser = subparsers.addParser("import").help(lagug_resource.getString("help_import"));
+		parser.setDefault("action", new ImportAction());
+		parser.addArgument("-s", "--source").nargs("*").help(lagug_resource.getString("help_import_source"));
+		parser.addArgument("-f", "--filter").type(String.class).help(lagug_resource.getString("help_import_filter"));
+		
 	}
 }
