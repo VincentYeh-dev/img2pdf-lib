@@ -8,7 +8,6 @@ import java.util.concurrent.Callable;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
 import org.vincentyeh.IMG2PDF.pdf.document.ImagesPDFDocument;
 import org.vincentyeh.IMG2PDF.pdf.page.ImagePage;
-import org.vincentyeh.IMG2PDF.pdf.page.PageDirection;
 import org.vincentyeh.IMG2PDF.pdf.page.PageSize;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.util.ImageProcess;
@@ -19,19 +18,23 @@ import org.vincentyeh.IMG2PDF.util.ImageProcess;
  * @author VincentYeh
  *
  */
-public abstract class PDFConverter implements Callable<ImagesPDFDocument> {
+public class PDFConverter implements Callable<ImagesPDFDocument> {
 
-	public abstract void before();
-	public abstract void convert(int index)throws Exception;
-	public abstract void fail(int index,Exception e);
-	public abstract void done();
-	
+//	public abstract void before();
+//
+//	public abstract void convert(int index) throws Exception;
+//
+//	public abstract void fail(int index, Exception e);
+//
+//	public abstract void done();
+
 	protected final ImagesPDFDocument doc;
-	protected ArrayList<ImgFile> imgs;
 	protected boolean isProtectedByPwd;
-	
-	private final PageDirection defaultDirection;
-	private final boolean autoRotate;
+//	protected ArrayList<ImgFile> imgs;
+//	private final PageDirection defaultDirection;
+//	private final boolean autoRotate;
+	private ConversionListener listener;
+	private final Task task;
 
 	/**
 	 * Create PDFFile with Task
@@ -42,14 +45,16 @@ public abstract class PDFConverter implements Callable<ImagesPDFDocument> {
 	public PDFConverter(Task task) throws IOException {
 		if (task == null)
 			throw new NullPointerException("task is null.");
+		this.task=task;
 		doc = new ImagesPDFDocument(task.getSize(), task.getAlign());
 		doc.protect(task.getSpp());
 		doc.setDestination(task.getDestination());
-		imgs = task.getImgs();
-		defaultDirection=task.getDefaultDirection();
-		autoRotate=task.getAutoRotate();
+//		imgs = task.getImgs();
+//		defaultDirection=task.getDefaultDirection();
+//		autoRotate=task.getAutoRotate();
+
 //		not included in task------------------------------------
-		
+
 //		------------------------------------
 	}
 
@@ -60,20 +65,27 @@ public abstract class PDFConverter implements Callable<ImagesPDFDocument> {
 	 */
 	@Override
 	public ImagesPDFDocument call() throws Exception {
-		before();
+//		before();
+		ArrayList<ImgFile> imgs = task.getImgs();
+		if (listener != null)
+			listener.onConversionPreparing(task);
 		for (int i = 0; i < imgs.size(); i++) {
-			convert(i);
+			if (listener != null)
+			listener.onConverting(i);
 			try {
 				ImageProcess ip = new ImageProcess(imgs.get(i));
 				doc.addPage(createImgPage(ip.read()));
 			} catch (Exception e) {
-				fail(i,e);
+//				fail(i,e);
+				if (listener != null)
+					listener.onConversionFail(i, e);
 				doc.close();
 				throw e;
 			}
 		}
-		
-		done();
+
+		if (listener != null)
+			listener.onConversionComplete();
 		return doc;
 	}
 
@@ -88,12 +100,17 @@ public abstract class PDFConverter implements Callable<ImagesPDFDocument> {
 		PageSize size = doc.getSize();
 		ImagePage imgpage = null;
 		if (size == PageSize.DEPEND_ON_IMG) {
-			imgpage = new ImagePage(doc.getAlign(),img);
+			imgpage = new ImagePage(doc.getAlign(), img);
 		} else {
-			imgpage = new ImagePage(doc.getAlign(), doc.getSize(),autoRotate,defaultDirection,img);
+			imgpage = new ImagePage(doc.getAlign(), doc.getSize(), task.getAutoRotate(), task.getDefaultDirection(),
+					img);
 		}
 		imgpage.drawImageToPage(doc);
 		return imgpage;
+	}
+
+	public void setListener(ConversionListener listener) {
+		this.listener = listener;
 	}
 
 }

@@ -77,36 +77,6 @@ public abstract class CreateAction implements Action {
 	}
 
 	public static void setupParser(Subparsers subparsers) {
-//		Subparser create_parser = subparsers.addParser("create").help("Type \"create -h\" to get more help.");
-//		
-//		create_parser.addArgument("-pz", "--pdf_size").required(true).type(PageSize.class)
-//				.help("PDF each page size.\ntype DEPEND to set each page size depend on each image size");
-//		create_parser.addArgument("-pa", "--pdf_align").type(PageAlign.class).setDefault(new PageAlign("CENTER|CENTER"))
-//				.metavar("TopBottom|LeftRight").help("alignment of page of PDF.");
-//
-//		create_parser.addArgument("-pdi", "--pdf_direction").type(PageDirection.class).help("Image direction of each page");
-//
-//		create_parser.addArgument("-par", "--pdf_auto_rotate").setDefault(Boolean.TRUE)
-//				.type(Arguments.booleanType("yes", "no")).help("auto rotate each page.");
-//
-//		create_parser.addArgument("-ps", "--pdf_sortby").type(Sortby.class).help("Order files by name or date");
-//
-//		create_parser.addArgument("-po", "--pdf_order").type(Order.class)
-//				.help("order by increasing(0,1,2,3) or decreasing(3,2,1,0) value");
-//
-//		create_parser.addArgument("-popwd", "--pdf_owner_password").type(String.class).metavar("ownerpassword")
-//				.help("PDF owner password");
-//		create_parser.addArgument("-pupwd", "--pdf_user_password").type(String.class).metavar("userpassword")
-//				.help("PDF user password");
-//		create_parser.addArgument("-pp", "--pdf_permission").type(DocumentAccessPermission.class)
-//				.setDefault(new DocumentAccessPermission()).help("access permission of document.");
-//
-//		create_parser.addArgument("-pdst", "--pdf_destination").type(String.class).metavar("destination")
-//				.help("destination of converted file");
-//
-//		create_parser.addArgument("-ldst", "--list_destination").type(String.class).metavar("destination")
-//				.help("Output task list(*.XML)");
-
 		Subparser create_parser = subparsers.addParser("create").help(lagug_resource.getString("help_create"));
 
 		create_parser.addArgument("-pz", "--pdf_size").required(true).type(PageSize.class)
@@ -146,7 +116,7 @@ public abstract class CreateAction implements Action {
 	}
 
 	protected FileFilterHelper createImageFilter(String regex) {
-		FileFilterHelper ffh = new FileFilterHelper(regex);
+		FileFilterHelper ffh = new FileFilterHelper(".*\\.(png|PNG|jpg|JPG)");
 		return ffh;
 	}
 
@@ -158,7 +128,7 @@ public abstract class CreateAction implements Action {
 		while (buf != null) {
 			buf = reader.readLine();
 			if (buf != null && !buf.isEmpty()) {
-				System.out.println(buf);
+				System.out.println("import: "+buf);
 				File dir = new File(buf);
 				if (!dir.exists())
 					throw new FileNotFoundException(dir.getName() + " not found.");

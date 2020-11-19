@@ -31,7 +31,7 @@ public class WalkAnimation {
 				+ "-po INCREASE " 
 //				+ "-pupwd 1234AAA " 
 //				+ "-popwd 1234AAA " 
-				+ "-pp 11 " 
+//				+ "-pp 11 " 
 				+ "-pdst "
 				+ sample_root.getAbsolutePath() 
 				+ "\\output\\$PARENT{0}.pdf " 
