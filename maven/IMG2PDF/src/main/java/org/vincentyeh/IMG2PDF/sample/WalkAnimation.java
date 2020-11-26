@@ -44,8 +44,8 @@ public class WalkAnimation {
 		String convert_command = "convert "+ taskslist_destination.getAbsolutePath();
 		System.out.println(create_command);
 		System.out.println(convert_command);
-		MainProgram.main(create_command.split("\\s"));
-		MainProgram.main(convert_command.split("\\s"));
+		MainProgram.main(create_command);
+		MainProgram.main(convert_command);
 	}
 
 }

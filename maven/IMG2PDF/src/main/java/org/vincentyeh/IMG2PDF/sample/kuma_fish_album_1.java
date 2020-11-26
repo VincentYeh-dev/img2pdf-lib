@@ -11,9 +11,11 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.vincentyeh.IMG2PDF.commandline.MainProgram;
 import org.xml.sax.SAXException;
 
+import net.sourceforge.argparse4j.inf.ArgumentParserException;
+
 public class kuma_fish_album_1 {
 
-	public static void main(String[] args) throws IOException, ParserConfigurationException, SAXException {
+	public static void main(String[] args) throws Exception {
 		
 		File project_root=new File("").getAbsoluteFile().getParentFile().getParentFile();
 		File sample_root=new File(project_root, "sample\\kuma_fish_album_1");
@@ -26,28 +28,32 @@ public class kuma_fish_album_1 {
 		BufferedWriter writer=new BufferedWriter(new OutputStreamWriter(new FileOutputStream(sources_list), "UTF-8"));
 		writer.write(image_sources_dir.getAbsolutePath()+"\n\n");
 		writer.close();
-		
+
+		String filter="[^<>;,?\"*|\\/]+\\.(png|PNG|jpg|JPG)";
 		String create_command = "create " 
 				+ "-pz A4 " 
 				+ "-ps NUMERTIC " 
-				+ "-pa CENTER|CENTER " 
+				+ "-pa CENTER-CENTER " 
 				+ "-pdi Vertical "
 				+ "-par yes " 
 				+ "-po INCREASE " 
 //				+ "-pupwd 1234AAA " 
 //				+ "-popwd 1234AAA " 
-				+ "-pp 11 "
-				+ "-pdst "+ sample_root.getAbsolutePath()+ "\\output\\$PARENT{0}.pdf " 
-				+ "-pdi Vertical " 
-				+ "-ldst "+ taskslist_destination.getAbsolutePath()+ " " 
-				+ "import -s " 
-				+ sources_list.getAbsolutePath();
+//				+ "-pp 11 " 
+				+ "-pdst "
+				+ sample_root.getAbsolutePath() 
+				+ "\\output\\$PARENT{0}.pdf " 
+				+ "-ldst "
+				+ taskslist_destination.getAbsolutePath()
+				+ " import -s "
+				+ sources_list.getAbsolutePath()
+				+ " -f "+filter;
 
 		String convert_command = "convert "+ taskslist_destination.getAbsolutePath();
-		
-		
-		MainProgram.main(create_command.split("\\s"));
-		MainProgram.main(convert_command.split("\\s"));
+		System.out.println(create_command);
+		System.out.println(convert_command);
+		MainProgram.main(create_command);
+		MainProgram.main(convert_command);
 		
 	}
 

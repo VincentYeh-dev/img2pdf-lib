@@ -10,6 +10,7 @@ import java.util.concurrent.Future;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.vincentyeh.IMG2PDF.commandline.MainProgram;
 import org.vincentyeh.IMG2PDF.pdf.converter.ConversionListener;
 import org.vincentyeh.IMG2PDF.pdf.converter.PDFConverter;
 import org.vincentyeh.IMG2PDF.pdf.document.ImagesPDFDocument;
@@ -20,17 +21,16 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 import net.sourceforge.argparse4j.inf.Subparsers;
 
-public class ConvertAction implements Action {
+public class ConvertAction extends AbstractAction{
 	
 	protected ArrayList<String> tasklist_sources;
 	
-	protected static ResourceBundle lagug_resource;
+//	protected static ResourceBundle MainProgram.lagug_resource;
 
-	static {
-//		lagug_resource = ResourceBundle.getBundle("language_package",new Locale("en","US"));
-		lagug_resource = ResourceBundle.getBundle("language_package", Locale.getDefault());
-		
-	}
+//	static {
+//		MainProgram.lagug_resource = ResourceBundle.getBundle("language_package",new Locale("en","US"));
+//		MainProgram.lagug_resource = ResourceBundle.getBundle("language_package",MainProgram.locale);
+//	}
 
 	@Override
 	public void setupByNamespace(Namespace ns) {

@@ -8,6 +8,7 @@ import java.util.Collections;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.vincentyeh.IMG2PDF.commandline.MainProgram;
 import org.vincentyeh.IMG2PDF.file.FileFilterHelper;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
 import org.vincentyeh.IMG2PDF.task.Task;

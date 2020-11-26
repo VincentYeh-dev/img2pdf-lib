@@ -20,19 +20,8 @@ import org.vincentyeh.IMG2PDF.util.ImageProcess;
  */
 public class PDFConverter implements Callable<ImagesPDFDocument> {
 
-//	public abstract void before();
-//
-//	public abstract void convert(int index) throws Exception;
-//
-//	public abstract void fail(int index, Exception e);
-//
-//	public abstract void done();
-
 	protected final ImagesPDFDocument doc;
 	protected boolean isProtectedByPwd;
-//	protected ArrayList<ImgFile> imgs;
-//	private final PageDirection defaultDirection;
-//	private final boolean autoRotate;
 	private ConversionListener listener;
 	private final Task task;
 
@@ -49,9 +38,6 @@ public class PDFConverter implements Callable<ImagesPDFDocument> {
 		doc = new ImagesPDFDocument(task.getSize(), task.getAlign());
 		doc.protect(task.getSpp());
 		doc.setDestination(task.getDestination());
-//		imgs = task.getImgs();
-//		defaultDirection=task.getDefaultDirection();
-//		autoRotate=task.getAutoRotate();
 
 //		not included in task------------------------------------
 
@@ -76,7 +62,6 @@ public class PDFConverter implements Callable<ImagesPDFDocument> {
 				ImageProcess ip = new ImageProcess(imgs.get(i));
 				doc.addPage(createImgPage(ip.read()));
 			} catch (Exception e) {
-//				fail(i,e);
 				if (listener != null)
 					listener.onConversionFail(i, e);
 				doc.close();

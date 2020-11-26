@@ -3,6 +3,7 @@ package org.vincentyeh.IMG2PDF.commandline;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import org.vincentyeh.IMG2PDF.commandline.action.AbstractAction;
 import org.vincentyeh.IMG2PDF.commandline.action.Action;
 import org.vincentyeh.IMG2PDF.commandline.action.ConvertAction;
 import org.vincentyeh.IMG2PDF.commandline.action.CreateAction;
@@ -14,29 +15,40 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparsers;
 
 public class MainProgram {
+	public static ResourceBundle lagug_resource;
+	
 	public final static String PROGRAM_NAME = "IMG2PDF";
 	public final static String PROGRAM_VERSION = "v0.9";
-	private final Action action;
+	private final AbstractAction action;
+	
+	static {
+		lagug_resource = ResourceBundle.getBundle("language_package",Locale.getDefault());
+	}
 
-	public MainProgram(String[] args) {
+	public MainProgram(String[] args) throws ArgumentParserException {
 		ArgumentParser parser = ArgumentParsers.newFor(PROGRAM_NAME).build();
 		parser.version(PROGRAM_VERSION);
 		Subparsers subparser = parser.addSubparsers().help("sub command");
+
+		AbstractAction.setLagug_resource(lagug_resource);
 		CreateAction.setupParser(subparser);
 		ConvertAction.setupParser(subparser);
+		
 		Namespace ns = null;
 		try {
 			ns = parser.parseArgs(args);
 
 		} catch (ArgumentParserException e) {
 			parser.handleError(e);
-			System.exit(1);
+			System.err.println("Program is interrupted.");
+			throw e;
+//			System.exit(1);
 		}
 		if (ns == null) {
-			System.err.println("Namespace is null.");
+			throw new NullPointerException("Namespace is null.");
 		}
-
-		action = (Action) ns.get("action");
+		
+		action = (AbstractAction) ns.get("action");
 		action.setupByNamespace(ns);
 	}
 
@@ -44,9 +56,24 @@ public class MainProgram {
 		action.start();
 	}
 
-	public static void main(String[] args) {
-		MainProgram main =new MainProgram(args);
-		main.startCommand();
+	private static void main(String[] args){
+		
+		MainProgram main=null;
+		try {
+			main = new MainProgram(args);
+			main.startCommand();
+		} catch (ArgumentParserException e) {
+//			System.exit(0);
+			return;
+		}catch (RuntimeException e) {
+			e.printStackTrace();
+		}
 	}
+	
+//	Only for test.This function never been used in the release executable file.
+	public static void main(String args) throws ArgumentParserException {
+		main(args.split("\\s"));
+	}
+	
 
 }

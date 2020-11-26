@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import org.vincentyeh.IMG2PDF.commandline.MainProgram;
 import org.vincentyeh.IMG2PDF.file.FileFilterHelper;
 import org.vincentyeh.IMG2PDF.file.FileFilterHelper;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
@@ -30,39 +31,23 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 import net.sourceforge.argparse4j.inf.Subparsers;
 
-public abstract class CreateAction implements Action {
+public abstract class CreateAction extends AbstractAction{
 
 	protected PageSize pdf_size;
-
 	protected PageAlign pdf_align;
-
 	protected PageDirection pdf_direction;
-
 	protected boolean pdf_auto_rotate;
-
 	protected Sortby pdf_sortby;
-
 	protected Order pdf_order;
-
 	protected String pdf_owner_password;
-
 	protected String pdf_user_password;
-
 	protected DocumentAccessPermission pdf_permission;
-
 	protected String pdf_destination;
-
 	protected String list_destination;
-	protected static ResourceBundle lagug_resource;
-
-	static {
-//		lagug_resource = ResourceBundle.getBundle("language_package",new Locale("en","US"));
-		lagug_resource = ResourceBundle.getBundle("language_package", Locale.getDefault());
-		
-	}
 
 	@Override
 	public void setupByNamespace(Namespace ns) {
+		
 		pdf_size = (PageSize) ns.get("pdf_size");
 		pdf_align = (PageAlign) ns.get("pdf_align");
 		pdf_direction = (PageDirection) ns.get("pdf_direction");
@@ -77,41 +62,42 @@ public abstract class CreateAction implements Action {
 	}
 
 	public static void setupParser(Subparsers subparsers) {
-		Subparser create_parser = subparsers.addParser("create").help(lagug_resource.getString("help_create"));
+		Subparser parser = subparsers.addParser("create").help(lagug_resource.getString("help_create"));
 
-		create_parser.addArgument("-pz", "--pdf_size").required(true).type(PageSize.class)
+		parser.addArgument("-pz", "--pdf_size").required(true).type(PageSize.class)
 				.help(lagug_resource.getString("help_create_pdf_size"));
-		create_parser.addArgument("-pa", "--pdf_align").type(PageAlign.class).setDefault(new PageAlign("CENTER-CENTER"))
+		parser.addArgument("-pa", "--pdf_align").type(PageAlign.class).setDefault(new PageAlign("CENTER-CENTER"))
 				.metavar("TopBottom|LeftRight").help(lagug_resource.getString("help_create_pdf_align"));
 
-		create_parser.addArgument("-pdi", "--pdf_direction").type(PageDirection.class)
+		parser.addArgument("-pdi", "--pdf_direction").type(PageDirection.class)
 				.help(lagug_resource.getString("help_create_pdf_direction"));
 
-		create_parser.addArgument("-par", "--pdf_auto_rotate").setDefault(Boolean.TRUE)
+		parser.addArgument("-par", "--pdf_auto_rotate").setDefault(Boolean.TRUE)
 				.type(Arguments.booleanType("yes", "no")).help(lagug_resource.getString("help_create_pdf_auto_rotate"));
 
-		create_parser.addArgument("-ps", "--pdf_sortby").type(Sortby.class)
+		parser.addArgument("-ps", "--pdf_sortby").type(Sortby.class)
 				.help(lagug_resource.getString("help_create_pdf_sortby"));
 
-		create_parser.addArgument("-po", "--pdf_order").type(Order.class)
+		parser.addArgument("-po", "--pdf_order").type(Order.class)
 				.help(lagug_resource.getString("help_create_pdf_order"));
 
-		create_parser.addArgument("-popwd", "--pdf_owner_password").type(String.class).metavar("ownerpassword")
+		parser.addArgument("-popwd", "--pdf_owner_password").type(String.class).metavar("ownerpassword")
 				.help(lagug_resource.getString("help_create_pdf_owner_password"));
-		create_parser.addArgument("-pupwd", "--pdf_user_password").type(String.class).metavar("userpassword")
+		parser.addArgument("-pupwd", "--pdf_user_password").type(String.class).metavar("userpassword")
 				.help(lagug_resource.getString("help_create_pdf_user_password"));
-		create_parser.addArgument("-pp", "--pdf_permission").type(DocumentAccessPermission.class)
+		parser.addArgument("-pp", "--pdf_permission").type(DocumentAccessPermission.class)
 				.setDefault(new DocumentAccessPermission())
 				.help(lagug_resource.getString("help_create_pdf_permission"));
 
-		create_parser.addArgument("-pdst", "--pdf_destination").type(String.class).metavar("destination")
+		parser.addArgument("-pdst", "--pdf_destination").type(String.class).metavar("destination")
 				.help(lagug_resource.getString("help_create_pdf_destination"));
 
-		create_parser.addArgument("-ldst", "--list_destination").type(String.class).metavar("destination")
+		parser.addArgument("-ldst", "--list_destination").type(String.class).metavar("destination")
 				.help(lagug_resource.getString("help_create_list_destination"));
 
-		ImportAction.setupParser(create_parser.addSubparsers());
-		AddAction.setupParser(create_parser.addSubparsers());
+		Subparsers innerSubparsers=parser.addSubparsers();
+		ImportAction.setupParser(innerSubparsers);
+		AddAction.setupParser(innerSubparsers);
 
 	}
 

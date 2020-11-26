@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.vincentyeh.IMG2PDF.commandline.MainProgram;
 import org.vincentyeh.IMG2PDF.file.FileFilterHelper;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
 import org.vincentyeh.IMG2PDF.file.text.UTF8InputStream;

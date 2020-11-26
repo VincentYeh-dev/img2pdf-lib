@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TASKLIST>
-  <TASK destination="D:\Project\git\IMG2PDF\sample\kuma_fish_album_1\output\kuma_fish_album_1.pdf" size="A4" align="CENTER|CENTER" default-direction="Vertical" auto-rotate="true">
+  <TASK destination="D:\Project\git\IMG2PDF\sample\kuma_fish_album_1\output\kuma_fish_album_1.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
     <FILES>
       <FILE>D:\Project\git\IMG2PDF\sample\kuma_fish_album_1\image-sources\Horizontal_1.jpg</FILE>
       <FILE>D:\Project\git\IMG2PDF\sample\kuma_fish_album_1\image-sources\Horizontal_2.jpg</FILE>
