@@ -13,10 +13,10 @@ import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.util.ImageProcess;
 
 /**
- * The implementation of Task.It is the core class of conversion.
- * 
+ * The core of this program.
+ * At first,this class will be initialized by task.
+ * When call() being called by other program,this program will start conversion and finally return ImagesPDFDocument.
  * @author VincentYeh
- *
  */
 public class PDFConverter implements Callable<ImagesPDFDocument> {
 
@@ -26,22 +26,17 @@ public class PDFConverter implements Callable<ImagesPDFDocument> {
 	private final Task task;
 
 	/**
-	 * Create PDFFile with Task
-	 * 
-	 * @param task The task to do on PDFFile.
+	 * Setup the pdf converter.
+	 * @param task
 	 * @throws IOException
 	 */
 	public PDFConverter(Task task) throws IOException {
 		if (task == null)
 			throw new NullPointerException("task is null.");
 		this.task=task;
-		doc = new ImagesPDFDocument(task.getSize(), task.getAlign());
+		doc = new ImagesPDFDocument();
 		doc.protect(task.getSpp());
 		doc.setDestination(task.getDestination());
-
-//		not included in task------------------------------------
-
-//		------------------------------------
 	}
 
 	/**
@@ -51,7 +46,6 @@ public class PDFConverter implements Callable<ImagesPDFDocument> {
 	 */
 	@Override
 	public ImagesPDFDocument call() throws Exception {
-//		before();
 		ArrayList<ImgFile> imgs = task.getImgs();
 		if (listener != null)
 			listener.onConversionPreparing(task);
@@ -82,18 +76,23 @@ public class PDFConverter implements Callable<ImagesPDFDocument> {
 	 * @throws IOException Failure of drawing image to page
 	 */
 	protected ImagePage createImgPage(BufferedImage img) throws Exception {
-		PageSize size = doc.getSize();
+		PageSize size = task.getSize();
 		ImagePage imgpage = null;
 		if (size == PageSize.DEPEND_ON_IMG) {
-			imgpage = new ImagePage(doc.getAlign(), img);
+			imgpage = new ImagePage(task.getAlign(), img);
 		} else {
-			imgpage = new ImagePage(doc.getAlign(), doc.getSize(), task.getAutoRotate(), task.getDefaultDirection(),
+			imgpage = new ImagePage(task.getAlign(), task.getSize(), task.getAutoRotate(), task.getDefaultDirection(),
 					img);
 		}
 		imgpage.drawImageToPage(doc);
 		return imgpage;
 	}
 
+	/**
+	 * Setup the listener.
+	 * 
+	 * @param listener ConversionListener
+	 */
 	public void setListener(ConversionListener listener) {
 		this.listener = listener;
 	}

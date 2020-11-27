@@ -1,13 +1,15 @@
 package org.vincentyeh.IMG2PDF.commandline;
 
-import java.util.Locale;
-import java.util.ResourceBundle;
-
 import org.junit.Test;
 
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 
 public class GetHelpTester {
+	
+	@Test
+	public void h() throws ArgumentParserException {
+		MainProgram.main("-h");
+	}
 	
 	@Test
 	public void create() throws ArgumentParserException {

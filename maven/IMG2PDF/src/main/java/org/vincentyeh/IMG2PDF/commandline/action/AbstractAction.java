@@ -1,7 +1,5 @@
 package org.vincentyeh.IMG2PDF.commandline.action;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 

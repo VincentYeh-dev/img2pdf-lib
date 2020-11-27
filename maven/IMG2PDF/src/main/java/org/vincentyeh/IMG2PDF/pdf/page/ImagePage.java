@@ -20,28 +20,6 @@ public class ImagePage extends PDPage {
 	private final float img_width;
 	private final float position_y;
 	private final float position_x;
-	/**
-	 * <b>The calculation of diff</b>
-	 * <p>
-	 * resize=abs((image height/image width)-(page height/page width))
-	 * </p>
-	 * 
-	 * <b>Feature</b>
-	 * <p>
-	 * resize is the variable that can be set to prevent raw image over-deformed.
-	 * </p>
-	 * <p>
-	 * The default value is less than 0.It do nothing when you don't set it to the
-	 * value that more than 0.
-	 * </p>
-	 * <p>
-	 * If you do that before execution of process() method,the program will throw a
-	 * Exception that warn a user the sub is out of range when the resize larger
-	 * than max_resize.
-	 * </p>
-	 * 
-	 */
-	private float max_resize;
 
 	public ImagePage(PageAlign align, PageSize size, boolean autoRotate, PageDirection direction, BufferedImage image) {
 		this.align = align;
@@ -213,18 +191,5 @@ public class ImagePage extends PDPage {
 
 		return new float[] { out_height, out_width };
 	}
-
-	public void setMaxResize(float max_resize) {
-		this.max_resize = max_resize;
-	}
-
-	/**
-	 * Rotate the image when image is horizontal.
-	 * 
-	 * @param enable enable or disable rotation.
-	 */
-//	public void setAutoRotate(boolean enable) {
-//		this.autoRotate = enable;
-//	}
 
 }
