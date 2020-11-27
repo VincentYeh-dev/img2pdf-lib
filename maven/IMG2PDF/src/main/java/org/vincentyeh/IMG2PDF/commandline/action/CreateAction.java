@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.regex.PatternSyntaxException;
 
 import org.vincentyeh.IMG2PDF.commandline.MainProgram;
 import org.vincentyeh.IMG2PDF.file.FileFilterHelper;
@@ -31,7 +32,7 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 import net.sourceforge.argparse4j.inf.Subparsers;
 
-public abstract class CreateAction extends AbstractAction{
+public abstract class CreateAction extends AbstractAction {
 
 	protected PageSize pdf_size;
 	protected PageAlign pdf_align;
@@ -47,7 +48,7 @@ public abstract class CreateAction extends AbstractAction{
 
 	@Override
 	public void setupByNamespace(Namespace ns) {
-		
+
 		pdf_size = (PageSize) ns.get("pdf_size");
 		pdf_align = (PageAlign) ns.get("pdf_align");
 		pdf_direction = (PageDirection) ns.get("pdf_direction");
@@ -66,7 +67,7 @@ public abstract class CreateAction extends AbstractAction{
 
 		parser.addArgument("-pz", "--pdf_size").required(true).type(PageSize.class)
 				.help(lagug_resource.getString("help_create_pdf_size"));
-		parser.addArgument("-pa", "--pdf_align").type(PageAlign.class).setDefault(new PageAlign("CENTER-CENTER"))
+		parser.addArgument("-pa", "--pdf_align").type(new PageAlign("CENTER-CENTER")).setDefault(new PageAlign("CENTER-CENTER"))
 				.metavar("TopBottom|LeftRight").help(lagug_resource.getString("help_create_pdf_align"));
 
 		parser.addArgument("-pdi", "--pdf_direction").type(PageDirection.class)
@@ -85,7 +86,7 @@ public abstract class CreateAction extends AbstractAction{
 				.help(lagug_resource.getString("help_create_pdf_owner_password"));
 		parser.addArgument("-pupwd", "--pdf_user_password").type(String.class).metavar("userpassword")
 				.help(lagug_resource.getString("help_create_pdf_user_password"));
-		parser.addArgument("-pp", "--pdf_permission").type(DocumentAccessPermission.class)
+		parser.addArgument("-pp", "--pdf_permission").type(new DocumentAccessPermission())
 				.setDefault(new DocumentAccessPermission())
 				.help(lagug_resource.getString("help_create_pdf_permission"));
 
@@ -95,18 +96,13 @@ public abstract class CreateAction extends AbstractAction{
 		parser.addArgument("-ldst", "--list_destination").type(String.class).metavar("destination")
 				.help(lagug_resource.getString("help_create_list_destination"));
 
-		Subparsers innerSubparsers=parser.addSubparsers();
+		Subparsers innerSubparsers = parser.addSubparsers();
 		ImportAction.setupParser(innerSubparsers);
 		AddAction.setupParser(innerSubparsers);
 
 	}
 
-	protected FileFilterHelper createImageFilter(String regex) {
-		FileFilterHelper ffh = new FileFilterHelper(".*\\.(png|PNG|jpg|JPG)");
-		return ffh;
-	}
-
-	protected TaskList importTasksFromTXT(File file, String filter) throws IOException {
+	protected TaskList importTasksFromTXT(File file, FileFilterHelper filter) throws PatternSyntaxException,IOException {
 		UTF8InputStream uis = new UTF8InputStream(file);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(uis.getInputStream(), "UTF-8"));
 		TaskList tasks = new TaskList();
@@ -114,7 +110,7 @@ public abstract class CreateAction extends AbstractAction{
 		while (buf != null) {
 			buf = reader.readLine();
 			if (buf != null && !buf.isEmpty()) {
-				System.out.println("import: "+buf);
+				System.out.println("import: " + buf);
 				File dir = new File(buf);
 				if (!dir.exists())
 					throw new FileNotFoundException(dir.getName() + " not found.");
@@ -123,7 +119,7 @@ public abstract class CreateAction extends AbstractAction{
 					throw new RuntimeException(dir.getName() + " is not the directory.");
 
 				NameFormatter nf = new NameFormatter(pdf_destination, dir);
-				FileFilterHelper ffh = createImageFilter(filter);
+				
 				Task task = new Task(pdf_owner_password, pdf_user_password, pdf_permission);
 				String d = nf.getConverted();
 				task.setDestination(d);
@@ -133,7 +129,7 @@ public abstract class CreateAction extends AbstractAction{
 				task.setAutoRotate(pdf_auto_rotate);
 
 				ArrayList<ImgFile> imgs = new ArrayList<ImgFile>();
-				for (File f : dir.listFiles(ffh)) {
+				for (File f : dir.listFiles(filter)) {
 					ImgFile img = new ImgFile(f.getAbsolutePath(), pdf_sortby, pdf_order);
 					imgs.add(img);
 				}

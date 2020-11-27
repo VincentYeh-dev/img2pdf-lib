@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.regex.PatternSyntaxException;
 
 import org.vincentyeh.IMG2PDF.commandline.MainProgram;
 import org.vincentyeh.IMG2PDF.file.FileFilterHelper;
@@ -25,7 +26,7 @@ public class ImportAction extends CreateAction {
 
 	
 	protected ArrayList<String> sources;
-	protected String filter;
+	protected FileFilterHelper filter;
 	public ImportAction() {
 
 	}
@@ -45,7 +46,7 @@ public class ImportAction extends CreateAction {
 	public void setupByNamespace(Namespace ns) {
 		super.setupByNamespace(ns);
 		this.sources = (ArrayList<String>) ns.get("source");
-		this.filter=ns.getString("filter");
+		this.filter=(FileFilterHelper)ns.get("filter");
 //		https://regex101.com/
 		
 	}
@@ -55,8 +56,9 @@ public class ImportAction extends CreateAction {
 		TaskList tasks=new TaskList();
 		
 		for (String source : sources) {
-			tasks.addAll(importTasksFromTXT(new File(source),filter));
+				tasks.addAll(importTasksFromTXT(new File(source),filter));
 		}
+		
 		tasks.toXMLFile(new File(list_destination));
 	}
 
@@ -64,7 +66,7 @@ public class ImportAction extends CreateAction {
 		Subparser parser = subparsers.addParser("import").help(lagug_resource.getString("help_import"));
 		parser.setDefault("action", new ImportAction());
 		parser.addArgument("-s", "--source").nargs("*").help(lagug_resource.getString("help_import_source"));
-		parser.addArgument("-f", "--filter").type(String.class).help(lagug_resource.getString("help_import_filter"));
+		parser.addArgument("-f", "--filter").type(new FileFilterHelper("")).help(lagug_resource.getString("help_import_filter"));
 		
 	}
 }

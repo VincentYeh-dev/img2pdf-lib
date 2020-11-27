@@ -33,11 +33,10 @@ public class kuma_fish_album_1 {
 			writer.write(image_sources_dir.getAbsolutePath()+"\n\n");
 			writer.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		String filter="[^<>;,?\"*|\\/]+\\.(png|PNG|jpg|JPG)";
+		String filter=".*\\.(png${OR}PNG${OR}jpg${OR}JPG)";
 		String create_command = "create " 
 				+ "-pz A4 " 
 				+ "-ps NUMERTIC " 

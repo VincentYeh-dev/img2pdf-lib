@@ -29,7 +29,7 @@ public class WalkAnimation {
 			e.printStackTrace();
 		}
 		
-		String filter="[^<>;,?\"*|\\/]+\\.(png|PNG|jpg|JPG)";
+		String filter=".*\\.(png${OR}PNG${OR}jpg${OR}JPG)";
 		
 		String create_command = "create " 
 				+ "-pz A4 " 

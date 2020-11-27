@@ -41,6 +41,7 @@ public class Task {
 
 	public Task(Element element) throws FileNotFoundException {
 		this(parsePermission(element.getChild("PERMISSION")));
+		
 		this.destination = element.getAttributeValue("destination");
 		this.align = new PageAlign(element.getAttributeValue("align"));
 		this.size = PageSize.getSizeFromString(element.getAttributeValue("size"));
@@ -53,6 +54,13 @@ public class Task {
 
 	}
 
+	
+	
+	
+	/**
+	 * To Element that contain Task attribute.
+	 * @return Element
+	 */
 	public Element toElement() {
 		Element task = new Element("TASK");
 		Element xml_files = new Element("FILES");

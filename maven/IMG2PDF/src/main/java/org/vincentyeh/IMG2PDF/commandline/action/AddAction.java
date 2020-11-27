@@ -24,7 +24,7 @@ import net.sourceforge.argparse4j.inf.Subparsers;
 public class AddAction extends CreateAction {
 	
 	protected ArrayList<String> sources;
-	protected String filter;
+	protected FileFilterHelper filter;
 	
 	public AddAction() {
 
@@ -35,7 +35,7 @@ public class AddAction extends CreateAction {
 	public void setupByNamespace(Namespace ns) {
 		super.setupByNamespace(ns);
 		this.sources = (ArrayList<String>) ns.get("source");
-		this.filter=ns.getString("filter");
+		this.filter=(FileFilterHelper)ns.get("filter");
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class AddAction extends CreateAction {
 		parser.setDefault("action", new AddAction());
 		
 		parser.addArgument("-s", "--source").nargs("*").help(lagug_resource.getString("help_add_source"));
-		parser.addArgument("-f", "--filter").type(String.class).help(lagug_resource.getString("help_add_filter"));
+		parser.addArgument("-f", "--filter").type(new FileFilterHelper("")).help(lagug_resource.getString("help_add_filter"));
 		
 	}
 	

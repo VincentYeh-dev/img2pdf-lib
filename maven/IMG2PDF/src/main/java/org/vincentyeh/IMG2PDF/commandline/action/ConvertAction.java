@@ -21,16 +21,9 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 import net.sourceforge.argparse4j.inf.Subparsers;
 
-public class ConvertAction extends AbstractAction{
-	
-	protected ArrayList<String> tasklist_sources;
-	
-//	protected static ResourceBundle MainProgram.lagug_resource;
+public class ConvertAction extends AbstractAction {
 
-//	static {
-//		MainProgram.lagug_resource = ResourceBundle.getBundle("language_package",new Locale("en","US"));
-//		MainProgram.lagug_resource = ResourceBundle.getBundle("language_package",MainProgram.locale);
-//	}
+	protected ArrayList<String> tasklist_sources;
 
 	@Override
 	public void setupByNamespace(Namespace ns) {
@@ -59,20 +52,31 @@ public class ConvertAction extends AbstractAction{
 	private void convertList(TaskList tasks) {
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		for (Task task : tasks) {
+			ImagesPDFDocument result = null;
 			try {
 				PDFConverter pdf = new PDFConverter(task);
-				
 				pdf.setListener(listener);
 				Future<ImagesPDFDocument> future = executor.submit(pdf);
-				ImagesPDFDocument result = future.get();
-				result.save();
-				result.close();
+				result = future.get();
+				
 			} catch (Exception e) {
-				if (e.getMessage().equals("Unsupported Image Type")) {
-					System.err.println("\nUnsupported Image Type\n");
-				}
 				e.printStackTrace();
 			}
+
+			try {
+				if(result!=null)
+					result.save();
+			} catch (IOException e) {
+				System.err.println(e.getMessage());
+			}
+
+			try {
+				if (result != null)
+					result.close();
+			} catch (IOException ignore) {
+				ignore.printStackTrace();
+			}
+
 		}
 		executor.shutdown();
 	}
@@ -80,11 +84,12 @@ public class ConvertAction extends AbstractAction{
 	public static void setupParser(Subparsers subparsers) {
 		Subparser convert_parser = subparsers.addParser("convert").help(lagug_resource.getString("help_convert"));
 		convert_parser.setDefault("action", new ConvertAction());
-		convert_parser.addArgument("tasklist_source").nargs("*").help(lagug_resource.getString("help_convert_tasklist_source"));
-		
+		convert_parser.addArgument("tasklist_source").nargs("*")
+				.help(lagug_resource.getString("help_convert_tasklist_source"));
+
 	}
-	
-	private ConversionListener listener=new ConversionListener() {
+
+	private ConversionListener listener = new ConversionListener() {
 		private int size_of_imgs;
 		private double perImg;
 		private double progress = 0;
@@ -97,11 +102,11 @@ public class ConvertAction extends AbstractAction{
 			System.out.printf("destination:%s\n", task.getDestination());
 			System.out.print("Progress->");
 			System.out.print("0%[");
-			
+
 		}
 
 		@Override
-		public void onConverting(int index) throws Exception {
+		public void onConverting(int index) {
 			progress += perImg;
 			while (progress >= 1) {
 				System.out.print("=");
@@ -111,13 +116,11 @@ public class ConvertAction extends AbstractAction{
 
 		@Override
 		public void onConversionComplete() {
-			System.out.print("]%100");
+			System.out.print("]%100\n");
 //			if(isProtectedByPwd)
 //				System.out.print(" *");
-			System.out.println("\nDONE.");
-			
-			System.out.println("\n\n");
-			
+			System.out.println("DONE.\n\n");
+
 //			try {
 //				Runtime.getRuntime().exec("explorer.exe /select," + doc.getDestination());
 //			} catch (IOException e) {
@@ -128,9 +131,18 @@ public class ConvertAction extends AbstractAction{
 
 		@Override
 		public void onConversionFail(int index, Exception e) {
-			System.out.print("FAIL]");
-			e.printStackTrace();
-			
+			System.out.print("CONVERSION FAIL]\n");
+			System.err.println(e.getMessage());
+//			e.printStackTrace();
+
 		}
+
+		@Override
+		public void onImageReadFail(int index, IOException e) {
+			System.out.print("IMAGE READ FAIL]\n");
+			System.err.println(e.getMessage());
+//			e.printStackTrace();
+		}
+
 	};
 }

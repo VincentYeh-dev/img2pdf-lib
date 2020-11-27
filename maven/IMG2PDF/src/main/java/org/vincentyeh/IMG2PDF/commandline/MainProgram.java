@@ -40,11 +40,12 @@ public class MainProgram {
 
 		} catch (ArgumentParserException e) {
 			parser.handleError(e);
+			
 			System.err.println("Program is interrupted.");
 			throw e;
 //			System.exit(1);
 		}
-		
+
 		if (ns == null)
 			throw new NullPointerException("Namespace is null.");
 
@@ -60,11 +61,11 @@ public class MainProgram {
 
 	public static void main(String[] args) {
 
-		if(args==null) {
+		if (args == null) {
 			System.err.println("args is null.");
 			return;
 		}
-		
+
 		MainProgram main = null;
 		try {
 			main = new MainProgram(args);
