@@ -5,6 +5,11 @@ import java.awt.image.BufferedImage;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
+/**
+ * Direction of page.Horizontal or Vertical.
+ * 
+ * @author VincentYeh
+ */
 public enum PageDirection {
 	Horizontal(90), Vertical(0);
 	private final int page_rotate_angle;

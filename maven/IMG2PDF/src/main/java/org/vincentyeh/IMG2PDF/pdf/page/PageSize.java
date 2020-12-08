@@ -2,8 +2,7 @@ package org.vincentyeh.IMG2PDF.pdf.page;
 
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 /**
- * Size is the variable that define size of pages of PDFFile. It only can be
- * create by using getSizeFromString(str) or directly specify enum
+ * Size is the variable that define size of pages of PDFFile. 
  * 
  * @author VincetYeh
  */

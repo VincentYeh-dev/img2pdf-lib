@@ -186,7 +186,6 @@ public class Task {
 		int keyLength = 128;
 		StandardProtectionPolicy spp = new StandardProtectionPolicy(owner_pwd, user_pwd, ap);
 		spp.setEncryptionKeyLength(keyLength);
-//		spp.setPermissions(ap);
 		return spp;
 	}
 

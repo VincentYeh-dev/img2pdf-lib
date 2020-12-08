@@ -67,7 +67,6 @@ public class AddAction extends CreateAction {
 	public static void setupParser(Subparsers subparsers) {
 		Subparser parser = subparsers.addParser("add").help(lagug_resource.getString("help_add"));
 		parser.setDefault("action", new AddAction());
-		
 		parser.addArgument("-s", "--source").nargs("*").help(lagug_resource.getString("help_add_source"));
 		parser.addArgument("-f", "--filter").type(new FileFilterHelper("")).help(lagug_resource.getString("help_add_filter"));
 		

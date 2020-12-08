@@ -11,6 +11,11 @@ import org.vincentyeh.IMG2PDF.pdf.page.PageAlign.LeftRightAlign;
 import org.vincentyeh.IMG2PDF.pdf.page.PageAlign.TopBottomAlign;
 import org.vincentyeh.IMG2PDF.util.ImageProcess;
 
+/**
+ * Page that contain image in PDF File.
+ * 
+ * @author VincentYeh
+ */
 public class ImagePage extends PDPage {
 	private final PageAlign align;
 	private final BufferedImage image;
