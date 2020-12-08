@@ -31,4 +31,8 @@ public class GetHelpTester {
 		MainProgram.main("convert -h");
 	}
 
+	@Test
+	public void version() throws ArgumentParserException {
+		MainProgram.main("--version");
+	}
 }

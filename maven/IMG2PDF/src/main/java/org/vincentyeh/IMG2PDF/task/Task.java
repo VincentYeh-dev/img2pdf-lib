@@ -39,6 +39,13 @@ public class Task {
 		this((String) obj[0], (String) obj[1], (DocumentAccessPermission) obj[2]);
 	}
 
+	/**
+	 * Initialize Task by element.
+	 * This constructor is designed for parsed XML element.
+	 * 
+	 * @param element 
+	 * @throws FileNotFoundException When source image not found.
+	 */
 	public Task(Element element) throws FileNotFoundException {
 		this(parsePermission(element.getChild("PERMISSION")));
 		
@@ -47,7 +54,7 @@ public class Task {
 		this.size = PageSize.getSizeFromString(element.getAttributeValue("size"));
 		this.defaultDirection = PageDirection.getDirectionFromString(element.getAttributeValue("default-direction"));
 		this.autoRotate = Boolean.valueOf(element.getAttributeValue("auto-rotate"));
-
+		
 		List<Element> contains_files = element.getChild("FILES").getChildren("FILE");
 		ArrayList<Element> xml_files = new ArrayList<Element>(contains_files);
 		imgs.addAll(elements2imgs(xml_files));

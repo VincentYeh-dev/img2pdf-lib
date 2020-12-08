@@ -8,5 +8,4 @@ public interface Action {
 	
 	public void setupByNamespace(Namespace ns);
 	public void start();
-	
 }

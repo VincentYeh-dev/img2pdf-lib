@@ -34,22 +34,21 @@ public class ConvertAction extends AbstractAction {
 	@Override
 	public void start() {
 		for (String filepath : tasklist_sources) {
+			TaskList tasks = null;
 			try {
-				convertList(new TaskList(filepath));
-			} catch (ParserConfigurationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (SAXException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				tasks = new TaskList(filepath);
+			} catch (Exception e) {
+				System.err.println("Unable to parse xml.\n" + e.getMessage());
 				e.printStackTrace();
 			}
+			
+			if (tasks != null)
+				startConversion(tasks);
+			
 		}
 	}
 
-	private void convertList(TaskList tasks) {
+	private void startConversion(TaskList tasks) {
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		for (Task task : tasks) {
 			ImagesPDFDocument result = null;
@@ -58,13 +57,13 @@ public class ConvertAction extends AbstractAction {
 				pdf.setListener(listener);
 				Future<ImagesPDFDocument> future = executor.submit(pdf);
 				result = future.get();
-				
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 
 			try {
-				if(result!=null)
+				if (result != null)
 					result.save();
 			} catch (IOException e) {
 				System.err.println(e.getMessage());
