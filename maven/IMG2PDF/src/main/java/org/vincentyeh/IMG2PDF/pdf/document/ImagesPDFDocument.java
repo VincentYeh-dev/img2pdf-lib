@@ -4,9 +4,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
-import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
-import org.vincentyeh.IMG2PDF.pdf.page.PageSize;
 
 /**
  * PDF document that contain destination.

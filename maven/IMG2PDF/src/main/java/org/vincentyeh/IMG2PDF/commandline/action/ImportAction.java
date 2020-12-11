@@ -1,23 +1,10 @@
 package org.vincentyeh.IMG2PDF.commandline.action;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.regex.PatternSyntaxException;
-
-import org.vincentyeh.IMG2PDF.commandline.MainProgram;
 import org.vincentyeh.IMG2PDF.file.FileFilterHelper;
-import org.vincentyeh.IMG2PDF.file.ImgFile;
-import org.vincentyeh.IMG2PDF.file.text.UTF8InputStream;
-import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskList;
-import org.vincentyeh.IMG2PDF.util.NameFormatter;
-
-import net.sourceforge.argparse4j.annotation.Arg;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 import net.sourceforge.argparse4j.inf.Subparsers;

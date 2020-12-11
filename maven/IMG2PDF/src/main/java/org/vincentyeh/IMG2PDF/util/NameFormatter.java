@@ -2,72 +2,71 @@ package org.vincentyeh.IMG2PDF.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * 
+ * https://regex101.com/
  * 
  * @author VincentYeh
  */
 public class NameFormatter {
-	private String converted_name;
+	private final ArrayList<File> parents = new ArrayList<>();
+	private final File file;
 
-	public NameFormatter(String format, File file) throws FileNotFoundException {
-		String changed = format;
-		HashMap<String, Integer> ps = parentFormatter(format);
-		for (String key : ps.keySet()) {
-			int level = ps.get(key);
-			changed = changed.replace(key, getParentFile(file, level).getName());
+	public NameFormatter(File file) throws FileNotFoundException {
+		this.file = file;
+		File parent = file.getParentFile();
+		while (parent != null) {
+			parents.add(parent);
+			parent = parent.getParentFile();
 		}
-
-		Date date = new Date(file.lastModified());
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HHmmss");
-		String buf[] = file.getName().split("\\.");
-
-		changed = changed.replace("$NAME", buf[0]).replace("$DATE", sdf.format(date));
-		converted_name = changed;
 	}
 
-	private HashMap<String, Integer> parentFormatter(String format) {
+	private String formatDateTime(String format, Date date) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		format = format.replace("$Y", String.format("%d", cal.get(Calendar.YEAR)))
+				.replace("$M", String.format("%02d", cal.get(Calendar.MONTH) + 1))
+				.replace("$D", String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)))
+				.replace("$H", String.format("%02d", cal.get(Calendar.HOUR)))
+				.replace("$N", String.format("%02d", cal.get(Calendar.MINUTE)))
+				.replace("$S", String.format("%02d", cal.get(Calendar.SECOND)));
+		return format;
+	}
+
+	private String formatParents(String format, ArrayList<File> parents)
+			throws FileNotFoundException, ParentOverPointException {
 		Matcher matcher = Pattern.compile(".*?(\\$PARENT\\{[0-9]{1,}\\}).*?").matcher(format);
-		HashMap<String, Integer> map = new HashMap<String, Integer>();
 		while (matcher.find()) {
 			String parent = matcher.group(1);
 			Matcher matcher_num = Pattern.compile("\\$PARENT\\{([0-9]{1,})\\}").matcher(parent);
 			if (matcher_num.find()) {
-				int level = Integer.valueOf(matcher_num.group(1));
-				map.put(parent, level);
+				int index = Integer.valueOf(matcher_num.group(1));
+				if (index >= parents.size()) {
+					throw new ParentOverPointException(index);
+				}
+				format = format.replace(parent, parents.get(index).getName());
 			}
 		}
-		return map;
+		return format;
 	}
 
-	public String getConverted() {
-		return converted_name;
-	}
+	public String format(String format) throws FileNotFoundException, ParentOverPointException {
+		String buf[] = file.getName().split("\\.");
 
-	@Override
-	public String toString() {
-		return getConverted();
-	}
+		format = format.replace("$NAME", buf[0]);
 
-	private File getParentFile(File file, int index) throws FileNotFoundException, ParentOverPointException {
-		File buf = new File(file.getAbsolutePath());
-		if (!file.exists()) {
-			throw new FileNotFoundException(file.getName() + " not found.");
-		}
+		if (format.matches(".*\\$PARENT\\{([0-9]{1,})\\}.*"))
+			format = formatParents(format, parents);
 
-		for (int i = 0; i <= index; i++) {
-			buf = buf.getParentFile();
-			if (buf == null) {
-				throw new ParentOverPointException(file, index);
-			}
-		}
-		return buf;
+		if (format.matches(".*\\$(Y|M|D|H|N|S){1,}.*"))
+			format = formatDateTime(format, new Date(file.lastModified()));
+
+		return format;
 	}
 
 	public class ParentOverPointException extends RuntimeException {
@@ -77,8 +76,8 @@ public class NameFormatter {
 		 */
 		private static final long serialVersionUID = 2237547036157477461L;
 
-		public ParentOverPointException(File file, int index) {
-			super(String.format("Index:%d at %s not found.", index, file.getAbsoluteFile()));
+		public ParentOverPointException(int index) {
+			super(String.format("Parent in index:%d not found.", index));
 		}
 
 	}

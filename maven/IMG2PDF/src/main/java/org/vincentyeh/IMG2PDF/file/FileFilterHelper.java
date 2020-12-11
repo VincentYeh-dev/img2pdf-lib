@@ -4,9 +4,6 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
-import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
-
 import net.sourceforge.argparse4j.inf.Argument;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;

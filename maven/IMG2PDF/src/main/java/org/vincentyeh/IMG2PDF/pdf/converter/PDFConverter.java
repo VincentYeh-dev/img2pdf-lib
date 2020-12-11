@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
 
-import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 
 import org.vincentyeh.IMG2PDF.file.ImgFile;

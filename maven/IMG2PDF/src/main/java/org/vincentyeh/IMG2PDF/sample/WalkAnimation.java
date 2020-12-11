@@ -43,7 +43,7 @@ public class WalkAnimation {
 //				+ "-pp 11 " 
 				+ "-pdst "
 				+ sample_root.getAbsolutePath() 
-				+ "\\output\\$PARENT{0}.pdf " 
+				+ "\\output\\$PARENT{0}-$Y-$M-$D-$H-$N-$S.pdf " 
 				+ "-ldst "
 				+ taskslist_destination.getAbsolutePath()
 				+ " import -s "

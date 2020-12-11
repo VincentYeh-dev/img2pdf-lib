@@ -7,12 +7,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.regex.PatternSyntaxException;
 
-import org.vincentyeh.IMG2PDF.commandline.MainProgram;
-import org.vincentyeh.IMG2PDF.file.FileFilterHelper;
 import org.vincentyeh.IMG2PDF.file.FileFilterHelper;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
 import org.vincentyeh.IMG2PDF.file.ImgFile.Order;
@@ -25,8 +21,6 @@ import org.vincentyeh.IMG2PDF.pdf.page.PageSize;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskList;
 import org.vincentyeh.IMG2PDF.util.NameFormatter;
-
-import net.sourceforge.argparse4j.annotation.Arg;
 import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
@@ -118,10 +112,10 @@ public abstract class CreateAction extends AbstractAction {
 				if (!dir.isDirectory())
 					throw new RuntimeException(dir.getName() + " is not the directory.");
 
-				NameFormatter nf = new NameFormatter(pdf_destination, dir);
+				NameFormatter nf = new NameFormatter(dir);
 				
 				Task task = new Task(pdf_owner_password, pdf_user_password, pdf_permission);
-				String d = nf.getConverted();
+				String d = nf.format(pdf_destination);
 				task.setDestination(d);
 				task.setAlign(pdf_align);
 				task.setSize(pdf_size);

@@ -2,16 +2,10 @@ package org.vincentyeh.IMG2PDF.sample;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.vincentyeh.IMG2PDF.commandline.MainProgram;
-import org.xml.sax.SAXException;
 
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 

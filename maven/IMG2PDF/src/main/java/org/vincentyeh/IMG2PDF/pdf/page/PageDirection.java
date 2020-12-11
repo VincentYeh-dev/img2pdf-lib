@@ -1,8 +1,6 @@
 package org.vincentyeh.IMG2PDF.pdf.page;
 
 import java.awt.image.BufferedImage;
-
-import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
 /**
