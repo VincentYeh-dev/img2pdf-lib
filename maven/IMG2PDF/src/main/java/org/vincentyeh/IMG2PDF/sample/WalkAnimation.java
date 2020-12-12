@@ -42,8 +42,7 @@ public class WalkAnimation {
 //				+ "-popwd 1234AAA " 
 //				+ "-pp 11 " 
 				+ "-pdst "
-				+ sample_root.getAbsolutePath() 
-				+ "\\output\\$PARENT{0}-$Y-$M-$D-$H-$N-$S.pdf " 
+				+ "\""+sample_root.getAbsolutePath()+ "\\output\\$PARENT{0} $MY-$MM-$MD $MH-$MN-$MS.pdf\" " 
 				+ "-ldst "
 				+ taskslist_destination.getAbsolutePath()
 				+ " import -s "
@@ -53,6 +52,7 @@ public class WalkAnimation {
 		String convert_command = "convert "+ taskslist_destination.getAbsolutePath();
 		System.out.println(create_command);
 		System.out.println(convert_command);
+		System.out.println();
 		try {
 			MainProgram.main(create_command);
 			MainProgram.main(convert_command);

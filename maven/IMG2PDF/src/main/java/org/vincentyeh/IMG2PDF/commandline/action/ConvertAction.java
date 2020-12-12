@@ -1,5 +1,6 @@
 package org.vincentyeh.IMG2PDF.commandline.action;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
@@ -92,7 +93,8 @@ public class ConvertAction extends AbstractAction {
 			perImg = (10. / size_of_imgs);
 			System.out.println("---PDF Conversion---");
 			System.out.printf("destination:%s\n", task.getDestination());
-			System.out.print("Progress->");
+			System.out.printf("name:%s\n",new File(task.getDestination()).getName());
+			System.out.print("\nProgress->");
 			System.out.print("0%[");
 
 		}

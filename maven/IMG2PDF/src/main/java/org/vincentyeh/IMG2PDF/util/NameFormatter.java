@@ -14,6 +14,20 @@ import java.util.regex.Pattern;
  * @author VincentYeh
  */
 public class NameFormatter {
+	private static final String SYMBOL_CURRENT_Y="$CY";
+	private static final String SYMBOL_CURRENT_M="$CM";
+	private static final String SYMBOL_CURRENT_D="$CD";
+	private static final String SYMBOL_CURRENT_H="$CH";
+	private static final String SYMBOL_CURRENT_N="$CN";
+	private static final String SYMBOL_CURRENT_S="$CS";
+
+	private static final String SYMBOL_MODIFY_Y="$MY";
+	private static final String SYMBOL_MODIFY_M="$MM";
+	private static final String SYMBOL_MODIFY_D="$MD";
+	private static final String SYMBOL_MODIFY_H="$MH";
+	private static final String SYMBOL_MODIFY_N="$MN";
+	private static final String SYMBOL_MODIFY_S="$MS";
+	
 	private final ArrayList<File> parents = new ArrayList<>();
 	private final File file;
 
@@ -26,15 +40,27 @@ public class NameFormatter {
 		}
 	}
 
-	private String formatDateTime(String format, Date date) {
+	private String formatCurrentDateTime(String format, Date current_date) {
 		Calendar cal = Calendar.getInstance();
-		cal.setTime(date);
-		format = format.replace("$Y", String.format("%d", cal.get(Calendar.YEAR)))
-				.replace("$M", String.format("%02d", cal.get(Calendar.MONTH) + 1))
-				.replace("$D", String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)))
-				.replace("$H", String.format("%02d", cal.get(Calendar.HOUR)))
-				.replace("$N", String.format("%02d", cal.get(Calendar.MINUTE)))
-				.replace("$S", String.format("%02d", cal.get(Calendar.SECOND)));
+		cal.setTime(current_date);
+		format = format.replace(SYMBOL_CURRENT_Y, String.format("%d", cal.get(Calendar.YEAR)))
+				.replace(SYMBOL_CURRENT_M, String.format("%02d", cal.get(Calendar.MONTH) + 1))
+				.replace(SYMBOL_CURRENT_D, String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)))
+				.replace(SYMBOL_CURRENT_H, String.format("%02d", cal.get(Calendar.HOUR)))
+				.replace(SYMBOL_CURRENT_N, String.format("%02d", cal.get(Calendar.MINUTE)))
+				.replace(SYMBOL_CURRENT_S, String.format("%02d", cal.get(Calendar.SECOND)));
+		return format;
+	}
+	
+	private String formatModifyDateTime(String format, Date modify_date) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(modify_date);
+		format = format.replace(SYMBOL_MODIFY_Y, String.format("%d", cal.get(Calendar.YEAR)))
+				.replace(SYMBOL_MODIFY_M, String.format("%02d", cal.get(Calendar.MONTH) + 1))
+				.replace(SYMBOL_MODIFY_D, String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)))
+				.replace(SYMBOL_MODIFY_H, String.format("%02d", cal.get(Calendar.HOUR)))
+				.replace(SYMBOL_MODIFY_N, String.format("%02d", cal.get(Calendar.MINUTE)))
+				.replace(SYMBOL_MODIFY_S, String.format("%02d", cal.get(Calendar.SECOND)));
 		return format;
 	}
 
@@ -63,8 +89,11 @@ public class NameFormatter {
 		if (format.matches(".*\\$PARENT\\{([0-9]{1,})\\}.*"))
 			format = formatParents(format, parents);
 
-		if (format.matches(".*\\$(Y|M|D|H|N|S){1,}.*"))
-			format = formatDateTime(format, new Date(file.lastModified()));
+		if (format.matches(".*\\$(CY|CM|CD|CH|CN|CS).*"))
+			format = formatCurrentDateTime(format,new Date());
+		
+		if (format.matches(".*\\$(MY|MM|MD|MH|MN|MS).*"))
+			format = formatModifyDateTime(format, new Date(file.lastModified()));
 
 		return format;
 	}
