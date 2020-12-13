@@ -23,7 +23,9 @@ public class FileFilterHelper implements FileFilter,ArgumentType<FileFilterHelpe
 
 	@Override
 	public FileFilterHelper convert(ArgumentParser parser, Argument arg, String value) throws ArgumentParserException {
-		String regex = value.replace("${OR}", "|");
+//		String regex = value.replace("${OR}", "|");
+		String regex = value;
+		
 		try {
 			//Test if regex is valid.
 			Pattern.compile(regex);

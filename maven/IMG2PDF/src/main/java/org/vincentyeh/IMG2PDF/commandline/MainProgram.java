@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import org.vincentyeh.IMG2PDF.commandline.action.AbstractAction;
 import org.vincentyeh.IMG2PDF.commandline.action.ConvertAction;
 import org.vincentyeh.IMG2PDF.commandline.action.CreateAction;
+import org.vincentyeh.IMG2PDF.util.ArgumentUtil;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
@@ -31,7 +32,7 @@ public class MainProgram {
 	}
 
 	public MainProgram(String[] args) throws ArgumentParserException {
-		args=compileSpaceSymbol(args);
+		args=ArgumentUtil.fixArgumentSpaceArray(ArgumentUtil.fixSymbol(args));
 		
 		ArgumentParser parser = ArgumentParsers.newFor(PROGRAM_NAME).build();
 		parser.version(PROGRAM_VERSION);
@@ -44,7 +45,7 @@ public class MainProgram {
 
 		Namespace ns = null;
 		try {
-			ns = fixSpaceSymbol(parser.parseArgs(args));
+			ns = parser.parseArgs(args);
 
 		} catch (ArgumentParserException e) {
 			parser.handleError(e);
@@ -91,39 +92,39 @@ public class MainProgram {
 		main(args.split("\\s"));
 	}
 	
-	
-	private String[] compileSpaceSymbol(String[] args) {
-		StringBuffer buffer=new StringBuffer();
-		
-		buffer.append(args[0]);
-		for(int i=1;i<args.length;i++) {
-			buffer.append(" ");
-			buffer.append(args[i]);
-		}
-		String changed = buffer.toString();
-		Pattern pattern = Pattern.compile("(\".*?\")");
-		Matcher matcher = pattern.matcher(changed);
-		
-		while (matcher.find()) {
-			String origin = matcher.group(1);
-			String fixed = origin.replaceAll("\\s",'\\'+SYMBOL_SPACE);
-			fixed=fixed.replace("\"", "");
-			changed=changed.replace(origin, fixed);
-		}
-		return changed.split("\\s");
-	}
-	
-	private Namespace fixSpaceSymbol(Namespace raw) {
-		Map<String,Object> data=raw.getAttrs();
-		Iterator<String> a=data.keySet().iterator();
-		while(a.hasNext()) {
-			String key=a.next();
-			Object obj=data.get(key);
-			if(obj instanceof String) {
-				String value=(String)obj;
-				data.put(key, value.replace(SYMBOL_SPACE," "));
-			}
-		}
-		return new Namespace(data);
-	}
+//	
+//	private String[] compileSpaceSymbol(String[] args) {
+//		StringBuffer buffer=new StringBuffer();
+//		
+//		buffer.append(args[0]);
+//		for(int i=1;i<args.length;i++) {
+//			buffer.append(" ");
+//			buffer.append(args[i]);
+//		}
+//		String changed = buffer.toString();
+//		Pattern pattern = Pattern.compile("(\".*?\")");
+//		Matcher matcher = pattern.matcher(changed);
+//		
+//		while (matcher.find()) {
+//			String origin = matcher.group(1);
+//			String fixed = origin.replaceAll("\\s",'\\'+SYMBOL_SPACE);
+//			fixed=fixed.replace("\"", "");
+//			changed=changed.replace(origin, fixed);
+//		}
+//		return changed.split("\\s");
+//	}
+//	
+//	private Namespace fixSpaceSymbol(Namespace raw) {
+//		Map<String,Object> data=raw.getAttrs();
+//		Iterator<String> a=data.keySet().iterator();
+//		while(a.hasNext()) {
+//			String key=a.next();
+//			Object obj=data.get(key);
+//			if(obj instanceof String) {
+//				String value=(String)obj;
+//				data.put(key, value.replace(SYMBOL_SPACE," "));
+//			}
+//		}
+//		return new Namespace(data);
+//	}
 }

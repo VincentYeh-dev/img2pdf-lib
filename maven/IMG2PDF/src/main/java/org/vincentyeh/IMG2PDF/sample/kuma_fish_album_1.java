@@ -30,7 +30,7 @@ public class kuma_fish_album_1 {
 			e.printStackTrace();
 		}
 
-		String filter=".*\\.(png${OR}PNG${OR}jpg${OR}JPG)";
+		String filter=".*\\.(png$VBARPNG$VBARjpg$VBARJPG)";
 		String create_command = "create " 
 				+ "-pz A4 " 
 				+ "-ps NUMERTIC " 
