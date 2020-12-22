@@ -41,15 +41,20 @@ public class ArgumentUtil {
 		String combined = combineArray(args);
 
 //		((\s+|[^"]*\s+)("[^"]*")|([^"]*))*\s*
-		if (!combined.matches("((\\s+|[^\"]*\\s+)(\"[^\"]*\")|([^\"]*))*\\s*"))
+//		(((\s+|[^"]*\s+)("[^"]*")|([^"]*))*\s*)|("[^"]*")
+//		Still have some problem.
+		if (!combined.matches("(((\\s+|[^\"]*\\s+)(\"[^\"]*\")|([^\"]*))*\\s*)|(\"[^\"]*\")"))
 			throw new QuotesNotpairException("symbol error.");
+		
 
 //		(\s+|[^"]*\s+)("[^"]*")
+//		(\"[^\"]*\")
 		Pattern pattern = Pattern.compile("(\\s+|[^\"]*\\s+)(\"[^\"]*\")");
 		Matcher matcher = pattern.matcher(combined);
 		String replaced = combined;
 		while (matcher.find()) {
 			String origin = matcher.group(2);
+//			String origin = matcher.group(1);
 			String fixed = origin.replaceAll("\\s", "\\$SPACE");
 			fixed = fixed.replace("\"", "");
 			replaced = replaced.replace(origin, fixed);
