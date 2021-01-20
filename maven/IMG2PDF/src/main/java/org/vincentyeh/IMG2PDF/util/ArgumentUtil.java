@@ -1,8 +1,17 @@
 package org.vincentyeh.IMG2PDF.util;
 
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Test on https://regex101.com/
+ * https://www.ocpsoft.org/regex/how-to-interrupt-a-long-running-infinite-java-regular-expression/
+ * https://www.regular-expressions.info/catastrophic.html
+ * 
+ * @author vincent
+ *
+ */
 public class ArgumentUtil {
 	static enum SymbolItem {
 		VERTICAL_BAR("$VBAR", "|");
@@ -40,31 +49,47 @@ public class ArgumentUtil {
 	public static String[] fixArgumentSpaceArray(String[] args) {
 		String combined = combineArray(args);
 
-//		((\s+|[^"]*\s+)("[^"]*")|([^"]*))*\s*
-//		(((\s+|[^"]*\s+)("[^"]*")|([^"]*))*\s*)|("[^"]*")
-//		Still have some problem.
-		if (!combined.matches("(((\\s+|[^\"]*\\s+)(\"[^\"]*\")|([^\"]*))*\\s*)|(\"[^\"]*\")"))
-			throw new QuotesNotpairException("symbol error.");
-		
+//		regex:^[^\s].*
+		if (combined.matches("^[^\\s].*")) {
+//			No space in the start of the line.
+			combined = " " + combined;
+		}
 
-//		(\s+|[^"]*\s+)("[^"]*")
-//		(\"[^\"]*\")
-		Pattern pattern = Pattern.compile("(\\s+|[^\"]*\\s+)(\"[^\"]*\")");
+//		infinite loop:
+//		regex:(((\s+|[^"]*\s+)("[^"]*")|([^"]*))*\s*)|("[^"]*")
+		
+//		regex:(\s("([^"]+)"|([^\s"]+)))+
+		if (!combined.matches("(\\s(\"([^\"]+)\"|([^\\s\"]+)))+")) {
+			throw new ArgumentSyntaxException("symbol error.");
+		}
+		
+//		regex:(\s+|[^"]*\s+)("[^"]*")
+//		Pattern pattern = Pattern.compile("(\\s+|[^\"]*\\s+)(\"[^\"]*\")");
+		
+//		regex:"[^"]*"
+		Pattern pattern = Pattern.compile("\"[^\"]*\"");
 		Matcher matcher = pattern.matcher(combined);
 		String replaced = combined;
 		while (matcher.find()) {
-			String origin = matcher.group(2);
-//			String origin = matcher.group(1);
-			String fixed = origin.replaceAll("\\s", "\\$SPACE");
+//			String origin = matcher.group(2);
+			String origin = matcher.group(0);
+			String fixed = origin.replaceAll("\\s", "" + (char) 0x05);
 			fixed = fixed.replace("\"", "");
 			replaced = replaced.replace(origin, fixed);
 		}
 
 		String[] a = replaced.split("\\s");
+		ArrayList<String> newStrArray = new ArrayList<String>();
+
 		for (int i = 0; i < a.length; i++) {
-			a[i] = a[i].replace("$SPACE", " ");
+			if (a[i] == null || a[i].isEmpty())
+				continue;
+			newStrArray.add(a[i].replace("" + (char) 0x05, " "));
 		}
-		return a;
+
+		String[] strs = new String[newStrArray.size()];
+		newStrArray.toArray(strs);
+		return strs;
 	}
 
 	public static String combineArray(String[] array) {
@@ -78,22 +103,22 @@ public class ArgumentUtil {
 	}
 
 	public static String[] fixSymbol(String[] args) {
-		String combined=combineArray(args);
-		SymbolItem[] items=SymbolItem.values();
-		String replaced=combined;
-		for(SymbolItem item:items) {
-			replaced=replaced.replace(item.getSymbol(),item.getReal());
+		String combined = combineArray(args);
+		SymbolItem[] items = SymbolItem.values();
+		String replaced = combined;
+		for (SymbolItem item : items) {
+			replaced = replaced.replace(item.getSymbol(), item.getReal());
 		}
 		return replaced.split("\\s");
 	}
 
-	public static class QuotesNotpairException extends RuntimeException {
+	public static class ArgumentSyntaxException extends RuntimeException {
 
 		private static final long serialVersionUID = -1999559893289634112L;
 
-		public QuotesNotpairException(String msg) {
+		public ArgumentSyntaxException(String msg) {
 			super(msg);
 		}
-
 	}
+
 }
