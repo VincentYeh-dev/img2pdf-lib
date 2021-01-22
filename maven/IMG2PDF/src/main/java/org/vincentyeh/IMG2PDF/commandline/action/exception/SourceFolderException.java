@@ -3,6 +3,10 @@ package org.vincentyeh.IMG2PDF.commandline.action.exception;
 import java.io.File;
 
 public class SourceFolderException extends RuntimeException {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	protected final int line;
 	protected final File dir;
 	protected final File source_file;

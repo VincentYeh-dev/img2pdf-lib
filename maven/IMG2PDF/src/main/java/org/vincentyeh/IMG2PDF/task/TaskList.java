@@ -69,6 +69,10 @@ public class TaskList extends ArrayList<Task> {
 	
 	private static Document getDOMParsedDocument(final String filepath)
 			throws ParserConfigurationException, SAXException, IOException {
+		File xml_file=new File(filepath);
+		if(!xml_file.exists())
+			throw new FileNotFoundException(xml_file.getName()+" not found.");
+		
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		// If want to make namespace aware.
 		// factory.setNamespaceAware(true);

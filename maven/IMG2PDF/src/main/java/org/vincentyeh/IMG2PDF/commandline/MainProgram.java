@@ -1,12 +1,14 @@
 package org.vincentyeh.IMG2PDF.commandline;
 
+import java.io.FileNotFoundException;
 import java.util.Locale;
 import java.util.ResourceBundle;
+
 import org.vincentyeh.IMG2PDF.commandline.action.AbstractAction;
 import org.vincentyeh.IMG2PDF.commandline.action.ConvertAction;
 import org.vincentyeh.IMG2PDF.commandline.action.CreateAction;
-import org.vincentyeh.IMG2PDF.commandline.action.exception.SourceFolderException;
 import org.vincentyeh.IMG2PDF.util.ArgumentUtil;
+
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
@@ -60,8 +62,12 @@ public class MainProgram {
 	public void startCommand() {
 		try {
 			action.start();
-		} catch (SourceFolderException e) {
+		} catch (RuntimeException e) {
 			System.err.println(e.getMessage());
+		}catch (FileNotFoundException e) {
+			System.err.println(e.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 

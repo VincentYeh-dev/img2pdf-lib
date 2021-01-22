@@ -36,6 +36,6 @@ public class CreateActionTester {
 //		System.out.println(convert_command);
 		System.out.println();
 		MainProgram.main(create_command);
-//		MainProgram.main(convert_command);
+		MainProgram.main(convert_command);
 	}
 }

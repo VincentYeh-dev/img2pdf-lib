@@ -1,16 +1,22 @@
 package org.vincentyeh.IMG2PDF.commandline.action;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.vincentyeh.IMG2PDF.pdf.converter.ConversionListener;
 import org.vincentyeh.IMG2PDF.pdf.converter.PDFConverter;
 import org.vincentyeh.IMG2PDF.pdf.document.ImagesPDFDocument;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskList;
+import org.xml.sax.SAXException;
+
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 import net.sourceforge.argparse4j.inf.Subparsers;
@@ -26,23 +32,17 @@ public class ConvertAction extends AbstractAction {
 	}
 
 	@Override
-	public void start() {
+	public void start() throws ParserConfigurationException, FileNotFoundException, SAXException, IOException {
 		for (String filepath : tasklist_sources) {
 			TaskList tasks = null;
-			try {
-				tasks = new TaskList(filepath);
-			} catch (Exception e) {
-				System.err.println("Unable to parse xml.\n" + e.getMessage());
-				e.printStackTrace();
-			}
-			
+			tasks = new TaskList(filepath);
+			System.out.println("[imported] "+filepath);
 			if (tasks != null)
 				startConversion(tasks);
-			
 		}
 	}
 
-	private void startConversion(TaskList tasks) {
+	private void startConversion(TaskList tasks) throws IOException {
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		for (Task task : tasks) {
 			ImagesPDFDocument result = null;
@@ -56,18 +56,13 @@ public class ConvertAction extends AbstractAction {
 				e.printStackTrace();
 			}
 
-			try {
-				if (result != null)
-					result.save();
-			} catch (IOException e) {
-				System.err.println(e.getMessage());
-			}
+			if (result != null)
+				result.save();
 
 			try {
 				if (result != null)
 					result.close();
 			} catch (IOException ignore) {
-				ignore.printStackTrace();
 			}
 
 		}
@@ -93,7 +88,7 @@ public class ConvertAction extends AbstractAction {
 			perImg = (10. / size_of_imgs);
 			System.out.println("---PDF Conversion---");
 			System.out.printf("destination:%s\n", task.getDestination());
-			System.out.printf("name:%s\n",new File(task.getDestination()).getName());
+			System.out.printf("name:%s\n", new File(task.getDestination()).getName());
 			System.out.print("\nProgress->");
 			System.out.print("0%[");
 
