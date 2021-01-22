@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
  * https://www.ocpsoft.org/regex/how-to-interrupt-a-long-running-infinite-java-regular-expression/
  * https://www.regular-expressions.info/catastrophic.html
  * 
- * @author vincent
+ * @author VincentYeh
  *
  */
 public class ArgumentUtil {
@@ -47,6 +47,7 @@ public class ArgumentUtil {
 	}
 
 	public static String[] fixArgumentSpaceArray(String[] args) {
+		if(args==null) throw new NullPointerException("args==null");
 		String combined = combineArray(args);
 
 //		regex:^[^\s].*

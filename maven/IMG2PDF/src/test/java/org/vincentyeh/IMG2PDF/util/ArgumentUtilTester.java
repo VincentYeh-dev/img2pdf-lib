@@ -27,12 +27,21 @@ public class ArgumentUtilTester {
 //	-----------------------
 	@Test(expected = ArgumentParserException.class)
 	public void testPositionalNoQuotes() throws ArgumentParserException {
-		passArgument("-a1 XXX Hello World. Nice to meet you human!!");
+		passArgument("Hello World. Nice to meet you human!!");
 	}
 
 	@Test
 	public void testPositionalWithQuotes() throws ArgumentParserException {
 		String raw = "\"Hello World. Nice to meet you human!!\"";
+		String expected = "Hello World. Nice to meet you human!!";
+		Namespace ns = passArgument(raw);
+		System.out.println(ns);
+		assertEquals(expected, ns.get("p1").toString());
+	}
+	
+	@Test
+	public void testPositional_Prefix_WithQuotes() throws ArgumentParserException {
+		String raw = "-a1 XXX \"Hello World. Nice to meet you human!!\"";
 		String expected = "Hello World. Nice to meet you human!!";
 		Namespace ns = passArgument(raw);
 		System.out.println(ns);
@@ -61,9 +70,20 @@ public class ArgumentUtilTester {
 		System.out.println("##########testNonSense##########");
 		ArrayList<String> test_list = new ArrayList<>();
 		test_list.add("-a1 \"Hello Wo\"rld. Nice to meet you human!!\" Hello");
+		test_list.add("-a1 \"\"Hello World. Nice to meet you human!!\" Hello");
 		test_list.add("-a1 \"Hello World. Nice to meet you hum\"an!!\" Hello");
 		test_list.add("-a1 \"Hello\" World. Nice to meet you human!!\" Hello");
-
+		test_list.add("-a1 \"Hello\" World\". Nice to meet you human!!\" Hello");
+		test_list.add("-a1 Hello World. Nice to meet you human!!\" Hello");
+//		test_list.add("-a1 \"Hello\" World \". Nice to meet you human!!\" Hello");
+		test_list.add("\"");
+		test_list.add("\"\"");
+		test_list.add("\"\"\"Hello world");
+		test_list.add("\"\"Hello'\"world'");
+		
+//		test_list.add("-a1 \"Hello world\"");
+		
+		
 		for (String str : test_list) {
 			try {
 				passArgument(str);

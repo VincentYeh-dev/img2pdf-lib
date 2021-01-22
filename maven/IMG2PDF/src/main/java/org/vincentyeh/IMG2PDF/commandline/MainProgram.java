@@ -1,17 +1,12 @@
 package org.vincentyeh.IMG2PDF.commandline;
 
-import java.util.Iterator;
 import java.util.Locale;
-import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.vincentyeh.IMG2PDF.commandline.action.AbstractAction;
 import org.vincentyeh.IMG2PDF.commandline.action.ConvertAction;
 import org.vincentyeh.IMG2PDF.commandline.action.CreateAction;
+import org.vincentyeh.IMG2PDF.commandline.action.exception.SourceFolderException;
 import org.vincentyeh.IMG2PDF.util.ArgumentUtil;
-
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
@@ -19,8 +14,6 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparsers;
 
 public class MainProgram {
-	private static final String SYMBOL_SPACE="$SPACE";
-	
 	public static ResourceBundle lagug_resource;
 	
 	public final static String PROGRAM_NAME = "IMG2PDF";
@@ -59,13 +52,17 @@ public class MainProgram {
 			throw new NullPointerException("Namespace is null.");
 
 		action = (AbstractAction) ns.get("action");
+		if (action == null)
+			throw new NullPointerException("action==null.");
 		action.setupByNamespace(ns);
 	}
 
 	public void startCommand() {
-		if (action == null)
-			throw new NullPointerException("Action is null.");
-		action.start();
+		try {
+			action.start();
+		} catch (SourceFolderException e) {
+			System.err.println(e.getMessage());
+		}
 	}
 
 	public static void main(String[] args) {
@@ -82,49 +79,12 @@ public class MainProgram {
 		} catch (ArgumentParserException e) {
 //			System.exit(0);
 			return;
-		} catch (RuntimeException e) {
-			e.printStackTrace();
 		}
 	}
 
 //	Only for test.This function never been used in the release executable file.
-	public static void main(String args) throws ArgumentParserException {
+	public static void main(String args){
 		main(args.split("\\s"));
 	}
 	
-//	
-//	private String[] compileSpaceSymbol(String[] args) {
-//		StringBuffer buffer=new StringBuffer();
-//		
-//		buffer.append(args[0]);
-//		for(int i=1;i<args.length;i++) {
-//			buffer.append(" ");
-//			buffer.append(args[i]);
-//		}
-//		String changed = buffer.toString();
-//		Pattern pattern = Pattern.compile("(\".*?\")");
-//		Matcher matcher = pattern.matcher(changed);
-//		
-//		while (matcher.find()) {
-//			String origin = matcher.group(1);
-//			String fixed = origin.replaceAll("\\s",'\\'+SYMBOL_SPACE);
-//			fixed=fixed.replace("\"", "");
-//			changed=changed.replace(origin, fixed);
-//		}
-//		return changed.split("\\s");
-//	}
-//	
-//	private Namespace fixSpaceSymbol(Namespace raw) {
-//		Map<String,Object> data=raw.getAttrs();
-//		Iterator<String> a=data.keySet().iterator();
-//		while(a.hasNext()) {
-//			String key=a.next();
-//			Object obj=data.get(key);
-//			if(obj instanceof String) {
-//				String value=(String)obj;
-//				data.put(key, value.replace(SYMBOL_SPACE," "));
-//			}
-//		}
-//		return new Namespace(data);
-//	}
 }

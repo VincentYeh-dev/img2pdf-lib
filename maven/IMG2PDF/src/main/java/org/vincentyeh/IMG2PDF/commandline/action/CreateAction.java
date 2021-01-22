@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.regex.PatternSyntaxException;
 
+import org.vincentyeh.IMG2PDF.commandline.action.exception.SourceFolderException;
+import org.vincentyeh.IMG2PDF.commandline.action.exception.SourceFolderIsFileException;
+import org.vincentyeh.IMG2PDF.commandline.action.exception.SourceFolderNotFoundException;
 import org.vincentyeh.IMG2PDF.file.FileFilterHelper;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
 import org.vincentyeh.IMG2PDF.file.ImgFile.Order;
@@ -96,45 +99,64 @@ public abstract class CreateAction extends AbstractAction {
 
 	}
 
-	protected TaskList importTasksFromTXT(File file, FileFilterHelper filter) throws PatternSyntaxException,IOException {
+	protected TaskList importTasksFromTXT(File file, FileFilterHelper filter) throws PatternSyntaxException,SourceFolderException,IOException {
+		if(!file.exists())
+			new FileNotFoundException(file.getName()+" not found.");
+		
 		UTF8InputStream uis = new UTF8InputStream(file);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(uis.getInputStream(), "UTF-8"));
 		TaskList tasks = new TaskList();
+		
+		String format="### Document setting ###\nAlign:%s\nSize:%s\nDefault direction:%s\nAuto Rotate:%s\n###END###\n\n";
+		System.out.printf(format,pdf_align.toString(),pdf_size.toString(),pdf_direction.toString(),pdf_auto_rotate);
+		
+		int line_counter=0;
 		String buf = "";
 		while (buf != null) {
 			buf = reader.readLine();
+			line_counter++;
 			if (buf != null && !buf.isEmpty()) {
-				System.out.println("import: " + buf);
 				File dir = new File(buf);
-				if (!dir.exists())
-					throw new FileNotFoundException(dir.getName() + " not found.");
-
-				if (!dir.isDirectory())
-					throw new RuntimeException(dir.getName() + " is not the directory.");
-
-				NameFormatter nf = new NameFormatter(dir);
 				
-				Task task = new Task(pdf_owner_password, pdf_user_password, pdf_permission);
-				String d = nf.format(pdf_destination);
-				task.setDestination(d);
-				task.setAlign(pdf_align);
-				task.setSize(pdf_size);
-				task.setDefaultDirection(pdf_direction);
-				task.setAutoRotate(pdf_auto_rotate);
+				if (!dir.exists())
+					throw new SourceFolderNotFoundException(line_counter,dir,file);
 
-				ArrayList<ImgFile> imgs = new ArrayList<ImgFile>();
-				for (File f : dir.listFiles(filter)) {
-					ImgFile img = new ImgFile(f.getAbsolutePath(), pdf_sortby, pdf_order);
-					imgs.add(img);
-				}
-				Collections.sort(imgs);
-				task.setImgs(imgs);
-
-				tasks.add(task);
+				if (dir.isFile())
+					throw new SourceFolderIsFileException(line_counter,dir,file);
+				
+				tasks.add(parse2Task(dir,filter));
+				
+				System.out.println("[imported] " + dir.getName());
 			}
 		}
 		uis.close();
 		reader.close();
 		return tasks;
+	}
+	
+	private Task parse2Task(File source_directory, FileFilterHelper filter) throws FileNotFoundException {
+		Task task = new Task(pdf_owner_password, pdf_user_password, pdf_permission);
+
+		NameFormatter nf = new NameFormatter(source_directory);
+		String real_dest = nf.format(pdf_destination);
+		task.setDestination(real_dest);
+		task.setAlign(pdf_align);
+		task.setSize(pdf_size);
+		task.setDefaultDirection(pdf_direction);
+		task.setAutoRotate(pdf_auto_rotate);
+		
+		ArrayList<ImgFile> imgs=importImagesFile(source_directory, filter);
+		Collections.sort(imgs);
+		task.setImgs(imgs);
+		return task;
+	}
+	
+	private ArrayList<ImgFile> importImagesFile(File source_directory, FileFilterHelper filter) throws FileNotFoundException{
+		ArrayList<ImgFile> imgs = new ArrayList<ImgFile>();
+		for (File f : source_directory.listFiles(filter)) {
+			ImgFile img = new ImgFile(f.getAbsolutePath(), pdf_sortby, pdf_order);
+			imgs.add(img);
+		}
+		return imgs;
 	}
 }
