@@ -58,6 +58,13 @@ public class MainProgram {
 			throw new NullPointerException("action==null.");
 		action.setupByNamespace(ns);
 	}
+	
+	public MainProgram(Namespace ns) throws ArgumentParserException {
+		action = (AbstractAction) ns.get("action");
+		if (action == null)
+			throw new NullPointerException("action==null.");
+		action.setupByNamespace(ns);
+	}
 
 	public void startCommand() {
 		try {
