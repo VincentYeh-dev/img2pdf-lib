@@ -1,2 +1,2 @@
-D:\Project\git\IMG2PDF\sample\walk-animation\image-sources
+C:\Users\user\git\IMG2PDF\sample\walk-animation\image-sources
 

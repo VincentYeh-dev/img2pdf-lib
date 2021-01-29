@@ -48,6 +48,8 @@ public class ArgumentUtil {
 
 	public static String[] fixArgumentSpaceArray(String[] args) {
 		if(args==null) throw new NullPointerException("args==null");
+		if(args.length==0) throw new IllegalArgumentException("args is empty");
+		
 		String combined = combineArray(args);
 
 //		regex:^[^\s].*
@@ -104,6 +106,9 @@ public class ArgumentUtil {
 	}
 
 	public static String[] fixSymbol(String[] args) {
+		if(args==null) throw new NullPointerException("args==null");
+		if(args.length==0) throw new IllegalArgumentException("args is empty");
+		
 		String combined = combineArray(args);
 		SymbolItem[] items = SymbolItem.values();
 		String replaced = combined;

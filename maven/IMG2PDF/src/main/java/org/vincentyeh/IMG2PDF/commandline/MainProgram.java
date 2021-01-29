@@ -17,7 +17,7 @@ import net.sourceforge.argparse4j.inf.Subparsers;
 
 public class MainProgram {
 	public static ResourceBundle lagug_resource;
-	
+
 	public final static String PROGRAM_NAME = "IMG2PDF";
 	public final static String PROGRAM_VERSION = "v0.9";
 	private final AbstractAction action;
@@ -27,8 +27,8 @@ public class MainProgram {
 	}
 
 	public MainProgram(String[] args) throws ArgumentParserException {
-		args=ArgumentUtil.fixArgumentSpaceArray(ArgumentUtil.fixSymbol(args));
-		
+		args = ArgumentUtil.fixArgumentSpaceArray(ArgumentUtil.fixSymbol(args));
+
 		ArgumentParser parser = ArgumentParsers.newFor(PROGRAM_NAME).build();
 		parser.version(PROGRAM_VERSION);
 
@@ -58,7 +58,7 @@ public class MainProgram {
 			throw new NullPointerException("action==null.");
 		action.setupByNamespace(ns);
 	}
-	
+
 	public MainProgram(Namespace ns) throws ArgumentParserException {
 		action = (AbstractAction) ns.get("action");
 		if (action == null)
@@ -71,7 +71,7 @@ public class MainProgram {
 			action.start();
 		} catch (RuntimeException e) {
 			System.err.println(e.getMessage());
-		}catch (FileNotFoundException e) {
+		} catch (FileNotFoundException e) {
 			System.err.println(e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -80,8 +80,8 @@ public class MainProgram {
 
 	public static void main(String[] args) {
 
-		if (args == null) {
-			System.err.println("args is null.");
+		if (args == null || args.length == 0) {
+			System.err.println("Please provide enough argument.");
 			return;
 		}
 
@@ -92,12 +92,14 @@ public class MainProgram {
 		} catch (ArgumentParserException e) {
 //			System.exit(0);
 			return;
+		} catch (IllegalArgumentException | NullPointerException e2) {
+			e2.printStackTrace();
 		}
 	}
 
 //	Only for test.This function never been used in the release executable file.
-	public static void main(String args){
+	public static void main(String args) {
 		main(args.split("\\s"));
 	}
-	
+
 }

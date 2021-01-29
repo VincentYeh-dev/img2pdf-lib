@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TASKLIST>
-  <TASK destination="D:\Project\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-01-23 00-31-18.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+  <TASK destination="C:\Users\user\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-01-29 04-23-39.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
     <FILES>
-      <FILE>D:\Project\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
-      <FILE>D:\Project\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
-      <FILE>D:\Project\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
-      <FILE>D:\Project\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
-      <FILE>D:\Project\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
-      <FILE>D:\Project\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
-      <FILE>D:\Project\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
-      <FILE>D:\Project\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
-      <FILE>D:\Project\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
-      <FILE>D:\Project\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
-      <FILE>D:\Project\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
-      <FILE>D:\Project\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+      <FILE>C:\Users\user\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\user\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\user\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\user\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\user\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\user\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\user\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\user\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\user\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\user\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\user\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\user\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
     </FILES>
     <PERMISSION canPrint="true" canModify="true">
       <OWNER-PASSWORD />
