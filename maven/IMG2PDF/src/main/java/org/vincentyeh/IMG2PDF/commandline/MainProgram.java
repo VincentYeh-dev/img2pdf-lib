@@ -27,8 +27,6 @@ public class MainProgram {
 	}
 
 	public MainProgram(String[] args) throws ArgumentParserException {
-		args = ArgumentUtil.fixArgumentSpaceArray(ArgumentUtil.fixSymbol(args));
-
 		ArgumentParser parser = ArgumentParsers.newFor(PROGRAM_NAME).build();
 		parser.version(PROGRAM_VERSION);
 
@@ -40,8 +38,15 @@ public class MainProgram {
 
 		Namespace ns = null;
 		try {
-			ns = parser.parseArgs(args);
-
+			String[] new_args=null;
+			try {
+				new_args=ArgumentUtil.fixArgumentSpaceArray(ArgumentUtil.fixSymbol(args));
+			} catch (IllegalArgumentException | NullPointerException e) {
+				throw new ArgumentParserException("too few arguments", parser);
+			}
+			
+			ns = parser.parseArgs(new_args);
+			
 		} catch (ArgumentParserException e) {
 			parser.handleError(e);
 
@@ -79,22 +84,15 @@ public class MainProgram {
 	}
 
 	public static void main(String[] args) {
-
-		if (args == null || args.length == 0) {
-			System.err.println("Please provide enough argument.");
-			return;
-		}
-
 		MainProgram main = null;
 		try {
 			main = new MainProgram(args);
-			main.startCommand();
 		} catch (ArgumentParserException e) {
 //			System.exit(0);
 			return;
-		} catch (IllegalArgumentException | NullPointerException e2) {
-			e2.printStackTrace();
 		}
+
+		main.startCommand();
 	}
 
 //	Only for test.This function never been used in the release executable file.
