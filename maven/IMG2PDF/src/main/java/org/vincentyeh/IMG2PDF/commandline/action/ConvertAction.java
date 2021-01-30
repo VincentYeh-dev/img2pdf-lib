@@ -33,12 +33,15 @@ public class ConvertAction extends AbstractAction {
 
 	@Override
 	public void start() throws ParserConfigurationException, FileNotFoundException, SAXException, IOException {
-		for (String filepath : tasklist_sources) {
-			TaskList tasks = null;
-			tasks = new TaskList(filepath);
-			System.out.println("[imported] "+filepath);
-			if (tasks != null)
-				startConversion(tasks);
+		for (String str_src : tasklist_sources) {
+			File source = new File(str_src);
+			if (!source.exists())
+				throw new FileNotFoundException("File not found:" + source.getAbsolutePath());
+
+			TaskList tasks = new TaskList(source);
+			System.out.println("[imported] " + source.getAbsolutePath());
+			
+			startConversion(tasks);
 		}
 	}
 

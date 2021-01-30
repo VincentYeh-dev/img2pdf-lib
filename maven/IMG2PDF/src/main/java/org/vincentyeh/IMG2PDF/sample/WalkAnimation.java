@@ -16,6 +16,8 @@ public class WalkAnimation {
 		File project_root = new File("").getAbsoluteFile().getParentFile().getParentFile();
 		File sample_root = new File(project_root, "sample\\walk-animation");
 		File taskslist_destination = new File(sample_root, "taskslist\\test.xml");
+		taskslist_destination.delete();
+		
 		File image_sources_dir = new File(sample_root, "image-sources").getAbsoluteFile();
 
 		File sources_list = new File(sample_root, "dirlist.txt").getAbsoluteFile();
@@ -37,7 +39,7 @@ public class WalkAnimation {
 //				+ "-popwd 1234AAA " 
 //				+ "-pp 11 " 
 				+ "-pdst " + "\"" + sample_root.getAbsolutePath()
-				+ "\\output\\$PARENT{0} $MY-$MM-$MD $MH-$MN-$MS.pdf\" " + "-ldst \""
+				+ "\\output\\$PARENT{0} $CY-$CM-$CD $CH-$CN-$CS.pdf\" " + "-ldst \""
 				+ taskslist_destination.getAbsolutePath() + "\" import -s \"" + sources_list.getAbsolutePath()
 				+ "\" -f " + filter;
 

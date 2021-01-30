@@ -28,8 +28,8 @@ public class TaskList extends ArrayList<Task> {
 
 	}
 
-	public TaskList(String filepath) throws ParserConfigurationException, SAXException, IOException {
-		this(getDOMParsedDocument(filepath));
+	public TaskList(File xml_file) throws ParserConfigurationException, SAXException, IOException {
+		this(getDOMParsedDocument(xml_file));
 	}
 
 	public TaskList(Document doc) throws FileNotFoundException {
@@ -73,9 +73,8 @@ public class TaskList extends ArrayList<Task> {
 		return root;
 	}
 
-	private static Document getDOMParsedDocument(final String filepath)
+	private static Document getDOMParsedDocument(final File xml_file)
 			throws ParserConfigurationException, SAXException, IOException {
-		File xml_file = new File(filepath);
 		if (!xml_file.exists())
 			throw new FileNotFoundException(xml_file.getName() + " not found.");
 
@@ -83,7 +82,7 @@ public class TaskList extends ArrayList<Task> {
 		// If want to make namespace aware.
 		// factory.setNamespaceAware(true);
 		DocumentBuilder documentBuilder = factory.newDocumentBuilder();
-		org.w3c.dom.Document w3cDocument = documentBuilder.parse(filepath);
+		org.w3c.dom.Document w3cDocument = documentBuilder.parse(xml_file);
 		return new DOMBuilder().build(w3cDocument);
 	}
 
