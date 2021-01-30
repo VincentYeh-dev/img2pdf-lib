@@ -154,7 +154,7 @@ public abstract class CreateAction extends AbstractAction {
 					tasks.add(parse2Task(dir, filter));
 					System.out.println("[imported] " + dir.getName());
 				} catch (SourceFolderException e) {
-					System.err.println(e);
+					System.err.println(e.getMessage());
 				}
 			}
 		}

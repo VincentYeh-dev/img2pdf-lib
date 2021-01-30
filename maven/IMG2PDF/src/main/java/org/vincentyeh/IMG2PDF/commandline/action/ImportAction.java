@@ -3,6 +3,7 @@ package org.vincentyeh.IMG2PDF.commandline.action;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.PatternSyntaxException;
 
 import org.vincentyeh.IMG2PDF.commandline.action.exception.SourceFolderException;
@@ -15,7 +16,7 @@ import net.sourceforge.argparse4j.inf.Subparsers;
 
 public class ImportAction extends CreateAction {
 
-	protected ArrayList<String> sources;
+	protected List<String> sources;
 	protected FileFilterHelper filter;
 
 	public ImportAction() {
@@ -23,9 +24,10 @@ public class ImportAction extends CreateAction {
 	}
 
 	@Override
-	public void start(){
+	public void start() {
+//		Create empty task list.
 		TaskList tasks = new TaskList();
-
+		
 		for (String source : sources) {
 			try {
 				tasks.addAll(importTasksFromTXT(new File(source), filter));
@@ -36,11 +38,10 @@ public class ImportAction extends CreateAction {
 		tasks.toXMLFile(new File(list_destination));
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void setupByNamespace(Namespace ns) {
 		super.setupByNamespace(ns);
-		this.sources = (ArrayList<String>) ns.get("source");
+		this.sources = ns.getList("source");
 		this.filter = (FileFilterHelper) ns.get("filter");
 
 	}
