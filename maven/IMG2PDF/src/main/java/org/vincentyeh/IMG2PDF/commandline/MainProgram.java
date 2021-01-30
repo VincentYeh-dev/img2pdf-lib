@@ -19,7 +19,6 @@ public class MainProgram {
 	public static ResourceBundle lagug_resource;
 
 	public final static String PROGRAM_NAME = "IMG2PDF";
-	public final static String PROGRAM_VERSION = "v0.9";
 	private final AbstractAction action;
 
 	static {
@@ -28,7 +27,6 @@ public class MainProgram {
 
 	public MainProgram(String[] args) throws ArgumentParserException {
 		ArgumentParser parser = ArgumentParsers.newFor(PROGRAM_NAME).build();
-		parser.version(PROGRAM_VERSION);
 
 		AbstractAction.setLagug_resource(lagug_resource);
 		parser.description(lagug_resource.getString("root_description"));
@@ -38,15 +36,15 @@ public class MainProgram {
 
 		Namespace ns = null;
 		try {
-			String[] new_args=null;
+			String[] new_args = null;
 			try {
-				new_args=ArgumentUtil.fixArgumentSpaceArray(ArgumentUtil.fixSymbol(args));
+				new_args = ArgumentUtil.fixArgumentSpaceArray(ArgumentUtil.fixSymbol(args));
 			} catch (IllegalArgumentException | NullPointerException e) {
 				throw new ArgumentParserException("too few arguments", parser);
 			}
-			
+
 			ns = parser.parseArgs(new_args);
-			
+
 		} catch (ArgumentParserException e) {
 			parser.handleError(e);
 
@@ -64,20 +62,9 @@ public class MainProgram {
 		action.setupByNamespace(ns);
 	}
 
-	public MainProgram(Namespace ns) throws ArgumentParserException {
-		action = (AbstractAction) ns.get("action");
-		if (action == null)
-			throw new NullPointerException("action==null.");
-		action.setupByNamespace(ns);
-	}
-
 	public void startCommand() {
 		try {
 			action.start();
-		} catch (RuntimeException e) {
-			System.err.println(e.getMessage());
-		} catch (FileNotFoundException e) {
-			System.err.println(e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

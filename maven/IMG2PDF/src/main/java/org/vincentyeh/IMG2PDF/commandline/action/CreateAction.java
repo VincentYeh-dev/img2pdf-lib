@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.regex.PatternSyntaxException;
@@ -67,12 +68,12 @@ public abstract class CreateAction extends AbstractAction {
 		pdf_owner_password = ns.getString("pdf_owner_password");
 
 		pdf_user_password = ns.getString("pdf_user_password");
-		
+
 		pdf_permission = (DocumentAccessPermission) ns.get("pdf_permission");
 
 		if (pdf_permission == null)
 			throw new ArgumentNotFoundException("pdf_permission");
-		
+
 		pdf_destination = ns.getString("pdf_destination");
 
 		if (pdf_destination == null)
@@ -108,7 +109,7 @@ public abstract class CreateAction extends AbstractAction {
 				.help(lagug_resource.getString("help_create_pdf_owner_password"));
 		parser.addArgument("-pupwd", "--pdf_user_password").required(false).type(String.class).metavar("userpassword")
 				.help(lagug_resource.getString("help_create_pdf_user_password"));
-		
+
 		parser.addArgument("-pp", "--pdf_permission").required(false).type(new DocumentAccessPermission())
 				.setDefault(new DocumentAccessPermission())
 				.help(lagug_resource.getString("help_create_pdf_permission"));
@@ -125,15 +126,14 @@ public abstract class CreateAction extends AbstractAction {
 
 	}
 
-	protected TaskList importTasksFromTXT(File file, FileFilterHelper filter)
-			throws PatternSyntaxException, SourceFolderException, IOException {
+	protected TaskList importTasksFromTXT(File file, FileFilterHelper filter) throws IOException {
 		if (!file.exists())
 			new FileNotFoundException(file.getName() + " not found.");
 
 		UTF8InputStream uis = new UTF8InputStream(file);
-		BufferedReader reader = new BufferedReader(new InputStreamReader(uis.getInputStream(), "UTF-8"));
+		BufferedReader reader = new BufferedReader(new InputStreamReader(uis.getInputStream(),StandardCharsets.UTF_8));
+		
 		TaskList tasks = new TaskList();
-
 		String format = "### Document setting ###\nAlign:%s\nSize:%s\nDefault direction:%s\nAuto Rotate:%s\n###END###\n\n";
 		System.out.printf(format, pdf_align.toString(), pdf_size.toString(), pdf_direction.toString(), pdf_auto_rotate);
 
@@ -144,20 +144,33 @@ public abstract class CreateAction extends AbstractAction {
 			line_counter++;
 			if (buf != null && !buf.isEmpty()) {
 				File dir = new File(buf);
+				try {
+					if (!dir.exists())
+						throw new SourceFolderNotFoundException(line_counter, dir, file);
 
-				if (!dir.exists())
-					throw new SourceFolderNotFoundException(line_counter, dir, file);
+					if (dir.isFile())
+						throw new SourceFolderIsFileException(line_counter, dir, file);
 
-				if (dir.isFile())
-					throw new SourceFolderIsFileException(line_counter, dir, file);
-
-				tasks.add(parse2Task(dir, filter));
-
-				System.out.println("[imported] " + dir.getName());
+					tasks.add(parse2Task(dir, filter));
+					System.out.println("[imported] " + dir.getName());
+				} catch (SourceFolderException e) {
+					System.err.println(e);
+				}
 			}
 		}
-		uis.close();
-		reader.close();
+		
+		try {
+			if (uis != null)
+				uis.close();
+		} catch (IOException ignore) {
+		}
+
+		try {
+			if (reader != null)
+				reader.close();
+		} catch (IOException ignore) {
+		}
+		
 		return tasks;
 	}
 

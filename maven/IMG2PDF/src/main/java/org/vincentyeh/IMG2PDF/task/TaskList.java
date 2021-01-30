@@ -35,7 +35,7 @@ public class TaskList extends ArrayList<Task> {
 	public TaskList(Document doc) throws FileNotFoundException {
 		this(doc.getRootElement());
 	}
-	
+
 	public TaskList(Element root) throws FileNotFoundException {
 		ArrayList<Element> importedTaskList = new ArrayList<Element>(root.getChildren("TASK"));
 		for (Element task : importedTaskList) {
@@ -49,14 +49,20 @@ public class TaskList extends ArrayList<Task> {
 	 * @param file destination of output XML file.
 	 * @throws IOException Exception of writing PDF
 	 */
-	public void toXMLFile(File file) throws IOException {
+	public void toXMLFile(File file) {
 		Document doc = new Document();
 		Element root = toElement();
 		doc.setRootElement(root);
 		// Create the XML
 		XMLOutputter outter = new XMLOutputter();
 		outter.setFormat(Format.getPrettyFormat());
-		outter.output(doc, new FileWriter(file));
+		try {
+			outter.output(doc, new FileWriter(file));
+		} catch (FileNotFoundException e) {
+			System.err.println(e.getMessage());
+		}catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public Element toElement() {
@@ -66,13 +72,13 @@ public class TaskList extends ArrayList<Task> {
 		}
 		return root;
 	}
-	
+
 	private static Document getDOMParsedDocument(final String filepath)
 			throws ParserConfigurationException, SAXException, IOException {
-		File xml_file=new File(filepath);
-		if(!xml_file.exists())
-			throw new FileNotFoundException(xml_file.getName()+" not found.");
-		
+		File xml_file = new File(filepath);
+		if (!xml_file.exists())
+			throw new FileNotFoundException(xml_file.getName() + " not found.");
+
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		// If want to make namespace aware.
 		// factory.setNamespaceAware(true);
@@ -80,6 +86,5 @@ public class TaskList extends ArrayList<Task> {
 		org.w3c.dom.Document w3cDocument = documentBuilder.parse(filepath);
 		return new DOMBuilder().build(w3cDocument);
 	}
-	
 
 }

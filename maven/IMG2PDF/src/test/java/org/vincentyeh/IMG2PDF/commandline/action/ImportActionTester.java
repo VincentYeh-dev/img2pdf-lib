@@ -1,5 +1,6 @@
 package org.vincentyeh.IMG2PDF.commandline.action;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.junit.Test;
@@ -13,7 +14,7 @@ import org.vincentyeh.IMG2PDF.pdf.page.PageSize;
 
 import net.sourceforge.argparse4j.inf.Namespace;
 
-public class CreateActionTester {
+public class ImportActionTester {
 
 //	@Test
 //	public void testNotExist() {
@@ -50,7 +51,7 @@ public class CreateActionTester {
 //	}
 	
 	@Test
-	public void test_setupByNamespace() throws Exception {
+	public void test_setupByNamespace() {
 		HashMap<String,Object> attrs=new HashMap<>();
 		attrs.put("action",new ImportAction());
 		attrs.put("pdf_align",new PageAlign("CENTER-CENTER"));
@@ -63,9 +64,21 @@ public class CreateActionTester {
 //		attrs.put("pdf_user_password",null);
 		attrs.put("pdf_permission",new DocumentAccessPermission());
 		attrs.put("pdf_destination","");
-		attrs.put("list_destination","");
+		attrs.put("list_destination","src\\test\\resources\\test.xml");
+//		attrs.put("list_destination","");
+//		attrs.put("list_destination","C:\\test.xml");
+		ArrayList<String> sources=new ArrayList<>();
+		sources.add("src\\test\\resources\\dirlist_NotExist.txt");
+		attrs.put("source",sources);
 		Namespace ns=new Namespace(attrs);
 		CreateAction aa=(ImportAction)ns.get("action");
 		aa.setupByNamespace(ns);
+		
+		try {
+			aa.start();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
