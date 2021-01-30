@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.regex.PatternSyntaxException;
 
 import org.vincentyeh.IMG2PDF.commandline.action.exception.ArgumentNotFoundException;
@@ -32,7 +33,7 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 import net.sourceforge.argparse4j.inf.Subparsers;
 
-public abstract class CreateAction extends AbstractAction {
+public class CreateAction extends AbstractAction {
 
 	protected PageSize pdf_size;
 	protected PageAlign pdf_align;
@@ -45,6 +46,9 @@ public abstract class CreateAction extends AbstractAction {
 	protected DocumentAccessPermission pdf_permission;
 	protected String pdf_destination;
 	protected String list_destination;
+
+	protected List<String> sources;
+	protected FileFilterHelper filter;
 
 	@Override
 	public void setupByNamespace(Namespace ns) {
@@ -82,11 +86,21 @@ public abstract class CreateAction extends AbstractAction {
 		if (list_destination == null)
 			throw new ArgumentNotFoundException("list_destination");
 
+		this.filter = (FileFilterHelper) ns.get("filter");
+
+		if (filter == null)
+			throw new ArgumentNotFoundException("filter");
+
+		this.sources = ns.getList("source");
+
+		if (sources == null)
+			throw new ArgumentNotFoundException("sources");
+
 	}
 
 	public static void setupParser(Subparsers subparsers) {
 		Subparser parser = subparsers.addParser("create").help(lagug_resource.getString("help_create"));
-//		required:
+		parser.setDefault("action", new CreateAction());
 		parser.addArgument("-pz", "--pdf_size").required(true).type(PageSize.class)
 				.help(lagug_resource.getString("help_create_pdf_size"));
 		parser.addArgument("-pa", "--pdf_align").required(false).type(new PageAlign("CENTER-CENTER"))
@@ -120,9 +134,11 @@ public abstract class CreateAction extends AbstractAction {
 		parser.addArgument("-ldst", "--list_destination").required(true).type(String.class).metavar("destination")
 				.help(lagug_resource.getString("help_create_list_destination"));
 
-		Subparsers innerSubparsers = parser.addSubparsers();
-		ImportAction.setupParser(innerSubparsers);
-		AddAction.setupParser(innerSubparsers);
+		parser.addArgument("-f", "--filter").required(false).type(new FileFilterHelper(""))
+				.setDefault(new FileFilterHelper("[^\\.]*\\.(png|PNG|jpg|JPG)"))
+				.help(lagug_resource.getString("help_import_filter"));
+
+		parser.addArgument("source").type(String.class).nargs("*").help(lagug_resource.getString("help_import_source"));
 
 	}
 
@@ -131,8 +147,8 @@ public abstract class CreateAction extends AbstractAction {
 			new FileNotFoundException(file.getName() + " not found.");
 
 		UTF8InputStream uis = new UTF8InputStream(file);
-		BufferedReader reader = new BufferedReader(new InputStreamReader(uis.getInputStream(),StandardCharsets.UTF_8));
-		
+		BufferedReader reader = new BufferedReader(new InputStreamReader(uis.getInputStream(), StandardCharsets.UTF_8));
+
 		TaskList tasks = new TaskList();
 		String format = "### Document setting ###\nAlign:%s\nSize:%s\nDefault direction:%s\nAuto Rotate:%s\n###END###\n\n";
 		System.out.printf(format, pdf_align.toString(), pdf_size.toString(), pdf_direction.toString(), pdf_auto_rotate);
@@ -158,7 +174,7 @@ public abstract class CreateAction extends AbstractAction {
 				}
 			}
 		}
-		
+
 		try {
 			if (uis != null)
 				uis.close();
@@ -170,7 +186,7 @@ public abstract class CreateAction extends AbstractAction {
 				reader.close();
 		} catch (IOException ignore) {
 		}
-		
+
 		return tasks;
 	}
 
@@ -199,5 +215,28 @@ public abstract class CreateAction extends AbstractAction {
 			imgs.add(img);
 		}
 		return imgs;
+	}
+
+	@Override
+	public void start() throws Exception {
+		File dst = new File(list_destination);
+
+		TaskList tasks = dst.exists() ? new TaskList(dst) : new TaskList();
+
+		for (String str_source : sources) {
+			File source = new File(str_source);
+
+			if (!source.exists())
+				throw new FileNotFoundException("File not found:" + source.getAbsolutePath());
+
+			try {
+				tasks.addAll(importTasksFromTXT(source, filter));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		tasks.toXMLFile(dst);
+
 	}
 }

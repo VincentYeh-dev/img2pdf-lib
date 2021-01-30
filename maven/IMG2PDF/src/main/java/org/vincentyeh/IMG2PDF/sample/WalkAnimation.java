@@ -40,8 +40,8 @@ public class WalkAnimation {
 //				+ "-pp 11 " 
 				+ "-pdst " + "\"" + sample_root.getAbsolutePath()
 				+ "\\output\\$PARENT{0} $CY-$CM-$CD $CH-$CN-$CS.pdf\" " + "-ldst \""
-				+ taskslist_destination.getAbsolutePath() + "\" import -s \"" + sources_list.getAbsolutePath()
-				+ "\" -f " + filter;
+				+ taskslist_destination.getAbsolutePath() + "\" \"" + sources_list.getAbsolutePath()
+				+ "\"";
 
 		String convert_command = "convert " + taskslist_destination.getAbsolutePath();
 		System.out.println(create_command);
