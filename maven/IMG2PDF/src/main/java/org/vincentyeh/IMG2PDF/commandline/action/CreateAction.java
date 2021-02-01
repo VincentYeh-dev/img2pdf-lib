@@ -150,9 +150,10 @@ public class CreateAction extends AbstractAction {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(uis.getInputStream(), StandardCharsets.UTF_8));
 
 		TaskList tasks = new TaskList();
-		String format = "### Document setting ###\nAlign:%s\nSize:%s\nDefault direction:%s\nAuto Rotate:%s\n###END###\n\n";
+		String format = "### Document setting ###\nAlign:%s\nSize:%s\nDefault direction:%s\nAuto Rotate:%s\n###END###\n";
 		System.out.printf(format, pdf_align.toString(), pdf_size.toString(), pdf_direction.toString(), pdf_auto_rotate);
 
+		System.out.println("Import tasks from list:");
 		int line_counter = 0;
 		String buf = "";
 		while (buf != null) {
@@ -168,7 +169,7 @@ public class CreateAction extends AbstractAction {
 						throw new SourceFolderIsFileException(line_counter, dir, file);
 
 					tasks.add(parse2Task(dir, filter));
-					System.out.println("[imported] " + dir.getName());
+					System.out.println("\t[imported] " + dir.getAbsolutePath());
 				} catch (SourceFolderException e) {
 					System.err.println(e.getMessage());
 				}
@@ -219,6 +220,7 @@ public class CreateAction extends AbstractAction {
 
 	@Override
 	public void start() throws Exception {
+		super.start();
 		File dst = new File(list_destination);
 
 		TaskList tasks = dst.exists() ? new TaskList(dst) : new TaskList();
@@ -235,8 +237,13 @@ public class CreateAction extends AbstractAction {
 				e.printStackTrace();
 			}
 		}
-
-		tasks.toXMLFile(dst);
-
+		try {
+			tasks.toXMLFile(dst);
+			System.out.println("\nWrite task list to "+dst.getAbsolutePath());
+		} catch (IOException e) {
+			System.err.println("Unable to create task list file->"+e.getMessage());
+		}
+		
+		super.done();
 	}
 }

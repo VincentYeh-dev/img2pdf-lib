@@ -8,7 +8,6 @@ import java.io.OutputStreamWriter;
 
 import org.vincentyeh.IMG2PDF.commandline.MainProgram;
 
-import net.sourceforge.argparse4j.inf.ArgumentParserException;
 
 public class WalkAnimation {
 
@@ -43,7 +42,7 @@ public class WalkAnimation {
 				+ taskslist_destination.getAbsolutePath() + "\" \"" + sources_list.getAbsolutePath()
 				+ "\"";
 
-		String convert_command = "convert " + taskslist_destination.getAbsolutePath();
+		String convert_command = "convert -o yes " + taskslist_destination.getAbsolutePath();
 		System.out.println(create_command);
 		System.out.println(convert_command);
 		System.out.println();

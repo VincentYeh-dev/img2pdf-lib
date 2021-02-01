@@ -47,22 +47,18 @@ public class TaskList extends ArrayList<Task> {
 	 * Write XML Element to the file.
 	 * 
 	 * @param file destination of output XML file.
-	 * @throws IOException Exception of writing PDF
+	 * @throws IOException
 	 */
-	public void toXMLFile(File file) {
+	public void toXMLFile(File file) throws IOException {
 		Document doc = new Document();
 		Element root = toElement();
 		doc.setRootElement(root);
 		// Create the XML
 		XMLOutputter outter = new XMLOutputter();
 		outter.setFormat(Format.getPrettyFormat());
-		try {
-			outter.output(doc, new FileWriter(file));
-		} catch (FileNotFoundException e) {
-			System.err.println(e.getMessage());
-		}catch (IOException e) {
-			e.printStackTrace();
-		}
+		
+		outter.output(doc, new FileWriter(file));
+
 	}
 
 	public Element toElement() {
