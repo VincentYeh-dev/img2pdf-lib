@@ -13,6 +13,11 @@ public class FileFilterHelper implements FileFilter,ArgumentType<FileFilterHelpe
 	private final String regex;
 
 	public FileFilterHelper(String regex){
+		try {
+			Pattern.compile(regex);
+		} catch (PatternSyntaxException e) {
+			throw e;
+		}
 		this.regex = regex;
 	}
 
