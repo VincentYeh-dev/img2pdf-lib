@@ -5,14 +5,22 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.vincentyeh.IMG2PDF.commandline.action.exception.ArgumentNotFoundException;
 import org.vincentyeh.IMG2PDF.pdf.converter.ConversionListener;
 import org.vincentyeh.IMG2PDF.pdf.converter.PDFConverter;
 import org.vincentyeh.IMG2PDF.pdf.document.ImagesPDFDocument;
+import org.vincentyeh.IMG2PDF.pdf.page.PageSize;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskList;
 
@@ -23,30 +31,50 @@ import net.sourceforge.argparse4j.inf.Subparsers;
 
 public class ConvertAction extends AbstractAction {
 
-	protected ArrayList<String> tasklist_sources;
-	protected boolean open_when_complete = false;
+	protected final File[] tasklist_sources;
+	protected final boolean open_when_complete = false;
+	
+	
+	
+	public ConvertAction(String[] args) throws ParseException {
+		this((new DefaultParser()).parse(setupOptions(), args));
+	}
+	
+	public ConvertAction(CommandLine cmd) {
 
-	@Override
-	public void setupByNamespace(Namespace ns) {
-		this.tasklist_sources = ns.get("tasklist_source");
-		this.open_when_complete=ns.getBoolean("open_when_complete");
+		String[] str_sources = cmd.getOptionValues("source");
+
+		if (str_sources == null)
+			throw new ArgumentNotFoundException("sources");
+
+		tasklist_sources = new File[str_sources.length];
+		for (int i = 0; i < tasklist_sources.length; i++) {
+			System.out.println("sources checking....");
+			tasklist_sources[i] = new File(str_sources[i]);
+
+			if (!tasklist_sources[i].exists()) {
+				System.err.println("File not found:" + tasklist_sources[i].getAbsolutePath());
+				continue;
+			} else if (tasklist_sources[i].isDirectory()) {
+				System.err.println("Path should be a file:" + tasklist_sources[i].getAbsolutePath());
+				continue;
+			} else {
+				System.err.println("[Verified] " + tasklist_sources[i].getAbsolutePath());
+			}
+
+		}
 
 	}
+
 
 	@Override
 	public void start() throws Exception {
 		super.start();
 		System.out.println("Import tasklists.");
-		for (String str_src : tasklist_sources) {
-			File source = new File(str_src);
-			if (!source.exists())
-				throw new FileNotFoundException("File not found:" + source.getAbsolutePath());
+		for (File src : tasklist_sources) {
+			TaskList tasks = new TaskList(src);
 
-			TaskList tasks = null;
-
-			tasks = new TaskList(source);
-
-			System.out.println("\t[imported] " + source.getAbsolutePath() + "\n");
+			System.out.println("\t[imported] " + src.getAbsolutePath() + "\n");
 
 			startConversion(tasks);
 		}
@@ -54,6 +82,7 @@ public class ConvertAction extends AbstractAction {
 		super.done();
 	}
 
+	
 	private void startConversion(TaskList tasks) {
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		for (Task task : tasks) {
@@ -102,15 +131,31 @@ public class ConvertAction extends AbstractAction {
 		executor.shutdown();
 	}
 
+	
 	public static void setupParser(Subparsers subparsers) {
-		Subparser convert_parser = subparsers.addParser("convert").help(lagug_resource.getString("help_convert"));
-		convert_parser.setDefault("action", new ConvertAction());
-		convert_parser.addArgument("tasklist_source").nargs("*")
-				.help(lagug_resource.getString("help_convert_tasklist_source"));
-		
-		convert_parser.addArgument("-o","--open_when_complete").required(false).type(Arguments.booleanType("yes", "no")).setDefault(Boolean.FALSE)
-		.help("Open PDF after conversion is completed.");
+//		Subparser convert_parser = subparsers.addParser("convert").help(lagug_resource.getString("help_convert"));
+//		convert_parser.setDefault("action", new ConvertAction());
+//		convert_parser.addArgument("tasklist_source").nargs("*")
+//				.help(lagug_resource.getString("help_convert_tasklist_source"));
+//
+//		convert_parser.addArgument("-o", "--open_when_complete").required(false)
+//				.type(Arguments.booleanType("yes", "no")).setDefault(Boolean.FALSE)
+//				.help("Open PDF after conversion is completed.");
 
+	}
+	
+	public static Options setupOptions() {
+		Options options = new Options();
+		Option opt_tasklist_source = createArgOption("lsrc", "tasklist_source", "help_convert_tasklist_source");
+		Option opt_open_when_complete = createArgOption("o", "open_when_complete", "help_create_pdf_align");
+
+		options.addOption(opt_tasklist_source);
+		options.addOption(opt_open_when_complete);
+		
+		Option opt_mode = new Option("m", "mode", true, "mode");
+		options.addOption(opt_mode);
+		
+		return options;
 	}
 
 	private ConversionListener listener = new ConversionListener() {

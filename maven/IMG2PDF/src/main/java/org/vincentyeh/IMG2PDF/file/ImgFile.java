@@ -88,19 +88,28 @@ public class ImgFile extends File implements Comparable<File> {
 			this.str = str;
 		}
 
-		public static Order getByStr(String str) {
-			switch (str) {
-			case "NONE":
-				return NONE;
-			case "INCREASE":
-				return INCREASE;
-			case "DECREASE":
-				return DECREASE;
-			default:
-				throw new RuntimeException("Order is invalid");
+//		public static Order getByStr(String str) {
+//			switch (str) {
+//			case "NONE":
+//				return NONE;
+//			case "INCREASE":
+//				return INCREASE;
+//			case "DECREASE":
+//				return DECREASE;
+//			default:
+//				throw new RuntimeException("Order is invalid");
+//			}
+//		}
+		
+		public static Order getByString(String str) {
+			Order[] orders=Order.values();
+			for(Order order:orders) {
+				if(order.str.equals(str))
+					return order;
 			}
+			throw new RuntimeException("Order is invalid");
 		}
-
+		
 		public String getStr() {
 			return str;
 		}
@@ -123,17 +132,26 @@ public class ImgFile extends File implements Comparable<File> {
 			this.str = str;
 		}
 
-		public static Sortby getByStr(String str) {
-			switch (str) {
-			case "NONE":
-				return NONE;
-			case "DATE":
-				return DATE;
-			case "NAME":
-				return NAME;
-			default:
-				throw new RuntimeException("Sortby is invalid");
+//		public static Sortby getByStr(String str) {
+//			switch (str) {
+//			case "NONE":
+//				return NONE;
+//			case "DATE":
+//				return DATE;
+//			case "NAME":
+//				return NAME;
+//			default:
+//				throw new RuntimeException("Sortby is invalid");
+//			}
+//		}
+		
+		public static Sortby getByString(String str) {
+			Sortby[] sortbys=Sortby.values();
+			for(Sortby sortby:sortbys) {
+				if(sortby.str.equals(str))
+					return sortby;
 			}
+			throw new RuntimeException("Sortby is invalid");
 		}
 
 		public static String[] valuesStr() {

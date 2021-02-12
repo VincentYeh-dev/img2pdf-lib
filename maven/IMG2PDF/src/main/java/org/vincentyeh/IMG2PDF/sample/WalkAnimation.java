@@ -8,7 +8,6 @@ import java.io.OutputStreamWriter;
 
 import org.vincentyeh.IMG2PDF.commandline.MainProgram;
 
-
 public class WalkAnimation {
 
 	public static void main(String[] args) {
@@ -16,7 +15,7 @@ public class WalkAnimation {
 		File sample_root = new File(project_root, "sample\\walk-animation");
 		File taskslist_destination = new File(sample_root, "taskslist\\test.xml");
 		taskslist_destination.delete();
-		
+
 		File image_sources_dir = new File(sample_root, "image-sources").getAbsoluteFile();
 
 		File sources_list = new File(sample_root, "dirlist.txt").getAbsoluteFile();
@@ -32,15 +31,13 @@ public class WalkAnimation {
 
 		String filter = ".*\\.(png$VBARPNG$VBARjpg$VBARJPG)";
 
-		String create_command = "create " + "-pz A4 " + "-ps NUMERTIC " + "-pa CENTER-CENTER " + "-pdi Vertical "
-				+ "-par yes " + "-po INCREASE "
+		String create_command = "-m create " + "-pz A4 " + "-ps NUMERTIC " + "-pa CENTER-CENTER " + "-pdi Vertical "
+				+ "-par YES " + "-po INCREASE "
 //				+ "-pupwd 1234AAA " 
 //				+ "-popwd 1234AAA " 
-//				+ "-pp 11 " 
-				+ "-pdst " + "\"" + sample_root.getAbsolutePath()
-				+ "\\output\\$PARENT{0} $CY-$CM-$CD $CH-$CN-$CS.pdf\" " + "-ldst \""
-				+ taskslist_destination.getAbsolutePath() + "\" \"" + sources_list.getAbsolutePath()
-				+ "\"";
+				+ "-pp 11 " + "-f \"[^\\.]*\\.(png|PNG|jpg|JPG)\" " + "-pdst \"" + sample_root.getAbsolutePath()
+				+ "\\output\\$PARENT{0} AAAAAA\" " + "-ldst \"" + taskslist_destination.getAbsolutePath() + "\" -src \""
+				+ sources_list.getAbsolutePath() + "\"";
 
 		String convert_command = "convert -o yes " + taskslist_destination.getAbsolutePath();
 		System.out.println(create_command);

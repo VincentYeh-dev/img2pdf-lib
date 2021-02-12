@@ -3,6 +3,8 @@ package org.vincentyeh.IMG2PDF.commandline.action;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import org.apache.commons.cli.Option;
+
 public abstract class AbstractAction implements Action {
 	protected static ResourceBundle lagug_resource;
 	static {
@@ -27,5 +29,13 @@ public abstract class AbstractAction implements Action {
 
 	public void done() {
 		System.out.println("DONE.");
+	}
+
+	protected static Option createArgOption(String opt, String longOpt, String res_description) {
+		return new Option(opt, longOpt, true, lagug_resource.getString(res_description));
+	}
+
+	protected static Option createOption(String opt, String longOpt, String res_description) {
+		return new Option(opt, longOpt, false, lagug_resource.getString(res_description));
 	}
 }
