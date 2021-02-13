@@ -81,41 +81,6 @@ public class MainProgram {
 		
 	}
 
-//		ArgumentParser parser = ArgumentParsers.newFor(PROGRAM_NAME).build();
-//
-//		AbstractAction.setLagug_resource(lagug_resource);
-//
-//		parser.description(lagug_resource.getString("root_description"));
-//		Subparsers subparser = parser.addSubparsers().help(lagug_resource.getString("help_action"));
-//
-//		Namespace ns = null;
-//		try {
-//			String[] new_args = null;
-//			try {
-//				new_args = ArgumentUtil.fixArgumentSpaceArray(ArgumentUtil.fixSymbol(args));
-//			} catch (IllegalArgumentException | NullPointerException e) {
-//				throw new ArgumentParserException("too few arguments", parser);
-//			}
-//
-//			ns = parser.parseArgs(new_args);
-//
-//		} catch (ArgumentParserException e) {
-//			parser.handleError(e);
-//
-//			System.err.println("Program is interrupted.");
-//			throw e;
-////			System.exit(1);
-//		}
-//
-//		if (ns == null)
-//			throw new NullPointerException("Namespace is null.");
-//
-//		action = (AbstractAction) ns.get("action");
-//		if (action == null)
-//			throw new NullPointerException("action==null.");
-//		action.setupByNamespace(ns);
-//	}
-
 	public void startCommand() {
 		try {
 			action.start();
