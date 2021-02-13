@@ -7,12 +7,14 @@ import java.util.ResourceBundle;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.vincentyeh.IMG2PDF.commandline.action.AbstractAction;
 import org.vincentyeh.IMG2PDF.commandline.action.ConvertAction;
 import org.vincentyeh.IMG2PDF.commandline.action.CreateAction;
+import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
 import org.vincentyeh.IMG2PDF.util.ArgumentUtil;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
@@ -32,58 +34,58 @@ public class MainProgram {
 	}
 
 	public MainProgram(String[] args) throws ParseException {
-		
-		
-		Options options = new Options();
 
+		Options options = new Options();
 		Option opt_mode = new Option("m", "mode", true, "mode");
+		Option opt_help = new Option("h", "help", false, "help");
 		options.addOption(opt_mode);
+		options.addOption(opt_help);
 
 		CommandLineParser parser = new RelaxedParser();
-		
+
 		CommandLine mode_chooser = parser.parse(options, args);
 
 //		action = new CreateAction(args);
 		
-		if (mode_chooser.hasOption("mode")) {
-			String value = mode_chooser.getOptionValue("mode");
-			if (value.equals("create")) {
-				System.out.println("create");
-				try {
-					action = new CreateAction(args);
-				} catch (ParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-			} else if (value.equals("convert")) {
-				System.out.println("convert");
-
-				try {
-					action = new ConvertAction(args);
-				} catch (ParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-			} else {
-				throw new RuntimeException("sss");
-			}
-
-			try {
-				action.start();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		try {
+			
+			if (args == null || args.length == 0 || (mode_chooser.hasOption("help") && args.length == 1)) {
+				throw new HelperException(options);
 			}
 			
+			if (mode_chooser.hasOption("mode")) {
+				String value = mode_chooser.getOptionValue("mode");
+
+				if (value == null)
+					throw new NullPointerException();
+				else if (value.equals("create")) {
+					System.out.println("create");
+					action = new CreateAction(args);
+
+				} else if (value.equals("convert")) {
+					System.out.println("convert");
+					action = new ConvertAction(args);
+				} else {
+					throw new RuntimeException("sss");
+				}
+
+			}
+
+		} catch (HelperException e) {
+			System.err.println(e.getMessage());
+			HelpFormatter formatter = new HelpFormatter();
+			formatter.printHelp("ant", e.opt);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		
+
 	}
 
 	public void startCommand() {
 		try {
-			action.start();
+			if (action != null)
+				action.start();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -92,12 +94,12 @@ public class MainProgram {
 	public static void main(String[] args) {
 		try {
 			MainProgram main = new MainProgram(args);
-		} catch (ParseException e) {
+			main.startCommand();
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-//		main.startCommand();
 	}
 
 }

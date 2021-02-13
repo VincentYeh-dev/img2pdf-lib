@@ -13,10 +13,12 @@ import java.util.concurrent.Future;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.ArgumentNotFoundException;
+import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
 import org.vincentyeh.IMG2PDF.pdf.converter.ConversionListener;
 import org.vincentyeh.IMG2PDF.pdf.converter.PDFConverter;
 import org.vincentyeh.IMG2PDF.pdf.document.ImagesPDFDocument;
@@ -33,14 +35,14 @@ public class ConvertAction extends AbstractAction {
 
 	protected final File[] tasklist_sources;
 	protected final boolean open_when_complete = false;
-	
-	
-	
+
 	public ConvertAction(String[] args) throws ParseException {
 		this((new DefaultParser()).parse(setupOptions(), args));
 	}
-	
-	public ConvertAction(CommandLine cmd) {
+
+	public ConvertAction(CommandLine cmd) throws HelperException {
+		if (cmd.hasOption("-h"))
+			throw new HelperException(setupOptions());
 
 		String[] str_sources = cmd.getOptionValues("tasklist_source");
 
@@ -66,7 +68,6 @@ public class ConvertAction extends AbstractAction {
 
 	}
 
-
 	@Override
 	public void start() throws Exception {
 		super.start();
@@ -82,7 +83,6 @@ public class ConvertAction extends AbstractAction {
 		super.done();
 	}
 
-	
 	private void startConversion(TaskList tasks) {
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		for (Task task : tasks) {
@@ -131,30 +131,19 @@ public class ConvertAction extends AbstractAction {
 		executor.shutdown();
 	}
 
-	
-	public static void setupParser(Subparsers subparsers) {
-//		Subparser convert_parser = subparsers.addParser("convert").help(lagug_resource.getString("help_convert"));
-//		convert_parser.setDefault("action", new ConvertAction());
-//		convert_parser.addArgument("tasklist_source").nargs("*")
-//				.help(lagug_resource.getString("help_convert_tasklist_source"));
-//
-//		convert_parser.addArgument("-o", "--open_when_complete").required(false)
-//				.type(Arguments.booleanType("yes", "no")).setDefault(Boolean.FALSE)
-//				.help("Open PDF after conversion is completed.");
-
-	}
-	
 	public static Options setupOptions() {
 		Options options = new Options();
+		Option opt_help = createOption("h", "help", "help_create_pdf_size");
 		Option opt_tasklist_source = createArgOption("lsrc", "tasklist_source", "help_convert_tasklist_source");
 		Option opt_open_when_complete = createArgOption("o", "open_when_complete", "help_create_pdf_align");
 
+		options.addOption(opt_help);
 		options.addOption(opt_tasklist_source);
 		options.addOption(opt_open_when_complete);
-		
+
 		Option opt_mode = new Option("m", "mode", true, "mode");
 		options.addOption(opt_mode);
-		
+
 		return options;
 	}
 

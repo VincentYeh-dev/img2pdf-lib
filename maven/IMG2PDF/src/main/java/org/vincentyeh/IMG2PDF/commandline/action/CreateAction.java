@@ -8,16 +8,15 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.ArgumentNotFoundException;
+import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.SourceFolderException;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.SourceFolderIsFileException;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.SourceFolderNotFoundException;
@@ -33,11 +32,6 @@ import org.vincentyeh.IMG2PDF.pdf.page.PageSize;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskList;
 import org.vincentyeh.IMG2PDF.util.NameFormatter;
-
-import net.sourceforge.argparse4j.impl.Arguments;
-import net.sourceforge.argparse4j.inf.Namespace;
-import net.sourceforge.argparse4j.inf.Subparser;
-import net.sourceforge.argparse4j.inf.Subparsers;
 
 public class CreateAction extends AbstractAction {
 
@@ -68,8 +62,10 @@ public class CreateAction extends AbstractAction {
 		this((new DefaultParser()).parse(setupOptions(), args));
 	}
 
-	public CreateAction(CommandLine cmd) {
-
+	public CreateAction(CommandLine cmd) throws HelperException {
+		if (cmd.hasOption("-h"))
+			throw new HelperException(setupOptions());
+		
 		pdf_size = PageSize.getSizeFromString(cmd.getOptionValue("pdf_size", DEF_PDF_SIZE));
 
 		if (pdf_size == null)
@@ -139,6 +135,7 @@ public class CreateAction extends AbstractAction {
 
 	public static Options setupOptions() {
 		Options options = new Options();
+		Option opt_help = createOption("h", "help", "help_create_pdf_size");
 		Option opt_pdf_size = createArgOption("pz", "pdf_size", "help_create_pdf_size");
 		Option opt_pdf_align = createArgOption("pa", "pdf_align", "help_create_pdf_align");
 		Option opt_pdf_direction = createArgOption("pdi", "pdf_direction", "help_create_pdf_direction");
@@ -153,11 +150,12 @@ public class CreateAction extends AbstractAction {
 		Option opt_filter = createArgOption("f", "filter", "help_import_filter");
 		
 		Option opt_sources = createArgOption("src", "source", "help_import_source");
-		opt_sources.setRequired(true);
+//		opt_sources.setRequired(true);
 		
 		Option opt_list_destination = createArgOption("ldst", "list_destination", "help_create_list_destination");
-		opt_list_destination.setRequired(true);
+//		opt_list_destination.setRequired(true);
 		
+		options.addOption(opt_help);	
 		options.addOption(opt_pdf_size);
 		options.addOption(opt_pdf_align);
 		options.addOption(opt_pdf_direction);
