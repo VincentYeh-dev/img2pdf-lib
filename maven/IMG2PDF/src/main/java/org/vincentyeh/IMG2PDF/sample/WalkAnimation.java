@@ -29,22 +29,38 @@ public class WalkAnimation {
 			e.printStackTrace();
 		}
 
-		String filter = ".*\\.(png$VBARPNG$VBARjpg$VBARJPG)";
-
-		String create_command = "-m create " + "-pz A4 " + "-ps NUMERTIC " + "-pa CENTER-CENTER " + "-pdi Vertical "
-				+ "-par YES " + "-po INCREASE "
-//				+ "-pupwd 1234AAA " 
-//				+ "-popwd 1234AAA " 
-				+ "-pp 11 " + "-f \"[^\\.]*\\.(png|PNG|jpg|JPG)\" " + "-pdst \"" + sample_root.getAbsolutePath()
-				+ "\\output\\$PARENT{0} AAAAAA\" " + "-ldst \"" + taskslist_destination.getAbsolutePath() + "\" -src \""
+		String create_command = "-m create "
+//				
+				+ "-pz A4 "
+//				
+				+ "-ps NUMERTIC "
+//				
+				+ "-pa CENTER-CENTER "
+//				
+				+ "-pdi Vertical "
+//				
+				+ "-par YES "
+//				
+				+ "-po INCREASE "
+//				
+//				+ "-pupwd 1234AAA "
+//				
+//				+ "-popwd 1234AAA "
+//				
+				+ "-pp 11 "
+//				
+				+ "-f \"[^\\.]*\\.(png|PNG|jpg|JPG)\" "
+//				
+				+ "-pdst \"" + sample_root.getAbsolutePath() + "\\output\\$PARENT{0} $CY-$CM-$CD $CH-$CN-$CS.pdf\" "
+//				
+				+ "-ldst \"" + taskslist_destination.getAbsolutePath() + "\" -src \""
+//				
 				+ sources_list.getAbsolutePath() + "\"";
 
-		String convert_command = "convert -o yes " + taskslist_destination.getAbsolutePath();
+		String convert_command = "-m convert -o YES " + taskslist_destination.getAbsolutePath();
 		System.out.println(create_command);
 		System.out.println(convert_command);
 		System.out.println();
-		MainProgram.main(create_command);
-		MainProgram.main(convert_command);
 	}
 
 }

@@ -30,21 +30,21 @@ public class kuma_fish_album_1 {
 			e.printStackTrace();
 		}
 
-		String filter = ".*\\.(png$VBARPNG$VBARjpg$VBARJPG)";
-		String create_command = "create " + "-pz A4 " + "-ps NUMERTIC " + "-pa CENTER-CENTER " + "-pdi Vertical "
-				+ "-par yes " + "-po INCREASE "
+		String create_command = "-m create " + "-pz A4 " + "-ps NUMERTIC " + "-pa CENTER-CENTER " + "-pdi Vertical "
+				+ "-par YES " + "-po INCREASE "
 //				+ "-pupwd 1234AAA " 
 //				+ "-popwd 1234AAA " 
-//				+ "-pp 11 " 
-				+ "-pdst " + sample_root.getAbsolutePath() + "\\output\\$PARENT{0}.pdf " + "-ldst "
-				+ taskslist_destination.getAbsolutePath() + " import -s " + sources_list.getAbsolutePath() + " -f "
-				+ filter;
+				+ "-pp 11 " + "-f \"[^\\.]*\\.(png|PNG|jpg|JPG)\" " + "-pdst \"" + sample_root.getAbsolutePath()
+				+ "\\output\\$PARENT{0} $CY-$CM-$CD $CH-$CN-$CS.pdf\" "+ "-ldst \"" + taskslist_destination.getAbsolutePath() + "\" -src \""
+				+ sources_list.getAbsolutePath() + "\"";
 
-		String convert_command = "convert " + taskslist_destination.getAbsolutePath();
+		
+		
+		String convert_command = "-m convert -o YES " + taskslist_destination.getAbsolutePath();
 		System.out.println(create_command);
 		System.out.println(convert_command);
-		MainProgram.main(create_command);
-		MainProgram.main(convert_command);
+//		MainProgram.main(create_command);
+//		MainProgram.main(convert_command);
 
 	}
 

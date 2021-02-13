@@ -41,7 +41,13 @@ import net.sourceforge.argparse4j.inf.Subparsers;
 
 public class CreateAction extends AbstractAction {
 
-	private static final String DEFV_PDF_AUTO_ROTATE = "YES";
+	private static final String DEF_PDF_SIZE = "A4";
+	private static final String DEF_PDF_ALIGN = "CENTER-CENTER";
+	private static final String DEF_PDF_DIRECTION = "Vertical";
+	private static final String DEFV_PDF_SORTBY = "NAME";
+	private static final String DEFV_PDF_ORDER = "INCREASE";
+	private static final String DEFV_PDF_AUTO_ROTATE = "NO";
+	private static final String DEFV_PDF_FILTER = "[^\\.]*\\.(png|PNG|jpg|JPG)" ;
 
 	protected final PageSize pdf_size;
 	protected final PageAlign pdf_align;
@@ -63,65 +69,55 @@ public class CreateAction extends AbstractAction {
 	}
 
 	public CreateAction(CommandLine cmd) {
-		if (cmd.hasOption("pdf_size"))
-			pdf_size = PageSize.getSizeFromString(cmd.getOptionValue("pdf_size"));
-		else
+
+		pdf_size = PageSize.getSizeFromString(cmd.getOptionValue("pdf_size", DEF_PDF_SIZE));
+
+		if (pdf_size == null)
 			throw new ArgumentNotFoundException("pdf_size");
 
-		if (cmd.hasOption("pdf_align"))
-			pdf_align = new PageAlign(cmd.getOptionValue("pdf_align"));
-		else
+		pdf_align = new PageAlign(cmd.getOptionValue("pdf_align", DEF_PDF_ALIGN));
+
+		if (pdf_align == null)
 			throw new ArgumentNotFoundException("pdf_align");
 
-		if (cmd.hasOption("pdf_direction"))
-			pdf_direction = PageDirection.getDirectionFromString(cmd.getOptionValue("pdf_direction"));
-		else
+		pdf_direction = PageDirection.getDirectionFromString(cmd.getOptionValue("pdf_direction", DEF_PDF_DIRECTION));
+
+		if (pdf_direction == null)
 			throw new ArgumentNotFoundException("pdf_direction");
 
-		if (cmd.hasOption("pdf_auto_rotate"))
-			pdf_auto_rotate = cmd.getOptionValue("pdf_auto_rotate").equals("YES");
-		else
-			throw new ArgumentNotFoundException("pdf_auto_rotate");
+		pdf_auto_rotate = cmd.getOptionValue("pdf_auto_rotate", DEFV_PDF_AUTO_ROTATE).equals("YES");
 
-		if (cmd.hasOption("pdf_sortby"))
-			pdf_sortby = Sortby.getByString(cmd.getOptionValue("pdf_sortby"));
-		else
+		pdf_sortby = Sortby.getByString(cmd.getOptionValue("pdf_sortby", DEFV_PDF_SORTBY));
+		if (pdf_sortby == null)
 			throw new ArgumentNotFoundException("pdf_sortby");
 
-		if (cmd.hasOption("pdf_order"))
-			pdf_order = Order.getByString(cmd.getOptionValue("pdf_order"));
-		else
+		pdf_order = Order.getByString(cmd.getOptionValue("pdf_order", DEFV_PDF_ORDER));
+		if (pdf_order == null)
 			throw new ArgumentNotFoundException("pdf_order");
 
 		pdf_owner_password = cmd.getOptionValue("pdf_owner_password");
 		pdf_user_password = cmd.getOptionValue("pdf_user_password");
 
-		if (cmd.hasOption("pdf_permission"))
-			pdf_permission = new DocumentAccessPermission(cmd.getOptionValue("pdf_permission"));
-		else
+		pdf_permission = new DocumentAccessPermission(cmd.getOptionValue("pdf_permission", "11"));
+		if (pdf_permission == null)
 			throw new ArgumentNotFoundException("pdf_permission");
 
-		if (cmd.hasOption("pdf_destination"))
-			pdf_destination = cmd.getOptionValue("pdf_destination");
-		else
+		pdf_destination = cmd.getOptionValue("pdf_destination");
+		if (pdf_destination == null)
 			throw new ArgumentNotFoundException("pdf_destination");
 
-		if (cmd.hasOption("list_destination"))
-			list_destination = cmd.getOptionValue("list_destination");
-		else
+		list_destination = cmd.getOptionValue("list_destination");
+		if (list_destination == null)
 			throw new ArgumentNotFoundException("list_destination");
 
-		if (cmd.hasOption("filter"))
-			this.filter = new FileFilterHelper(cmd.getOptionValue("filter"));
-		else
+		filter = new FileFilterHelper(cmd.getOptionValue("filter",DEFV_PDF_FILTER));
+		if (filter == null)
 			throw new ArgumentNotFoundException("filter");
 
-		String[] str_sources = null;
-
-		if (cmd.hasOption("source"))
-			str_sources = cmd.getOptionValues("source");
-		else
-			throw new ArgumentNotFoundException("sources");
+		String[] str_sources = cmd.getOptionValues("source");
+		if (str_sources == null) {
+			str_sources = new String[0];
+		}
 
 		sources = new File[str_sources.length];
 		for (int i = 0; i < sources.length; i++) {
@@ -155,9 +151,13 @@ public class CreateAction extends AbstractAction {
 		Option opt_pdf_permission = createArgOption("pp", "pdf_permission", "help_create_pdf_permission");
 		Option opt_pdf_destination = createArgOption("pdst", "pdf_destination", "help_create_pdf_destination");
 		Option opt_filter = createArgOption("f", "filter", "help_import_filter");
+		
 		Option opt_sources = createArgOption("src", "source", "help_import_source");
+		opt_sources.setRequired(true);
+		
 		Option opt_list_destination = createArgOption("ldst", "list_destination", "help_create_list_destination");
-
+		opt_list_destination.setRequired(true);
+		
 		options.addOption(opt_pdf_size);
 		options.addOption(opt_pdf_align);
 		options.addOption(opt_pdf_direction);
@@ -176,48 +176,6 @@ public class CreateAction extends AbstractAction {
 		options.addOption(opt_mode);
 
 		return options;
-//
-//		Subparser parser = subparsers.addParser("create").help(lagug_resource.getString("help_create"));
-//		parser.setDefault("action", new CreateAction());
-//		parser.addArgument("-pz", "--pdf_size").required(true).type(PageSize.class)
-//				.help(lagug_resource.getString("help_create_pdf_size"));
-//		parser.addArgument("-pa", "--pdf_align").required(false).type(new PageAlign("CENTER-CENTER"))
-//				.setDefault(new PageAlign("CENTER-CENTER")).metavar("TopBottom|LeftRight")
-//				.help(lagug_resource.getString("help_create_pdf_align"));
-//
-//		parser.addArgument("-pdi", "--pdf_direction").required(false).type(PageDirection.class)
-//				.setDefault(PageDirection.Vertical).help(lagug_resource.getString("help_create_pdf_direction"));
-//
-//		parser.addArgument("-par", "--pdf_auto_rotate").required(false).type(Arguments.booleanType("yes", "no"))
-//				.setDefault(Boolean.TRUE).help(lagug_resource.getString("help_create_pdf_auto_rotate"));
-//
-//		parser.addArgument("-ps", "--pdf_sortby").required(false).type(Sortby.class).setDefault(Sortby.NAME)
-//				.help(lagug_resource.getString("help_create_pdf_sortby"));
-//
-//		parser.addArgument("-po", "--pdf_order").required(false).type(Order.class).setDefault(Order.INCREASE)
-//				.help(lagug_resource.getString("help_create_pdf_order"));
-//
-//		parser.addArgument("-popwd", "--pdf_owner_password").required(false).type(String.class).metavar("ownerpassword")
-//				.help(lagug_resource.getString("help_create_pdf_owner_password"));
-//		parser.addArgument("-pupwd", "--pdf_user_password").required(false).type(String.class).metavar("userpassword")
-//				.help(lagug_resource.getString("help_create_pdf_user_password"));
-//
-//		parser.addArgument("-pp", "--pdf_permission").required(false).type(new DocumentAccessPermission())
-//				.setDefault(new DocumentAccessPermission())
-//				.help(lagug_resource.getString("help_create_pdf_permission"));
-//
-//		parser.addArgument("-pdst", "--pdf_destination").required(true).type(String.class).metavar("destination")
-//				.help(lagug_resource.getString("help_create_pdf_destination"));
-//
-//		parser.addArgument("-ldst", "--list_destination").required(true).type(String.class).metavar("destination")
-//				.help(lagug_resource.getString("help_create_list_destination"));
-//
-//		parser.addArgument("-f", "--filter").required(false).type(new FileFilterHelper(""))
-//				.setDefault(new FileFilterHelper("[^\\.]*\\.(png|PNG|jpg|JPG)"))
-//				.help(lagug_resource.getString("help_import_filter"));
-//
-//		parser.addArgument("source").type(String.class).nargs("*").help(lagug_resource.getString("help_import_source"));
-
 	}
 
 	protected TaskList importTasksFromTXT(File file, FileFilterHelper filter) throws IOException {

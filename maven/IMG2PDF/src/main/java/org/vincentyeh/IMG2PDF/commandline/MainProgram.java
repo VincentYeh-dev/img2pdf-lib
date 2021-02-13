@@ -43,6 +43,8 @@ public class MainProgram {
 		
 		CommandLine mode_chooser = parser.parse(options, args);
 
+//		action = new CreateAction(args);
+		
 		if (mode_chooser.hasOption("mode")) {
 			String value = mode_chooser.getOptionValue("mode");
 			if (value.equals("create")) {
@@ -68,7 +70,16 @@ public class MainProgram {
 				throw new RuntimeException("sss");
 			}
 
+			try {
+				action.start();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 		}
+		
+	}
 
 //		ArgumentParser parser = ArgumentParsers.newFor(PROGRAM_NAME).build();
 //
@@ -103,7 +114,7 @@ public class MainProgram {
 //		if (action == null)
 //			throw new NullPointerException("action==null.");
 //		action.setupByNamespace(ns);
-	}
+//	}
 
 	public void startCommand() {
 		try {
@@ -122,11 +133,6 @@ public class MainProgram {
 		}
 
 //		main.startCommand();
-	}
-
-//	Only for test.This function never been used in the release executable file.
-	public static void main(String args) {
-		main(args.split("\\s"));
 	}
 
 }

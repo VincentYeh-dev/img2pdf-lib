@@ -42,7 +42,7 @@ public class ConvertAction extends AbstractAction {
 	
 	public ConvertAction(CommandLine cmd) {
 
-		String[] str_sources = cmd.getOptionValues("source");
+		String[] str_sources = cmd.getOptionValues("tasklist_source");
 
 		if (str_sources == null)
 			throw new ArgumentNotFoundException("sources");
@@ -59,7 +59,7 @@ public class ConvertAction extends AbstractAction {
 				System.err.println("Path should be a file:" + tasklist_sources[i].getAbsolutePath());
 				continue;
 			} else {
-				System.err.println("[Verified] " + tasklist_sources[i].getAbsolutePath());
+				System.out.println("[Verified] " + tasklist_sources[i].getAbsolutePath());
 			}
 
 		}
