@@ -18,7 +18,7 @@ public class ImgFile extends File implements Comparable<File> {
 	private static final long serialVersionUID = -6910177315066351680L;
 
 	private final Sortby sortby;
-	private final Order order;
+	private final Sequence order;
 
 	/**
 	 * Create the ImgFile that no need to sort.
@@ -27,7 +27,7 @@ public class ImgFile extends File implements Comparable<File> {
 	 * @throws FileNotFoundException when file is not exists
 	 */
 	public ImgFile(String pathname) throws FileNotFoundException {
-		this(pathname, Sortby.NONE, Order.NONE);
+		this(pathname, Sortby.NONE, Sequence.NONE);
 	}
 
 	/**
@@ -38,7 +38,7 @@ public class ImgFile extends File implements Comparable<File> {
 	 * @param order    order
 	 * @throws FileNotFoundException when file is not exists
 	 */
-	public ImgFile(String pathname, Sortby sortby, Order order) throws FileNotFoundException {
+	public ImgFile(String pathname, Sortby sortby, Sequence order) throws FileNotFoundException {
 		super(pathname);
 		if (pathname.isEmpty())
 			throw new RuntimeException("Path name is empty.");
@@ -56,99 +56,58 @@ public class ImgFile extends File implements Comparable<File> {
 	public int compareTo(File o) {
 		switch (sortby) {
 		case NAME:
-			if (order == Order.INCREASE)
+			if (order == Sequence.INCREASE)
 				return this.getName().compareTo(o.getName());
-			else if (order == Order.DECREASE)
+			else if (order == Sequence.DECREASE)
 				return o.getName().compareTo(this.getName());
 		case DATE:
-			if (order == Order.INCREASE)
+			if (order == Sequence.INCREASE)
 				return (this.lastModified() - o.lastModified() > 0) ? 1 : -1;
 
-			else if (order == Order.DECREASE)
+			else if (order == Sequence.DECREASE)
 				return (this.lastModified() - o.lastModified() > 0) ? -1 : 1;
 		case NUMERTIC:
-			if (order == Order.INCREASE)
+			if (order == Sequence.INCREASE)
 				return compareTo(this.getName(), o.getName());
 
-			else if (order == Order.DECREASE)
+			else if (order == Sequence.DECREASE)
 				return compareTo(o.getName(), this.getName());
 
-			
 		default:
 			throw new RuntimeException("Multiple files need to be sorted by sort and order arguments.");
 		}
 
 	}
 
-	public enum Order {
-		NONE("NONE"), INCREASE("INCREASE"), DECREASE("DECREASE");
-		private String str;
+	public enum Sequence {
+		NONE, INCREASE, DECREASE;
 
-		private Order(String str) {
-			this.str = str;
-		}
-
-//		public static Order getByStr(String str) {
-//			switch (str) {
-//			case "NONE":
-//				return NONE;
-//			case "INCREASE":
-//				return INCREASE;
-//			case "DECREASE":
-//				return DECREASE;
-//			default:
-//				throw new RuntimeException("Order is invalid");
-//			}
-//		}
-		
-		public static Order getByString(String str) {
-			Order[] orders=Order.values();
-			for(Order order:orders) {
-				if(order.str.equals(str))
-					return order;
+		public static Sequence getByString(String str) {
+			Sequence[] sequences = Sequence.values();
+			for (Sequence sequence : sequences) {
+				if (sequence.toString().equals(str))
+					return sequence;
 			}
-			throw new RuntimeException("Order is invalid");
-		}
-		
-		public String getStr() {
-			return str;
+			throw new RuntimeException("Sequence is invalid");
 		}
 
 		public static String[] valuesStr() {
-			Order[] order_list = Order.values();
-			String[] str_list = new String[order_list.length];
+			Sequence[] list = Sequence.values();
+			String[] str_list = new String[list.length];
 			for (int i = 0; i < str_list.length; i++) {
-				str_list[i] = order_list[i].getStr();
+				str_list[i] = list[i].toString();
 			}
 			return str_list;
 		}
 	}
 
 	public enum Sortby {
-		NONE("NONE"), NAME("NAME"), DATE("DATE"), NUMERTIC("NUMERTIC");
-		private String str;
+		NONE, NAME, DATE, NUMERTIC;
 
-		private Sortby(String str) {
-			this.str = str;
-		}
-
-//		public static Sortby getByStr(String str) {
-//			switch (str) {
-//			case "NONE":
-//				return NONE;
-//			case "DATE":
-//				return DATE;
-//			case "NAME":
-//				return NAME;
-//			default:
-//				throw new RuntimeException("Sortby is invalid");
-//			}
-//		}
-		
 		public static Sortby getByString(String str) {
-			Sortby[] sortbys=Sortby.values();
-			for(Sortby sortby:sortbys) {
-				if(sortby.str.equals(str))
+			Sortby[] sortbys = Sortby.values();
+			for (Sortby sortby : sortbys) {
+				if (sortby.toString().equals(str))
 					return sortby;
 			}
 			throw new RuntimeException("Sortby is invalid");
@@ -158,14 +117,11 @@ public class ImgFile extends File implements Comparable<File> {
 			Sortby[] sortby_list = Sortby.values();
 			String[] str_list = new String[sortby_list.length];
 			for (int i = 0; i < str_list.length; i++) {
-				str_list[i] = sortby_list[i].getStr();
+				str_list[i] = sortby_list[i].toString();
 			}
 			return str_list;
 		}
 
-		public String getStr() {
-			return str;
-		}
 	}
 
 	public static class FileIsDirectoryException extends FileNotImageException {
@@ -197,7 +153,7 @@ public class ImgFile extends File implements Comparable<File> {
 
 	}
 
-	int compareTo(String ThisStr, String OStr) {
+	private int compareTo(String ThisStr, String OStr) {
 		String noNumThis = ThisStr.replaceAll("[0-9]{1,}", "*");
 		String noNumO = OStr.replaceAll("[0-9]{1,}", "*");
 
@@ -216,7 +172,7 @@ public class ImgFile extends File implements Comparable<File> {
 		}
 	}
 
-	ArrayList<Integer> getNum(String str) {
+	private ArrayList<Integer> getNum(String str) {
 		String s[] = str.split("[^0-9]{1,}");
 		ArrayList<Integer> buf = new ArrayList<Integer>();
 		for (int i = 0; i < s.length; i++) {

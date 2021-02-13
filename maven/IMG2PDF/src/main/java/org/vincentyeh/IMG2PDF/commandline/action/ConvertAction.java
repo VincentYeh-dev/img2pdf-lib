@@ -26,10 +26,6 @@ import org.vincentyeh.IMG2PDF.pdf.page.PageSize;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskList;
 
-import net.sourceforge.argparse4j.impl.Arguments;
-import net.sourceforge.argparse4j.inf.Namespace;
-import net.sourceforge.argparse4j.inf.Subparser;
-import net.sourceforge.argparse4j.inf.Subparsers;
 
 public class ConvertAction extends AbstractAction {
 
@@ -40,7 +36,7 @@ public class ConvertAction extends AbstractAction {
 		this((new DefaultParser()).parse(setupOptions(), args));
 	}
 
-	public ConvertAction(CommandLine cmd) throws HelperException {
+	public ConvertAction(CommandLine cmd) throws HelperException, ArgumentNotFoundException {
 		if (cmd.hasOption("-h"))
 			throw new HelperException(setupOptions());
 
@@ -48,7 +44,7 @@ public class ConvertAction extends AbstractAction {
 
 		if (str_sources == null)
 			throw new ArgumentNotFoundException("sources");
-
+		
 		tasklist_sources = new File[str_sources.length];
 		for (int i = 0; i < tasklist_sources.length; i++) {
 			System.out.println("sources checking....");

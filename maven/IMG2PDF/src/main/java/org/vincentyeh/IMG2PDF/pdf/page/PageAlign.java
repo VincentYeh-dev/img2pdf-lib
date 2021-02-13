@@ -1,36 +1,25 @@
 package org.vincentyeh.IMG2PDF.pdf.page;
 
-import org.vincentyeh.IMG2PDF.file.ImgFile.Order;
-
-import net.sourceforge.argparse4j.inf.Argument;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.ArgumentParserException;
-import net.sourceforge.argparse4j.inf.ArgumentType;
-
 /**
  * The class which define Alignment of page of PDF
  * 
  * @author vincent
  */
-public class PageAlign implements ArgumentType<PageAlign>{
-	private final LeftRightAlign LRA;
-	private final TopBottomAlign TBA;
+public class PageAlign {
+//	水平對齊
+	private final HorizontalAlign hori_algin;
+//	垂直對齊
+	private final VerticalAlign verti_algin;
 
-
-	@Override
-	public PageAlign convert(ArgumentParser parser, Argument arg, String value) throws ArgumentParserException {
-		return new PageAlign(value);
-	}
-	
 	/**
 	 * Create Align by enums.
 	 * 
 	 * @param LRA Left Right Align
 	 * @param TBA Top Bottom Align
 	 */
-	public PageAlign(LeftRightAlign LRA, TopBottomAlign TBA) {
-		this.LRA = LRA;
-		this.TBA = TBA;
+	public PageAlign(final HorizontalAlign hori_algin, final VerticalAlign verti_algin) {
+		this.hori_algin = hori_algin;
+		this.verti_algin = verti_algin;
 	}
 
 	/**
@@ -39,114 +28,65 @@ public class PageAlign implements ArgumentType<PageAlign>{
 	 * 
 	 * @param str Alignment
 	 */
-	public PageAlign(String str) throws IllegalAlignException {
-		String[] LR_TB_A = str.split("-");
-		try {
-			TBA = TopBottomAlign.getByStr(LR_TB_A[0]);
-			LRA = LeftRightAlign.getByStr(LR_TB_A[1]);
-		} catch (IllegalArgumentException e) {
-			throw new IllegalAlignException(e.getMessage());
-		}
-
+	public PageAlign(final String str){
+		String[] verti_hori_align = str.split("-");
+		this.verti_algin = VerticalAlign.getByString(verti_hori_align[0]);
+		this.hori_algin = HorizontalAlign.getByString(verti_hori_align[1]);
 	}
 
-	public LeftRightAlign getLRA() {
-		return LRA;
+	public HorizontalAlign getHorizontal() {
+		return hori_algin;
 	}
 
-	public TopBottomAlign getTBA() {
-		return TBA;
+	public VerticalAlign getVertical() {
+		return verti_algin;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("%s-%s", TBA.getStr(), LRA.getStr());
+		return String.format("%s-%s", verti_algin,hori_algin);
 	}
 
-	public static class IllegalAlignException extends IllegalArgumentException {
+	public enum HorizontalAlign {
+		RIGHT, LEFT, CENTER, FILL;
 
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 182897419820418934L;
-
-		public IllegalAlignException(String str) {
-			super(str + " isn't a type of align.");
-			// TODO Auto-generated constructor stub
-		}
-
-	}
-
-	public enum LeftRightAlign {
-		RIGHT("RIGHT"), LEFT("LEFT"), CENTER("CENTER"), FILL("FILL");
-		private String str;
-
-		private LeftRightAlign(String str) {
-			this.str = str;
-		}
-
-		public static LeftRightAlign getByStr(String str) throws IllegalArgumentException {
-			switch (str) {
-			case "RIGHT":
-				return RIGHT;
-			case "LEFT":
-				return LEFT;
-			case "CENTER":
-				return CENTER;
-			case "FILL":
-				return FILL;
-			default:
-				throw new IllegalArgumentException(str);
+		public static HorizontalAlign getByString(String str) {
+			HorizontalAlign[] aligns = HorizontalAlign.values();
+			for (HorizontalAlign align : aligns) {
+				if (align.toString().equals(str))
+					return align;
 			}
-		}
-
-		public String getStr() {
-			return str;
+			throw new IllegalArgumentException("HorizontalAlign is invalid");
 		}
 
 		public static String[] valuesStr() {
-			Order[] list = Order.values();
-			String[] str_list = new String[list.length];
+			HorizontalAlign[] aligns = HorizontalAlign.values();
+			String[] str_list = new String[aligns.length];
 			for (int i = 0; i < str_list.length; i++) {
-				str_list[i] = list[i].getStr();
+				str_list[i] = aligns[i].toString();
 			}
 			return str_list;
 		}
 
 	}
 
-	public enum TopBottomAlign {
-		TOP("TOP"), BOTTOM("BOTTOM"), CENTER("CENTER"), FILL("FILL");
-		private String str;
+	public enum VerticalAlign {
+		TOP, BOTTOM, CENTER, FILL;
 
-		private TopBottomAlign(String str) {
-			this.str = str;
-		}
-
-		public static TopBottomAlign getByStr(String str) throws IllegalArgumentException {
-			switch (str) {
-			case "TOP":
-				return TOP;
-			case "BOTTOM":
-				return BOTTOM;
-			case "CENTER":
-				return CENTER;
-			case "FILL":
-				return FILL;
-			default:
-				throw new IllegalArgumentException(str);
+		public static VerticalAlign getByString(String str) {
+			VerticalAlign[] aligns = VerticalAlign.values();
+			for (VerticalAlign align : aligns) {
+				if (align.toString().equals(str))
+					return align;
 			}
-		}
-
-		public String getStr() {
-			return str;
+			throw new IllegalArgumentException("VerticalAlign is invalid");
 		}
 
 		public static String[] valuesStr() {
-			Order[] list = Order.values();
-			String[] str_list = new String[list.length];
+			VerticalAlign[] aligns = VerticalAlign.values();
+			String[] str_list = new String[aligns.length];
 			for (int i = 0; i < str_list.length; i++) {
-				str_list[i] = list[i].getStr();
+				str_list[i] = aligns[i].toString();
 			}
 			return str_list;
 		}

@@ -51,8 +51,8 @@ public class Task {
 		
 		this.destination = element.getAttributeValue("destination");
 		this.align = new PageAlign(element.getAttributeValue("align"));
-		this.size = PageSize.getSizeFromString(element.getAttributeValue("size"));
-		this.defaultDirection = PageDirection.getDirectionFromString(element.getAttributeValue("default-direction"));
+		this.size = PageSize.getByString(element.getAttributeValue("size"));
+		this.defaultDirection = PageDirection.getByString(element.getAttributeValue("default-direction"));
 		this.autoRotate = Boolean.valueOf(element.getAttributeValue("auto-rotate"));
 		
 		List<Element> contains_files = element.getChild("FILES").getChildren("FILE");
@@ -79,7 +79,7 @@ public class Task {
 		task.addContent(xml_files);
 
 		task.setAttribute("destination", destination);
-		task.setAttribute("size", size.getStr() + "");
+		task.setAttribute("size", size.toString() + "");
 		task.setAttribute("align", align.toString());
 		task.setAttribute("default-direction", defaultDirection.toString());
 		task.setAttribute("auto-rotate", String.valueOf(autoRotate));

@@ -12,6 +12,7 @@ public enum PageDirection {
 	Horizontal(90), Vertical(0);
 	private final int page_rotate_angle;
 	private final int image_rotate_angle;
+	
 
 	private PageDirection(int angle) {
 		page_rotate_angle = angle;
@@ -38,15 +39,13 @@ public enum PageDirection {
 		return height / width > 1 ? Vertical : Horizontal;
 	}
 
-	public static PageDirection getDirectionFromString(String str) {
-		switch (str) {
-		case "Vertical":
-			return Vertical;
-		case "Horizontal":
-			return Horizontal;
-		default:
-			return null;
+	public static PageDirection getByString(String str) {
+		PageDirection[] directions = PageDirection.values();
+		for (PageDirection direction : directions) {
+			if (direction.toString().equals(str))
+				return direction;
 		}
+		throw new IllegalArgumentException("Direction is invalid");
 	}
 
 }

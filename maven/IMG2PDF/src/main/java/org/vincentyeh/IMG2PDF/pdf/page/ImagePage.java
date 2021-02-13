@@ -7,8 +7,8 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
-import org.vincentyeh.IMG2PDF.pdf.page.PageAlign.LeftRightAlign;
-import org.vincentyeh.IMG2PDF.pdf.page.PageAlign.TopBottomAlign;
+import org.vincentyeh.IMG2PDF.pdf.page.PageAlign.HorizontalAlign;
+import org.vincentyeh.IMG2PDF.pdf.page.PageAlign.VerticalAlign;
 import org.vincentyeh.IMG2PDF.util.ImageProcess;
 
 /**
@@ -98,15 +98,15 @@ public class ImagePage extends PDPage {
 
 		float position_x = 0, position_y = 0;
 
-		LeftRightAlign LRA = align.getLRA();
-		TopBottomAlign TBA = align.getTBA();
+		HorizontalAlign hori_align = align.getHorizontal();
+		VerticalAlign verti_align = align.getVertical();
 
 		float x_space = page_width - img_width;
 		float y_space = page_height - img_height;
 
 		if (y_space == 0) {
 			if (!isRotated) {
-				switch (LRA) {
+				switch (hori_align) {
 				case LEFT:
 					position_x = 0;
 					break;
@@ -122,7 +122,7 @@ public class ImagePage extends PDPage {
 					break;
 				}
 			} else {
-				switch (TBA) {
+				switch (verti_align) {
 				case TOP:
 					position_x = 0;
 					break;
@@ -142,7 +142,7 @@ public class ImagePage extends PDPage {
 		} else if (x_space == 0) {
 
 			if (!isRotated) {
-				switch (TBA) {
+				switch (verti_align) {
 				case BOTTOM:
 					position_y = 0;
 					break;
@@ -159,7 +159,7 @@ public class ImagePage extends PDPage {
 
 				}
 			} else {
-				switch (LRA) {
+				switch (hori_align) {
 				case LEFT:
 					position_y = 0;
 					break;

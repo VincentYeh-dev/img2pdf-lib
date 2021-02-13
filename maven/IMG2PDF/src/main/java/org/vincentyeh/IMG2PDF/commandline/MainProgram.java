@@ -15,13 +15,7 @@ import org.vincentyeh.IMG2PDF.commandline.action.AbstractAction;
 import org.vincentyeh.IMG2PDF.commandline.action.ConvertAction;
 import org.vincentyeh.IMG2PDF.commandline.action.CreateAction;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
-import org.vincentyeh.IMG2PDF.util.ArgumentUtil;
 
-import net.sourceforge.argparse4j.ArgumentParsers;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.ArgumentParserException;
-import net.sourceforge.argparse4j.inf.Namespace;
-import net.sourceforge.argparse4j.inf.Subparsers;
 
 public class MainProgram {
 	public static ResourceBundle lagug_resource;
@@ -75,6 +69,8 @@ public class MainProgram {
 			System.err.println(e.getMessage());
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("ant", e.opt);
+		}catch (IllegalArgumentException e) {
+			System.err.println(e.getMessage());
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

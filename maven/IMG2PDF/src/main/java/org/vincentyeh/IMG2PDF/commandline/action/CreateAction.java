@@ -11,18 +11,18 @@ import java.util.Collections;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.ArgumentNotFoundException;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
+import org.vincentyeh.IMG2PDF.commandline.action.exception.IllegalParserArgumentException;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.SourceFolderException;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.SourceFolderIsFileException;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.SourceFolderNotFoundException;
 import org.vincentyeh.IMG2PDF.file.FileFilterHelper;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
-import org.vincentyeh.IMG2PDF.file.ImgFile.Order;
+import org.vincentyeh.IMG2PDF.file.ImgFile.Sequence;
 import org.vincentyeh.IMG2PDF.file.ImgFile.Sortby;
 import org.vincentyeh.IMG2PDF.file.text.UTF8InputStream;
 import org.vincentyeh.IMG2PDF.pdf.document.DocumentAccessPermission;
@@ -41,14 +41,14 @@ public class CreateAction extends AbstractAction {
 	private static final String DEFV_PDF_SORTBY = "NAME";
 	private static final String DEFV_PDF_ORDER = "INCREASE";
 	private static final String DEFV_PDF_AUTO_ROTATE = "NO";
-	private static final String DEFV_PDF_FILTER = "[^\\.]*\\.(png|PNG|jpg|JPG)" ;
+	private static final String DEFV_PDF_FILTER = "[^\\.]*\\.(png|PNG|jpg|JPG)";
 
 	protected final PageSize pdf_size;
 	protected final PageAlign pdf_align;
 	protected final PageDirection pdf_direction;
 	protected final boolean pdf_auto_rotate;
 	protected final Sortby pdf_sortby;
-	protected final Order pdf_order;
+	protected final Sequence pdf_sequence;
 	protected final String pdf_owner_password;
 	protected final String pdf_user_password;
 	protected final DocumentAccessPermission pdf_permission;
@@ -62,12 +62,17 @@ public class CreateAction extends AbstractAction {
 		this((new DefaultParser()).parse(setupOptions(), args));
 	}
 
-	public CreateAction(CommandLine cmd) throws HelperException {
+	public CreateAction(CommandLine cmd)
+			throws HelperException, ArgumentNotFoundException, IllegalParserArgumentException {
 		if (cmd.hasOption("-h"))
 			throw new HelperException(setupOptions());
 		
-		pdf_size = PageSize.getSizeFromString(cmd.getOptionValue("pdf_size", DEF_PDF_SIZE));
-
+		try {
+			pdf_size = PageSize.getByString(cmd.getOptionValue("pdf_size", DEF_PDF_SIZE));
+		} catch (IllegalArgumentException e) {
+			throw new IllegalParserArgumentException(e.getMessage());
+		}
+		
 		if (pdf_size == null)
 			throw new ArgumentNotFoundException("pdf_size");
 
@@ -76,19 +81,21 @@ public class CreateAction extends AbstractAction {
 		if (pdf_align == null)
 			throw new ArgumentNotFoundException("pdf_align");
 
-		pdf_direction = PageDirection.getDirectionFromString(cmd.getOptionValue("pdf_direction", DEF_PDF_DIRECTION));
+		pdf_direction = PageDirection.getByString(cmd.getOptionValue("pdf_direction", DEF_PDF_DIRECTION));
 
 		if (pdf_direction == null)
 			throw new ArgumentNotFoundException("pdf_direction");
 
 		pdf_auto_rotate = cmd.getOptionValue("pdf_auto_rotate", DEFV_PDF_AUTO_ROTATE).equals("YES");
 
+		
+		
 		pdf_sortby = Sortby.getByString(cmd.getOptionValue("pdf_sortby", DEFV_PDF_SORTBY));
 		if (pdf_sortby == null)
 			throw new ArgumentNotFoundException("pdf_sortby");
 
-		pdf_order = Order.getByString(cmd.getOptionValue("pdf_order", DEFV_PDF_ORDER));
-		if (pdf_order == null)
+		pdf_sequence = Sequence.getByString(cmd.getOptionValue("pdf_order", DEFV_PDF_ORDER));
+		if (pdf_sequence == null)
 			throw new ArgumentNotFoundException("pdf_order");
 
 		pdf_owner_password = cmd.getOptionValue("pdf_owner_password");
@@ -106,7 +113,7 @@ public class CreateAction extends AbstractAction {
 		if (list_destination == null)
 			throw new ArgumentNotFoundException("list_destination");
 
-		filter = new FileFilterHelper(cmd.getOptionValue("filter",DEFV_PDF_FILTER));
+		filter = new FileFilterHelper(cmd.getOptionValue("filter", DEFV_PDF_FILTER));
 		if (filter == null)
 			throw new ArgumentNotFoundException("filter");
 
@@ -148,14 +155,14 @@ public class CreateAction extends AbstractAction {
 		Option opt_pdf_permission = createArgOption("pp", "pdf_permission", "help_create_pdf_permission");
 		Option opt_pdf_destination = createArgOption("pdst", "pdf_destination", "help_create_pdf_destination");
 		Option opt_filter = createArgOption("f", "filter", "help_import_filter");
-		
+
 		Option opt_sources = createArgOption("src", "source", "help_import_source");
 //		opt_sources.setRequired(true);
-		
+
 		Option opt_list_destination = createArgOption("ldst", "list_destination", "help_create_list_destination");
 //		opt_list_destination.setRequired(true);
-		
-		options.addOption(opt_help);	
+
+		options.addOption(opt_help);
 		options.addOption(opt_pdf_size);
 		options.addOption(opt_pdf_align);
 		options.addOption(opt_pdf_direction);
@@ -246,7 +253,7 @@ public class CreateAction extends AbstractAction {
 			throws FileNotFoundException {
 		ArrayList<ImgFile> imgs = new ArrayList<ImgFile>();
 		for (File f : source_directory.listFiles(filter)) {
-			ImgFile img = new ImgFile(f.getAbsolutePath(), pdf_sortby, pdf_order);
+			ImgFile img = new ImgFile(f.getAbsolutePath(), pdf_sortby, pdf_sequence);
 			imgs.add(img);
 		}
 		return imgs;

@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import org.vincentyeh.IMG2PDF.commandline.MainProgram;
 
-import net.sourceforge.argparse4j.inf.ArgumentParserException;
-
 public class kuma_fish_album_1 {
 
 	public static void main(String[] args) {
@@ -17,7 +15,7 @@ public class kuma_fish_album_1 {
 		File sample_root = new File(project_root, "sample\\kuma_fish_album_1");
 		File taskslist_destination = new File(sample_root, "taskslist\\test.xml");
 		taskslist_destination.delete();
-		
+
 		File image_sources_dir = new File(sample_root, "image-sources").getAbsoluteFile();
 
 		File sources_list = new File(sample_root, "dirlist.txt").getAbsoluteFile();
