@@ -38,4 +38,15 @@ public abstract class AbstractAction implements Action {
 	protected static Option createOption(String opt, String longOpt, String res_description) {
 		return new Option(opt, longOpt, false, lagug_resource.getString(res_description));
 	}
+	
+	protected static <T> String listEnum(Class<T> _class_enum) {
+		T[] enums = _class_enum.getEnumConstants();
+		StringBuilder sb = new StringBuilder();
+		sb.append(enums[0].toString());
+		for (int i = 1; i < enums.length; i++) {
+			sb.append(",");
+			sb.append(enums[i].toString());
+		}
+		return sb.toString();
+	}
 }

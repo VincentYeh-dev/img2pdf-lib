@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
+import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
+import org.vincentyeh.IMG2PDF.pdf.page.PageAlign.VerticalAlign;
+
 /**
  * The ImgFile is a comparable subclass of File.It's can be compared by filename
  * and the last time the file was modified.
@@ -82,44 +85,27 @@ public class ImgFile extends File implements Comparable<File> {
 	public enum Sequence {
 		NONE, INCREASE, DECREASE;
 
-		public static Sequence getByString(String str) {
+		public static Sequence getByString(String str) throws UnrecognizedEnumException {
 			Sequence[] sequences = Sequence.values();
 			for (Sequence sequence : sequences) {
 				if (sequence.toString().equals(str))
 					return sequence;
 			}
-			throw new RuntimeException("Sequence is invalid");
+			throw new UnrecognizedEnumException(str,Sequence.class);
 		}
 
-		public static String[] valuesStr() {
-			Sequence[] list = Sequence.values();
-			String[] str_list = new String[list.length];
-			for (int i = 0; i < str_list.length; i++) {
-				str_list[i] = list[i].toString();
-			}
-			return str_list;
-		}
 	}
 
 	public enum Sortby {
 		NONE, NAME, DATE, NUMERTIC;
 
-		public static Sortby getByString(String str) {
+		public static Sortby getByString(String str) throws UnrecognizedEnumException {
 			Sortby[] sortbys = Sortby.values();
 			for (Sortby sortby : sortbys) {
 				if (sortby.toString().equals(str))
 					return sortby;
 			}
-			throw new RuntimeException("Sortby is invalid");
-		}
-
-		public static String[] valuesStr() {
-			Sortby[] sortby_list = Sortby.values();
-			String[] str_list = new String[sortby_list.length];
-			for (int i = 0; i < str_list.length; i++) {
-				str_list[i] = sortby_list[i].toString();
-			}
-			return str_list;
+			throw new UnrecognizedEnumException(str,Sortby.class);
 		}
 
 	}

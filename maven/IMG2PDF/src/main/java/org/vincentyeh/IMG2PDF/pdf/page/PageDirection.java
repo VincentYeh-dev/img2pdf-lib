@@ -2,6 +2,8 @@ package org.vincentyeh.IMG2PDF.pdf.page;
 
 import java.awt.image.BufferedImage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
+import org.vincentyeh.IMG2PDF.file.ImgFile.Sortby;
 
 /**
  * Direction of page.Horizontal or Vertical.
@@ -39,13 +41,13 @@ public enum PageDirection {
 		return height / width > 1 ? Vertical : Horizontal;
 	}
 
-	public static PageDirection getByString(String str) {
+	public static PageDirection getByString(String str) throws UnrecognizedEnumException {
 		PageDirection[] directions = PageDirection.values();
 		for (PageDirection direction : directions) {
 			if (direction.toString().equals(str))
 				return direction;
 		}
-		throw new IllegalArgumentException("Direction is invalid");
+		throw new UnrecognizedEnumException(str,PageDirection.class);
 	}
 
 }

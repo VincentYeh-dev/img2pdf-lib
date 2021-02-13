@@ -16,7 +16,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.ArgumentNotFoundException;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
-import org.vincentyeh.IMG2PDF.commandline.action.exception.IllegalParserArgumentException;
+import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.SourceFolderException;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.SourceFolderIsFileException;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.SourceFolderNotFoundException;
@@ -62,48 +62,45 @@ public class CreateAction extends AbstractAction {
 		this((new DefaultParser()).parse(setupOptions(), args));
 	}
 
-	public CreateAction(CommandLine cmd)
-			throws HelperException, ArgumentNotFoundException, IllegalParserArgumentException {
+	public CreateAction(CommandLine cmd) throws HelperException, ArgumentNotFoundException, UnrecognizedEnumException {
 		if (cmd.hasOption("-h"))
 			throw new HelperException(setupOptions());
-		
-		try {
-			pdf_size = PageSize.getByString(cmd.getOptionValue("pdf_size", DEF_PDF_SIZE));
-		} catch (IllegalArgumentException e) {
-			throw new IllegalParserArgumentException(e.getMessage());
-		}
-		
-		if (pdf_size == null)
-			throw new ArgumentNotFoundException("pdf_size");
+
+		pdf_size = PageSize.getByString(cmd.getOptionValue("pdf_size", DEF_PDF_SIZE));
+
+//		if (pdf_size == null)
+//			throw new ArgumentNotFoundException("pdf_size");
 
 		pdf_align = new PageAlign(cmd.getOptionValue("pdf_align", DEF_PDF_ALIGN));
 
-		if (pdf_align == null)
-			throw new ArgumentNotFoundException("pdf_align");
+//		if (pdf_align == null)
+//			throw new ArgumentNotFoundException("pdf_align");
 
 		pdf_direction = PageDirection.getByString(cmd.getOptionValue("pdf_direction", DEF_PDF_DIRECTION));
 
-		if (pdf_direction == null)
-			throw new ArgumentNotFoundException("pdf_direction");
-
-		pdf_auto_rotate = cmd.getOptionValue("pdf_auto_rotate", DEFV_PDF_AUTO_ROTATE).equals("YES");
-
-		
+//		if (pdf_direction == null)
+//			throw new ArgumentNotFoundException("pdf_direction");
 		
 		pdf_sortby = Sortby.getByString(cmd.getOptionValue("pdf_sortby", DEFV_PDF_SORTBY));
-		if (pdf_sortby == null)
-			throw new ArgumentNotFoundException("pdf_sortby");
+//		if (pdf_sortby == null)
+//			throw new ArgumentNotFoundException("pdf_sortby");
 
 		pdf_sequence = Sequence.getByString(cmd.getOptionValue("pdf_order", DEFV_PDF_ORDER));
-		if (pdf_sequence == null)
-			throw new ArgumentNotFoundException("pdf_order");
+//		if (pdf_sequence == null)
+//			throw new ArgumentNotFoundException("pdf_order");
+
+		pdf_permission = new DocumentAccessPermission(cmd.getOptionValue("pdf_permission", "11"));
+//		if (pdf_permission == null)
+//			throw new ArgumentNotFoundException("pdf_permission");
+		
+		pdf_auto_rotate = cmd.getOptionValue("pdf_auto_rotate", DEFV_PDF_AUTO_ROTATE).equals("YES");
+
 
 		pdf_owner_password = cmd.getOptionValue("pdf_owner_password");
 		pdf_user_password = cmd.getOptionValue("pdf_user_password");
+		
 
-		pdf_permission = new DocumentAccessPermission(cmd.getOptionValue("pdf_permission", "11"));
-		if (pdf_permission == null)
-			throw new ArgumentNotFoundException("pdf_permission");
+		
 
 		pdf_destination = cmd.getOptionValue("pdf_destination");
 		if (pdf_destination == null)
@@ -140,7 +137,7 @@ public class CreateAction extends AbstractAction {
 		System.out.println("CHECK DONE.");
 	}
 
-	public static Options setupOptions() {
+	private static Options setupOptions() {
 		Options options = new Options();
 		Option opt_help = createOption("h", "help", "help_create_pdf_size");
 		Option opt_pdf_size = createArgOption("pz", "pdf_size", "help_create_pdf_size");

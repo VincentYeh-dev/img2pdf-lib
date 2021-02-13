@@ -15,6 +15,7 @@ import org.jdom2.Element;
 import org.jdom2.input.DOMBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
 import org.xml.sax.SAXException;
 
 public class TaskList extends ArrayList<Task> {
@@ -28,17 +29,18 @@ public class TaskList extends ArrayList<Task> {
 
 	}
 
-	public TaskList(File xml_file) throws ParserConfigurationException, SAXException, IOException {
+	public TaskList(File xml_file) throws ParserConfigurationException, SAXException, IOException, UnrecognizedEnumException {
 		this(getDOMParsedDocument(xml_file));
 	}
 
-	public TaskList(Document doc) throws FileNotFoundException {
+	public TaskList(Document doc) throws FileNotFoundException, UnrecognizedEnumException {
 		this(doc.getRootElement());
 	}
 
-	public TaskList(Element root) throws FileNotFoundException {
+	public TaskList(Element root) throws FileNotFoundException, UnrecognizedEnumException {
 		ArrayList<Element> importedTaskList = new ArrayList<Element>(root.getChildren("TASK"));
 		for (Element task : importedTaskList) {
+
 			this.add(new Task(task));
 		}
 	}
@@ -56,7 +58,7 @@ public class TaskList extends ArrayList<Task> {
 		// Create the XML
 		XMLOutputter outter = new XMLOutputter();
 		outter.setFormat(Format.getPrettyFormat());
-		
+
 		outter.output(doc, new FileWriter(file));
 
 	}

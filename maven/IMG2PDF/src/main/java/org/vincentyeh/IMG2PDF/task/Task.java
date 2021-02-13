@@ -8,6 +8,7 @@ import java.util.List;
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
 import org.jdom2.Element;
+import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
 import org.vincentyeh.IMG2PDF.pdf.document.DocumentAccessPermission;
 import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
@@ -45,8 +46,9 @@ public class Task {
 	 * 
 	 * @param element 
 	 * @throws FileNotFoundException When source image not found.
+	 * @throws UnrecognizedEnumException 
 	 */
-	public Task(Element element) throws FileNotFoundException {
+	public Task(Element element) throws FileNotFoundException, UnrecognizedEnumException {
 		this(parsePermission(element.getChild("PERMISSION")));
 		
 		this.destination = element.getAttributeValue("destination");

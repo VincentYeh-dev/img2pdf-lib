@@ -15,6 +15,7 @@ import org.vincentyeh.IMG2PDF.commandline.action.AbstractAction;
 import org.vincentyeh.IMG2PDF.commandline.action.ConvertAction;
 import org.vincentyeh.IMG2PDF.commandline.action.CreateAction;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
+import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
 
 
 public class MainProgram {
@@ -69,7 +70,7 @@ public class MainProgram {
 			System.err.println(e.getMessage());
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("ant", e.opt);
-		}catch (IllegalArgumentException e) {
+		}catch (UnrecognizedEnumException e) {
 			System.err.println(e.getMessage());
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block

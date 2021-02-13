@@ -127,7 +127,7 @@ public class ConvertAction extends AbstractAction {
 		executor.shutdown();
 	}
 
-	public static Options setupOptions() {
+	private static Options setupOptions() {
 		Options options = new Options();
 		Option opt_help = createOption("h", "help", "help_create_pdf_size");
 		Option opt_tasklist_source = createArgOption("lsrc", "tasklist_source", "help_convert_tasklist_source");

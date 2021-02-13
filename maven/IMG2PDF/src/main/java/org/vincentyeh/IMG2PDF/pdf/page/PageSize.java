@@ -1,6 +1,8 @@
 package org.vincentyeh.IMG2PDF.pdf.page;
 
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
+import org.vincentyeh.IMG2PDF.pdf.page.PageAlign.HorizontalAlign;
 
 /**
  * Size is the variable that define size of pages of PDFFile.
@@ -25,32 +27,19 @@ public enum PageSize {
 	 * 
 	 * @param str The String contain definition of Size.
 	 * @return Size
+	 * @throws UnrecognizedEnumException When unrecognizable enum pass in to constructor.
 	 */
-	public static PageSize getByString(String str) {
+	public static PageSize getByString(String str) throws UnrecognizedEnumException {
 		PageSize[] sizes = PageSize.values();
 		for (PageSize size : sizes) {
 			if (size.toString().equals(str))
 				return size;
 		}
-		throw new IllegalArgumentException("Sortby is invalid");
+		throw new UnrecognizedEnumException(str, PageSize.class);
 	}
 
 	public PDRectangle getPdrectangle() {
 		return pdrectangle;
-	}
-
-	/**
-	 * List all item of enum in String.
-	 * 
-	 * @return The array of enum in String.
-	 */
-	public static String[] valuesStr() {
-		PageSize[] size_list = PageSize.values();
-		String[] str_list = new String[size_list.length];
-		for (int i = 0; i < str_list.length; i++) {
-			str_list[i] = size_list[i].toString();
-		}
-		return str_list;
 	}
 
 }
