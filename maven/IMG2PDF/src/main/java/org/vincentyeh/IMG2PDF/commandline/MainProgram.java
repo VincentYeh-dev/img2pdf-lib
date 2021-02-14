@@ -17,7 +17,6 @@ import org.vincentyeh.IMG2PDF.commandline.action.CreateAction;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
 
-
 public class MainProgram {
 	public static ResourceBundle lagug_resource;
 
@@ -32,33 +31,32 @@ public class MainProgram {
 
 		Options options = new Options();
 		Option opt_mode = new Option("m", "mode", true, "mode");
-		Option opt_help = new Option("h", "help", false, "help");
+		Option opt_help = new Option("h", "help", false, "help_create_pdf_size");
+
 		options.addOption(opt_mode);
 		options.addOption(opt_help);
 
 		CommandLineParser parser = new RelaxedParser();
 
-		CommandLine mode_chooser = parser.parse(options, args);
-
 //		action = new CreateAction(args);
-		
+
 		try {
-			
+
+			CommandLine mode_chooser = parser.parse(options, args);
+
 			if (args == null || args.length == 0 || (mode_chooser.hasOption("help") && args.length == 1)) {
 				throw new HelperException(options);
 			}
-			
+
 			if (mode_chooser.hasOption("mode")) {
 				String value = mode_chooser.getOptionValue("mode");
 
 				if (value == null)
 					throw new NullPointerException();
 				else if (value.equals("create")) {
-					System.out.println("create");
 					action = new CreateAction(args);
 
 				} else if (value.equals("convert")) {
-					System.out.println("convert");
 					action = new ConvertAction(args);
 				} else {
 					throw new RuntimeException("sss");
@@ -70,7 +68,7 @@ public class MainProgram {
 			System.err.println(e.getMessage());
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("ant", e.opt);
-		}catch (UnrecognizedEnumException e) {
+		} catch (UnrecognizedEnumException e) {
 			System.err.println(e.getMessage());
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
@@ -89,6 +87,7 @@ public class MainProgram {
 	}
 
 	public static void main(String[] args) {
+		dumpArray(args);
 		try {
 			MainProgram main = new MainProgram(args);
 			main.startCommand();
@@ -97,6 +96,16 @@ public class MainProgram {
 			e.printStackTrace();
 		}
 
+	}
+
+	public static <T> void dumpArray(T[] array) {
+		System.out.print("[");
+		System.out.print(array[0]);
+		for (int i = 1; i < array.length; i++) {
+			System.out.print(",");
+			System.out.print(array[i]);
+		}
+		System.out.print("]\n");
 	}
 
 }

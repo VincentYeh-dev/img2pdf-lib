@@ -7,6 +7,7 @@ import org.apache.commons.cli.Option;
 
 public abstract class AbstractAction implements Action {
 	protected static ResourceBundle lagug_resource;
+	
 	static {
 		lagug_resource = ResourceBundle.getBundle("language_package", Locale.ROOT);
 	}

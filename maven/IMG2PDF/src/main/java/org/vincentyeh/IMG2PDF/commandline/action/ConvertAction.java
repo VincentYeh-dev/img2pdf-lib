@@ -17,6 +17,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.vincentyeh.IMG2PDF.commandline.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.ArgumentNotFoundException;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
 import org.vincentyeh.IMG2PDF.pdf.converter.ConversionListener;
@@ -32,8 +33,10 @@ public class ConvertAction extends AbstractAction {
 	protected final File[] tasklist_sources;
 	protected final boolean open_when_complete = false;
 
+	private static final Option opt_help = new Option("h", "help", false, "help");
+
 	public ConvertAction(String[] args) throws ParseException {
-		this((new DefaultParser()).parse(setupOptions(), args));
+		this((new CheckHelpParser(opt_help)).parse(setupOptions(), args));
 	}
 
 	public ConvertAction(CommandLine cmd) throws HelperException, ArgumentNotFoundException {
@@ -129,10 +132,12 @@ public class ConvertAction extends AbstractAction {
 
 	private static Options setupOptions() {
 		Options options = new Options();
-		Option opt_help = createOption("h", "help", "help_create_pdf_size");
 		Option opt_tasklist_source = createArgOption("lsrc", "tasklist_source", "help_convert_tasklist_source");
+		opt_tasklist_source.setRequired(true);
+		
 		Option opt_open_when_complete = createArgOption("o", "open_when_complete", "help_create_pdf_align");
-
+		opt_open_when_complete.setRequired(true);
+		
 		options.addOption(opt_help);
 		options.addOption(opt_tasklist_source);
 		options.addOption(opt_open_when_complete);

@@ -14,6 +14,7 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.vincentyeh.IMG2PDF.commandline.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.ArgumentNotFoundException;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
@@ -58,13 +59,15 @@ public class CreateAction extends AbstractAction {
 	protected final File[] sources;
 	protected final FileFilterHelper filter;
 
+	private static final Option opt_help = new Option("h", "help", false, "help");
+
 	public CreateAction(String[] args) throws ParseException {
-		this((new DefaultParser()).parse(setupOptions(), args));
+		this((new CheckHelpParser(opt_help)).parse(setupOptions(), args));
 	}
 
 	public CreateAction(CommandLine cmd) throws HelperException, ArgumentNotFoundException, UnrecognizedEnumException {
-		if (cmd.hasOption("-h"))
-			throw new HelperException(setupOptions());
+//		if (cmd.hasOption("-h"))
+//			throw new HelperException(setupOptions());
 
 		pdf_size = PageSize.getByString(cmd.getOptionValue("pdf_size", DEF_PDF_SIZE));
 
@@ -80,7 +83,7 @@ public class CreateAction extends AbstractAction {
 
 //		if (pdf_direction == null)
 //			throw new ArgumentNotFoundException("pdf_direction");
-		
+
 		pdf_sortby = Sortby.getByString(cmd.getOptionValue("pdf_sortby", DEFV_PDF_SORTBY));
 //		if (pdf_sortby == null)
 //			throw new ArgumentNotFoundException("pdf_sortby");
@@ -92,15 +95,11 @@ public class CreateAction extends AbstractAction {
 		pdf_permission = new DocumentAccessPermission(cmd.getOptionValue("pdf_permission", "11"));
 //		if (pdf_permission == null)
 //			throw new ArgumentNotFoundException("pdf_permission");
-		
-		pdf_auto_rotate = cmd.getOptionValue("pdf_auto_rotate", DEFV_PDF_AUTO_ROTATE).equals("YES");
 
+		pdf_auto_rotate = cmd.getOptionValue("pdf_auto_rotate", DEFV_PDF_AUTO_ROTATE).equals("YES");
 
 		pdf_owner_password = cmd.getOptionValue("pdf_owner_password");
 		pdf_user_password = cmd.getOptionValue("pdf_user_password");
-		
-
-		
 
 		pdf_destination = cmd.getOptionValue("pdf_destination");
 		if (pdf_destination == null)
@@ -139,7 +138,6 @@ public class CreateAction extends AbstractAction {
 
 	private static Options setupOptions() {
 		Options options = new Options();
-		Option opt_help = createOption("h", "help", "help_create_pdf_size");
 		Option opt_pdf_size = createArgOption("pz", "pdf_size", "help_create_pdf_size");
 		Option opt_pdf_align = createArgOption("pa", "pdf_align", "help_create_pdf_align");
 		Option opt_pdf_direction = createArgOption("pdi", "pdf_direction", "help_create_pdf_direction");
@@ -149,15 +147,19 @@ public class CreateAction extends AbstractAction {
 		Option opt_pdf_owner_password = createArgOption("popwd", "pdf_owner_password",
 				"help_create_pdf_owner_password");
 		Option opt_pdf_user_password = createArgOption("pupwd", "pdf_user_password", "help_create_pdf_user_password");
+		
 		Option opt_pdf_permission = createArgOption("pp", "pdf_permission", "help_create_pdf_permission");
+		
 		Option opt_pdf_destination = createArgOption("pdst", "pdf_destination", "help_create_pdf_destination");
+		opt_pdf_destination.setRequired(true);
+		
 		Option opt_filter = createArgOption("f", "filter", "help_import_filter");
 
 		Option opt_sources = createArgOption("src", "source", "help_import_source");
-//		opt_sources.setRequired(true);
+		opt_sources.setRequired(true);
 
 		Option opt_list_destination = createArgOption("ldst", "list_destination", "help_create_list_destination");
-//		opt_list_destination.setRequired(true);
+		opt_list_destination.setRequired(true);
 
 		options.addOption(opt_help);
 		options.addOption(opt_pdf_size);
