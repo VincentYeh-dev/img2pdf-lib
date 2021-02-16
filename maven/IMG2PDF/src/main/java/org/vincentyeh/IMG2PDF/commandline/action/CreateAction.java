@@ -14,6 +14,7 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.UnrecognizedOptionException;
 import org.vincentyeh.IMG2PDF.commandline.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.ArgumentNotFoundException;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
@@ -40,7 +41,7 @@ public class CreateAction extends AbstractAction {
 	private static final String DEF_PDF_ALIGN = "CENTER-CENTER";
 	private static final String DEF_PDF_DIRECTION = "Vertical";
 	private static final String DEFV_PDF_SORTBY = "NAME";
-	private static final String DEFV_PDF_ORDER = "INCREASE";
+	private static final String DEFV_PDF_SEQUENCE = "INCREASE";
 	private static final String DEFV_PDF_AUTO_ROTATE = "NO";
 	private static final String DEFV_PDF_FILTER = "[^\\.]*\\.(png|PNG|jpg|JPG)";
 
@@ -61,7 +62,7 @@ public class CreateAction extends AbstractAction {
 
 	private static final Option opt_help = new Option("h", "help", false, "help");
 
-	public CreateAction(String[] args) throws ParseException {
+	public CreateAction(String[] args) throws UnrecognizedOptionException,ParseException {
 		this((new CheckHelpParser(opt_help)).parse(setupOptions(), args));
 	}
 
@@ -88,7 +89,7 @@ public class CreateAction extends AbstractAction {
 //		if (pdf_sortby == null)
 //			throw new ArgumentNotFoundException("pdf_sortby");
 
-		pdf_sequence = Sequence.getByString(cmd.getOptionValue("pdf_order", DEFV_PDF_ORDER));
+		pdf_sequence = Sequence.getByString(cmd.getOptionValue("pdf_sequence", DEFV_PDF_SEQUENCE));
 //		if (pdf_sequence == null)
 //			throw new ArgumentNotFoundException("pdf_order");
 
@@ -138,12 +139,12 @@ public class CreateAction extends AbstractAction {
 
 	private static Options setupOptions() {
 		Options options = new Options();
-		Option opt_pdf_size = createArgOption("pz", "pdf_size", "help_create_pdf_size");
+		Option opt_pdf_size = createEnumOption("pz", "pdf_size", "help_create_pdf_size",PageSize.class);
 		Option opt_pdf_align = createArgOption("pa", "pdf_align", "help_create_pdf_align");
-		Option opt_pdf_direction = createArgOption("pdi", "pdf_direction", "help_create_pdf_direction");
+		Option opt_pdf_direction = createEnumOption("pdi", "pdf_direction", "help_create_pdf_direction",PageDirection.class);
 		Option opt_pdf_auto_rotate = createArgOption("par", "pdf_auto_rotate", "help_create_pdf_auto_rotate");
-		Option opt_pdf_sortby = createArgOption("ps", "pdf_sortby", "help_create_pdf_sortby");
-		Option opt_pdf_order = createArgOption("po", "pdf_order", "help_create_pdf_order");
+		Option opt_pdf_sortby = createEnumOption("ps", "pdf_sortby", "help_create_pdf_sortby",Sortby.class);
+		Option opt_pdf_sequence = createEnumOption("pseq", "pdf_sequence", "help_create_pdf_sequence",Sequence.class);
 		Option opt_pdf_owner_password = createArgOption("popwd", "pdf_owner_password",
 				"help_create_pdf_owner_password");
 		Option opt_pdf_user_password = createArgOption("pupwd", "pdf_user_password", "help_create_pdf_user_password");
@@ -153,9 +154,9 @@ public class CreateAction extends AbstractAction {
 		Option opt_pdf_destination = createArgOption("pdst", "pdf_destination", "help_create_pdf_destination");
 		opt_pdf_destination.setRequired(true);
 		
-		Option opt_filter = createArgOption("f", "filter", "help_import_filter");
+		Option opt_filter = createArgOption("f", "filter", "help_create_filter");
 
-		Option opt_sources = createArgOption("src", "source", "help_import_source");
+		Option opt_sources = createArgOption("src", "source", "help_create_source");
 		opt_sources.setRequired(true);
 
 		Option opt_list_destination = createArgOption("ldst", "list_destination", "help_create_list_destination");
@@ -167,7 +168,7 @@ public class CreateAction extends AbstractAction {
 		options.addOption(opt_pdf_direction);
 		options.addOption(opt_pdf_auto_rotate);
 		options.addOption(opt_pdf_sortby);
-		options.addOption(opt_pdf_order);
+		options.addOption(opt_pdf_sequence);
 		options.addOption(opt_pdf_owner_password);
 		options.addOption(opt_pdf_user_password);
 		options.addOption(opt_pdf_permission);

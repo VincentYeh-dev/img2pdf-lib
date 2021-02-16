@@ -35,6 +35,10 @@ public abstract class AbstractAction implements Action {
 	protected static Option createArgOption(String opt, String longOpt, String res_description) {
 		return new Option(opt, longOpt, true, lagug_resource.getString(res_description));
 	}
+	
+	protected static <T> Option createEnumOption(String opt, String longOpt, String res_description,Class<T> _enum) {
+		return new Option(opt, longOpt, true,String.format(lagug_resource.getString(res_description),listEnum(_enum)));
+	}
 
 	protected static Option createOption(String opt, String longOpt, String res_description) {
 		return new Option(opt, longOpt, false, lagug_resource.getString(res_description));

@@ -11,7 +11,9 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.UnrecognizedOptionException;
 import org.vincentyeh.IMG2PDF.commandline.action.AbstractAction;
+import org.vincentyeh.IMG2PDF.commandline.action.ActionMode;
 import org.vincentyeh.IMG2PDF.commandline.action.ConvertAction;
 import org.vincentyeh.IMG2PDF.commandline.action.CreateAction;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
@@ -30,7 +32,7 @@ public class MainProgram {
 	public MainProgram(String[] args) throws ParseException {
 
 		Options options = new Options();
-		Option opt_mode = new Option("m", "mode", true, "mode");
+		Option opt_mode = new Option("m", "mode", true,String.format(lagug_resource.getString("root_mode"),listEnum(ActionMode.class)));
 		Option opt_help = new Option("h", "help", false, "help_create_pdf_size");
 
 		options.addOption(opt_mode);
@@ -68,6 +70,9 @@ public class MainProgram {
 			System.err.println(e.getMessage());
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("ant", e.opt);
+		}catch (UnrecognizedOptionException e) {
+//			e.printStackTrace();
+			System.err.println(e.getMessage());
 		} catch (UnrecognizedEnumException e) {
 			System.err.println(e.getMessage());
 		} catch (ParseException e) {
@@ -106,6 +111,17 @@ public class MainProgram {
 			System.out.print(array[i]);
 		}
 		System.out.print("]\n");
+	}
+	
+	protected static <T> String listEnum(Class<T> _class_enum) {
+		T[] enums = _class_enum.getEnumConstants();
+		StringBuilder sb = new StringBuilder();
+		sb.append(enums[0].toString());
+		for (int i = 1; i < enums.length; i++) {
+			sb.append(",");
+			sb.append(enums[i].toString());
+		}
+		return sb.toString();
 	}
 
 }

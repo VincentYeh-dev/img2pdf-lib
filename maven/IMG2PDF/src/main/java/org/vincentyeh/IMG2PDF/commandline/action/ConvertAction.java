@@ -2,28 +2,23 @@ package org.vincentyeh.IMG2PDF.commandline.action;
 
 import java.awt.Desktop;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.UnrecognizedOptionException;
 import org.vincentyeh.IMG2PDF.commandline.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.ArgumentNotFoundException;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
 import org.vincentyeh.IMG2PDF.pdf.converter.ConversionListener;
 import org.vincentyeh.IMG2PDF.pdf.converter.PDFConverter;
 import org.vincentyeh.IMG2PDF.pdf.document.ImagesPDFDocument;
-import org.vincentyeh.IMG2PDF.pdf.page.PageSize;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskList;
 
@@ -35,7 +30,7 @@ public class ConvertAction extends AbstractAction {
 
 	private static final Option opt_help = new Option("h", "help", false, "help");
 
-	public ConvertAction(String[] args) throws ParseException {
+	public ConvertAction(String[] args) throws UnrecognizedOptionException,ParseException {
 		this((new CheckHelpParser(opt_help)).parse(setupOptions(), args));
 	}
 
