@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -62,7 +63,7 @@ public class CreateAction extends AbstractAction {
 
 	private static final Option opt_help = new Option("h", "help", false, "help");
 
-	public CreateAction(String[] args) throws UnrecognizedOptionException,ParseException {
+	public CreateAction(String[] args) throws UnrecognizedOptionException, ParseException {
 		this((new CheckHelpParser(opt_help)).parse(setupOptions(), args));
 	}
 
@@ -139,21 +140,22 @@ public class CreateAction extends AbstractAction {
 
 	private static Options setupOptions() {
 		Options options = new Options();
-		Option opt_pdf_size = createEnumOption("pz", "pdf_size", "help_create_pdf_size",PageSize.class);
+		Option opt_pdf_size = createEnumOption("pz", "pdf_size", "help_create_pdf_size", PageSize.class);
 		Option opt_pdf_align = createArgOption("pa", "pdf_align", "help_create_pdf_align");
-		Option opt_pdf_direction = createEnumOption("pdi", "pdf_direction", "help_create_pdf_direction",PageDirection.class);
+		Option opt_pdf_direction = createEnumOption("pdi", "pdf_direction", "help_create_pdf_direction",
+				PageDirection.class);
 		Option opt_pdf_auto_rotate = createArgOption("par", "pdf_auto_rotate", "help_create_pdf_auto_rotate");
-		Option opt_pdf_sortby = createEnumOption("ps", "pdf_sortby", "help_create_pdf_sortby",Sortby.class);
-		Option opt_pdf_sequence = createEnumOption("pseq", "pdf_sequence", "help_create_pdf_sequence",Sequence.class);
+		Option opt_pdf_sortby = createEnumOption("ps", "pdf_sortby", "help_create_pdf_sortby", Sortby.class);
+		Option opt_pdf_sequence = createEnumOption("pseq", "pdf_sequence", "help_create_pdf_sequence", Sequence.class);
 		Option opt_pdf_owner_password = createArgOption("popwd", "pdf_owner_password",
 				"help_create_pdf_owner_password");
 		Option opt_pdf_user_password = createArgOption("pupwd", "pdf_user_password", "help_create_pdf_user_password");
-		
+
 		Option opt_pdf_permission = createArgOption("pp", "pdf_permission", "help_create_pdf_permission");
-		
+
 		Option opt_pdf_destination = createArgOption("pdst", "pdf_destination", "help_create_pdf_destination");
 		opt_pdf_destination.setRequired(true);
-		
+
 		Option opt_filter = createArgOption("f", "filter", "help_create_filter");
 
 		Option opt_sources = createArgOption("src", "source", "help_create_source");
@@ -233,20 +235,24 @@ public class CreateAction extends AbstractAction {
 	}
 
 	private Task parse2Task(File source_directory, FileFilterHelper filter) throws FileNotFoundException {
-		Task task = new Task(pdf_owner_password, pdf_user_password, pdf_permission);
+		HashMap<String, Object> configuration = new HashMap<>();
 
 		NameFormatter nf = new NameFormatter(source_directory);
-		String real_dest = nf.format(pdf_destination);
-		task.setDestination(real_dest);
-		task.setAlign(pdf_align);
-		task.setSize(pdf_size);
-		task.setDefaultDirection(pdf_direction);
-		task.setAutoRotate(pdf_auto_rotate);
+		configuration.put("pdf_permission", pdf_permission);
+		configuration.put("pdf_destination", nf.format(pdf_destination));
+		configuration.put("pdf_align", pdf_align);
+		configuration.put("pdf_size", pdf_size);
+		configuration.put("pdf_direction", pdf_direction);
+		configuration.put("pdf_auto_rotate", pdf_auto_rotate);
 
+		configuration.put("pdf_user_password", pdf_user_password);
+		configuration.put("pdf_owner_password", pdf_owner_password);
+		
 		ArrayList<ImgFile> imgs = importImagesFile(source_directory, filter);
 		Collections.sort(imgs);
-		task.setImgs(imgs);
-		return task;
+		configuration.put("imgs", imgs);
+
+		return new Task(configuration);
 	}
 
 	private ArrayList<ImgFile> importImagesFile(File source_directory, FileFilterHelper filter)

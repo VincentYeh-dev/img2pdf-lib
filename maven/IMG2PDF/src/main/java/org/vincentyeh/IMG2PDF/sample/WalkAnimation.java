@@ -43,9 +43,9 @@ public class WalkAnimation {
 //				
 				+ "-pseq INCREASE "
 //				
-//				+ "-pupwd 1234AAA "
+				+ "-pupwd 1234AAA "
 //				
-//				+ "-popwd 1234AAA "
+				+ "-popwd 1234AAA "
 //				
 				+ "-pp 11 "
 //				

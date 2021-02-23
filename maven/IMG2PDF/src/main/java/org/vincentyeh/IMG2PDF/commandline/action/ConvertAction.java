@@ -100,7 +100,7 @@ public class ConvertAction extends AbstractAction {
 				if (open_when_complete) {
 					Desktop desktop = Desktop.getDesktop();
 
-					File dst = new File(task.getDestination());
+					File dst = new File(task.getPDFDestination());
 
 					if (dst.exists())
 						try {
@@ -154,8 +154,8 @@ public class ConvertAction extends AbstractAction {
 			size_of_imgs = task.getImgs().size();
 			perImg = (10. / size_of_imgs);
 			System.out.println("###PDF Conversion Task###");
-			System.out.printf("destination:%s\n", task.getDestination());
-			System.out.printf("name:%s\n", new File(task.getDestination()).getName());
+			System.out.printf("destination:%s\n", task.getPDFDestination());
+			System.out.printf("name:%s\n", new File(task.getPDFDestination()).getName());
 			System.out.print("\nProgress->");
 			System.out.print("0%[");
 

@@ -39,7 +39,7 @@ public class PDFConverter implements Callable<ImagesPDFDocument> {
 		this.task = task;
 		doc = new ImagesPDFDocument();
 		doc.protect(task.getSpp());
-		doc.setDestination(task.getDestination());
+		doc.setDestination(task.getPDFDestination());
 	}
 
 	/**
@@ -110,12 +110,12 @@ public class PDFConverter implements Callable<ImagesPDFDocument> {
 	 * @throws Exception
 	 */
 	private ImagePage createImgPage(BufferedImage img) throws Exception  {
-		PageSize size = task.getSize();
+		PageSize size = task.getPDFSize();
 		ImagePage imgpage = null;
 		if (size == PageSize.DEPEND_ON_IMG) {
-			imgpage = new ImagePage(task.getAlign(), img);
+			imgpage = new ImagePage(task.getPDFAlign(), img);
 		} else {
-			imgpage = new ImagePage(task.getAlign(), task.getSize(), task.getAutoRotate(), task.getDefaultDirection(),
+			imgpage = new ImagePage(task.getPDFAlign(), task.getPDFSize(), task.getPDFAutoRotate(), task.getPDFDirection(),
 					img);
 		}
 		imgpage.drawImageToPage(doc);
