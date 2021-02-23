@@ -57,7 +57,7 @@ public class WalkAnimation {
 //				
 				+ sources_list.getAbsolutePath() + "\"";
 
-		String convert_command = "-m convert -o YES -lsrc \"" + taskslist_destination.getAbsolutePath()+"\"";
+		String convert_command = "-m convert -o -lsrc \"" + taskslist_destination.getAbsolutePath()+"\"";
 		System.out.println("create command:");
 		System.out.println(create_command);
 		

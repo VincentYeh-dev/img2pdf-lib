@@ -26,7 +26,7 @@ import org.vincentyeh.IMG2PDF.task.TaskList;
 public class ConvertAction extends AbstractAction {
 
 	protected final File[] tasklist_sources;
-	protected final boolean open_when_complete = false;
+	protected final boolean open_when_complete;
 
 	private static final Option opt_help = new Option("h", "help", false, "help");
 
@@ -42,6 +42,8 @@ public class ConvertAction extends AbstractAction {
 
 		if (str_sources == null)
 			throw new ArgumentNotFoundException("sources");
+		
+		open_when_complete=cmd.hasOption("o");
 		
 		tasklist_sources = new File[str_sources.length];
 		for (int i = 0; i < tasklist_sources.length; i++) {
@@ -130,8 +132,7 @@ public class ConvertAction extends AbstractAction {
 		Option opt_tasklist_source = createArgOption("lsrc", "tasklist_source", "help_convert_tasklist_source");
 		opt_tasklist_source.setRequired(true);
 		
-		Option opt_open_when_complete = createArgOption("o", "open_when_complete", "help_create_pdf_align");
-		opt_open_when_complete.setRequired(true);
+		Option opt_open_when_complete = createOption("o", "open_when_complete", "help_create_pdf_align");
 		
 		options.addOption(opt_help);
 		options.addOption(opt_tasklist_source);
