@@ -20,6 +20,10 @@ public class ImagesPDFDocument extends PDDocument {
 	}
 	
 	public void save() throws IOException {
+		if(destination.getParentFile().mkdirs()) {
+			System.out.println("Required folders have been created in advance:"+destination.getParent());
+		}
+		
 		super.save(this.destination);
 	}
 	

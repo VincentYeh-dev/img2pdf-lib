@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TASKLIST>
-  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-14 11-53-26.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="false">
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-23 11-50-13.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
     <FILES>
       <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
       <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>

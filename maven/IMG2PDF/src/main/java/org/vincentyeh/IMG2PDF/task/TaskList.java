@@ -52,13 +52,18 @@ public class TaskList extends ArrayList<Task> {
 	 * @throws IOException
 	 */
 	public void toXMLFile(File file) throws IOException {
+
+		if(file.getParentFile().mkdirs()) {
+			System.out.println("Required folders have been created in advance:"+file.getParent());
+		}
+		
 		Document doc = new Document();
 		Element root = toElement();
 		doc.setRootElement(root);
 		// Create the XML
 		XMLOutputter outter = new XMLOutputter();
 		outter.setFormat(Format.getPrettyFormat());
-
+		
 		outter.output(doc, new FileWriter(file));
 
 	}
