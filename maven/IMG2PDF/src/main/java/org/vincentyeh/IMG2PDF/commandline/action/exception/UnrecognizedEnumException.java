@@ -1,8 +1,8 @@
 package org.vincentyeh.IMG2PDF.commandline.action.exception;
 
-import org.apache.commons.cli.ParseException;
+import org.vincentyeh.IMG2PDF.commandline.Configuration;
 
-public class UnrecognizedEnumException extends ParseException {
+public class UnrecognizedEnumException extends RuntimeException {
 
 	/**
 	 * 
@@ -10,17 +10,17 @@ public class UnrecognizedEnumException extends ParseException {
 	private static final long serialVersionUID = 5818347104393060334L;
 
 	public <T> UnrecognizedEnumException(String unrecognizable_enum, Class<T> _class) {
-		super(String.format("%s is not a recognizable enum of %s.\r\nAvaiable choices:%s", unrecognizable_enum,
+		super(String.format(Configuration.getResString("err_unrecognizable_enum_long"),unrecognizable_enum,
 				_class.getSimpleName(), listEnum(_class)));
 
 	}
 
 	public UnrecognizedEnumException(String unrecognizable_enum, String _enum) {
-		super(String.format("%s is not a recognizable enum of %s.", unrecognizable_enum, _enum));
+		super(String.format(Configuration.getResString("err_unrecognizable_enum_short"), unrecognizable_enum, _enum));
 	}
 
 	public <T> UnrecognizedEnumException(String unrecognizable_enum, String _enum, Class<T> _class) {
-		super(String.format("%s is not a recognizable enum of %s.\r\nAvaiable choices:%s", unrecognizable_enum, _enum,
+		super(String.format(Configuration.getResString("err_unrecognizable_enum_long"), unrecognizable_enum, _enum,
 				listEnum(_class)));
 
 	}

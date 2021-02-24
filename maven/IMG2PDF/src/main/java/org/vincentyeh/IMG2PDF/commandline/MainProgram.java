@@ -1,12 +1,10 @@
 package org.vincentyeh.IMG2PDF.commandline;
 
-import java.io.FileNotFoundException;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -20,27 +18,27 @@ import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
 
 public class MainProgram {
-	public static ResourceBundle lagug_resource;
-
-	public final static String PROGRAM_NAME = "IMG2PDF";
 	private AbstractAction action;
 
 	static {
-		lagug_resource = ResourceBundle.getBundle("language_package", Locale.getDefault());
+//	Local:
+		Configuration.setLagugRes(ResourceBundle.getBundle("language_package", Locale.getDefault()));
+//	root:
+
+//		Configuration.setLagugRes(ResourceBundle.getBundle("language_package", Locale.ROOT));
 	}
 
 	public MainProgram(String[] args) throws ParseException {
 
 		Options options = new Options();
-		Option opt_mode = new Option("m", "mode", true,String.format(lagug_resource.getString("root_mode"),listEnum(ActionMode.class)));
+		Option opt_mode = new Option("m", "mode", true,
+				String.format(Configuration.getResString("root_mode"), listEnum(ActionMode.class)));
 		Option opt_help = new Option("h", "help", false, "help_create_pdf_size");
 
 		options.addOption(opt_mode);
 		options.addOption(opt_help);
 
 		CommandLineParser parser = new RelaxedParser();
-
-//		action = new CreateAction(args);
 
 		try {
 
@@ -70,7 +68,7 @@ public class MainProgram {
 			System.err.println(e.getMessage());
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("ant", e.opt);
-		}catch (UnrecognizedOptionException e) {
+		} catch (UnrecognizedOptionException e) {
 //			e.printStackTrace();
 			System.err.println(e.getMessage());
 		} catch (UnrecognizedEnumException e) {
@@ -97,7 +95,6 @@ public class MainProgram {
 			MainProgram main = new MainProgram(args);
 			main.startCommand();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -112,7 +109,7 @@ public class MainProgram {
 		}
 		System.out.print("]\n");
 	}
-	
+
 	protected static <T> String listEnum(Class<T> _class_enum) {
 		T[] enums = _class_enum.getEnumConstants();
 		StringBuilder sb = new StringBuilder();
