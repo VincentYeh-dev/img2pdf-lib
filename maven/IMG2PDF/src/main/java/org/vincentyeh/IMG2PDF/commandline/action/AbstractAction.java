@@ -7,10 +7,6 @@ import org.vincentyeh.IMG2PDF.commandline.Configuration;
 public abstract class AbstractAction implements Action {
 	
 	public void start() throws Exception {
-		System.out.println("\n##IMG2PDF##");
-		System.out.println("Developer: VincentYeh-dev");
-		System.out.println("Version: XXX");
-		System.out.println("-----------------------");
 
 	}
 

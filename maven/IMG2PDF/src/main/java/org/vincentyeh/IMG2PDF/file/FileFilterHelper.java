@@ -22,4 +22,7 @@ public class FileFilterHelper implements FileFilter{
 		return file.getName().matches(regex);
 	}
 	
+	public String getRegex() {
+		return regex;
+	}
 }

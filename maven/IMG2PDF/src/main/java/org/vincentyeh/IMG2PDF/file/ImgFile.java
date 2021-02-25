@@ -21,7 +21,7 @@ public class ImgFile extends File implements Comparable<File> {
 	private static final long serialVersionUID = -6910177315066351680L;
 
 	private final Sortby sortby;
-	private final Sequence order;
+	private final Sequence sequence;
 
 	/**
 	 * Create the ImgFile that no need to sort.
@@ -38,10 +38,10 @@ public class ImgFile extends File implements Comparable<File> {
 	 * 
 	 * @param pathname the path of image file
 	 * @param sortby   sortby
-	 * @param order    order
+	 * @param sequence sequence
 	 * @throws FileNotFoundException when file is not exists
 	 */
-	public ImgFile(String pathname, Sortby sortby, Sequence order) throws FileNotFoundException {
+	public ImgFile(String pathname, Sortby sortby, Sequence sequence) throws FileNotFoundException {
 		super(pathname);
 		if (pathname.isEmpty())
 			throw new RuntimeException("Path name is empty.");
@@ -51,7 +51,7 @@ public class ImgFile extends File implements Comparable<File> {
 			throw new FileIsDirectoryException(this);
 
 		this.sortby = sortby;
-		this.order = order;
+		this.sequence = sequence;
 
 	}
 
@@ -59,25 +59,25 @@ public class ImgFile extends File implements Comparable<File> {
 	public int compareTo(File o) {
 		switch (sortby) {
 		case NAME:
-			if (order == Sequence.INCREASE)
+			if (sequence == Sequence.INCREASE)
 				return this.getName().compareTo(o.getName());
-			else if (order == Sequence.DECREASE)
+			else if (sequence == Sequence.DECREASE)
 				return o.getName().compareTo(this.getName());
 		case DATE:
-			if (order == Sequence.INCREASE)
+			if (sequence == Sequence.INCREASE)
 				return (this.lastModified() - o.lastModified() > 0) ? 1 : -1;
 
-			else if (order == Sequence.DECREASE)
+			else if (sequence == Sequence.DECREASE)
 				return (this.lastModified() - o.lastModified() > 0) ? -1 : 1;
 		case NUMERTIC:
-			if (order == Sequence.INCREASE)
+			if (sequence == Sequence.INCREASE)
 				return compareTo(this.getName(), o.getName());
 
-			else if (order == Sequence.DECREASE)
+			else if (sequence == Sequence.DECREASE)
 				return compareTo(o.getName(), this.getName());
 
 		default:
-			throw new RuntimeException("Multiple files need to be sorted by sort and order arguments.");
+			throw new RuntimeException("Multiple files need to be sorted by sort and sequence arguments.");
 		}
 
 	}
@@ -91,7 +91,7 @@ public class ImgFile extends File implements Comparable<File> {
 				if (sequence.toString().equals(str))
 					return sequence;
 			}
-			throw new UnrecognizedEnumException(str,Sequence.class);
+			throw new UnrecognizedEnumException(str, Sequence.class);
 		}
 
 	}
@@ -105,7 +105,7 @@ public class ImgFile extends File implements Comparable<File> {
 				if (sortby.toString().equals(str))
 					return sortby;
 			}
-			throw new UnrecognizedEnumException(str,Sortby.class);
+			throw new UnrecognizedEnumException(str, Sortby.class);
 		}
 
 	}

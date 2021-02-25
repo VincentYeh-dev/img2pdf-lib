@@ -58,6 +58,7 @@ public class CreateAction extends AbstractAction {
 	protected final DocumentAccessPermission pdf_permission;
 	protected final String pdf_destination;
 	protected final String list_destination;
+	protected final boolean debug;
 
 	protected final File[] sources;
 	protected final FileFilterHelper filter;
@@ -69,36 +70,22 @@ public class CreateAction extends AbstractAction {
 	}
 
 	public CreateAction(CommandLine cmd) throws HelperException, ArgumentNotFoundException, UnrecognizedEnumException {
-//		if (cmd.hasOption("-h"))
-//			throw new HelperException(setupOptions());
-		pdf_size = PageSize.getByString(cmd.getOptionValue("pdf_size", DEF_PDF_SIZE));
 
-//		if (pdf_size == null)
-//			throw new ArgumentNotFoundException("pdf_size");
+		debug = cmd.hasOption("d");
+
+		pdf_size = PageSize.getByString(cmd.getOptionValue("pdf_size", DEF_PDF_SIZE));
 
 		pdf_align = new PageAlign(cmd.getOptionValue("pdf_align", DEF_PDF_ALIGN));
 
-//		if (pdf_align == null)
-//			throw new ArgumentNotFoundException("pdf_align");
-
 		pdf_direction = PageDirection.getByString(cmd.getOptionValue("pdf_direction", DEF_PDF_DIRECTION));
 
-//		if (pdf_direction == null)
-//			throw new ArgumentNotFoundException("pdf_direction");
-
 		pdf_sortby = Sortby.getByString(cmd.getOptionValue("pdf_sortby", DEFV_PDF_SORTBY));
-//		if (pdf_sortby == null)
-//			throw new ArgumentNotFoundException("pdf_sortby");
 
 		pdf_sequence = Sequence.getByString(cmd.getOptionValue("pdf_sequence", DEFV_PDF_SEQUENCE));
-//		if (pdf_sequence == null)
-//			throw new ArgumentNotFoundException("pdf_order");
 
 		pdf_permission = new DocumentAccessPermission(cmd.getOptionValue("pdf_permission", "11"));
-//		if (pdf_permission == null)
-//			throw new ArgumentNotFoundException("pdf_permission");
 
-		pdf_auto_rotate = cmd.getOptionValue("pdf_auto_rotate", DEFV_PDF_AUTO_ROTATE).equals("YES");
+		pdf_auto_rotate = cmd.hasOption("pdf_auto_rotate");
 
 		pdf_owner_password = cmd.getOptionValue("pdf_owner_password");
 		pdf_user_password = cmd.getOptionValue("pdf_user_password");
@@ -122,8 +109,10 @@ public class CreateAction extends AbstractAction {
 
 		sources = new File[str_sources.length];
 		for (int i = 0; i < sources.length; i++) {
-			System.out.println("sources checking....");
+//			per dirlist
+
 			sources[i] = new File(str_sources[i]);
+			System.out.printf("\n" + Configuration.getResString("source_verifying") + "\n", sources[i].getName());
 
 			if (!sources[i].exists()) {
 				System.err.printf("\n" + Configuration.getResString("err_filenotfound") + "\n",
@@ -136,59 +125,57 @@ public class CreateAction extends AbstractAction {
 //				System.err.println("Path should be a file:" + sources[i].getAbsolutePath());
 				continue;
 			} else {
-				System.out.printf("[" + Configuration.getResString("common_verified") + "] %s\n",
+				System.out.printf("\t[" + Configuration.getResString("common_verified") + "] %s\n",
 						sources[i].getAbsolutePath());
 //				System.out.println("[Verified] " + sources[i].getAbsolutePath());
 			}
 		}
 		System.out.println("CHECK DONE.");
+
+		System.out.printf("### " + Configuration.getResString("tasklist_config")
+				+ " ###\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s############\n",
+//				
+				Configuration.getResString("arg_align"), pdf_align.toString(),
+//				
+				Configuration.getResString("arg_size"), pdf_size.toString(),
+//				
+				Configuration.getResString("arg_direction"), pdf_direction.toString(),
+//				
+				Configuration.getResString("arg_auto_rotate"), pdf_auto_rotate,
+//				
+				Configuration.getResString("arg_filter"), filter.getRegex(),
+//				
+				Configuration.getResString("arg_tasklist_dst"), list_destination,
+//				
+				Configuration.getResString("arg_source"), dumpArrayString(sources)
+//				
+		);
 	}
 
-	private static Options setupOptions() {
-		Options options = new Options();
-		Option opt_pdf_size = createEnumOption("pz", "pdf_size", "help_create_pdf_size", PageSize.class);
-		Option opt_pdf_align = createArgOption("pa", "pdf_align", "help_create_pdf_align");
-		Option opt_pdf_direction = createEnumOption("pdi", "pdf_direction", "help_create_pdf_direction",
-				PageDirection.class);
-		Option opt_pdf_auto_rotate = createArgOption("par", "pdf_auto_rotate", "help_create_pdf_auto_rotate");
-		Option opt_pdf_sortby = createEnumOption("ps", "pdf_sortby", "help_create_pdf_sortby", Sortby.class);
-		Option opt_pdf_sequence = createEnumOption("pseq", "pdf_sequence", "help_create_pdf_sequence", Sequence.class);
-		Option opt_pdf_owner_password = createArgOption("popwd", "pdf_owner_password",
-				"help_create_pdf_owner_password");
-		Option opt_pdf_user_password = createArgOption("pupwd", "pdf_user_password", "help_create_pdf_user_password");
+	@Override
+	public void start() throws Exception {
+		super.start();
+		File dst = new File(list_destination);
 
-		Option opt_pdf_permission = createArgOption("pp", "pdf_permission", "help_create_pdf_permission");
+		TaskList tasks = dst.exists() ? new TaskList(dst) : new TaskList();
 
-		Option opt_pdf_destination = createArgOption("pdst", "pdf_destination", "help_create_pdf_destination");
-		opt_pdf_destination.setRequired(true);
+		for (File source : sources) {
 
-		Option opt_filter = createArgOption("f", "filter", "help_create_filter");
+			try {
+				tasks.addAll(importTasksFromTXT(source, filter));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 
-		Option opt_sources = createArgOption("src", "source", "help_create_source");
-		opt_sources.setRequired(true);
+		try {
+			tasks.toXMLFile(dst);
+			System.out.printf("\n[" + Configuration.getResString("common_exported") + "] %s\n", dst.getAbsolutePath());
+		} catch (IOException e) {
+			System.err.printf("\n" + Configuration.getResString("err_tasklist_create") + "\n", e.getMessage());
+		}
 
-		Option opt_list_destination = createArgOption("ldst", "list_destination", "help_create_list_destination");
-		opt_list_destination.setRequired(true);
-
-		options.addOption(opt_help);
-		options.addOption(opt_pdf_size);
-		options.addOption(opt_pdf_align);
-		options.addOption(opt_pdf_direction);
-		options.addOption(opt_pdf_auto_rotate);
-		options.addOption(opt_pdf_sortby);
-		options.addOption(opt_pdf_sequence);
-		options.addOption(opt_pdf_owner_password);
-		options.addOption(opt_pdf_user_password);
-		options.addOption(opt_pdf_permission);
-		options.addOption(opt_pdf_destination);
-		options.addOption(opt_filter);
-		options.addOption(opt_sources);
-		options.addOption(opt_list_destination);
-
-		Option opt_mode = new Option("m", "mode", true, "mode");
-		options.addOption(opt_mode);
-
-		return options;
+		super.done();
 	}
 
 	protected TaskList importTasksFromTXT(File file, FileFilterHelper filter) throws IOException {
@@ -198,18 +185,8 @@ public class CreateAction extends AbstractAction {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(uis.getInputStream(), StandardCharsets.UTF_8));
 
 		TaskList tasks = new TaskList();
-		String format = "### Document setting ###\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n###END###\n";
-		System.out.printf(format,
-//				
-				Configuration.getResString("arg_align"), pdf_align.toString(),
-//				
-				Configuration.getResString("arg_size"), pdf_size.toString(),
-//				
-				Configuration.getResString("arg_direction"), pdf_direction.toString(),
-//				
-				Configuration.getResString("arg_auto_rotate"), pdf_auto_rotate);
 
-		System.out.println("Import tasks from list:");
+		System.out.printf("\n" + Configuration.getResString("import_from_list") + "\n", file.getName());
 		int line_counter = 0;
 		String buf = "";
 		while (buf != null) {
@@ -225,7 +202,7 @@ public class CreateAction extends AbstractAction {
 						throw new SourceFolderIsFileException(line_counter, dir, file);
 
 					tasks.add(parse2Task(dir, filter));
-					System.out.printf("\n\t[" + Configuration.getResString("common_imported") + "] %s\n",
+					System.out.printf("\t[" + Configuration.getResString("common_imported") + "] %s\n",
 							dir.getAbsolutePath());
 				} catch (SourceFolderException e) {
 					System.err.println(e.getMessage());
@@ -263,7 +240,17 @@ public class CreateAction extends AbstractAction {
 		configuration.put("pdf_owner_password", pdf_owner_password);
 
 		ArrayList<ImgFile> imgs = importImagesFile(source_directory, filter);
+
 		Collections.sort(imgs);
+		if (debug) {
+			System.out.println("@Debug");
+			System.out.println("Sort Images:");
+			for (ImgFile img : imgs) {
+				System.out.println(img);
+			}
+			System.out.println();
+		}
+		
 		configuration.put("imgs", imgs);
 
 		return new Task(configuration);
@@ -271,38 +258,85 @@ public class CreateAction extends AbstractAction {
 
 	private ArrayList<ImgFile> importImagesFile(File source_directory, FileFilterHelper filter)
 			throws FileNotFoundException {
+		if (debug) {
+			System.out.println("@Debug");
+			System.out.println("Import Images:");
+		}
 		ArrayList<ImgFile> imgs = new ArrayList<ImgFile>();
 		for (File f : source_directory.listFiles(filter)) {
 			ImgFile img = new ImgFile(f.getAbsolutePath(), pdf_sortby, pdf_sequence);
 			imgs.add(img);
+			if (debug)
+				System.out.println(img);
 		}
+
+		if (debug)
+			System.out.println();
+
 		return imgs;
 	}
 
-	@Override
-	public void start() throws Exception {
-		super.start();
-		File dst = new File(list_destination);
-
-		TaskList tasks = dst.exists() ? new TaskList(dst) : new TaskList();
-
-		for (File source : sources) {
-
-			try {
-				tasks.addAll(importTasksFromTXT(source, filter));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+	private static <T> String dumpArrayString(T[] array) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		sb.append(array[0].toString());
+		for (int i = 1; i < array.length; i++) {
+			sb.append(",");
+			sb.append(array[i].toString());
 		}
+		sb.append("]\n");
+		return sb.toString();
+	}
 
-		try {
-			tasks.toXMLFile(dst);
-			System.out.printf("\n[" + Configuration.getResString("common_exported") + "] %s\n", dst.getAbsolutePath());
-		} catch (IOException e) {
-			System.err.printf("\n" + Configuration.getResString("err_tasklist_create") + "\n", e.getMessage());
-		}
+	private static Options setupOptions() {
 
-		super.done();
+		Options options = new Options();
+		Option opt_debug = createOption("d", "debug", "help_create_debug");
+
+		Option opt_pdf_size = createEnumOption("pz", "pdf_size", "help_create_pdf_size", PageSize.class);
+		Option opt_pdf_align = createArgOption("pa", "pdf_align", "help_create_pdf_align");
+		Option opt_pdf_direction = createEnumOption("pdi", "pdf_direction", "help_create_pdf_direction",
+				PageDirection.class);
+		Option opt_pdf_auto_rotate = createOption("par", "pdf_auto_rotate", "help_create_pdf_auto_rotate");
+		Option opt_pdf_sortby = createEnumOption("ps", "pdf_sortby", "help_create_pdf_sortby", Sortby.class);
+		Option opt_pdf_sequence = createEnumOption("pseq", "pdf_sequence", "help_create_pdf_sequence", Sequence.class);
+		Option opt_pdf_owner_password = createArgOption("popwd", "pdf_owner_password",
+				"help_create_pdf_owner_password");
+		Option opt_pdf_user_password = createArgOption("pupwd", "pdf_user_password", "help_create_pdf_user_password");
+
+		Option opt_pdf_permission = createArgOption("pp", "pdf_permission", "help_create_pdf_permission");
+
+		Option opt_pdf_destination = createArgOption("pdst", "pdf_destination", "help_create_pdf_destination");
+		opt_pdf_destination.setRequired(true);
+
+		Option opt_filter = createArgOption("f", "filter", "help_create_filter");
+
+		Option opt_sources = createArgOption("src", "source", "help_create_source");
+		opt_sources.setRequired(true);
+
+		Option opt_list_destination = createArgOption("ldst", "list_destination", "help_create_list_destination");
+		opt_list_destination.setRequired(true);
+
+		options.addOption(opt_debug);
+		options.addOption(opt_help);
+		options.addOption(opt_pdf_size);
+		options.addOption(opt_pdf_align);
+		options.addOption(opt_pdf_direction);
+		options.addOption(opt_pdf_auto_rotate);
+		options.addOption(opt_pdf_sortby);
+		options.addOption(opt_pdf_sequence);
+		options.addOption(opt_pdf_owner_password);
+		options.addOption(opt_pdf_user_password);
+		options.addOption(opt_pdf_permission);
+		options.addOption(opt_pdf_destination);
+		options.addOption(opt_filter);
+		options.addOption(opt_sources);
+		options.addOption(opt_list_destination);
+
+		Option opt_mode = new Option("m", "mode", true, "mode");
+		options.addOption(opt_mode);
+
+		return options;
 	}
 
 }

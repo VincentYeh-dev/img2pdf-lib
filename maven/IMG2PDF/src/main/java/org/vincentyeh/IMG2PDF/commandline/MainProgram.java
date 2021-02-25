@@ -30,6 +30,11 @@ public class MainProgram {
 
 	public MainProgram(String[] args) throws ParseException {
 
+		System.out.println("##IMG2PDF##");
+		System.out.println("Developer: VincentYeh-dev");
+		System.out.println("Version: XXX");
+		System.out.println("-----------------------");
+		
 		Options options = new Options();
 		Option opt_mode = new Option("m", "mode", true,
 				String.format(Configuration.getResString("root_mode"), listEnum(ActionMode.class)));
@@ -90,7 +95,7 @@ public class MainProgram {
 	}
 
 	public static void main(String[] args) {
-		dumpArray(args);
+//		dumpArray(args);
 		try {
 			MainProgram main = new MainProgram(args);
 			main.startCommand();
