@@ -20,6 +20,8 @@ import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumExcep
 public class MainProgram {
 	private AbstractAction action;
 
+	private static final Option opt_help = new Option("h", "help", false, "help");
+
 	static {
 //	Local:
 		Configuration.setLagugRes(ResourceBundle.getBundle("language_package", Locale.getDefault()));
@@ -31,17 +33,18 @@ public class MainProgram {
 	public MainProgram(String[] args) throws ParseException {
 
 		System.out.println("##IMG2PDF##");
-		System.out.println("Developer: VincentYeh-dev");
-		System.out.println("Version: XXX");
+		System.out.printf("%s: %s", Configuration.getResString("common_developer"), Configuration.DEVELOPER);
+		System.out.printf("\n%s: %s\n", Configuration.getResString("common_version"), Configuration.PROGRAM_VER);
 		System.out.println("-----------------------");
-		
-		Options options = new Options();
-		Option opt_mode = new Option("m", "mode", true,
-				String.format(Configuration.getResString("root_mode"), listEnum(ActionMode.class)));
-		Option opt_help = new Option("h", "help", false, "help_create_pdf_size");
 
-		options.addOption(opt_mode);
-		options.addOption(opt_help);
+//		Options options = new Options();
+//		Option opt_mode = new Option("m", "mode", true,
+//				String.format(Configuration.getResString("root_mode"), listEnum(ActionMode.class)));
+//		Option opt_help = new Option("h", "help", false, Configuration.getResString("root_help"));
+//
+//		options.addOption(opt_mode);
+//		options.addOption(opt_help);
+		Options options = setupOptions();
 
 		CommandLineParser parser = new RelaxedParser();
 
@@ -64,15 +67,15 @@ public class MainProgram {
 				} else if (value.equals("convert")) {
 					action = new ConvertAction(args);
 				} else {
-					throw new RuntimeException("sss");
+					throw new HelperException(options);
 				}
 
 			}
 
 		} catch (HelperException e) {
-			System.err.println(e.getMessage());
+//			System.err.println(e.getMessage());
 			HelpFormatter formatter = new HelpFormatter();
-			formatter.printHelp("ant", e.opt);
+			formatter.printHelp(Configuration.PROGRAM_NAME, e.opt);
 		} catch (UnrecognizedOptionException e) {
 //			e.printStackTrace();
 			System.err.println(e.getMessage());
@@ -83,6 +86,18 @@ public class MainProgram {
 			e.printStackTrace();
 		}
 
+	}
+
+	private static Options setupOptions() {
+
+		Options options = new Options();
+		Option opt_mode = new Option("m", "mode", true,
+				String.format(Configuration.getResString("root_mode"), listEnum(ActionMode.class)));
+		
+		options.addOption(opt_mode);
+		options.addOption(opt_help);
+
+		return options;
 	}
 
 	public void startCommand() {
@@ -124,6 +139,19 @@ public class MainProgram {
 			sb.append(enums[i].toString());
 		}
 		return sb.toString();
+	}
+
+	protected static Option createArgOption(String opt, String longOpt, String res_description) {
+		return new Option(opt, longOpt, true, Configuration.getResString(res_description));
+	}
+
+	protected static <T> Option createEnumOption(String opt, String longOpt, String res_description, Class<T> _enum) {
+		return new Option(opt, longOpt, true,
+				String.format(Configuration.getResString(res_description), listEnum(_enum)));
+	}
+
+	protected static Option createOption(String opt, String longOpt, String res_description) {
+		return new Option(opt, longOpt, false, Configuration.getResString(res_description));
 	}
 
 }
