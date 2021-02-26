@@ -11,7 +11,6 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
@@ -44,7 +43,6 @@ public class CreateAction extends AbstractAction {
 	private static final String DEF_PDF_DIRECTION = "Vertical";
 	private static final String DEFV_PDF_SORTBY = "NAME";
 	private static final String DEFV_PDF_SEQUENCE = "INCREASE";
-	private static final String DEFV_PDF_AUTO_ROTATE = "NO";
 	private static final String DEFV_PDF_FILTER = "[^\\.]*\\.(png|PNG|jpg|JPG)";
 
 	protected final PageSize pdf_size;
@@ -65,12 +63,12 @@ public class CreateAction extends AbstractAction {
 
 	private static final Option opt_help = new Option("h", "help", false, "help");
 
-	public CreateAction(String[] args) throws UnrecognizedOptionException, ParseException {
-		this((new CheckHelpParser(opt_help)).parse(setupOptions(), args));
-	}
-
-	public CreateAction(CommandLine cmd) throws HelperException, ArgumentNotFoundException, UnrecognizedEnumException {
-
+	public CreateAction(String[] args) throws UnrecognizedEnumException, ParseException {
+		super(getLocaleOptions());
+		
+		CommandLine cmd=(new CheckHelpParser(opt_help)).parse(options, args);
+		
+		
 		debug = cmd.hasOption("d");
 
 		pdf_size = PageSize.getByString(cmd.getOptionValue("pdf_size", DEF_PDF_SIZE));
@@ -154,7 +152,6 @@ public class CreateAction extends AbstractAction {
 
 	@Override
 	public void start() throws Exception {
-		super.start();
 		File dst = new File(list_destination);
 
 		TaskList tasks = dst.exists() ? new TaskList(dst) : new TaskList();
@@ -174,8 +171,6 @@ public class CreateAction extends AbstractAction {
 		} catch (IOException e) {
 			System.err.printf("\n" + Configuration.getResString("err_tasklist_create") + "\n", e.getMessage());
 		}
-
-		super.done();
 	}
 
 	protected TaskList importTasksFromTXT(File file, FileFilterHelper filter) throws IOException {
@@ -288,7 +283,7 @@ public class CreateAction extends AbstractAction {
 		return sb.toString();
 	}
 
-	private static Options setupOptions() {
+	private static Options getLocaleOptions() {
 
 		Options options = new Options();
 		Option opt_debug = createOption("d", "debug", "help_create_debug");

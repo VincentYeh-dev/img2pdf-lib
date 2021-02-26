@@ -12,7 +12,6 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.UnrecognizedOptionException;
 import org.vincentyeh.IMG2PDF.commandline.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.ArgumentNotFoundException;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
@@ -22,29 +21,28 @@ import org.vincentyeh.IMG2PDF.pdf.document.ImagesPDFDocument;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskList;
 
-
 public class ConvertAction extends AbstractAction {
 
 	protected final File[] tasklist_sources;
 	protected final boolean open_when_complete;
 
 	private static final Option opt_help = new Option("h", "help", false, "help");
+	
+	public ConvertAction(String[] args) throws ParseException {
+		super(getLocaleOptions());
 
-	public ConvertAction(String[] args) throws UnrecognizedOptionException,ParseException {
-		this((new CheckHelpParser(opt_help)).parse(setupOptions(), args));
-	}
+		CommandLine cmd = (new CheckHelpParser(opt_help)).parse(options, args);
 
-	public ConvertAction(CommandLine cmd) throws HelperException, ArgumentNotFoundException {
 		if (cmd.hasOption("-h"))
-			throw new HelperException(setupOptions());
+			throw new HelperException(options);
 
 		String[] str_sources = cmd.getOptionValues("tasklist_source");
 
 		if (str_sources == null)
 			throw new ArgumentNotFoundException("sources");
-		
-		open_when_complete=cmd.hasOption("o");
-		
+
+		open_when_complete = cmd.hasOption("o");
+
 		tasklist_sources = new File[str_sources.length];
 		for (int i = 0; i < tasklist_sources.length; i++) {
 			System.out.println("sources checking....");
@@ -66,7 +64,6 @@ public class ConvertAction extends AbstractAction {
 
 	@Override
 	public void start() throws Exception {
-		super.start();
 		System.out.println("Import tasklists.");
 		for (File src : tasklist_sources) {
 			TaskList tasks = new TaskList(src);
@@ -76,7 +73,6 @@ public class ConvertAction extends AbstractAction {
 			startConversion(tasks);
 		}
 
-		super.done();
 	}
 
 	private void startConversion(TaskList tasks) {
@@ -127,13 +123,13 @@ public class ConvertAction extends AbstractAction {
 		executor.shutdown();
 	}
 
-	private static Options setupOptions() {
+	private static Options getLocaleOptions() {
 		Options options = new Options();
 		Option opt_tasklist_source = createArgOption("lsrc", "tasklist_source", "help_convert_tasklist_source");
 		opt_tasklist_source.setRequired(true);
-		
+
 		Option opt_open_when_complete = createOption("o", "open_when_complete", "help_create_pdf_align");
-		
+
 		options.addOption(opt_help);
 		options.addOption(opt_tasklist_source);
 		options.addOption(opt_open_when_complete);

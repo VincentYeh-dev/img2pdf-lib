@@ -2,19 +2,17 @@ package org.vincentyeh.IMG2PDF.commandline.action;
 
 
 import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
 import org.vincentyeh.IMG2PDF.commandline.Configuration;
 
 public abstract class AbstractAction implements Action {
+	protected Options options;
 	
-	public void start() throws Exception {
-
+	public AbstractAction(Options options) {
+		this.options=options;
 	}
-
-	public void done() {
-		System.out.println("DONE.");
-	}
-
-	protected static Option createArgOption(String opt, String longOpt, String res_description) {
+	
+	protected static Option createArgOption(String opt, String longOpt, String res_description,String ...strings) {
 		return new Option(opt, longOpt, true,Configuration.getResString(res_description));
 	}
 
