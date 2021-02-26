@@ -21,7 +21,7 @@ public class CheckHelpParser extends DefaultParser {
 	@Override
 	public CommandLine parse(Options options, String[] arguments) throws ParseException {
 		Options opts = new Options();
-		opts.addOption(new Option("h", "help", false, "help"));
+		opts.addOption(helperOption);
 
 		CommandLineParser parser = new RelaxedParser();
 

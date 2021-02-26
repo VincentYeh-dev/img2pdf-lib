@@ -11,18 +11,16 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.MissingOptionException;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.UnrecognizedOptionException;
 import org.vincentyeh.IMG2PDF.commandline.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.commandline.Configuration;
-import org.vincentyeh.IMG2PDF.commandline.action.exception.ArgumentNotFoundException;
-import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
-import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.SourceFolderException;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.SourceFolderIsFileException;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.SourceFolderNotFoundException;
+import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
 import org.vincentyeh.IMG2PDF.file.FileFilterHelper;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
 import org.vincentyeh.IMG2PDF.file.ImgFile.Sequence;
@@ -63,7 +61,7 @@ public class CreateAction extends AbstractAction {
 
 	private static final Option opt_help = new Option("h", "help", false, "help");
 
-	public CreateAction(String[] args) throws UnrecognizedEnumException, ParseException {
+	public CreateAction(String[] args) throws UnrecognizedEnumException,MissingOptionException, ParseException {
 		super(getLocaleOptions());
 		
 		CommandLine cmd=(new CheckHelpParser(opt_help)).parse(options, args);
@@ -89,16 +87,19 @@ public class CreateAction extends AbstractAction {
 		pdf_user_password = cmd.getOptionValue("pdf_user_password");
 
 		pdf_destination = cmd.getOptionValue("pdf_destination");
-		if (pdf_destination == null)
-			throw new ArgumentNotFoundException("pdf_destination");
+		
+//		if (pdf_destination == null)
+//			throw new ArgumentNotFoundException("pdf_destination");
 
 		list_destination = cmd.getOptionValue("list_destination");
-		if (list_destination == null)
-			throw new ArgumentNotFoundException("list_destination");
+		
+//		if (list_destination == null)
+//			throw new ArgumentNotFoundException("list_destination");
 
 		filter = new FileFilterHelper(cmd.getOptionValue("filter", DEFV_PDF_FILTER));
-		if (filter == null)
-			throw new ArgumentNotFoundException("filter");
+		
+//		if (filter == null)
+//			throw new ArgumentNotFoundException("filter");
 
 		String[] str_sources = cmd.getOptionValues("source");
 		if (str_sources == null) {

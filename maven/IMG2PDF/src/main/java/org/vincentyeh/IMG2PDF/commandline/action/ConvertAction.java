@@ -9,11 +9,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.MissingOptionException;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.vincentyeh.IMG2PDF.commandline.CheckHelpParser;
-import org.vincentyeh.IMG2PDF.commandline.action.exception.ArgumentNotFoundException;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
 import org.vincentyeh.IMG2PDF.pdf.converter.ConversionListener;
 import org.vincentyeh.IMG2PDF.pdf.converter.PDFConverter;
@@ -28,7 +28,7 @@ public class ConvertAction extends AbstractAction {
 
 	private static final Option opt_help = new Option("h", "help", false, "help");
 	
-	public ConvertAction(String[] args) throws ParseException {
+	public ConvertAction(String[] args) throws MissingOptionException,ParseException {
 		super(getLocaleOptions());
 
 		CommandLine cmd = (new CheckHelpParser(opt_help)).parse(options, args);
@@ -38,8 +38,8 @@ public class ConvertAction extends AbstractAction {
 
 		String[] str_sources = cmd.getOptionValues("tasklist_source");
 
-		if (str_sources == null)
-			throw new ArgumentNotFoundException("sources");
+//		if (str_sources == null)
+//			throw new ArgumentNotFoundException("sources");
 
 		open_when_complete = cmd.hasOption("o");
 

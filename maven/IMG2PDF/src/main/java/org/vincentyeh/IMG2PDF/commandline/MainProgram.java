@@ -1,11 +1,12 @@
 package org.vincentyeh.IMG2PDF.commandline;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.MissingOptionException;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
@@ -23,13 +24,12 @@ public class MainProgram extends AbstractAction {
 
 	static {
 //		Language Setting:
-		
+
 //	Local:
 		Configuration.setLagugRes(ResourceBundle.getBundle("language_package", Locale.getDefault()));
 //	root:
 
 //		Configuration.setLagugRes(ResourceBundle.getBundle("language_package", Locale.ROOT));
-	
 
 		opt_help = createOption("h", "help", "root_help");
 	}
@@ -37,7 +37,7 @@ public class MainProgram extends AbstractAction {
 	private AbstractAction action;
 	private ActionMode mode;
 
-	public MainProgram(String[] args) throws ParseException {
+	public MainProgram(String[] args) throws MissingOptionException,ParseException {
 		super(getLocaleOptions());
 
 		System.out.println("##IMG2PDF##");
@@ -47,7 +47,7 @@ public class MainProgram extends AbstractAction {
 
 		CommandLine mode_chooser = (new RelaxedParser()).parse(options, args);
 
-		if (args == null || args.length == 0 || (mode_chooser.hasOption("help") && args.length == 1)) {
+		if (args == null || args.length == 0 || (mode_chooser.hasOption("help") && !mode_chooser.hasOption("mode"))) {
 			throw new HelperException(options);
 		}
 
@@ -70,19 +70,14 @@ public class MainProgram extends AbstractAction {
 
 	@Override
 	public void start() throws Exception {
-		try {
-			action.start();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
+		action.start();
 	}
 
 	private static Options getLocaleOptions() {
 
 		Options options = new Options();
-		Option opt_mode =createEnumOption("m", "mode", "root_mode", ActionMode.class);
-
+		Option opt_mode = createEnumOption("m", "mode", "root_mode", ActionMode.class);
+		opt_mode.setRequired(true);
 		options.addOption(opt_mode);
 		options.addOption(opt_help);
 
@@ -97,6 +92,9 @@ public class MainProgram extends AbstractAction {
 		} catch (HelperException e) {
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp(Configuration.PROGRAM_NAME, e.opt);
+			return;
+		} catch (MissingOptionException e) {
+			System.err.println(createMissingOptionsMessage(e.getMissingOptions()));
 			return;
 		} catch (UnrecognizedOptionException e) {
 //		e.printStackTrace();
