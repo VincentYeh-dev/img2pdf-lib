@@ -5,7 +5,7 @@ import java.util.ResourceBundle;
 
 public class Configuration {
 	public static final String PROGRAM_NAME="IMG2PDF";
-	public static final String PROGRAM_VER="111.";
+	public static final String PROGRAM_VER="0.0.1-SNAPSHOT";
 	public static final String DEVELOPER="VincentYeh-dev";
 	
 	private static ResourceBundle lagug_resource=null;

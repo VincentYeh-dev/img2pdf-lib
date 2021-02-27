@@ -97,7 +97,7 @@ public class CreateAction extends AbstractAction {
 			str_sources = new String[0];
 		}
 
-		System.out.println(Configuration.getResString("source_verifying"));
+		System.out.println(Configuration.getResString("source_folder_verifying"));
 		sources = new File[str_sources.length];
 		for (int i = 0; i < sources.length; i++) {
 			sources[i] = new File(str_sources[i]);

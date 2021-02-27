@@ -34,8 +34,8 @@ public class ConvertAction extends AbstractAction {
 	static {
 		opt_help = createOption("h", "help", "help_convert");
 	}
-	
-	public ConvertAction(String[] args) throws MissingOptionException,ParseException {
+
+	public ConvertAction(String[] args) throws MissingOptionException, ParseException {
 		super(getLocaleOptions());
 
 		CommandLine cmd = (new CheckHelpParser(opt_help)).parse(options, args);
@@ -45,24 +45,28 @@ public class ConvertAction extends AbstractAction {
 
 		String[] str_sources = cmd.getOptionValues("tasklist_source");
 
-//		if (str_sources == null)
-//			throw new ArgumentNotFoundException("sources");
-
 		open_when_complete = cmd.hasOption("o");
 
 		tasklist_sources = new File[str_sources.length];
 		for (int i = 0; i < tasklist_sources.length; i++) {
-			System.out.println("sources checking....");
+			System.out.println(Configuration.getResString("source_tasklist_verifying"));
 			tasklist_sources[i] = new File(str_sources[i]);
 
+			System.out.println("\t[" + Configuration.getResString("common_verifying") + "] "
+					+ tasklist_sources[i].getAbsolutePath());
+			System.out.print("\t");
 			if (!tasklist_sources[i].exists()) {
-				System.err.println("File not found:" + tasklist_sources[i].getAbsolutePath());
+				System.err.printf(Configuration.getResString("err_filenotfound") + "\n",
+						tasklist_sources[i].getAbsolutePath());
+//				System.err.println("File not found:" + tasklist_sources[i].getAbsolutePath());
 				continue;
 			} else if (tasklist_sources[i].isDirectory()) {
-				System.err.println("Path should be a file:" + tasklist_sources[i].getAbsolutePath());
+				System.err.printf(Configuration.getResString("err_path_is_file") + "\n",
+						tasklist_sources[i].getAbsolutePath());
 				continue;
 			} else {
-				System.out.println("[Verified] " + tasklist_sources[i].getAbsolutePath());
+				System.out.println("[" + Configuration.getResString("common_verified") + "] "
+						+ tasklist_sources[i].getAbsolutePath());
 			}
 
 		}
@@ -71,63 +75,62 @@ public class ConvertAction extends AbstractAction {
 
 	@Override
 	public void start() throws Exception {
-		System.out.println("Import tasklists.");
+		System.out.println(Configuration.getResString("import_tasklists"));
 		for (File src : tasklist_sources) {
+			System.out.print(
+					"\t[" + Configuration.getResString("common_importing") + "] " + src.getAbsolutePath() + "\n");
 			TaskList tasks = new TaskList(src);
 
-			System.out.println("\t[imported] " + src.getAbsolutePath() + "\n");
+			System.out
+					.print("\t[" + Configuration.getResString("common_imported") + "] " + src.getAbsolutePath() + "\n");
 
-			startConversion(tasks);
-		}
+			ExecutorService executor = Executors.newSingleThreadExecutor();
+			for (Task task : tasks) {
+				ImagesPDFDocument result = null;
 
-	}
-
-	private void startConversion(TaskList tasks) {
-		ExecutorService executor = Executors.newSingleThreadExecutor();
-		for (Task task : tasks) {
-			ImagesPDFDocument result = null;
-
-			try {
-				PDFConverter pdf = new PDFConverter(task);
-				pdf.setListener(listener);
-				Future<ImagesPDFDocument> future = executor.submit(pdf);
 				try {
-					result = future.get();
-				} catch (InterruptedException | ExecutionException e) {
-					// TODO Auto-generated catch block
+					PDFConverter pdf = new PDFConverter(task);
+					pdf.setListener(listener);
+					Future<ImagesPDFDocument> future = executor.submit(pdf);
+					try {
+						result = future.get();
+					} catch (InterruptedException | ExecutionException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					result.save();
+
+					if (open_when_complete) {
+						Desktop desktop = Desktop.getDesktop();
+
+						File dst = new File(task.getPDFDestination());
+
+						if (dst.exists())
+							try {
+								desktop.open(dst);
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+					}
+
+				} catch (IOException e) {
 					e.printStackTrace();
+				} catch (RuntimeException e) {
+					e.printStackTrace();
+				} finally {
+					try {
+						if (result != null)
+							result.close();
+					} catch (IOException ignore) {
+					}
 				}
 
-				result.save();
-
-				if (open_when_complete) {
-					Desktop desktop = Desktop.getDesktop();
-
-					File dst = new File(task.getPDFDestination());
-
-					if (dst.exists())
-						try {
-							desktop.open(dst);
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-				}
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (RuntimeException e) {
-				e.printStackTrace();
-			} finally {
-				try {
-					if (result != null)
-						result.close();
-				} catch (IOException ignore) {
-				}
 			}
-
+			executor.shutdown();
 		}
-		executor.shutdown();
+
 	}
 
 	private static Options getLocaleOptions() {
@@ -156,10 +159,11 @@ public class ConvertAction extends AbstractAction {
 		public void onConversionPreparing(Task task) {
 			size_of_imgs = task.getImgs().size();
 			perImg = (10. / size_of_imgs);
-			System.out.println("###PDF Conversion Task###");
-			System.out.printf("destination:%s\n", task.getPDFDestination());
-			System.out.printf("name:%s\n", new File(task.getPDFDestination()).getName());
-			System.out.print("\nProgress->");
+			System.out.printf("###%s###\n", Configuration.getResString("pdf_conversion_task"));
+			System.out.printf("%s:%s\n", Configuration.getResString("arg_pdf_dst"), task.getPDFDestination());
+			System.out.printf("%sname:%s\n", Configuration.getResString("common_name"),
+					new File(task.getPDFDestination()).getName());
+			System.out.printf("%s->", Configuration.getResString("common_progress"));
 			System.out.print("0%[");
 
 		}
