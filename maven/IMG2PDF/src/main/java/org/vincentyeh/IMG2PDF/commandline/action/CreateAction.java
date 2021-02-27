@@ -17,9 +17,6 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.vincentyeh.IMG2PDF.commandline.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.commandline.Configuration;
-import org.vincentyeh.IMG2PDF.commandline.action.exception.SourceFolderException;
-import org.vincentyeh.IMG2PDF.commandline.action.exception.SourceFolderIsFileException;
-import org.vincentyeh.IMG2PDF.commandline.action.exception.SourceFolderNotFoundException;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
 import org.vincentyeh.IMG2PDF.file.FileFilterHelper;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
@@ -59,14 +56,17 @@ public class CreateAction extends AbstractAction {
 	protected final File[] sources;
 	protected final FileFilterHelper filter;
 
-	private static final Option opt_help = new Option("h", "help", false, "help");
+	private static final Option opt_help;
 
-	public CreateAction(String[] args) throws UnrecognizedEnumException,MissingOptionException, ParseException {
+	static {
+		opt_help = createOption("h", "help", "help_create");
+	}
+
+	public CreateAction(String[] args) throws UnrecognizedEnumException, MissingOptionException, ParseException {
 		super(getLocaleOptions());
-		
-		CommandLine cmd=(new CheckHelpParser(opt_help)).parse(options, args);
-		
-		
+
+		CommandLine cmd = (new CheckHelpParser(opt_help)).parse(options, args);
+
 		debug = cmd.hasOption("d");
 
 		pdf_size = PageSize.getByString(cmd.getOptionValue("pdf_size", DEF_PDF_SIZE));
@@ -87,49 +87,35 @@ public class CreateAction extends AbstractAction {
 		pdf_user_password = cmd.getOptionValue("pdf_user_password");
 
 		pdf_destination = cmd.getOptionValue("pdf_destination");
-		
-//		if (pdf_destination == null)
-//			throw new ArgumentNotFoundException("pdf_destination");
 
 		list_destination = cmd.getOptionValue("list_destination");
-		
-//		if (list_destination == null)
-//			throw new ArgumentNotFoundException("list_destination");
 
 		filter = new FileFilterHelper(cmd.getOptionValue("filter", DEFV_PDF_FILTER));
-		
-//		if (filter == null)
-//			throw new ArgumentNotFoundException("filter");
 
 		String[] str_sources = cmd.getOptionValues("source");
 		if (str_sources == null) {
 			str_sources = new String[0];
 		}
 
+		System.out.println(Configuration.getResString("source_verifying"));
 		sources = new File[str_sources.length];
 		for (int i = 0; i < sources.length; i++) {
-//			per dirlist
-
 			sources[i] = new File(str_sources[i]);
-			System.out.printf("\n" + Configuration.getResString("source_verifying") + "\n", sources[i].getName());
+			System.out.printf("\t[" + Configuration.getResString("common_verifying") + "] %s\n",
+					sources[i].getAbsolutePath());
 
+			System.out.print("\t");
 			if (!sources[i].exists()) {
-				System.err.printf("\n" + Configuration.getResString("err_filenotfound") + "\n",
-						sources[i].getAbsolutePath());
-//				System.err.println("File not found:" + sources[i].getAbsolutePath());
+				System.err.printf(Configuration.getResString("err_filenotfound") + "\n", sources[i].getAbsolutePath());
 				continue;
 			} else if (sources[i].isDirectory()) {
-				System.err.printf("\n" + Configuration.getResString("err_path_is_file") + "\n",
-						sources[i].getAbsolutePath());
-//				System.err.println("Path should be a file:" + sources[i].getAbsolutePath());
+				System.err.printf(Configuration.getResString("err_path_is_file") + "\n", sources[i].getAbsolutePath());
 				continue;
 			} else {
-				System.out.printf("\t[" + Configuration.getResString("common_verified") + "] %s\n",
+				System.out.printf("[" + Configuration.getResString("common_verified") + "] %s\n",
 						sources[i].getAbsolutePath());
-//				System.out.println("[Verified] " + sources[i].getAbsolutePath());
 			}
 		}
-		System.out.println("CHECK DONE.");
 
 		System.out.printf("### " + Configuration.getResString("tasklist_config")
 				+ " ###\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s############\n",
@@ -158,12 +144,7 @@ public class CreateAction extends AbstractAction {
 		TaskList tasks = dst.exists() ? new TaskList(dst) : new TaskList();
 
 		for (File source : sources) {
-
-			try {
-				tasks.addAll(importTasksFromTXT(source, filter));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			tasks.addAll(importTasksFromTXT(source, filter));
 		}
 
 		try {
@@ -174,15 +155,17 @@ public class CreateAction extends AbstractAction {
 		}
 	}
 
-	protected TaskList importTasksFromTXT(File file, FileFilterHelper filter) throws IOException {
-		if (!file.exists())
-			new FileNotFoundException(String.format(Configuration.getResString("err_filenotfound"), file.getName()));
-		UTF8InputStream uis = new UTF8InputStream(file);
+	protected TaskList importTasksFromTXT(File dirlist, FileFilterHelper filter) throws IOException {
+		if (!dirlist.exists())
+			throw new FileNotFoundException(
+					String.format(Configuration.getResString("err_filenotfound"), dirlist.getName()));
+
+		UTF8InputStream uis = new UTF8InputStream(dirlist);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(uis.getInputStream(), StandardCharsets.UTF_8));
 
 		TaskList tasks = new TaskList();
 
-		System.out.printf("\n" + Configuration.getResString("import_from_list") + "\n", file.getName());
+		System.out.printf("\n" + Configuration.getResString("import_from_list") + "\n", dirlist.getName());
 		int line_counter = 0;
 		String buf = "";
 		while (buf != null) {
@@ -190,19 +173,25 @@ public class CreateAction extends AbstractAction {
 			line_counter++;
 			if (buf != null && !buf.isEmpty()) {
 				File dir = new File(buf);
-				try {
-					if (!dir.exists())
-						throw new SourceFolderNotFoundException(line_counter, dir, file);
 
-					if (dir.isFile())
-						throw new SourceFolderIsFileException(line_counter, dir, file);
-
-					tasks.add(parse2Task(dir, filter));
-					System.out.printf("\t[" + Configuration.getResString("common_imported") + "] %s\n",
-							dir.getAbsolutePath());
-				} catch (SourceFolderException e) {
-					System.err.println(e.getMessage());
+				if (!dir.exists()) {
+					System.err.printf(Configuration.getResString("err_source_filenotfound") + "\n", dirlist.getName(),
+							line_counter, dir.getAbsolutePath());
 				}
+
+				if (dir.isFile()) {
+					System.err.printf(Configuration.getResString("err_source_path_is_file") + "\n", dirlist.getName(),
+							line_counter, dir.getAbsolutePath());
+				}
+
+				System.out.printf("\t[" + Configuration.getResString("common_importing") + "] %s\n",
+						dir.getAbsolutePath());
+				
+				tasks.add(parse2Task(dir, filter));
+				
+				System.out.printf("\t[" + Configuration.getResString("common_imported") + "] %s\n",
+						dir.getAbsolutePath());
+
 			}
 		}
 
@@ -246,7 +235,7 @@ public class CreateAction extends AbstractAction {
 			}
 			System.out.println();
 		}
-		
+
 		configuration.put("imgs", imgs);
 
 		return new Task(configuration);

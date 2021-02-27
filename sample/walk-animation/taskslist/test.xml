@@ -60,4 +60,744 @@
       <USER-PASSWORD>1234AAA</USER-PASSWORD>
     </PERMISSION>
   </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-29-24.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-30-18.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-30-25.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-31-12.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-31-19.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-31-32.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-31-53.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-32-33.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-32-37.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-32-48.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-33-23.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-34-51.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-34-57.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-40-23.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-41-09.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-41-21.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-43-55.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-44-29.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-47-38.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-48-43.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-48-58.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-49-13.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-49-23.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-49-30.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-50-10.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-50-27.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-51-03.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-51-09.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-51-17.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-51-23.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-52-19.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-53-25.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-55-39.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-56-59.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 02-57-43.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 03-30-31.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\walk-animation\output\walk-animation 2021-02-27 03-39-29.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka1.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka2.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka3.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka4.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka5.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka6.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka7.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka8.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka9.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka10.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka11.png</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\walk-animation\image-sources\walka12.png</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
 </TASKLIST>

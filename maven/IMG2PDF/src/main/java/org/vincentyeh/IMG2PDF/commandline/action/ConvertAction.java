@@ -3,6 +3,8 @@ package org.vincentyeh.IMG2PDF.commandline.action;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,6 +16,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.vincentyeh.IMG2PDF.commandline.CheckHelpParser;
+import org.vincentyeh.IMG2PDF.commandline.Configuration;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
 import org.vincentyeh.IMG2PDF.pdf.converter.ConversionListener;
 import org.vincentyeh.IMG2PDF.pdf.converter.PDFConverter;
@@ -26,7 +29,11 @@ public class ConvertAction extends AbstractAction {
 	protected final File[] tasklist_sources;
 	protected final boolean open_when_complete;
 
-	private static final Option opt_help = new Option("h", "help", false, "help");
+	private static final Option opt_help;
+
+	static {
+		opt_help = createOption("h", "help", "help_convert");
+	}
 	
 	public ConvertAction(String[] args) throws MissingOptionException,ParseException {
 		super(getLocaleOptions());

@@ -1,11 +1,11 @@
 package org.vincentyeh.IMG2PDF.commandline;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.MissingArgumentException;
 import org.apache.commons.cli.MissingOptionException;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -37,7 +37,7 @@ public class MainProgram extends AbstractAction {
 	private AbstractAction action;
 	private ActionMode mode;
 
-	public MainProgram(String[] args) throws MissingOptionException,ParseException {
+	public MainProgram(String[] args) throws MissingOptionException, ParseException {
 		super(getLocaleOptions());
 
 		System.out.println("##IMG2PDF##");
@@ -77,7 +77,7 @@ public class MainProgram extends AbstractAction {
 
 		Options options = new Options();
 		Option opt_mode = createEnumOption("m", "mode", "root_mode", ActionMode.class);
-		opt_mode.setRequired(true);
+//		opt_mode.setRequired(true);
 		options.addOption(opt_mode);
 		options.addOption(opt_help);
 
@@ -95,6 +95,9 @@ public class MainProgram extends AbstractAction {
 			return;
 		} catch (MissingOptionException e) {
 			System.err.println(createMissingOptionsMessage(e.getMissingOptions()));
+			return;
+		} catch (MissingArgumentException e) {
+			System.err.println(createMissingArgumentOptionsMessage(e.getOption()));
 			return;
 		} catch (UnrecognizedOptionException e) {
 //		e.printStackTrace();

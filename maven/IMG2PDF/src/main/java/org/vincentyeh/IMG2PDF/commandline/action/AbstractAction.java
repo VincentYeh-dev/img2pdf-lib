@@ -46,6 +46,12 @@ public abstract class AbstractAction implements Action {
 
 		return buf.toString();
 	}
+	
+	protected static String createMissingArgumentOptionsMessage(Option option) {
+		 return String.format(Configuration.getResString("err_missing_argument_option"),option.getOpt());
+	}
+	
+	
 
 	protected static <T> String listEnum(Class<T> _class_enum) {
 		T[] enums = _class_enum.getEnumConstants();

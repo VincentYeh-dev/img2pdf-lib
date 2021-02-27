@@ -4,7 +4,7 @@
   <groupId>org.vincentyeh</groupId>
   <artifactId>IMG2PDF</artifactId>
   <name>IMG2PDF</name>
-  <version>1.0.1</version>
+  <version>0.0.1-SNAPSHOT</version>
   <url>http://maven.apache.org</url>
   <build>
     <plugins>
@@ -78,6 +78,8 @@
     </site>
   </distributionManagement>
   <properties>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 </project>
