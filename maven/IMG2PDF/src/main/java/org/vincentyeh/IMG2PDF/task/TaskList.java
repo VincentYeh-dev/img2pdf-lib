@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -52,7 +54,7 @@ public class TaskList extends ArrayList<Task> {
 	 * @throws IOException
 	 */
 	public void toXMLFile(File file) throws IOException {
-
+		
 		if(file.getParentFile().mkdirs()) {
 			System.out.println("Required folders have been created in advance:"+file.getParent());
 		}

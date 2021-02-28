@@ -101,6 +101,7 @@ public class MainProgram extends AbstractAction {
 			return;
 		} catch (UnrecognizedOptionException e) {
 //		e.printStackTrace();
+			System.err.println(createUnrecognizedOptionMessage(e.getOption()));
 			System.err.println(e.getMessage());
 			return;
 		} catch (UnrecognizedEnumException e) {
@@ -108,6 +109,10 @@ public class MainProgram extends AbstractAction {
 			return;
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
+//			e.printStackTrace();
+			System.err.println(e.getMessage());
+			return;
+		} catch (Exception e) {
 			e.printStackTrace();
 			return;
 		}

@@ -51,6 +51,9 @@ public abstract class AbstractAction implements Action {
 		 return String.format(Configuration.getResString("err_missing_argument_option"),option.getOpt());
 	}
 	
+	protected static String createUnrecognizedOptionMessage(String option) {
+		 return String.format(Configuration.getResString("err_missing_argument_option"),option);
+	}
 	
 
 	protected static <T> String listEnum(Class<T> _class_enum) {

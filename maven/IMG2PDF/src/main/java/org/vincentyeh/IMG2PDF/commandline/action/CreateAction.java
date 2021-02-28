@@ -98,24 +98,29 @@ public class CreateAction extends AbstractAction {
 		}
 
 		System.out.println(Configuration.getResString("source_folder_verifying"));
-		sources = new File[str_sources.length];
-		for (int i = 0; i < sources.length; i++) {
-			sources[i] = new File(str_sources[i]);
-			System.out.printf("\t[" + Configuration.getResString("common_verifying") + "] %s\n",
-					sources[i].getAbsolutePath());
+
+		ArrayList<File> verified_sources = new ArrayList<>();
+
+		for (int i = 0; i < str_sources.length; i++) {
+			File raw = (new File(str_sources[i])).getAbsoluteFile();
+
+			System.out.printf("\t[" + Configuration.getResString("common_verifying") + "] %s\n", raw.getAbsolutePath());
 
 			System.out.print("\t");
-			if (!sources[i].exists()) {
-				System.err.printf(Configuration.getResString("err_filenotfound") + "\n", sources[i].getAbsolutePath());
+			if (!raw.exists()) {
+				System.err.printf(Configuration.getResString("err_filenotfound") + "\n", raw.getAbsolutePath());
 				continue;
-			} else if (sources[i].isDirectory()) {
-				System.err.printf(Configuration.getResString("err_path_is_file") + "\n", sources[i].getAbsolutePath());
+			} else if (raw.isDirectory()) {
+				System.err.printf(Configuration.getResString("err_path_is_file") + "\n", raw.getAbsolutePath());
 				continue;
 			} else {
 				System.out.printf("[" + Configuration.getResString("common_verified") + "] %s\n",
-						sources[i].getAbsolutePath());
+						raw.getAbsolutePath());
 			}
+			verified_sources.add(raw);
 		}
+		sources = new File[verified_sources.size()];
+		verified_sources.toArray(sources);
 
 		System.out.printf("### " + Configuration.getResString("tasklist_config")
 				+ " ###\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s############\n",
@@ -139,7 +144,7 @@ public class CreateAction extends AbstractAction {
 
 	@Override
 	public void start() throws Exception {
-		File dst = new File(list_destination);
+		File dst = (new File(list_destination)).getAbsoluteFile();
 
 		TaskList tasks = dst.exists() ? new TaskList(dst) : new TaskList();
 
@@ -172,7 +177,7 @@ public class CreateAction extends AbstractAction {
 			buf = reader.readLine();
 			line_counter++;
 			if (buf != null && !buf.isEmpty()) {
-				File dir = new File(buf);
+				File dir = (new File(buf)).getAbsoluteFile();
 
 				if (!dir.exists()) {
 					System.err.printf(Configuration.getResString("err_source_filenotfound") + "\n", dirlist.getName(),
@@ -186,9 +191,9 @@ public class CreateAction extends AbstractAction {
 
 				System.out.printf("\t[" + Configuration.getResString("common_importing") + "] %s\n",
 						dir.getAbsolutePath());
-				
+
 				tasks.add(parse2Task(dir, filter));
-				
+
 				System.out.printf("\t[" + Configuration.getResString("common_imported") + "] %s\n",
 						dir.getAbsolutePath());
 
@@ -264,10 +269,12 @@ public class CreateAction extends AbstractAction {
 	private static <T> String dumpArrayString(T[] array) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("[");
-		sb.append(array[0].toString());
-		for (int i = 1; i < array.length; i++) {
-			sb.append(",");
-			sb.append(array[i].toString());
+		if (array != null&&array.length!=0) {
+			sb.append(array[0].toString());
+			for (int i = 1; i < array.length; i++) {
+				sb.append(",");
+				sb.append(array[i].toString());
+			}
 		}
 		sb.append("]\n");
 		return sb.toString();
