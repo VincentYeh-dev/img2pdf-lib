@@ -50,7 +50,7 @@ public class kuma_fish_album_1 {
 //				
 				+ "-pp 11 "
 //				
-				+ "-f \"[^\\.]*\\.(png|PNG|jpg|JPG)\" "
+				+ "-f \"glob:*.{PNG,JPG}\" "
 //				
 				+ "-pdst \"" + sample_root.getAbsolutePath() + "\\output\\$PARENT{0}.pdf\" "
 //				

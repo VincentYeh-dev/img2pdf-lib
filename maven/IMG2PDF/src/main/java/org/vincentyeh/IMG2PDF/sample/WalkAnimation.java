@@ -49,7 +49,7 @@ public class WalkAnimation {
 //				
 				+ "-pp 11 "
 //				
-				+ "-f \"[^\\.]*\\.(png|PNG|jpg|JPG)\" "
+				+ "-f \"glob:*.{PNG,JPG}\" "
 //				
 				+ "-pdst \"" + sample_root.getAbsolutePath() + "\\output\\$PARENT{0} $CY-$CM-$CD $CH-$CN-$CS.pdf\" "
 //				

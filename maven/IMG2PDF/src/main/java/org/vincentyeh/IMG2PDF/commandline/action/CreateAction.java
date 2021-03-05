@@ -38,7 +38,7 @@ public class CreateAction extends AbstractAction {
 	private static final String DEF_PDF_DIRECTION = "Vertical";
 	private static final String DEFV_PDF_SORTBY = "NAME";
 	private static final String DEFV_PDF_SEQUENCE = "INCREASE";
-	private static final String DEFV_PDF_FILTER = "[^\\.]*\\.(png|PNG|jpg|JPG)";
+	private static final String DEFV_PDF_FILTER = "glob:*.{PNG,JPG}\\";
 
 	protected final PageSize pdf_size;
 	protected final PageAlign pdf_align;
@@ -54,7 +54,8 @@ public class CreateAction extends AbstractAction {
 	protected final boolean debug;
 
 	protected final File[] sources;
-	protected final FileFilterHelper filter;
+//	protected final String str_path_filter;
+	protected final FileFilterHelper ffh;
 
 	private static final Option opt_help;
 
@@ -90,8 +91,12 @@ public class CreateAction extends AbstractAction {
 
 		list_destination = cmd.getOptionValue("list_destination");
 
-		filter = new FileFilterHelper(cmd.getOptionValue("filter", DEFV_PDF_FILTER));
-
+		try {
+			ffh = new FileFilterHelper(cmd.getOptionValue("filter", DEFV_PDF_FILTER));
+		}catch(UnsupportedOperationException e) {
+			throw new RuntimeException(String.format(Configuration.getResString("err_filter"),e.getMessage())) ;
+		}
+		
 		String[] str_sources = cmd.getOptionValues("source");
 		if (str_sources == null) {
 			str_sources = new String[0];
@@ -133,7 +138,7 @@ public class CreateAction extends AbstractAction {
 //				
 				Configuration.getResString("arg_auto_rotate"), pdf_auto_rotate,
 //				
-				Configuration.getResString("arg_filter"), filter.getRegex(),
+				Configuration.getResString("arg_filter"), ffh.getOperator(),
 //				
 				Configuration.getResString("arg_tasklist_dst"), list_destination,
 //				
@@ -149,7 +154,7 @@ public class CreateAction extends AbstractAction {
 		TaskList tasks = dst.exists() ? new TaskList(dst) : new TaskList();
 
 		for (File source : sources) {
-			tasks.addAll(importTasksFromTXT(source, filter));
+			tasks.addAll(importTasksFromTXT(source));
 		}
 
 		try {
@@ -160,7 +165,7 @@ public class CreateAction extends AbstractAction {
 		}
 	}
 
-	protected TaskList importTasksFromTXT(File dirlist, FileFilterHelper filter) throws IOException {
+	protected TaskList importTasksFromTXT(File dirlist) throws IOException {
 		if (!dirlist.exists())
 			throw new FileNotFoundException(
 					String.format(Configuration.getResString("err_filenotfound"), dirlist.getName()));
@@ -192,7 +197,7 @@ public class CreateAction extends AbstractAction {
 				System.out.printf("\t[" + Configuration.getResString("common_importing") + "] %s\n",
 						dir.getAbsolutePath());
 
-				tasks.add(parse2Task(dir, filter));
+				tasks.add(parse2Task(dir));
 
 				System.out.printf("\t[" + Configuration.getResString("common_imported") + "] %s\n",
 						dir.getAbsolutePath());
@@ -215,7 +220,7 @@ public class CreateAction extends AbstractAction {
 		return tasks;
 	}
 
-	private Task parse2Task(File source_directory, FileFilterHelper filter) throws FileNotFoundException {
+	private Task parse2Task(File source_directory) throws FileNotFoundException {
 		HashMap<String, Object> configuration = new HashMap<>();
 
 		NameFormatter nf = new NameFormatter(source_directory);
@@ -229,7 +234,7 @@ public class CreateAction extends AbstractAction {
 		configuration.put("pdf_user_password", pdf_user_password);
 		configuration.put("pdf_owner_password", pdf_owner_password);
 
-		ArrayList<ImgFile> imgs = importImagesFile(source_directory, filter);
+		ArrayList<ImgFile> imgs = importImagesFile(source_directory);
 
 		Collections.sort(imgs);
 		if (debug) {
@@ -246,14 +251,14 @@ public class CreateAction extends AbstractAction {
 		return new Task(configuration);
 	}
 
-	private ArrayList<ImgFile> importImagesFile(File source_directory, FileFilterHelper filter)
-			throws FileNotFoundException {
+	private ArrayList<ImgFile> importImagesFile(File source_directory) throws FileNotFoundException {
 		if (debug) {
 			System.out.println("@Debug");
 			System.out.println("Import Images:");
 		}
 		ArrayList<ImgFile> imgs = new ArrayList<ImgFile>();
-		for (File f : source_directory.listFiles(filter)) {
+		
+		for (File f : source_directory.listFiles(ffh)) {
 			ImgFile img = new ImgFile(f.getAbsolutePath(), pdf_sortby, pdf_sequence);
 			imgs.add(img);
 			if (debug)
@@ -269,7 +274,7 @@ public class CreateAction extends AbstractAction {
 	private static <T> String dumpArrayString(T[] array) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("[");
-		if (array != null&&array.length!=0) {
+		if (array != null && array.length != 0) {
 			sb.append(array[0].toString());
 			for (int i = 1; i < array.length; i++) {
 				sb.append(",");
@@ -330,5 +335,5 @@ public class CreateAction extends AbstractAction {
 
 		return options;
 	}
-
+	
 }

@@ -104,12 +104,10 @@ public class MainProgram extends AbstractAction {
 			System.err.println(createUnrecognizedOptionMessage(e.getOption()));
 			System.err.println(e.getMessage());
 			return;
-		} catch (UnrecognizedEnumException e) {
+		} catch (ParseException e) {
 			System.err.println(e.getMessage());
 			return;
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-//			e.printStackTrace();
+		} catch (RuntimeException e) {
 			System.err.println(e.getMessage());
 			return;
 		} catch (Exception e) {
