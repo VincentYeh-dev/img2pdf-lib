@@ -64,14 +64,14 @@ public class Task {
 		this.pdf_size = PageSize.getByString(element.getAttributeValue("size"));
 		this.pdf_destination = element.getAttributeValue("destination");
 		this.pdf_direction = PageDirection.getByString(element.getAttributeValue("default-direction"));
-		this.pdf_auto_rotate = Boolean.valueOf(element.getAttributeValue("auto-rotate"));
+		this.pdf_auto_rotate = Boolean.parseBoolean(element.getAttributeValue("auto-rotate"));
 
 		this.pdf_owner_password = owner.getValue();
 		this.pdf_user_password = user.getValue();
 
 		this.pdf_permission = new DocumentAccessPermission();
-		this.pdf_permission.setCanPrint(Boolean.valueOf(raw.getAttributeValue("canPrint")));
-		this.pdf_permission.setCanModify(Boolean.valueOf(raw.getAttributeValue("canModify")));
+		this.pdf_permission.setCanPrint(Boolean.parseBoolean(raw.getAttributeValue("canPrint")));
+		this.pdf_permission.setCanModify(Boolean.parseBoolean(raw.getAttributeValue("canModify")));
 
 		this.spp = createProtectionPolicy(pdf_owner_password, pdf_user_password, pdf_permission);
 

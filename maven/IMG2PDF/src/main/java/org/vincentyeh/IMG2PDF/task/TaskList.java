@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -17,6 +15,7 @@ import org.jdom2.Element;
 import org.jdom2.input.DOMBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+import org.vincentyeh.IMG2PDF.commandline.Configuration;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
 import org.xml.sax.SAXException;
 
@@ -54,9 +53,8 @@ public class TaskList extends ArrayList<Task> {
 	 * @throws IOException
 	 */
 	public void toXMLFile(File file) throws IOException {
-		
 		if(file.getParentFile().mkdirs()) {
-			System.out.println("Required folders have been created in advance:"+file.getParent());
+			System.out.printf(Configuration.getResString("info_required_folder_created")+"\n",file.getParent());
 		}
 		
 		Document doc = new Document();
@@ -81,7 +79,9 @@ public class TaskList extends ArrayList<Task> {
 	private static Document getDOMParsedDocument(final File xml_file)
 			throws ParserConfigurationException, SAXException, IOException {
 		if (!xml_file.exists())
-			throw new FileNotFoundException(xml_file.getName() + " not found.");
+			throw new FileNotFoundException(String.format(Configuration.getResString("err_filenotfound"),xml_file.getAbsolutePath()));
+		if (xml_file.isDirectory())
+			throw new RuntimeException(String.format(Configuration.getResString("err_path_is_folder"),xml_file.getAbsolutePath()));
 
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		// If want to make namespace aware.
