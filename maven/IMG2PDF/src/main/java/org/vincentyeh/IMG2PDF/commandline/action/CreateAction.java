@@ -1,13 +1,9 @@
 package org.vincentyeh.IMG2PDF.commandline.action;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,7 +20,6 @@ import org.vincentyeh.IMG2PDF.file.FileFilterHelper;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
 import org.vincentyeh.IMG2PDF.file.ImgFile.Sequence;
 import org.vincentyeh.IMG2PDF.file.ImgFile.Sortby;
-import org.vincentyeh.IMG2PDF.file.text.UTF8InputStream;
 import org.vincentyeh.IMG2PDF.pdf.document.DocumentAccessPermission;
 import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
 import org.vincentyeh.IMG2PDF.pdf.page.PageDirection;
@@ -191,15 +186,10 @@ public class CreateAction extends AbstractAction {
 
     protected TaskList importTasksFromTXT(File dirlist) throws IOException {
         FileUtil.checkReadableFile(dirlist);
-//        UTF8InputStream uis = new UTF8InputStream(dirlist);
-//        BufferedReader reader = new BufferedReader(new InputStreamReader(uis.getInputStream(), StandardCharsets.UTF_8));
-
         TaskList tasks = new TaskList();
-
         System.out.printf(Configuration.getResString("import_from_list") + "\n", dirlist.getName());
 
         List<String> lines=Files.readAllLines(dirlist.toPath());
-
         for(int line_counter=0;line_counter<lines.size();line_counter++){
             String line=lines.get(line_counter);
 
@@ -209,7 +199,12 @@ public class CreateAction extends AbstractAction {
             if(line.trim().isEmpty()||line.isEmpty())
                 continue;
 
-            File dir = (new File(line)).getAbsoluteFile();
+            File dir = new File(line);
+
+            if(!dir.isAbsolute()){
+                dir=new File(dirlist.getParent(),line);
+            }
+
 
             if (!dir.exists()) {
                 System.err.printf(Configuration.getResString("err_source_filenotfound") + "\n", dirlist.getName(),
@@ -229,44 +224,6 @@ public class CreateAction extends AbstractAction {
             System.out.printf("\t[" + Configuration.getResString("common_imported") + "] %s\n",
                     dir.getAbsolutePath());
         }
-//        int line_counter = 0;
-//        String buf = "";
-//        while (buf != null) {
-//            buf = reader.readLine();
-//            line_counter++;
-//            if (buf != null && !buf.isEmpty()) {
-//                File dir = (new File(buf)).getAbsoluteFile();
-//
-//                if (!dir.exists()) {
-//                    System.err.printf(Configuration.getResString("err_source_filenotfound") + "\n", dirlist.getName(),
-//                            line_counter, dir.getAbsolutePath());
-//                }
-//
-//                if (dir.isFile()) {
-//                    System.err.printf(Configuration.getResString("err_source_path_is_file") + "\n", dirlist.getName(),
-//                            line_counter, dir.getAbsolutePath());
-//                }
-//
-//                System.out.printf("\t[" + Configuration.getResString("common_importing") + "] %s\n",
-//                        dir.getAbsolutePath());
-//
-//                tasks.add(parse2Task(dir));
-//
-//                System.out.printf("\t[" + Configuration.getResString("common_imported") + "] %s\n",
-//                        dir.getAbsolutePath());
-//
-//            }
-//        }
-
-//        try {
-//            uis.close();
-//        } catch (Exception ignore) {
-//        }
-//
-//        try {
-//            reader.close();
-//        } catch (Exception ignore) {
-//        }
 
         return tasks;
     }
