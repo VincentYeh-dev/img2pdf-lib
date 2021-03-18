@@ -29,8 +29,16 @@ public class Task {
 	private final String pdf_owner_password;
 	private final String pdf_user_password;
 
-	@SuppressWarnings("unchecked")
-	public Task(HashMap<String, Object> configuration) {
+//	@SuppressWarnings("unchecked")
+	public Task(HashMap<String, Object> configuration,ArrayList<ImgFile> imgs) {
+		if(configuration==null)
+			throw new NullPointerException("configuration is null");
+
+		if(imgs==null)
+			throw new NullPointerException("imgs is null");
+
+		this.imgs=imgs;
+
 		pdf_align = (PageAlign) configuration.get("pdf_align");
 		pdf_size = (PageSize) configuration.get("pdf_size");
 		pdf_destination = configuration.get("pdf_destination").toString();
@@ -44,7 +52,7 @@ public class Task {
 
 		pdf_permission = (DocumentAccessPermission) configuration.get("pdf_permission");
 		spp = createProtectionPolicy(pdf_owner_password, pdf_user_password, pdf_permission);
-		imgs = (ArrayList<ImgFile>) configuration.get("imgs");
+//		imgs = (ArrayList<ImgFile>) configuration.get("imgs");
 	}
 
 	/**
@@ -56,6 +64,9 @@ public class Task {
 	 * @throws UnrecognizedEnumException
 	 */
 	public Task(Element element) throws FileNotFoundException, UnrecognizedEnumException {
+		if(element==null)
+			throw new NullPointerException("element is null");
+
 		Element raw = element.getChild("PERMISSION");
 		Element owner = raw.getChild("OWNER-PASSWORD");
 		Element user = raw.getChild("USER-PASSWORD");

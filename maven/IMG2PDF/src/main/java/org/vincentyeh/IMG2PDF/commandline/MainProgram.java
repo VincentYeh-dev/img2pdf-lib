@@ -48,7 +48,7 @@ public class MainProgram extends AbstractAction {
 
         CommandLine mode_chooser = (new RelaxedParser()).parse(options, args);
 
-        if (args == null || args.length == 0 || (mode_chooser.hasOption("help") && !mode_chooser.hasOption("mode"))) {
+        if (args.length == 0 || mode_chooser.hasOption("help") && !mode_chooser.hasOption("mode")) {
             throw new HelperException(options);
         }
 

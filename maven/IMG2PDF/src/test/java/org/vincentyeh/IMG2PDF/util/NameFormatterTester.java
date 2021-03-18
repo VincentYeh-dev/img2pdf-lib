@@ -5,6 +5,10 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.file.FileSystem;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.junit.Test;
 import org.vincentyeh.IMG2PDF.util.NameFormatter.ParentOverPointException;
 
@@ -31,7 +35,24 @@ public class NameFormatterTester {
 		System.out.println(formatter.format("$Y-$M-$D Hello$NAME $H:$N:$S"));
 		
 	}
-	
+	@Test
+	public void testNoSense() throws FileNotFoundException {
+		File file = new File("src\\test\\resources\\TestFile.txt").getAbsoluteFile();
+		assertTrue(file.exists());
+
+		NameFormatter formatter = new NameFormatter(file);
+		System.out.println(formatter.format("AAAAAAAAA$@$@%#@@"));
+
+	}
+
+	@Test
+	public void test() {
+		Path p=new File("src\\test\\resources\\TestFile.txt").toPath().toAbsolutePath();
+		System.out.println();
+		Path root=p.getRoot();
+		Path newPath=root.resolve(p.subpath(0,p.getNameCount()-0));
+		System.out.println(newPath);
+	}
 
 	@Test(expected = ParentOverPointException.class)
 	public void testParent() throws FileNotFoundException {

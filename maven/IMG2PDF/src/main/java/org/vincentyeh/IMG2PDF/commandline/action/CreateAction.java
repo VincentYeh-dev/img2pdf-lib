@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,7 +38,7 @@ public class CreateAction extends AbstractAction {
     private static final String DEF_PDF_DIRECTION = "Vertical";
     private static final String DEFV_PDF_SORTBY = "NAME";
     private static final String DEFV_PDF_SEQUENCE = "INCREASE";
-    private static final String DEFV_PDF_FILTER = "glob:*.{PNG,JPG}\\";
+    private static final String DEFV_PDF_FILTER = "glob:*.{PNG,JPG}";
 
     protected final PageSize pdf_size;
     protected final PageAlign pdf_align;
@@ -49,7 +50,8 @@ public class CreateAction extends AbstractAction {
     protected final String pdf_user_password;
     protected final DocumentAccessPermission pdf_permission;
     protected final String pdf_destination;
-    protected final String list_destination;
+//    protected final String list_destination;
+    protected final File dst;
     protected final boolean debug;
     protected final boolean overwrite_tasklist;
 
@@ -90,7 +92,12 @@ public class CreateAction extends AbstractAction {
 
         pdf_destination = cmd.getOptionValue("pdf_destination");
 
-        list_destination = cmd.getOptionValue("list_destination");
+        String list_destination = cmd.getOptionValue("list_destination");
+        dst = (new File(list_destination)).getAbsoluteFile();
+
+
+        if (!overwrite_tasklist && dst.exists())
+            throw new RuntimeException(String.format(Configuration.getResString("err_overwrite"), dst.getAbsolutePath()));
 
         try {
             ffh = new FileFilterHelper(cmd.getOptionValue("filter", DEFV_PDF_FILTER));
@@ -150,14 +157,13 @@ public class CreateAction extends AbstractAction {
 
     @Override
     public void start() throws Exception {
-        File dst = (new File(list_destination)).getAbsoluteFile();
-        if (!overwrite_tasklist && dst.exists())
-            throw new RuntimeException(String.format(Configuration.getResString("err_overwrite"), dst.getAbsolutePath()));
-
 //        TaskList tasks = dst.exists() ? new TaskList(dst) : new TaskList();
         TaskList tasks = new TaskList();
 
         for (File source : sources) {
+            if (!source.exists())
+                throw new FileNotFoundException(
+                        String.format(Configuration.getResString("err_filenotfound"), source.getName()));
             tasks.addAll(importTasksFromTXT(source));
         }
 
@@ -170,9 +176,9 @@ public class CreateAction extends AbstractAction {
     }
 
     protected TaskList importTasksFromTXT(File dirlist) throws IOException {
-        if (!dirlist.exists())
-            throw new FileNotFoundException(
-                    String.format(Configuration.getResString("err_filenotfound"), dirlist.getName()));
+//        if (!dirlist.exists())
+//            throw new FileNotFoundException(
+//                    String.format(Configuration.getResString("err_filenotfound"), dirlist.getName()));
 
         UTF8InputStream uis = new UTF8InputStream(dirlist);
         BufferedReader reader = new BufferedReader(new InputStreamReader(uis.getInputStream(), StandardCharsets.UTF_8));
@@ -248,9 +254,9 @@ public class CreateAction extends AbstractAction {
             System.out.println();
         }
 
-        configuration.put("imgs", imgs);
+//        configuration.put("imgs", imgs);
 
-        return new Task(configuration);
+        return new Task(configuration,imgs);
     }
 
     private ArrayList<ImgFile> importImagesFile(File source_directory) throws FileNotFoundException {
