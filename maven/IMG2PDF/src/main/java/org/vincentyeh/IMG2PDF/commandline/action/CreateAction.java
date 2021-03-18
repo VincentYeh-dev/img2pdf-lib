@@ -175,9 +175,7 @@ public class CreateAction extends AbstractAction {
         TaskList tasks = new TaskList();
 
         for (File source : sources) {
-            if (!source.exists())
-                throw new FileNotFoundException(
-                        String.format(Configuration.getResString("err_filenotfound"), source.getName()));
+            FileUtil.checkExists(source);
             tasks.addAll(importTasksFromTXT(source));
         }
 
@@ -191,10 +189,6 @@ public class CreateAction extends AbstractAction {
 
     protected TaskList importTasksFromTXT(File dirlist) throws IOException {
         FileUtil.checkReadableFile(dirlist);
-
-//        if (!dirlist.exists())
-//            throw new FileNotFoundException(
-//                    String.format(Configuration.getResString("err_filenotfound"), dirlist.getName()));
 
         UTF8InputStream uis = new UTF8InputStream(dirlist);
         BufferedReader reader = new BufferedReader(new InputStreamReader(uis.getInputStream(), StandardCharsets.UTF_8));
