@@ -1,9 +1,8 @@
 package org.vincentyeh.IMG2PDF.task;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -17,6 +16,7 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.vincentyeh.IMG2PDF.commandline.Configuration;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class TaskList extends ArrayList<Task> {
@@ -24,6 +24,7 @@ public class TaskList extends ArrayList<Task> {
 	/**
 	 * 
 	 */
+	private static final Charset charset=StandardCharsets.UTF_8;
 	private static final long serialVersionUID = 7305144027050402452L;
 
 	public TaskList() {
@@ -60,11 +61,11 @@ public class TaskList extends ArrayList<Task> {
 		Document doc = new Document();
 		Element root = toElement();
 		doc.setRootElement(root);
-		// Create the XML
 		XMLOutputter outter = new XMLOutputter();
-		outter.setFormat(Format.getPrettyFormat());
-		
-		outter.output(doc, new FileWriter(file));
+		Format format = Format.getPrettyFormat();
+		outter.setFormat(format);
+
+		outter.output(doc,new OutputStreamWriter(new FileOutputStream(file),charset));
 
 	}
 
@@ -87,7 +88,8 @@ public class TaskList extends ArrayList<Task> {
 		// If want to make namespace aware.
 		// factory.setNamespaceAware(true);
 		DocumentBuilder documentBuilder = factory.newDocumentBuilder();
-		org.w3c.dom.Document w3cDocument = documentBuilder.parse(xml_file);
+		InputSource source=new InputSource(new InputStreamReader(new FileInputStream(xml_file),charset));
+		org.w3c.dom.Document w3cDocument = documentBuilder.parse(source);
 		return new DOMBuilder().build(w3cDocument);
 	}
 

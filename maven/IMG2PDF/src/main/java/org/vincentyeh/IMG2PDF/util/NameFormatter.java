@@ -65,13 +65,13 @@ public class NameFormatter {
 	}
 
 	private String formatParents(String format, ArrayList<File> parents)
-			throws FileNotFoundException, ParentOverPointException {
+			throws NumberFormatException, ParentOverPointException {
 		Matcher matcher = Pattern.compile(".*?(\\$PARENT\\{[0-9]{1,}\\}).*?").matcher(format);
 		while (matcher.find()) {
 			String parent = matcher.group(1);
 			Matcher matcher_num = Pattern.compile("\\$PARENT\\{([0-9]{1,})\\}").matcher(parent);
 			if (matcher_num.find()) {
-				int index = Integer.valueOf(matcher_num.group(1));
+				int index = Integer.parseInt(matcher_num.group(1));
 				if (index >= parents.size()) {
 					throw new ParentOverPointException(index);
 				}
@@ -81,8 +81,8 @@ public class NameFormatter {
 		return format;
 	}
 
-	public String format(String format) throws FileNotFoundException, ParentOverPointException {
-		String buf[] = file.getName().split("\\.");
+	public String format(String format) throws ParentOverPointException {
+		String[] buf = file.getName().split("\\.");
 
 		format = format.replace("$NAME", buf[0]);
 
@@ -98,7 +98,7 @@ public class NameFormatter {
 		return format;
 	}
 
-	public class ParentOverPointException extends RuntimeException {
+	public static class ParentOverPointException extends RuntimeException {
 
 		/**
 		 * 
