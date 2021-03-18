@@ -6,10 +6,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
@@ -189,51 +191,82 @@ public class CreateAction extends AbstractAction {
 
     protected TaskList importTasksFromTXT(File dirlist) throws IOException {
         FileUtil.checkReadableFile(dirlist);
-
-        UTF8InputStream uis = new UTF8InputStream(dirlist);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(uis.getInputStream(), StandardCharsets.UTF_8));
+//        UTF8InputStream uis = new UTF8InputStream(dirlist);
+//        BufferedReader reader = new BufferedReader(new InputStreamReader(uis.getInputStream(), StandardCharsets.UTF_8));
 
         TaskList tasks = new TaskList();
 
         System.out.printf(Configuration.getResString("import_from_list") + "\n", dirlist.getName());
-        int line_counter = 0;
-        String buf = "";
-        while (buf != null) {
-            buf = reader.readLine();
-            line_counter++;
-            if (buf != null && !buf.isEmpty()) {
-                File dir = (new File(buf)).getAbsoluteFile();
 
-                if (!dir.exists()) {
-                    System.err.printf(Configuration.getResString("err_source_filenotfound") + "\n", dirlist.getName(),
-                            line_counter, dir.getAbsolutePath());
-                }
+        List<String> lines=Files.readAllLines(dirlist.toPath());
 
-                if (dir.isFile()) {
-                    System.err.printf(Configuration.getResString("err_source_path_is_file") + "\n", dirlist.getName(),
-                            line_counter, dir.getAbsolutePath());
-                }
+        for(int line_counter=0;line_counter<lines.size();line_counter++){
+            String line=lines.get(line_counter);
 
-                System.out.printf("\t[" + Configuration.getResString("common_importing") + "] %s\n",
-                        dir.getAbsolutePath());
+//            Ignore BOM Header:
+            line=line.replace("\uFEFF", "");
 
-                tasks.add(parse2Task(dir));
+            if(line.trim().isEmpty()||line.isEmpty())
+                continue;
 
-                System.out.printf("\t[" + Configuration.getResString("common_imported") + "] %s\n",
-                        dir.getAbsolutePath());
+            File dir = (new File(line)).getAbsoluteFile();
 
+            if (!dir.exists()) {
+                System.err.printf(Configuration.getResString("err_source_filenotfound") + "\n", dirlist.getName(),
+                        line_counter, dir.getAbsolutePath());
             }
-        }
 
-        try {
-            uis.close();
-        } catch (Exception ignore) {
-        }
+            if (dir.isFile()) {
+                System.err.printf(Configuration.getResString("err_source_path_is_file") + "\n", dirlist.getName(),
+                        line_counter, dir.getAbsolutePath());
+            }
 
-        try {
-            reader.close();
-        } catch (Exception ignore) {
+            System.out.printf("\t[" + Configuration.getResString("common_importing") + "] %s\n",
+                    dir.getAbsolutePath());
+
+            tasks.add(parse2Task(dir));
+
+            System.out.printf("\t[" + Configuration.getResString("common_imported") + "] %s\n",
+                    dir.getAbsolutePath());
         }
+//        int line_counter = 0;
+//        String buf = "";
+//        while (buf != null) {
+//            buf = reader.readLine();
+//            line_counter++;
+//            if (buf != null && !buf.isEmpty()) {
+//                File dir = (new File(buf)).getAbsoluteFile();
+//
+//                if (!dir.exists()) {
+//                    System.err.printf(Configuration.getResString("err_source_filenotfound") + "\n", dirlist.getName(),
+//                            line_counter, dir.getAbsolutePath());
+//                }
+//
+//                if (dir.isFile()) {
+//                    System.err.printf(Configuration.getResString("err_source_path_is_file") + "\n", dirlist.getName(),
+//                            line_counter, dir.getAbsolutePath());
+//                }
+//
+//                System.out.printf("\t[" + Configuration.getResString("common_importing") + "] %s\n",
+//                        dir.getAbsolutePath());
+//
+//                tasks.add(parse2Task(dir));
+//
+//                System.out.printf("\t[" + Configuration.getResString("common_imported") + "] %s\n",
+//                        dir.getAbsolutePath());
+//
+//            }
+//        }
+
+//        try {
+//            uis.close();
+//        } catch (Exception ignore) {
+//        }
+//
+//        try {
+//            reader.close();
+//        } catch (Exception ignore) {
+//        }
 
         return tasks;
     }
