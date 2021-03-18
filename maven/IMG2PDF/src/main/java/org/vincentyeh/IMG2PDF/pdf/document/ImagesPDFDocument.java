@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.vincentyeh.IMG2PDF.commandline.Configuration;
 
 /**
  * PDF document that contain destination.
@@ -21,7 +22,7 @@ public class ImagesPDFDocument extends PDDocument {
 	
 	public void save() throws IOException {
 		if(destination.getParentFile().mkdirs()) {
-			System.out.println("Required folders have been created in advance:"+destination.getParent());
+			System.out.printf(Configuration.getResString("info_required_folder_created")+"\n", destination.getParent());
 		}
 		
 		super.save(this.destination);

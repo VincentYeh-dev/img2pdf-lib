@@ -7,5 +7,5 @@ package org.vincentyeh.IMG2PDF.commandline.action;
  */
 public interface Action {
 	
-	public void start() throws Exception;
+	void start() throws Exception;
 }

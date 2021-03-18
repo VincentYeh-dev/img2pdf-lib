@@ -29,6 +29,7 @@ import org.vincentyeh.IMG2PDF.pdf.page.PageDirection;
 import org.vincentyeh.IMG2PDF.pdf.page.PageSize;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskList;
+import org.vincentyeh.IMG2PDF.util.FileUtil;
 import org.vincentyeh.IMG2PDF.util.NameFormatter;
 
 public class CreateAction extends AbstractAction {
@@ -95,7 +96,6 @@ public class CreateAction extends AbstractAction {
         String list_destination = cmd.getOptionValue("list_destination");
         dst = (new File(list_destination)).getAbsoluteFile();
 
-
         if (!overwrite_tasklist && dst.exists())
             throw new RuntimeException(String.format(Configuration.getResString("err_overwrite"), dst.getAbsolutePath()));
 
@@ -114,24 +114,39 @@ public class CreateAction extends AbstractAction {
 
         ArrayList<File> verified_sources = new ArrayList<>();
 
+
+//        Directory List:
         for (String str_source : str_sources) {
             File raw = (new File(str_source)).getAbsoluteFile();
 
             System.out.printf("\t[" + Configuration.getResString("common_verifying") + "] %s\n", raw.getAbsolutePath());
 
             System.out.print("\t");
-            if (!raw.exists()) {
-                System.err.printf(Configuration.getResString("err_filenotfound") + "\n", raw.getAbsolutePath());
-                continue;
-            } else if (raw.isDirectory()) {
-                System.err.printf(Configuration.getResString("err_path_is_file") + "\n", raw.getAbsolutePath());
-                continue;
-            } else {
+
+            try{
+                FileUtil.checkReadableFile(raw);
+
                 System.out.printf("[" + Configuration.getResString("common_verified") + "] %s\n",
                         raw.getAbsolutePath());
+
+                verified_sources.add(raw);
+            }catch (IOException e){
+                System.out.println(e.getMessage());
             }
-            verified_sources.add(raw);
+
+//            if (!raw.exists()) {
+//                System.err.printf(Configuration.getResString("err_filenotfound") + "\n", raw.getAbsolutePath());
+//                continue;
+//            } else if (raw.isDirectory()) {
+//                System.err.printf(Configuration.getResString("err_path_is_file") + "\n", raw.getAbsolutePath());
+//                continue;
+//            } else {
+//                System.out.printf("[" + Configuration.getResString("common_verified") + "] %s\n",
+//                        raw.getAbsolutePath());
+//            }
+//            verified_sources.add(raw);
         }
+
         sources = new File[verified_sources.size()];
         verified_sources.toArray(sources);
 
@@ -157,7 +172,6 @@ public class CreateAction extends AbstractAction {
 
     @Override
     public void start() throws Exception {
-//        TaskList tasks = dst.exists() ? new TaskList(dst) : new TaskList();
         TaskList tasks = new TaskList();
 
         for (File source : sources) {
@@ -176,6 +190,8 @@ public class CreateAction extends AbstractAction {
     }
 
     protected TaskList importTasksFromTXT(File dirlist) throws IOException {
+        FileUtil.checkReadableFile(dirlist);
+
 //        if (!dirlist.exists())
 //            throw new FileNotFoundException(
 //                    String.format(Configuration.getResString("err_filenotfound"), dirlist.getName()));

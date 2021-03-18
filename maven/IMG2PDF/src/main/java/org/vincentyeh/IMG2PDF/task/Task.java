@@ -29,7 +29,6 @@ public class Task {
 	private final String pdf_owner_password;
 	private final String pdf_user_password;
 
-//	@SuppressWarnings("unchecked")
 	public Task(HashMap<String, Object> configuration,ArrayList<ImgFile> imgs) {
 		if(configuration==null)
 			throw new NullPointerException("configuration is null");

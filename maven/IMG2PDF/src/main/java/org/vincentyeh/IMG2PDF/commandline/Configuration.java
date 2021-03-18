@@ -20,4 +20,6 @@ public class Configuration {
 	public static String getResString(String key) {
 		return Configuration.lagug_resource.getString(key);
 	}
+
+
 }
