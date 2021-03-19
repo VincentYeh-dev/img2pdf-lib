@@ -7,8 +7,8 @@ import java.util.concurrent.Callable;
 
 import javax.imageio.ImageIO;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.vincentyeh.IMG2PDF.file.ImgFile;
-import org.vincentyeh.IMG2PDF.pdf.document.ImagesPDFDocument;
 import org.vincentyeh.IMG2PDF.pdf.page.ImagePage;
 import org.vincentyeh.IMG2PDF.pdf.page.PageSize;
 import org.vincentyeh.IMG2PDF.task.Task;
@@ -20,9 +20,9 @@ import org.vincentyeh.IMG2PDF.task.Task;
  * 
  * @author VincentYeh
  */
-public class PDFConverter implements Callable<ImagesPDFDocument> {
+public class PDFConverter implements Callable<PDDocument> {
 
-	private final ImagesPDFDocument doc;
+	private final PDDocument doc;
 //	private boolean isProtectedByPwd;
 	private ConversionListener listener;
 	private final Task task;
@@ -37,9 +37,8 @@ public class PDFConverter implements Callable<ImagesPDFDocument> {
 		if (task == null)
 			throw new NullPointerException("task is null.");
 		this.task = task;
-		doc = new ImagesPDFDocument();
+		doc = new PDDocument();
 		doc.protect(task.getSpp());
-		doc.setDestination(task.getPDFDestination());
 	}
 
 	/**
@@ -51,7 +50,7 @@ public class PDFConverter implements Callable<ImagesPDFDocument> {
 	 * 
 	 */
 	@Override
-	public ImagesPDFDocument call() throws Exception {
+	public PDDocument call() throws Exception {
 		ArrayList<ImgFile> imgs = task.getImgs();
 		if (listener != null)
 			listener.onConversionPreparing(task);
@@ -63,11 +62,7 @@ public class PDFConverter implements Callable<ImagesPDFDocument> {
 			BufferedImage image = null;
 			try {
 				image = ImageIO.read(imgs.get(i));
-				
-//				if(1==1)
-//					throw new IOException("Image not support");
-				
-				
+
 			} catch (IOException e) {
 				closeDocument();
 				if (listener != null) {
@@ -80,9 +75,6 @@ public class PDFConverter implements Callable<ImagesPDFDocument> {
 
 			try {
 				doc.addPage(createImgPage(image));
-				
-//				if(1==1)
-//					throw new IOException("Conversion fail");
 				
 			} catch (Exception e) {
 				closeDocument();
