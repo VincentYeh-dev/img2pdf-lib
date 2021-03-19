@@ -13,12 +13,12 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.vincentyeh.IMG2PDF.commandline.parser.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.commandline.Configuration;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
 import org.vincentyeh.IMG2PDF.pdf.converter.ConversionListener;
 import org.vincentyeh.IMG2PDF.pdf.converter.PDFConverter;
-import org.vincentyeh.IMG2PDF.pdf.document.ImagesPDFDocument;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskList;
 import org.vincentyeh.IMG2PDF.util.FileUtil;
@@ -85,7 +85,7 @@ public class ConvertAction extends AbstractAction {
 
             ExecutorService executor = Executors.newSingleThreadExecutor();
             for (Task task : tasks) {
-                ImagesPDFDocument result = null;
+                PDDocument result = null;
                 File dst = new File(task.getPDFDestination());
                 if (!overwrite_output && dst.exists()) {
                     System.err.printf(Configuration.getResString("err_overwrite"), dst.getAbsolutePath());
@@ -95,7 +95,7 @@ public class ConvertAction extends AbstractAction {
                 try {
                     PDFConverter pdf = new PDFConverter(task);
                     pdf.setListener(listener);
-                    Future<ImagesPDFDocument> future = executor.submit(pdf);
+                    Future<PDDocument> future = executor.submit(pdf);
                     try {
                         result = future.get();
                     } catch (InterruptedException | ExecutionException e) {
@@ -106,7 +106,7 @@ public class ConvertAction extends AbstractAction {
 
                     FileUtil.makeDirectoryIfNotExists(dst);
                     FileUtil.checkWritableFile(dst);
-                    result.save();
+                    result.save(dst);
 
                     if (open_when_complete) {
                         Desktop desktop = Desktop.getDesktop();
