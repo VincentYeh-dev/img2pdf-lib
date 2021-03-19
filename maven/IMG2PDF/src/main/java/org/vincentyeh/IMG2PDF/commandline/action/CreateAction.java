@@ -13,7 +13,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.vincentyeh.IMG2PDF.commandline.CheckHelpParser;
+import org.vincentyeh.IMG2PDF.commandline.parser.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.commandline.Configuration;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
 import org.vincentyeh.IMG2PDF.file.FileFilterHelper;
@@ -228,7 +228,7 @@ public class CreateAction extends AbstractAction {
         return tasks;
     }
 
-    private Task parse2Task(File source_directory) throws FileNotFoundException {
+    private Task parse2Task(File source_directory) throws IOException {
         HashMap<String, Object> configuration = new HashMap<>();
 
         NameFormatter nf = new NameFormatter(source_directory);
