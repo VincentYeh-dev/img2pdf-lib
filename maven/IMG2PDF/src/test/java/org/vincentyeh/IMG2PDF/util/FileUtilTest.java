@@ -1,21 +1,34 @@
 package org.vincentyeh.IMG2PDF.util;
 
 import org.junit.Test;
+import org.vincentyeh.IMG2PDF.commandline.Configuration;
 
 import java.io.File;
 import java.io.FilePermission;
 import java.io.IOException;
 import java.nio.file.*;
 import java.security.AccessController;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class FileUtilTest {
+    static {
+//		Language Setting:
 
-    @Test (expected = IOException.class)
+//	Local:
+        Configuration.setLagugRes(ResourceBundle.getBundle("language_package", Locale.getDefault()));
+//	root:
+
+//		Configuration.setLagugRes(ResourceBundle.getBundle("language_package", Locale.ROOT));
+
+    }
+
+    @Test(expected = IOException.class)
     public void testWriteFileInSystemFolder() throws IOException {
         FileUtil.checkWritableFile(new File("C:\\test.xml"));
     }
 
-    @Test (expected = IOException.class)
+    @Test(expected = IOException.class)
     public void testWriteInSystemFolder() throws IOException {
         FileUtil.checkWritableFolder(new File("C:\\"));
     }
@@ -43,7 +56,7 @@ public class FileUtilTest {
     @Test
     public void testReadFileInDataFolder() throws IOException {
 
-        Path p=Paths.get("D:\\test.xml");
+        Path p = Paths.get("D:\\test.xml");
         Files.createFile(p);
 
         FileUtil.checkReadableFolder(p.toFile());

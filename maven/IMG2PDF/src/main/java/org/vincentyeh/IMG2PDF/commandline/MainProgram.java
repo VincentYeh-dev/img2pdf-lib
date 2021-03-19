@@ -17,7 +17,7 @@ import org.vincentyeh.IMG2PDF.commandline.action.ActionMode;
 import org.vincentyeh.IMG2PDF.commandline.action.ConvertAction;
 import org.vincentyeh.IMG2PDF.commandline.action.CreateAction;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
-import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
+import org.vincentyeh.IMG2PDF.commandline.parser.RelaxedParser;
 
 public class MainProgram extends AbstractAction {
 

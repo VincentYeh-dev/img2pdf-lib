@@ -1,7 +1,4 @@
-package org.vincentyeh.IMG2PDF.commandline;
-
-import java.util.ArrayList;
-import java.util.List;
+package org.vincentyeh.IMG2PDF.commandline.parser;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;

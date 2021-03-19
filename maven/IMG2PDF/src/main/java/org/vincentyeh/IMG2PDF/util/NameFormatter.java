@@ -2,6 +2,10 @@ package org.vincentyeh.IMG2PDF.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -28,16 +32,22 @@ public class NameFormatter {
 	private static final String SYMBOL_MODIFY_N="$MN";
 	private static final String SYMBOL_MODIFY_S="$MS";
 	
-	private final ArrayList<File> parents = new ArrayList<>();
-	private final File file;
+//	private final ArrayList<File> parents = new ArrayList<>();
+    private final File[] parents;
+    private final File file;
 
-	public NameFormatter(File file) throws FileNotFoundException {
-		this.file = file;
-		File parent = file.getParentFile();
-		while (parent != null) {
-			parents.add(parent);
-			parent = parent.getParentFile();
+//	private final File file;
+
+	public NameFormatter(File raw) throws IOException {
+	    FileUtil.checkReadableFile(raw);
+		file=raw;
+		Path p=raw.toPath();
+		parents = new File[p.getNameCount()-1];
+
+		for(int i=2;i<=p.getNameCount();i++){
+			parents[i-2]=p.getName(p.getNameCount()-i).toFile();
 		}
+
 	}
 
 	private String formatCurrentDateTime(String format, Date current_date) {
@@ -64,7 +74,7 @@ public class NameFormatter {
 		return format;
 	}
 
-	private String formatParents(String format, ArrayList<File> parents)
+	private String formatParents(String format, File[] parents)
 			throws NumberFormatException, ParentOverPointException {
 		Matcher matcher = Pattern.compile(".*?(\\$PARENT\\{[0-9]{1,}\\}).*?").matcher(format);
 		while (matcher.find()) {
@@ -72,17 +82,17 @@ public class NameFormatter {
 			Matcher matcher_num = Pattern.compile("\\$PARENT\\{([0-9]{1,})\\}").matcher(parent);
 			if (matcher_num.find()) {
 				int index = Integer.parseInt(matcher_num.group(1));
-				if (index >= parents.size()) {
+				if (index >= parents.length) {
 					throw new ParentOverPointException(index);
 				}
-				format = format.replace(parent, parents.get(index).getName());
+				format = format.replace(parent, parents[index].toString());
 			}
 		}
 		return format;
 	}
 
-	public String format(String format) throws ParentOverPointException {
-		String[] buf = file.getName().split("\\.");
+	public String format(String format) throws ParentOverPointException, IOException {
+        String[] buf = file.getName().split("\\.");
 
 		format = format.replace("$NAME", buf[0]);
 
@@ -92,9 +102,9 @@ public class NameFormatter {
 		if (format.matches(".*\\$(CY|CM|CD|CH|CN|CS).*"))
 			format = formatCurrentDateTime(format,new Date());
 		
-		if (format.matches(".*\\$(MY|MM|MD|MH|MN|MS).*"))
-			format = formatModifyDateTime(format, new Date(file.lastModified()));
-
+		if (format.matches(".*\\$(MY|MM|MD|MH|MN|MS).*")) {
+            format = formatModifyDateTime(format, new Date(file.lastModified()));
+        }
 		return format;
 	}
 
