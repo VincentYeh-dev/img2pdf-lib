@@ -47,9 +47,9 @@ public class CreateAction extends AbstractAction {
     protected final String pdf_owner_password;
     protected final String pdf_user_password;
     protected final DocumentAccessPermission pdf_permission;
-    protected final String pdf_destination;
+    protected final String pdf_dst;
 //    protected final String list_destination;
-    protected final File dst;
+    protected final File list_dst;
     protected final boolean debug;
     protected final boolean overwrite_tasklist;
 
@@ -88,13 +88,13 @@ public class CreateAction extends AbstractAction {
         pdf_owner_password = cmd.getOptionValue("pdf_owner_password");
         pdf_user_password = cmd.getOptionValue("pdf_user_password");
 
-        pdf_destination = cmd.getOptionValue("pdf_destination");
+        pdf_dst = cmd.getOptionValue("pdf_destination");
 
         String list_destination = cmd.getOptionValue("list_destination");
-        dst = (new File(list_destination)).getAbsoluteFile();
+        list_dst = (new File(list_destination)).getAbsoluteFile();
 
-        if (!overwrite_tasklist && dst.exists())
-            throw new RuntimeException(String.format(Configuration.getResString("err_overwrite"), dst.getAbsolutePath()));
+        if (!overwrite_tasklist && list_dst.exists())
+            throw new RuntimeException(String.format(Configuration.getResString("err_overwrite"), list_dst.getAbsolutePath()));
 
         try {
             ffh = new FileFilterHelper(cmd.getOptionValue("filter", DEFV_PDF_FILTER));
@@ -149,21 +149,21 @@ public class CreateAction extends AbstractAction {
 
         System.out.printf("### " + Configuration.getResString("tasklist_config")
                         + " ###\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s############\n",
-//				
+//
                 Configuration.getResString("arg_align"), pdf_align.toString(),
-//				
+//
                 Configuration.getResString("arg_size"), pdf_size.toString(),
-//				
+//
                 Configuration.getResString("arg_direction"), pdf_direction.toString(),
-//				
+//
                 Configuration.getResString("arg_auto_rotate"), pdf_auto_rotate,
-//				
+//
                 Configuration.getResString("arg_filter"), ffh.getOperator(),
-//				
+//
                 Configuration.getResString("arg_tasklist_dst"), list_destination,
-//				
+//
                 Configuration.getResString("arg_source"), dumpArrayString(sources)
-//				
+//
         );
     }
 
@@ -177,8 +177,8 @@ public class CreateAction extends AbstractAction {
         }
 
         try {
-            tasks.toXMLFile(dst);
-            System.out.printf("[" + Configuration.getResString("common_exported") + "] %s\n", dst.getAbsolutePath());
+            tasks.toXMLFile(list_dst);
+            System.out.printf("[" + Configuration.getResString("common_exported") + "] %s\n", list_dst.getAbsolutePath());
         } catch (IOException e) {
             System.err.printf(Configuration.getResString("err_tasklist_create") + "\n", e.getMessage());
         }
@@ -233,7 +233,7 @@ public class CreateAction extends AbstractAction {
 
         NameFormatter nf = new NameFormatter(source_directory);
         configuration.put("pdf_permission", pdf_permission);
-        configuration.put("pdf_destination", nf.format(pdf_destination));
+        configuration.put("pdf_destination", nf.format(pdf_dst));
         configuration.put("pdf_align", pdf_align);
         configuration.put("pdf_size", pdf_size);
         configuration.put("pdf_direction", pdf_direction);

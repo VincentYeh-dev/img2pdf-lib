@@ -52,11 +52,12 @@ public class TaskList extends ArrayList<Task> {
      * @throws IOException
      */
     public void toXMLFile(File file) throws IOException {
-//        FileUtil.checkWritableFile(file);
-
-        if (file.getParentFile().mkdirs()) {
-            System.out.printf(Configuration.getResString("info_required_folder_created") + "\n", file.getParent());
-        }
+        FileUtil.makeDirectoryIfNotExists(file);
+        FileUtil.checkWritableFile(file);
+//
+//        if (file.getParentFile().mkdirs()) {
+//            System.out.printf(Configuration.getResString("info_required_folder_created") + "\n", file.getParent());
+//        }
 
         Document doc = new Document();
         Element root = toElement();

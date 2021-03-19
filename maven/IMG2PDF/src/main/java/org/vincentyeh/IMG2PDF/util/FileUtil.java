@@ -5,26 +5,33 @@ import org.vincentyeh.IMG2PDF.commandline.Configuration;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class FileUtil {
-    public static void checkReadableFile(File raw) throws IOException {
-        checkExists(raw);
-        checkAbsolute(raw);
-
-        if (raw.isDirectory())
-            throw new IOException(String.format(Configuration.getResString("err_path_is_file") + "\n", raw.getAbsolutePath()));
-
-        if (!raw.canRead())
-            throw new IOException("File is not readable:" + raw.getAbsolutePath());
-
-    }
-
 
     public static void checkWritableFile(File raw) throws IOException {
         checkAbsolute(raw);
+        checkWritableFolder(raw.getParentFile());
+    }
 
-        if(!raw.canWrite())
-            throw new IOException("File is not writable:"+raw.getAbsolutePath());
+    public static void checkWritableFolder(File folder) throws IOException {
+        checkExists(folder);
+        if(!Files.isWritable(folder.toPath()))
+            throw new IOException("Folder is not writable:"+folder.toString());
+    }
+
+
+    public static void checkReadableFile(File raw) throws IOException {
+        checkAbsolute(raw);
+        checkExists(raw);
+        checkReadableFolder(raw.getParentFile());
+    }
+
+    public static void checkReadableFolder(File folder) throws IOException {
+        checkExists(folder);
+        if(!Files.isReadable(folder.toPath()))
+            throw new IOException("Folder is not readable:"+folder.toString());
     }
 
     public static void checkExists(File raw) throws FileNotFoundException {
@@ -36,6 +43,15 @@ public class FileUtil {
     public static void checkAbsolute(File raw) throws IOException {
         if (!raw.isAbsolute())
             throw new IOException("File path is not absolute:"+raw.getPath());
+    }
+
+    public static boolean makeDirectoryIfNotExists(File file) throws IOException {
+        checkAbsolute(file);
+        boolean done=file.getParentFile().mkdirs();
+        if (done) {
+            System.out.printf(Configuration.getResString("info_required_folder_created") + "\n", file.getParent());
+        }
+        return done;
     }
 
 
