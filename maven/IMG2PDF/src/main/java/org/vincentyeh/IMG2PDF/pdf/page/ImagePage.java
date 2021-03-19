@@ -1,5 +1,7 @@
 package org.vincentyeh.IMG2PDF.pdf.page;
 
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -9,7 +11,6 @@ import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.vincentyeh.IMG2PDF.pdf.page.PageAlign.HorizontalAlign;
 import org.vincentyeh.IMG2PDF.pdf.page.PageAlign.VerticalAlign;
-import org.vincentyeh.IMG2PDF.util.ImageProcess;
 
 /**
  * Page that contain image in PDF File.
@@ -46,7 +47,7 @@ public class ImagePage extends PDPage {
 			this.page_width = rect.getWidth();
 			this.page_height = rect.getHeight();
 			this.setRotation(direction.getPageRotateAngle());
-			this.image = ImageProcess.rotateImg(image, direction.getImageRotateAngle());
+			this.image = rotateImg(image, direction.getImageRotateAngle());
 			
 			float rotated_img_width = this.image.getWidth();
 			float rotated_img_height = this.image.getHeight();
@@ -82,9 +83,7 @@ public class ImagePage extends PDPage {
 
 	/**
 	 * Compute the position of image by align value.
-	 * 
-	 * @param raw  The image that put into this page.
-	 * @param page The Page that contain image.
+	 *
 	 * @return
 	 *         <ol>
 	 *         <li>x</li>
@@ -197,4 +196,20 @@ public class ImagePage extends PDPage {
 		return new float[] { out_height, out_width };
 	}
 
+	public BufferedImage rotateImg(BufferedImage raw, int rotate_angle) {
+		if(rotate_angle==0)return raw;
+		final double rads = Math.toRadians(rotate_angle);
+		final double sin = Math.abs(Math.sin(rads));
+		final double cos = Math.abs(Math.cos(rads));
+		final int w = (int) Math.floor(raw.getWidth() * cos + raw.getHeight() * sin);
+		final int h = (int) Math.floor(raw.getHeight() * cos + raw.getWidth() * sin);
+		final BufferedImage rotatedImage = new BufferedImage(w, h, raw.getType());
+		final AffineTransform at = new AffineTransform();
+		at.translate(w / 2, h / 2);
+		at.rotate(rads, 0, 0);
+		at.translate(-raw.getWidth() / 2, -raw.getHeight() / 2);
+		AffineTransformOp rotateOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
+		rotateOp.filter(raw, rotatedImage);
+		return rotatedImage;
+	}
 }

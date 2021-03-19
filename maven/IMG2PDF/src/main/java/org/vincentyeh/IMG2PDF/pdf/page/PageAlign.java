@@ -16,8 +16,8 @@ public class PageAlign {
 	/**
 	 * Create Align by enums.
 	 * 
-	 * @param LRA Left Right Align
-	 * @param TBA Top Bottom Align
+	 * @param hori_algin Horizontal Align
+	 * @param verti_algin Vertical Align
 	 */
 	public PageAlign(final HorizontalAlign hori_algin, final VerticalAlign verti_algin) {
 		this.hori_algin = hori_algin;
