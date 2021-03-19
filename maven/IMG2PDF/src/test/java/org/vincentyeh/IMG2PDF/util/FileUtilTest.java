@@ -23,6 +23,12 @@ public class FileUtilTest {
 
     }
 
+
+    @Test(expected = IOException.class)
+    public void testAbsolute() throws IOException {
+        FileUtil.checkAbsolute(new File("aa\\bb.txt"));
+    }
+
     @Test(expected = IOException.class)
     public void testWriteFileInSystemFolder() throws IOException {
         FileUtil.checkWritableFile(new File("C:\\test.xml"));

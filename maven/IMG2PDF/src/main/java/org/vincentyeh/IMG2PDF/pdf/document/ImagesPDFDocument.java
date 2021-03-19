@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.vincentyeh.IMG2PDF.commandline.Configuration;
+import org.vincentyeh.IMG2PDF.util.FileUtil;
 
 /**
  * PDF document that contain destination.
@@ -21,10 +22,6 @@ public class ImagesPDFDocument extends PDDocument {
 	}
 	
 	public void save() throws IOException {
-		if(destination.getParentFile().mkdirs()) {
-			System.out.printf(Configuration.getResString("info_required_folder_created")+"\n", destination.getParent());
-		}
-		
 		super.save(this.destination);
 	}
 	

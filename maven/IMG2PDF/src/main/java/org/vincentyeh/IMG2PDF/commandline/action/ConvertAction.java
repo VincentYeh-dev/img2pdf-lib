@@ -21,6 +21,7 @@ import org.vincentyeh.IMG2PDF.pdf.converter.PDFConverter;
 import org.vincentyeh.IMG2PDF.pdf.document.ImagesPDFDocument;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskList;
+import org.vincentyeh.IMG2PDF.util.FileUtil;
 
 public class ConvertAction extends AbstractAction {
 
@@ -92,8 +93,6 @@ public class ConvertAction extends AbstractAction {
                 }
 
                 try {
-//                    FileUtil.checkWritableFile(dst);
-
                     PDFConverter pdf = new PDFConverter(task);
                     pdf.setListener(listener);
                     Future<ImagesPDFDocument> future = executor.submit(pdf);
@@ -104,6 +103,9 @@ public class ConvertAction extends AbstractAction {
                         e.printStackTrace();
                     }
 
+
+                    FileUtil.makeDirectoryIfNotExists(dst);
+                    FileUtil.checkWritableFile(dst);
                     result.save();
 
                     if (open_when_complete) {
