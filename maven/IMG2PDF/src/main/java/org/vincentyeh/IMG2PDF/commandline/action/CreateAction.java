@@ -4,10 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
@@ -48,7 +45,7 @@ public class CreateAction extends AbstractAction {
     protected final String pdf_user_password;
     protected final DocumentAccessPermission pdf_permission;
     protected final String pdf_dst;
-//    protected final String list_destination;
+    //    protected final String list_destination;
     protected final File list_dst;
     protected final boolean debug;
     protected final boolean overwrite_tasklist;
@@ -120,14 +117,14 @@ public class CreateAction extends AbstractAction {
 
             System.out.print("\t");
 
-            try{
+            try {
                 FileUtil.checkReadableFile(raw);
 
                 System.out.printf("[" + Configuration.getResString("common_verified") + "] %s\n",
                         raw.getAbsolutePath());
 
                 verified_sources.add(raw);
-            }catch (IOException e){
+            } catch (IOException e) {
                 System.out.println(e.getMessage());
             }
 
@@ -189,20 +186,20 @@ public class CreateAction extends AbstractAction {
         TaskList tasks = new TaskList();
         System.out.printf(Configuration.getResString("import_from_list") + "\n", dirlist.getName());
 
-        List<String> lines=Files.readAllLines(dirlist.toPath());
-        for(int line_counter=0;line_counter<lines.size();line_counter++){
-            String line=lines.get(line_counter);
+        List<String> lines = Files.readAllLines(dirlist.toPath());
+        for (int line_counter = 0; line_counter < lines.size(); line_counter++) {
+            String line = lines.get(line_counter);
 
 //            Ignore BOM Header:
-            line=line.replace("\uFEFF", "");
+            line = line.replace("\uFEFF", "");
 
-            if(line.trim().isEmpty()||line.isEmpty())
+            if (line.trim().isEmpty() || line.isEmpty())
                 continue;
 
             File dir = new File(line);
 
-            if(!dir.isAbsolute()){
-                dir=new File(dirlist.getParent(),line);
+            if (!dir.isAbsolute()) {
+                dir = new File(dirlist.getParent(), line);
             }
 
 
@@ -242,9 +239,9 @@ public class CreateAction extends AbstractAction {
         configuration.put("pdf_user_password", pdf_user_password);
         configuration.put("pdf_owner_password", pdf_owner_password);
 
-        ArrayList<ImgFile> imgs = importImagesFile(source_directory);
-
-        Collections.sort(imgs);
+        ImgFile[] imgs = importImagesFile(source_directory);
+        Arrays.sort(imgs);
+//        Collections.sort(imgs);
         if (debug) {
             System.out.println("@Debug");
             System.out.println("Sort Images:");
@@ -256,32 +253,40 @@ public class CreateAction extends AbstractAction {
 
 //        configuration.put("imgs", imgs);
 
-        return new Task(configuration,imgs);
+        return new Task(configuration, imgs);
     }
 
-    private ArrayList<ImgFile> importImagesFile(File source_directory) throws FileNotFoundException {
+    private ImgFile[] importImagesFile(File source_directory) throws FileNotFoundException {
         if (debug) {
             System.out.println("@Debug");
             System.out.println("Import Images:");
         }
-        ArrayList<ImgFile> imgs = new ArrayList<>();
+//        ArrayList<ImgFile> imgs = new ArrayList<>();
 
         File[] files = source_directory.listFiles(ffh);
-
         if (files == null)
             files = new File[0];
 
-        for (File f : files) {
-            ImgFile img = new ImgFile(f.getAbsolutePath(), pdf_sortby, pdf_sequence);
-            imgs.add(img);
+        ImgFile[] imgFiles = new ImgFile[files.length];
+
+        for (int i = 0; i < imgFiles.length; i++) {
+            imgFiles[i] = new ImgFile(files[i].getAbsolutePath(), pdf_sortby, pdf_sequence);
+//            imgs.add(img);
             if (debug)
-                System.out.println(img);
+                System.out.println(imgFiles[i]);
         }
+
+//        for (File f : files) {
+//            ImgFile img = new ImgFile(f.getAbsolutePath(), pdf_sortby, pdf_sequence);
+//            imgs.add(img);
+//            if (debug)
+//                System.out.println(img);
+//        }
 
         if (debug)
             System.out.println();
 
-        return imgs;
+        return imgFiles;
     }
 
     private static <T> String dumpArrayString(T[] array) {

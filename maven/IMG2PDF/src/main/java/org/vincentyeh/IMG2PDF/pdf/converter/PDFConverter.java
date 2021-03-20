@@ -51,17 +51,17 @@ public class PDFConverter implements Callable<PDDocument> {
 	 */
 	@Override
 	public PDDocument call() throws Exception {
-		ArrayList<ImgFile> imgs = task.getImgs();
+		ImgFile[] imgs = task.getImgs();
 		if (listener != null)
 			listener.onConversionPreparing(task);
 
-		for (int i = 0; i < imgs.size(); i++) {
+		for (int i = 0; i < imgs.length; i++) {
 			if (listener != null)
 				listener.onConverting(i);
 
 			BufferedImage image = null;
 			try {
-				image = ImageIO.read(imgs.get(i));
+				image = ImageIO.read(imgs[i]);
 
 			} catch (IOException e) {
 				closeDocument();
