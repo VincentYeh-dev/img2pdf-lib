@@ -164,7 +164,7 @@ public class ConvertAction extends AbstractAction {
 
         @Override
         public void onConversionPreparing(Task task) {
-            int size_of_imgs = task.getImgs().size();
+            int size_of_imgs = task.getImgs().length;
             perImg = (10. / size_of_imgs);
             System.out.printf("###%s###\n", Configuration.getResString("pdf_conversion_task"));
             System.out.printf("%s:%s\n", Configuration.getResString("arg_pdf_dst"), task.getPDFDestination());

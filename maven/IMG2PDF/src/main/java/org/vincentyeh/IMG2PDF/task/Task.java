@@ -20,7 +20,7 @@ public class Task {
 	private final PageAlign pdf_align;
 	private final PageSize pdf_size;
 	private final String pdf_destination;
-	private final ArrayList<ImgFile> imgs;
+	private final ImgFile[] imgs;
 	private final PageDirection pdf_direction;
 	private final boolean pdf_auto_rotate;
 
@@ -29,19 +29,35 @@ public class Task {
 	private final String pdf_owner_password;
 	private final String pdf_user_password;
 
-	public Task(HashMap<String, Object> configuration,ArrayList<ImgFile> imgs) {
+	public Task(HashMap<String, Object> configuration,ImgFile[] imgs) {
 		if(configuration==null)
-			throw new NullPointerException("configuration is null");
+			throw new IllegalArgumentException("configuration is null");
 
 		if(imgs==null)
-			throw new NullPointerException("imgs is null");
-
+			throw new IllegalArgumentException("imgs is null");
 		this.imgs=imgs;
 
+		if(configuration.get("pdf_align")==null)
+			throw new IllegalArgumentException("pdf_align==null");
 		pdf_align = (PageAlign) configuration.get("pdf_align");
+
+
+		if(configuration.get("pdf_size")==null)
+			throw new IllegalArgumentException("pdf_size==null");
 		pdf_size = (PageSize) configuration.get("pdf_size");
+
+
+		if(configuration.get("pdf_destination")==null)
+			throw new IllegalArgumentException("pdf_destination==null");
 		pdf_destination = configuration.get("pdf_destination").toString();
+
+
+		if(configuration.get("pdf_direction")==null)
+			throw new IllegalArgumentException("pdf_direction==null");
 		pdf_direction = (PageDirection) configuration.get("pdf_direction");
+
+		if(configuration.get("pdf_auto_rotate")==null)
+			throw new IllegalArgumentException("pdf_auto_rotate==null");
 		pdf_auto_rotate = (Boolean) configuration.get("pdf_auto_rotate");
 
 		pdf_owner_password = configuration.get("pdf_owner_password") == null ? null
@@ -49,7 +65,10 @@ public class Task {
 		pdf_user_password = configuration.get("pdf_user_password") == null ? null
 				: configuration.get("pdf_user_password").toString();
 
+		if(configuration.get("pdf_permission")==null)
+			throw new IllegalArgumentException("pdf_permission==null");
 		pdf_permission = (DocumentAccessPermission) configuration.get("pdf_permission");
+
 		spp = createProtectionPolicy(pdf_owner_password, pdf_user_password, pdf_permission);
 //		imgs = (ArrayList<ImgFile>) configuration.get("imgs");
 	}
@@ -87,8 +106,10 @@ public class Task {
 
 		List<Element> contains_files = element.getChild("FILES").getChildren("FILE");
 		ArrayList<Element> xml_files = new ArrayList<Element>(contains_files);
-		this.imgs = new ArrayList<>();
-		this.imgs.addAll(elements2imgs(xml_files));
+		this.imgs=parseElementsToImages(xml_files);
+
+//		this.imgs = new ArrayList<>();
+//		this.imgs.addAll(elements2imgs(xml_files));
 
 	}
 
@@ -123,16 +144,22 @@ public class Task {
 		return task;
 	}
 
-	private ArrayList<ImgFile> elements2imgs(ArrayList<Element> el_files) throws FileNotFoundException {
-		ArrayList<ImgFile> imgs = new ArrayList<ImgFile>();
-		for (Element el : el_files) {
-			ImgFile img = new ImgFile(new File(el.getValue()).getAbsolutePath());
-			imgs.add(img);
+	private ImgFile[] parseElementsToImages(ArrayList<Element> el_files) throws FileNotFoundException {
+//		ArrayList<ImgFile> imgs = new ArrayList<ImgFile>();
+		ImgFile[] imgFiles=new ImgFile[el_files.size()];
+		for(int i=0;i<imgFiles.length;i++){
+			Element el=el_files.get(i);
+			imgFiles[i]=new ImgFile(new File(el.getValue()).getAbsolutePath());
 		}
-		return imgs;
+
+//		for (Element el : el_files) {
+//			ImgFile img = new ImgFile(new File(el.getValue()).getAbsolutePath());
+//			imgs.add(img);
+//		}
+		return imgFiles;
 	}
 
-	public ArrayList<ImgFile> getImgs() {
+	public ImgFile[] getImgs() {
 		return this.imgs;
 	}
 
