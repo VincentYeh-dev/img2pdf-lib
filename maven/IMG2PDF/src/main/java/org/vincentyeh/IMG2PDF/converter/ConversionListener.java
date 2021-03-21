@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.pdf.converter;
+package org.vincentyeh.IMG2PDF.converter;
 
 import java.io.IOException;
 

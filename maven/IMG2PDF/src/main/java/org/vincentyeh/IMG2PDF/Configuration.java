@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.commandline;
+package org.vincentyeh.IMG2PDF;
 
 import java.util.ResourceBundle;
 
