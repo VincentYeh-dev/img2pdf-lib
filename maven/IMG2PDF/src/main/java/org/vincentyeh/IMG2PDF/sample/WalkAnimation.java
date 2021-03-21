@@ -6,8 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
-import org.vincentyeh.IMG2PDF.commandline.MainProgram;
-
 public class WalkAnimation {
 
 	public static void main(String[] args) {

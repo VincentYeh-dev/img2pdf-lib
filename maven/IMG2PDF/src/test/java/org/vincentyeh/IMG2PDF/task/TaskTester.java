@@ -6,17 +6,16 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.junit.Assert;
 import org.junit.Test;
-import org.vincentyeh.IMG2PDF.file.ImgFile;
-import org.vincentyeh.IMG2PDF.pdf.document.DocumentAccessPermission;
-import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
-import org.vincentyeh.IMG2PDF.pdf.page.PageDirection;
-import org.vincentyeh.IMG2PDF.pdf.page.PageSize;
+import org.vincentyeh.IMG2PDF.pdf.argument.ImgFile;
+import org.vincentyeh.IMG2PDF.pdf.argument.DocumentAccessPermission;
+import org.vincentyeh.IMG2PDF.pdf.argument.PageAlign;
+import org.vincentyeh.IMG2PDF.pdf.argument.PageDirection;
+import org.vincentyeh.IMG2PDF.pdf.argument.PageSize;
 import org.vincentyeh.IMG2PDF.util.NameFormatter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 
 public class TaskTester {

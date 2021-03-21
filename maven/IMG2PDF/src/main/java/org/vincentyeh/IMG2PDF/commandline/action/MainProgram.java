@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.commandline;
+package org.vincentyeh.IMG2PDF.commandline.action;
 
 import java.io.FileNotFoundException;
 import java.util.Locale;
@@ -12,10 +12,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
-import org.vincentyeh.IMG2PDF.commandline.action.AbstractAction;
-import org.vincentyeh.IMG2PDF.commandline.action.ActionMode;
-import org.vincentyeh.IMG2PDF.commandline.action.ConvertAction;
-import org.vincentyeh.IMG2PDF.commandline.action.CreateAction;
+import org.vincentyeh.IMG2PDF.Configuration;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
 import org.vincentyeh.IMG2PDF.commandline.parser.RelaxedParser;
 

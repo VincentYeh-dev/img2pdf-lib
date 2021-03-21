@@ -10,11 +10,11 @@ import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
 import org.jdom2.Element;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
-import org.vincentyeh.IMG2PDF.file.ImgFile;
-import org.vincentyeh.IMG2PDF.pdf.document.DocumentAccessPermission;
-import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
-import org.vincentyeh.IMG2PDF.pdf.page.PageDirection;
-import org.vincentyeh.IMG2PDF.pdf.page.PageSize;
+import org.vincentyeh.IMG2PDF.pdf.argument.ImgFile;
+import org.vincentyeh.IMG2PDF.pdf.argument.DocumentAccessPermission;
+import org.vincentyeh.IMG2PDF.pdf.argument.PageAlign;
+import org.vincentyeh.IMG2PDF.pdf.argument.PageDirection;
+import org.vincentyeh.IMG2PDF.pdf.argument.PageSize;
 
 public class Task {
 	private final PageAlign pdf_align;

@@ -1,6 +1,6 @@
 package org.vincentyeh.IMG2PDF.commandline.action.exception;
 
-import org.vincentyeh.IMG2PDF.commandline.Configuration;
+import org.vincentyeh.IMG2PDF.Configuration;
 
 public class UnrecognizedEnumException extends RuntimeException {
 

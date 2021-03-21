@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.file;
+package org.vincentyeh.IMG2PDF.util;
 
 import java.io.File;
 import java.io.FileFilter;
