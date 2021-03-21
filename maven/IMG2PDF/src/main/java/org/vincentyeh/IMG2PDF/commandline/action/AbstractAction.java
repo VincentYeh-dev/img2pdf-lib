@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.vincentyeh.IMG2PDF.commandline.Configuration;
+import org.vincentyeh.IMG2PDF.Configuration;
 
 public abstract class AbstractAction implements Action {
 	protected Options options;

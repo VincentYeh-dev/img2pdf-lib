@@ -1,7 +1,6 @@
 package org.vincentyeh.IMG2PDF.commandline.action;
 
 import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
-import org.vincentyeh.IMG2PDF.pdf.page.PageDirection;
 
 public enum ActionMode {
 	create,convert;

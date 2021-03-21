@@ -1,12 +1,11 @@
 package org.vincentyeh.IMG2PDF.util;
 
-import org.vincentyeh.IMG2PDF.commandline.Configuration;
+import org.vincentyeh.IMG2PDF.Configuration;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 
 public class FileUtil {
 

@@ -1,16 +1,15 @@
-package org.vincentyeh.IMG2PDF.pdf.converter;
+package org.vincentyeh.IMG2PDF.converter;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.concurrent.Callable;
 
 import javax.imageio.ImageIO;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.vincentyeh.IMG2PDF.file.ImgFile;
-import org.vincentyeh.IMG2PDF.pdf.page.ImagePage;
-import org.vincentyeh.IMG2PDF.pdf.page.PageSize;
+import org.vincentyeh.IMG2PDF.pdf.argument.ImgFile;
+import org.vincentyeh.IMG2PDF.pdf.ImagePage;
+import org.vincentyeh.IMG2PDF.pdf.argument.PageSize;
 import org.vincentyeh.IMG2PDF.task.Task;
 
 /**

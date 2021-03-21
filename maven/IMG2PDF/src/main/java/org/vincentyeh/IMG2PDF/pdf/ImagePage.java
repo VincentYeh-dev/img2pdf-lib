@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.pdf.page;
+package org.vincentyeh.IMG2PDF.pdf;
 
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
@@ -9,8 +9,11 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
-import org.vincentyeh.IMG2PDF.pdf.page.PageAlign.HorizontalAlign;
-import org.vincentyeh.IMG2PDF.pdf.page.PageAlign.VerticalAlign;
+import org.vincentyeh.IMG2PDF.pdf.argument.PageAlign;
+import org.vincentyeh.IMG2PDF.pdf.argument.PageAlign.HorizontalAlign;
+import org.vincentyeh.IMG2PDF.pdf.argument.PageAlign.VerticalAlign;
+import org.vincentyeh.IMG2PDF.pdf.argument.PageDirection;
+import org.vincentyeh.IMG2PDF.pdf.argument.PageSize;
 
 /**
  * Page that contain image in PDF File.

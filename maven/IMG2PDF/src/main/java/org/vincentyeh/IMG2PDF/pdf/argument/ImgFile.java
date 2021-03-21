@@ -1,11 +1,10 @@
-package org.vincentyeh.IMG2PDF.file;
+package org.vincentyeh.IMG2PDF.pdf.argument;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
-import org.vincentyeh.IMG2PDF.pdf.page.PageAlign.VerticalAlign;
 
 /**
  * The ImgFile is a comparable subclass of File.It's can be compared by filename
