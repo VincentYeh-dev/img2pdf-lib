@@ -38,7 +38,7 @@ public class MainProgram extends AbstractAction {
     private AbstractAction action;
     private ActionMode mode;
 
-    public MainProgram(String[] args) throws MissingOptionException, ParseException, FileNotFoundException {
+    public MainProgram(String[] args) throws ParseException, FileNotFoundException {
         super(getLocaleOptions());
 
         System.out.println("##IMG2PDF##");

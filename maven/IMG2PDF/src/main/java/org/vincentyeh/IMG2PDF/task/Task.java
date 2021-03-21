@@ -133,7 +133,6 @@ public class Task {
 		task.setAttribute("align", pdf_align.toString());
 		task.setAttribute("default-direction", pdf_direction.toString());
 		task.setAttribute("auto-rotate", String.valueOf(pdf_auto_rotate));
-
 		Element permission = new Element("PERMISSION");
 		permission.setAttribute("canPrint", String.valueOf(pdf_permission.canPrint()));
 		permission.setAttribute("canModify", String.valueOf(pdf_permission.canModify()));
@@ -152,10 +151,6 @@ public class Task {
 			imgFiles[i]=new ImgFile(new File(el.getValue()).getAbsolutePath());
 		}
 
-//		for (Element el : el_files) {
-//			ImgFile img = new ImgFile(new File(el.getValue()).getAbsolutePath());
-//			imgs.add(img);
-//		}
 		return imgFiles;
 	}
 
