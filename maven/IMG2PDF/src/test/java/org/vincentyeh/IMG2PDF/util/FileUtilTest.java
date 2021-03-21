@@ -1,13 +1,11 @@
 package org.vincentyeh.IMG2PDF.util;
 
 import org.junit.Test;
-import org.vincentyeh.IMG2PDF.commandline.Configuration;
+import org.vincentyeh.IMG2PDF.Configuration;
 
 import java.io.File;
-import java.io.FilePermission;
 import java.io.IOException;
 import java.nio.file.*;
-import java.security.AccessController;
 import java.util.Locale;
 import java.util.ResourceBundle;
 

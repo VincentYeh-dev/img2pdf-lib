@@ -1,9 +1,8 @@
-package org.vincentyeh.IMG2PDF.pdf.page;
+package org.vincentyeh.IMG2PDF.pdf.argument;
 
 import java.awt.image.BufferedImage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
-import org.vincentyeh.IMG2PDF.file.ImgFile.Sortby;
 
 /**
  * Direction of page.Horizontal or Vertical.

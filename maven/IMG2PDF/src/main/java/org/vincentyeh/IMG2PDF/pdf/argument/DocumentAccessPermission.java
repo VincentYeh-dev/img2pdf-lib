@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.pdf.document;
+package org.vincentyeh.IMG2PDF.pdf.argument;
 
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 

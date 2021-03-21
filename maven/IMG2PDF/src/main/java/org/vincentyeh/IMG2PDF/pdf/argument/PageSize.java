@@ -1,8 +1,7 @@
-package org.vincentyeh.IMG2PDF.pdf.page;
+package org.vincentyeh.IMG2PDF.pdf.argument;
 
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
-import org.vincentyeh.IMG2PDF.pdf.page.PageAlign.HorizontalAlign;
 
 /**
  * Size is the variable that define size of pages of PDFFile.

@@ -52,7 +52,7 @@
               </artifactSet>
               <transformers>
                 <transformer>
-                  <mainClass>org.vincentyeh.IMG2PDF.commandline.MainProgram</mainClass>
+                  <mainClass>org.vincentyeh.IMG2PDF.commandline.action.MainProgram</mainClass>
                 </transformer>
               </transformers>
             </configuration>
