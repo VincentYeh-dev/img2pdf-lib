@@ -2,7 +2,7 @@
   <configuration default="false" name="WalkAnimation convert" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="org.vincentyeh.IMG2PDF.commandline.action.MainProgram" />
     <module name="IMG2PDF" />
-    <option name="PROGRAM_PARAMETERS" value="-m convert -o -lsrc &quot;C:\Users\vince\git\IMG2PDF\sample\walk-animation\taskslist\test.xml&quot;" />
+    <option name="PROGRAM_PARAMETERS" value="-m convert -o -lsrc &quot;D:\Projects\git\IMG2PDF\sample\walk-animation\taskslist\test.xml&quot;" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

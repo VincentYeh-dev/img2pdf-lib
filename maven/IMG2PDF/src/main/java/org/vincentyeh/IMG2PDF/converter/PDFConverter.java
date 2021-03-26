@@ -10,6 +10,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.vincentyeh.IMG2PDF.pdf.argument.ImgFile;
 import org.vincentyeh.IMG2PDF.pdf.ImagePage;
 import org.vincentyeh.IMG2PDF.pdf.argument.PageSize;
+import org.vincentyeh.IMG2PDF.pdf.argument.doc.PageArgument;
 import org.vincentyeh.IMG2PDF.task.Task;
 
 /**
@@ -37,7 +38,7 @@ public class PDFConverter implements Callable<PDDocument> {
 			throw new NullPointerException("task is null.");
 		this.task = task;
 		doc = new PDDocument();
-		doc.protect(task.getSpp());
+		doc.protect(task.getDocumentArgument().getSpp());
 	}
 
 	/**
@@ -101,12 +102,14 @@ public class PDFConverter implements Callable<PDDocument> {
 	 * @throws Exception
 	 */
 	private ImagePage createImgPage(BufferedImage img) throws Exception  {
-		PageSize size = task.getPDFSize();
+		PageArgument pageArgument=task.getPageArgument();
+
+		PageSize size = task.getPageArgument().getPdf_size();
 		ImagePage imgpage = null;
 		if (size == PageSize.DEPEND_ON_IMG) {
-			imgpage = new ImagePage(task.getPDFAlign(), img);
+			imgpage = new ImagePage(pageArgument.getPdf_align(), img);
 		} else {
-			imgpage = new ImagePage(task.getPDFAlign(), task.getPDFSize(), task.getPDFAutoRotate(), task.getPDFDirection(),
+			imgpage = new ImagePage(pageArgument.getPdf_align(),pageArgument.getPdf_size(),pageArgument.getAutoRotate(),pageArgument.getPdf_direction(),
 					img);
 		}
 		imgpage.drawImageToPage(doc);
