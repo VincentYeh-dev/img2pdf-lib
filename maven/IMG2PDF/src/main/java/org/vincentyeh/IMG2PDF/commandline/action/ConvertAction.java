@@ -86,7 +86,7 @@ public class ConvertAction extends AbstractAction {
             ExecutorService executor = Executors.newSingleThreadExecutor();
             for (Task task : tasks) {
                 PDDocument result = null;
-                File dst = new File(task.getPDFDestination());
+                File dst = task.getDocumentArgument().getPdf_destination();
                 if (!overwrite_output && dst.exists()) {
                     System.err.printf(Configuration.getResString("err_overwrite"), dst.getAbsolutePath());
                     continue;
@@ -167,9 +167,9 @@ public class ConvertAction extends AbstractAction {
             int size_of_imgs = task.getImgs().length;
             perImg = (10. / size_of_imgs);
             System.out.printf("###%s###\n", Configuration.getResString("pdf_conversion_task"));
-            System.out.printf("%s:%s\n", Configuration.getResString("arg_pdf_dst"), task.getPDFDestination());
+            System.out.printf("%s:%s\n", Configuration.getResString("arg_pdf_dst"), task.getDocumentArgument().getPdf_destination());
             System.out.printf("%s:%s\n", Configuration.getResString("common_name"),
-                    new File(task.getPDFDestination()).getName());
+                    new File(task.getDocumentArgument().getPdf_destination().getName()));
             System.out.printf("%s->", Configuration.getResString("common_progress"));
             System.out.print("0%[");
 

@@ -13,6 +13,8 @@ import org.apache.commons.cli.ParseException;
 import org.vincentyeh.IMG2PDF.commandline.parser.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.Configuration;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
+import org.vincentyeh.IMG2PDF.pdf.argument.doc.DocumentArgument;
+import org.vincentyeh.IMG2PDF.pdf.argument.doc.PageArgument;
 import org.vincentyeh.IMG2PDF.util.FileFilterHelper;
 import org.vincentyeh.IMG2PDF.pdf.argument.ImgFile;
 import org.vincentyeh.IMG2PDF.pdf.argument.ImgFile.Sequence;
@@ -226,18 +228,26 @@ public class CreateAction extends AbstractAction {
     }
 
     private Task parse2Task(File source_directory) throws IOException {
-        HashMap<String, Object> configuration = new HashMap<>();
 
         NameFormatter nf = new NameFormatter(source_directory);
-        configuration.put("pdf_permission", pdf_permission);
-        configuration.put("pdf_destination", nf.format(pdf_dst));
-        configuration.put("pdf_align", pdf_align);
-        configuration.put("pdf_size", pdf_size);
-        configuration.put("pdf_direction", pdf_direction);
-        configuration.put("pdf_auto_rotate", pdf_auto_rotate);
+        DocumentArgument documentArgument=new DocumentArgument(pdf_owner_password,pdf_user_password,pdf_permission,new File(nf.format(pdf_dst)));
+        PageArgument pageArgument=new PageArgument();
+        pageArgument.setPdf_align(pdf_align);
+        pageArgument.setPdf_size(pdf_size);
+        pageArgument.setPdf_direction(pdf_direction);
+        pageArgument.setPdf_auto_rotate(pdf_auto_rotate);
 
-        configuration.put("pdf_user_password", pdf_user_password);
-        configuration.put("pdf_owner_password", pdf_owner_password);
+//        HashMap<String, Object> configuration = new HashMap<>();
+//        NameFormatter nf = new NameFormatter(source_directory);
+//        configuration.put("pdf_permission", pdf_permission);
+//        configuration.put("pdf_destination", nf.format(pdf_dst));
+//        configuration.put("pdf_align", pdf_align);
+//        configuration.put("pdf_size", pdf_size);
+//        configuration.put("pdf_direction", pdf_direction);
+//        configuration.put("pdf_auto_rotate", pdf_auto_rotate);
+//
+//        configuration.put("pdf_user_password", pdf_user_password);
+//        configuration.put("pdf_owner_password", pdf_owner_password);
 
         ImgFile[] imgs = importImagesFile(source_directory);
         Arrays.sort(imgs);
@@ -253,7 +263,7 @@ public class CreateAction extends AbstractAction {
 
 //        configuration.put("imgs", imgs);
 
-        return new Task(configuration, imgs);
+        return new Task(documentArgument,pageArgument, imgs);
     }
 
     private ImgFile[] importImagesFile(File source_directory) throws FileNotFoundException {
