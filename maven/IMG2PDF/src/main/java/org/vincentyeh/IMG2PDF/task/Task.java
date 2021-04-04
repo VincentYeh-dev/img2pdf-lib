@@ -3,20 +3,13 @@ package org.vincentyeh.IMG2PDF.task;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
-import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
 import org.jdom2.Element;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
-import org.vincentyeh.IMG2PDF.pdf.argument.ImgFile;
-import org.vincentyeh.IMG2PDF.pdf.argument.DocumentAccessPermission;
-import org.vincentyeh.IMG2PDF.pdf.argument.PageAlign;
-import org.vincentyeh.IMG2PDF.pdf.argument.PageDirection;
-import org.vincentyeh.IMG2PDF.pdf.argument.PageSize;
-import org.vincentyeh.IMG2PDF.pdf.argument.doc.DocumentArgument;
-import org.vincentyeh.IMG2PDF.pdf.argument.doc.PageArgument;
+import org.vincentyeh.IMG2PDF.pdf.doc.ImgFile;
+import org.vincentyeh.IMG2PDF.pdf.doc.DocumentArgument;
+import org.vincentyeh.IMG2PDF.pdf.page.PageArgument;
 
 public class Task {
 //	private final PageAlign pdf_align;

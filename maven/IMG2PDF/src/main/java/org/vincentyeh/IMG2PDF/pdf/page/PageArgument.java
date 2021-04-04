@@ -1,9 +1,6 @@
-package org.vincentyeh.IMG2PDF.pdf.argument.doc;
+package org.vincentyeh.IMG2PDF.pdf.page;
 
 import org.jdom2.Element;
-import org.vincentyeh.IMG2PDF.pdf.argument.PageAlign;
-import org.vincentyeh.IMG2PDF.pdf.argument.PageDirection;
-import org.vincentyeh.IMG2PDF.pdf.argument.PageSize;
 
 
 public class PageArgument {
