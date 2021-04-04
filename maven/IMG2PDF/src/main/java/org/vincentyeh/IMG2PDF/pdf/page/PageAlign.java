@@ -51,7 +51,7 @@ public class PageAlign {
 	}
 
 	public enum HorizontalAlign {
-		RIGHT, LEFT, CENTER, FILL;
+		RIGHT, LEFT, CENTER;
 
 		public static HorizontalAlign getByString(String str) throws UnrecognizedEnumException {
 			HorizontalAlign[] aligns = HorizontalAlign.values();
@@ -65,7 +65,7 @@ public class PageAlign {
 	}
 
 	public enum VerticalAlign {
-		TOP, BOTTOM, CENTER, FILL;
+		TOP, BOTTOM, CENTER;
 
 		public static VerticalAlign getByString(String str) throws UnrecognizedEnumException {
 			VerticalAlign[] aligns = VerticalAlign.values();
