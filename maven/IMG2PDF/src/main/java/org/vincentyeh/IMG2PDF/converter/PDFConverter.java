@@ -7,10 +7,10 @@ import java.util.concurrent.Callable;
 import javax.imageio.ImageIO;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.vincentyeh.IMG2PDF.pdf.argument.ImgFile;
-import org.vincentyeh.IMG2PDF.pdf.ImagePage;
-import org.vincentyeh.IMG2PDF.pdf.argument.PageSize;
-import org.vincentyeh.IMG2PDF.pdf.argument.doc.PageArgument;
+import org.vincentyeh.IMG2PDF.pdf.doc.ImgFile;
+import org.vincentyeh.IMG2PDF.pdf.page.ImagePage;
+import org.vincentyeh.IMG2PDF.pdf.page.PageSize;
+import org.vincentyeh.IMG2PDF.pdf.page.PageArgument;
 import org.vincentyeh.IMG2PDF.task.Task;
 
 /**

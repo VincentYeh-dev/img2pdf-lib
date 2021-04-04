@@ -1,23 +1,5 @@
 package org.vincentyeh.IMG2PDF.task;
 
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
-import org.junit.Assert;
-import org.junit.Test;
-import org.vincentyeh.IMG2PDF.pdf.argument.ImgFile;
-import org.vincentyeh.IMG2PDF.pdf.argument.DocumentAccessPermission;
-import org.vincentyeh.IMG2PDF.pdf.argument.PageAlign;
-import org.vincentyeh.IMG2PDF.pdf.argument.PageDirection;
-import org.vincentyeh.IMG2PDF.pdf.argument.PageSize;
-import org.vincentyeh.IMG2PDF.util.NameFormatter;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.HashMap;
-
 public class TaskTester {
 //    @Test(expected = IllegalArgumentException.class)
 //    public void initialize_by_null_args() throws FileNotFoundException {

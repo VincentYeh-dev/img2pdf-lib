@@ -1,10 +1,8 @@
-package org.vincentyeh.IMG2PDF.pdf.argument.doc;
+package org.vincentyeh.IMG2PDF.pdf.doc;
 
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
 import org.jdom2.Element;
-import org.vincentyeh.IMG2PDF.pdf.argument.DocumentAccessPermission;
-import org.vincentyeh.IMG2PDF.pdf.argument.ImgFile;
 
 import java.io.File;
 

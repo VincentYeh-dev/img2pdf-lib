@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.pdf.argument;
+package org.vincentyeh.IMG2PDF.pdf.doc;
 
 import java.io.File;
 import java.io.FileNotFoundException;
