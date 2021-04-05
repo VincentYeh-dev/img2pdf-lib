@@ -124,7 +124,6 @@ public class MainProgram extends AbstractAction {
 		}catch (RuntimeException e){
 			System.err.println(e.getMessage());
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
