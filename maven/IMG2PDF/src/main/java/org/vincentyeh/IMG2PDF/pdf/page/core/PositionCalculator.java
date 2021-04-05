@@ -3,9 +3,9 @@ package org.vincentyeh.IMG2PDF.pdf.page.core;
 import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
 
 public class PositionCalculator {
-    private float x_space;
-    private float y_space;
-    private boolean rotated;
+    private final float x_space;
+    private final float y_space;
+    private final boolean rotated;
 
     public PositionCalculator(boolean rotated, float img_height, float img_width, float page_height,
                               float page_width) {
@@ -74,37 +74,14 @@ public class PositionCalculator {
 
         Position rotated_position = non_rotate_position_calculate(align);
 
-        return new Position(y_space - rotated_position.y, rotated_position.x + 0);
+        return new Position(y_space - rotated_position.getY(), rotated_position.getX() + 0);
 
     }
 
 
     public Position toRotatedPosition(Position raw) {
-        return new Position(y_space - raw.y, raw.x + 0);
+        return new Position(y_space - raw.getY(), raw.getX() + 0);
     }
 
-    public static class Position {
-        private final float x;
-        private final float y;
-
-        public Position(float x, float y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        public float getY() {
-            return y;
-        }
-
-        public float getX() {
-            return x;
-        }
-
-        @Override
-        public String toString() {
-            return String.format("(%.2f,%.2f)", x, y);
-        }
-
-    }
 
 }

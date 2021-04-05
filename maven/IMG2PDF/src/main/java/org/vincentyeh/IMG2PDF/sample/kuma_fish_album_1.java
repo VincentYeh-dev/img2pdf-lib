@@ -41,23 +41,24 @@ public class kuma_fish_album_1 {
 //				
 				+ "-par YES "
 //				
-				+ "-po INCREASE "
-//				
+				+ "-pseq INCREASE "
+//
 				+ "-pupwd 1234AAA "
-//				
+//
 				+ "-popwd 1234AAA "
-//				
+//
 				+ "-pp 11 "
-//				
+//
 				+ "-f \"glob:*.{PNG,JPG}\" "
-//				
-				+ "-pdst \"" + sample_root.getAbsolutePath() + "\\output\\$PARENT{0}.pdf\" "
+//
+				+ "-pdst \"" + sample_root.getAbsolutePath() + "\\output\\$PARENT{0} $CY-$CM-$CD $CH-$CN-$CS.pdf\" "
 //				
 				+ "-ldst \"" + taskslist_destination.getAbsolutePath() + "\" -src \""
 //				
 				+ sources_list.getAbsolutePath() + "\"";
 
-		String convert_command = "-m convert -o YES " + taskslist_destination.getAbsolutePath();
+		String convert_command = "-m convert -o -lsrc \"" + taskslist_destination.getAbsolutePath()+"\"";
+
 		System.out.println("create command:");
 		System.out.println(create_command);
 
