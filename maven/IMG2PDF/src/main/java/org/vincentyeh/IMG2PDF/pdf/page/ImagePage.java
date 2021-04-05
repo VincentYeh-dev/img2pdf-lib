@@ -15,6 +15,7 @@ import org.vincentyeh.IMG2PDF.pdf.page.PageAlign.VerticalAlign;
 import org.vincentyeh.IMG2PDF.pdf.page.core.Position;
 import org.vincentyeh.IMG2PDF.pdf.page.core.PositionCalculator;
 import org.vincentyeh.IMG2PDF.pdf.page.core.Size;
+import org.vincentyeh.IMG2PDF.pdf.page.core.SizeCalculator;
 
 /**
  * Page that contain image in PDF File.
@@ -37,19 +38,22 @@ public class ImagePage extends PDPage {
         }
         setMediaBox(new PDRectangle(page_size.getWidth(), page_size.getHeight()));
 
+
+        if (autoRotate) {
+            direction = PageDirection.getDirection(image);
+        }
+        this.setRotation(direction.getPageRotateAngle());
+
         if (size == PageSize.DEPEND_ON_IMG) {
             img_size = new Size(image.getHeight(), image.getWidth());
             this.image = image;
 
         } else {
-            if (autoRotate) {
-                direction = PageDirection.getDirection(image);
-            }
-
-            this.setRotation(direction.getPageRotateAngle());
             this.image = rotateImg(image, direction.getImageRotateAngle());
             Size rotated_img_size = new Size(this.image.getHeight(), this.image.getWidth());
-            img_size = sizeCalculate(rotated_img_size,page_size);
+
+            SizeCalculator sizeCalculator=new SizeCalculator(rotated_img_size,page_size);
+            img_size = sizeCalculator.scaleUpToMax();
         }
         PositionCalculator calculator = new PositionCalculator(this.getRotation() != 0, img_size.getHeight(), img_size.getWidth(), page_size.getHeight(), page_size.getWidth());
         position = calculator.calculate(align);
@@ -71,44 +75,6 @@ public class ImagePage extends PDPage {
         contentStream.close();
     }
 
-    private Size sizeCalculate(Size img_size, Size page_size) {
-        float img_height=img_size.getHeight();
-        float img_width=img_size.getWidth();
-        float page_height=page_size.getHeight();
-        float page_width=page_size.getWidth();
-
-        float out_width = (img_width / img_height) * page_height;
-        float out_height = (img_height / img_width) * page_width;
-        if (out_height <= page_height) {
-//			width fill
-            out_width = page_width;
-//			out_height = (img_height / img_width) * page_width;
-        } else if (out_width <= page_width) {
-//			height fill
-            out_height = page_height;
-//			out_width = (img_width / img_height) * page_height;
-        }
-
-        return new Size(out_height, out_width);
-    }
-
-
-    private float[] sizeCalculate(float img_height, float img_width, float page_height, float page_width) {
-
-        float out_width = (img_width / img_height) * page_height;
-        float out_height = (img_height / img_width) * page_width;
-        if (out_height <= page_height) {
-//			width fill
-            out_width = page_width;
-//			out_height = (img_height / img_width) * page_width;
-        } else if (out_width <= page_width) {
-//			height fill
-            out_height = page_height;
-//			out_width = (img_width / img_height) * page_height;
-        }
-
-        return new float[]{out_height, out_width};
-    }
 
 
     public BufferedImage rotateImg(BufferedImage raw, int rotate_angle) {
