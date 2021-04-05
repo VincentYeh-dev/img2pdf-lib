@@ -6,7 +6,7 @@ import org.jdom2.Element;
 public class PageArgument {
     private PageAlign pdf_align=new PageAlign("CENTER-CENTER");
     private PageSize pdf_size=PageSize.A4;
-    private PageDirection pdf_direction=PageDirection.Vertical;
+    private PageDirection pdf_direction=PageDirection.Portrait;
     private boolean pdf_auto_rotate=true;
 
     public PageArgument(){

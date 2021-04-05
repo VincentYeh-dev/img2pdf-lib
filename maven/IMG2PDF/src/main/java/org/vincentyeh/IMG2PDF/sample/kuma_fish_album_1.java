@@ -37,7 +37,7 @@ public class kuma_fish_album_1 {
 //				
 				+ "-pa CENTER-CENTER "
 //				
-				+ "-pdi Vertical "
+				+ "-pdi Portrait "
 //				
 				+ "-par YES "
 //				

@@ -32,7 +32,7 @@ public class CreateAction extends AbstractAction {
 
     private static final String DEF_PDF_SIZE = "A4";
     private static final String DEF_PDF_ALIGN = "CENTER-CENTER";
-    private static final String DEF_PDF_DIRECTION = "Vertical";
+    private static final String DEF_PDF_DIRECTION = "Portrait";
     private static final String DEFV_PDF_SORTBY = "NAME";
     private static final String DEFV_PDF_SEQUENCE = "INCREASE";
     private static final String DEFV_PDF_FILTER = "glob:*.{PNG,JPG}";
