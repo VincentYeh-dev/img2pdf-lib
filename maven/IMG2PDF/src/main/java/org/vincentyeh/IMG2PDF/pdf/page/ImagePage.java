@@ -17,6 +17,9 @@ import org.vincentyeh.IMG2PDF.pdf.page.core.PositionCalculator;
 import org.vincentyeh.IMG2PDF.pdf.page.core.Size;
 import org.vincentyeh.IMG2PDF.pdf.page.core.SizeCalculator;
 
+import static org.vincentyeh.IMG2PDF.pdf.page.PageDirection.Landscape;
+import static org.vincentyeh.IMG2PDF.pdf.page.PageDirection.Portrait;
+
 /**
  * Page that contain image in PDF File.
  *
@@ -26,7 +29,7 @@ public class ImagePage extends PDPage {
     private final BufferedImage image;
     private final Size img_size;
     private final Position position;
-    public ImagePage(PageAlign align, PageSize size, boolean autoRotate, PageDirection direction, BufferedImage image) {
+    public ImagePage(PageAlign align, PageSize size, boolean autoRotate, PageDirection page_direction, BufferedImage image) {
 
         final Size page_size;
 
@@ -39,17 +42,22 @@ public class ImagePage extends PDPage {
         setMediaBox(new PDRectangle(page_size.getWidth(), page_size.getHeight()));
 
 
+        PageDirection img_direction=getDirection(image);
+
         if (autoRotate) {
-            direction = PageDirection.getDirection(image);
+            page_direction =img_direction;
         }
-        this.setRotation(direction.getPageRotateAngle());
+
 
         if (size == PageSize.DEPEND_ON_IMG) {
             img_size = new Size(image.getHeight(), image.getWidth());
             this.image = image;
 
         } else {
-            this.image = rotateImg(image, direction.getImageRotateAngle());
+
+            super.setRotation(page_direction== Landscape?-90:0);
+            this.image = rotateImg(image, page_direction== Landscape?90:0);
+
             Size rotated_img_size = new Size(this.image.getHeight(), this.image.getWidth());
 
             SizeCalculator sizeCalculator=new SizeCalculator(rotated_img_size,page_size);
@@ -60,11 +68,11 @@ public class ImagePage extends PDPage {
     }
 
     public ImagePage(PageAlign align, PageSize size, BufferedImage image) {
-        this(align, size, true, PageDirection.Portrait, image);
+        this(align, size, true, Portrait, image);
     }
 
     public ImagePage(PageAlign align, BufferedImage image) {
-        this(align, PageSize.DEPEND_ON_IMG, false, PageDirection.Portrait, image);
+        this(align, PageSize.DEPEND_ON_IMG, false, Portrait, image);
     }
 
     public void drawImageToPage(PDDocument doc) throws Exception {
@@ -93,4 +101,22 @@ public class ImagePage extends PDPage {
         rotateOp.filter(raw, rotatedImage);
         return rotatedImage;
     }
+
+
+    private PageDirection getDirection(BufferedImage image) {
+        return getDirection(image.getHeight(), image.getWidth());
+    }
+
+    private PageDirection getDirection(Size size) {
+        return getDirection(size.getHeight(), size.getWidth());
+    }
+
+    private PageDirection getDirection(PDRectangle rectangle) {
+        return getDirection(rectangle.getHeight(), rectangle.getWidth());
+    }
+
+    private PageDirection getDirection(float height, float width) {
+        return height / width > 1 ? Portrait : Landscape;
+    }
+
 }
