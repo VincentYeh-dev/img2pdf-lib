@@ -4,66 +4,66 @@ import org.jdom2.Element;
 
 
 public class PageArgument {
-    private PageAlign pdf_align=new PageAlign("CENTER-CENTER");
-    private PageSize pdf_size=PageSize.A4;
-    private PageDirection pdf_direction=PageDirection.Portrait;
-    private boolean pdf_auto_rotate=true;
+    private PageAlign align=new PageAlign("CENTER-CENTER");
+    private PageSize size=PageSize.A4;
+    private PageDirection direction=PageDirection.Portrait;
+    private boolean auto_rotate=true;
 
     public PageArgument(){
 
     }
 
     public PageArgument(Element element){
-        this.pdf_align = new PageAlign(element.getChild("align").getValue());
-        this.pdf_size = PageSize.getByString(element.getChild("size").getValue());
-        this.pdf_direction = PageDirection.getByString(element.getChild("default-direction").getValue());
-        this.pdf_auto_rotate = Boolean.parseBoolean(element.getChild("auto-rotate").getValue());
+        this.align = new PageAlign(element.getChild("align").getValue());
+        this.size = PageSize.getByString(element.getChild("size").getValue());
+        this.direction = PageDirection.getByString(element.getChild("default-direction").getValue());
+        this.auto_rotate = Boolean.parseBoolean(element.getChild("auto-rotate").getValue());
     }
 
     public Element toElement(){
         Element element = new Element("PageArgument");
-        element.addContent(new Element("size").addContent(pdf_size.toString()));
-        element.addContent(new Element("align").addContent(pdf_align.toString()));
-        element.addContent(new Element("default-direction").addContent(pdf_direction.toString()));
-        element.addContent(new Element("auto-rotate").addContent(Boolean.toString(pdf_auto_rotate)));
-//		task.setAttribute("size", pdf_size.toString() + "");
-//		task.setAttribute("align", pdf_align.toString());
-//		task.setAttribute("default-direction", pdf_direction.toString());
-//		task.setAttribute("auto-rotate", String.valueOf(pdf_auto_rotate));
+        element.addContent(new Element("size").addContent(size.toString()));
+        element.addContent(new Element("align").addContent(align.toString()));
+        element.addContent(new Element("default-direction").addContent(direction.toString()));
+        element.addContent(new Element("auto-rotate").addContent(Boolean.toString(auto_rotate)));
+//		task.setAttribute("size", size.toString() + "");
+//		task.setAttribute("align", align.toString());
+//		task.setAttribute("default-direction", direction.toString());
+//		task.setAttribute("auto-rotate", String.valueOf(auto_rotate));
         return element;
 
     }
 
-    public void setPdf_align(PageAlign pdf_align) {
-        this.pdf_align = pdf_align;
+    public void setAlign(PageAlign align) {
+        this.align = align;
     }
 
-    public void setPdf_auto_rotate(boolean pdf_auto_rotate) {
-        this.pdf_auto_rotate = pdf_auto_rotate;
+    public void setAutoRotate(boolean auto_rotate) {
+        this.auto_rotate = auto_rotate;
     }
 
-    public void setPdf_direction(PageDirection pdf_direction) {
-        this.pdf_direction = pdf_direction;
+    public void setDirection(PageDirection direction) {
+        this.direction = direction;
     }
 
-    public void setPdf_size(PageSize pdf_size) {
-        this.pdf_size = pdf_size;
+    public void setSize(PageSize size) {
+        this.size = size;
     }
 
-    public PageAlign getPdf_align() {
-        return pdf_align;
+    public PageAlign getAlign() {
+        return align;
     }
 
-    public PageDirection getPdf_direction() {
-        return pdf_direction;
+    public PageDirection getDirection() {
+        return direction;
     }
 
-    public PageSize getPdf_size() {
-        return pdf_size;
+    public PageSize getSize() {
+        return size;
     }
 
     public boolean getAutoRotate(){
-        return pdf_auto_rotate;
+        return auto_rotate;
     }
 
 }

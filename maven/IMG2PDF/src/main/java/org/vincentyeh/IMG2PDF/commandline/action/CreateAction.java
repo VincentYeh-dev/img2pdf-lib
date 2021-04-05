@@ -232,10 +232,10 @@ public class CreateAction extends AbstractAction {
         NameFormatter nf = new NameFormatter(source_directory);
         DocumentArgument documentArgument=new DocumentArgument(pdf_owner_password,pdf_user_password,pdf_permission,new File(nf.format(pdf_dst)));
         PageArgument pageArgument=new PageArgument();
-        pageArgument.setPdf_align(pdf_align);
-        pageArgument.setPdf_size(pdf_size);
-        pageArgument.setPdf_direction(pdf_direction);
-        pageArgument.setPdf_auto_rotate(pdf_auto_rotate);
+        pageArgument.setAlign(pdf_align);
+        pageArgument.setSize(pdf_size);
+        pageArgument.setDirection(pdf_direction);
+        pageArgument.setAutoRotate(pdf_auto_rotate);
 
 //        HashMap<String, Object> configuration = new HashMap<>();
 //        NameFormatter nf = new NameFormatter(source_directory);
