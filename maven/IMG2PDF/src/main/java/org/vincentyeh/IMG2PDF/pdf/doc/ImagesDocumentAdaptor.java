@@ -1,7 +1,8 @@
 package org.vincentyeh.IMG2PDF.pdf.doc;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.vincentyeh.IMG2PDF.pdf.page.ImagePage;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.vincentyeh.IMG2PDF.pdf.page.ImagePageAdaptor;
 
 import java.io.IOException;
 
@@ -19,7 +20,7 @@ public class ImagesDocumentAdaptor {
         document.save(argument.getDestination());
     }
 
-    public void addPage(ImagePage imgPage) {
+    public void addPage(PDPage imgPage) {
         document.addPage(imgPage);
     }
 

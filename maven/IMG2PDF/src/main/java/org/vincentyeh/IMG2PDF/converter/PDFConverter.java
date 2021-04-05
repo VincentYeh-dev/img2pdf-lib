@@ -6,9 +6,10 @@ import java.util.concurrent.Callable;
 
 import javax.imageio.ImageIO;
 
+import org.apache.pdfbox.pdmodel.PDPage;
 import org.vincentyeh.IMG2PDF.pdf.doc.ImagesDocumentAdaptor;
 import org.vincentyeh.IMG2PDF.pdf.doc.ImgFile;
-import org.vincentyeh.IMG2PDF.pdf.page.ImagePage;
+import org.vincentyeh.IMG2PDF.pdf.page.ImagePageAdaptor;
 import org.vincentyeh.IMG2PDF.pdf.page.PageArgument;
 import org.vincentyeh.IMG2PDF.task.Task;
 
@@ -98,14 +99,10 @@ public class PDFConverter implements Callable<ImagesDocumentAdaptor> {
      * @return The page contain image
      * @throws Exception
      */
-    private ImagePage createImgPage(BufferedImage img) throws Exception {
-        PageArgument pageArgument = task.getPageArgument();
-
-        ImagePage imgpage = new ImagePage(pageArgument.getAlign(), pageArgument.getSize(), pageArgument.getAutoRotate(), pageArgument.getDirection(),
-                img);
-
+    private PDPage createImgPage(BufferedImage img) throws Exception {
+        ImagePageAdaptor imgpage = new ImagePageAdaptor(task.getPageArgument(), img);
         imgpage.drawImageToPage(documentAdaptor.getDocument());
-        return imgpage;
+        return imgpage.getPage();
     }
 
 
