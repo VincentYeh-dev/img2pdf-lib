@@ -10,7 +10,7 @@ import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumExcep
  * @author VincentYeh
  */
 public enum PageDirection {
-	Horizontal(90), Vertical(0);
+	Landscape(90), Portrait(0);
 	private final int page_rotate_angle;
 	private final int image_rotate_angle;
 	
@@ -37,7 +37,7 @@ public enum PageDirection {
 	}
 
 	public static PageDirection getDirection(float height, float width) {
-		return height / width > 1 ? Vertical : Horizontal;
+		return height / width > 1 ? Portrait : Landscape;
 	}
 
 	public static PageDirection getByString(String str) throws UnrecognizedEnumException {

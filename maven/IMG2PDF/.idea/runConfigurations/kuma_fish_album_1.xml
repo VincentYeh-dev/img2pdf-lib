@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="kuma_fish_album_1" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="org.vincentyeh.IMG2PDF.sample.kuma_fish_album_1" />
+    <module name="IMG2PDF" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

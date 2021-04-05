@@ -35,7 +35,7 @@ public class WalkAnimation {
 //				
 				+ "-pa CENTER-CENTER "
 //				
-				+ "-pdi Vertical "
+				+ "-pdi Portrait "
 //				
 				+ "-par YES "
 //				

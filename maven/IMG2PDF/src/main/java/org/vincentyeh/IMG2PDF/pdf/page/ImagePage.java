@@ -60,11 +60,11 @@ public class ImagePage extends PDPage {
     }
 
     public ImagePage(PageAlign align, PageSize size, BufferedImage image) {
-        this(align, size, true, PageDirection.Vertical, image);
+        this(align, size, true, PageDirection.Portrait, image);
     }
 
     public ImagePage(PageAlign align, BufferedImage image) {
-        this(align, PageSize.DEPEND_ON_IMG, false, PageDirection.Vertical, image);
+        this(align, PageSize.DEPEND_ON_IMG, false, PageDirection.Portrait, image);
     }
 
     public void drawImageToPage(PDDocument doc) throws Exception {
