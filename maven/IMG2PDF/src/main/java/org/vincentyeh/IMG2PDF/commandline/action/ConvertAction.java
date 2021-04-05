@@ -99,7 +99,6 @@ public class ConvertAction extends AbstractAction {
                     try {
                         result = future.get();
                     } catch (InterruptedException | ExecutionException e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                         continue;
                     }
@@ -116,7 +115,6 @@ public class ConvertAction extends AbstractAction {
                             try {
                                 desktop.open(dst);
                             } catch (IOException e) {
-                                // TODO Auto-generated catch block
                                 e.printStackTrace();
                             }
                     }
@@ -186,12 +184,6 @@ public class ConvertAction extends AbstractAction {
         public void onConversionComplete() {
             System.out.print("]%100\n");
 
-//			try {
-//				Runtime.getRuntime().exec("explorer.exe /select," + );
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
         }
 
         @Override
