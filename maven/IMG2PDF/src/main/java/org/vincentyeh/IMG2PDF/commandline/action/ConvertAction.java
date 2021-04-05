@@ -13,12 +13,12 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.pdfbox.pdmodel.PDDocument;
 import org.vincentyeh.IMG2PDF.commandline.parser.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.Configuration;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
 import org.vincentyeh.IMG2PDF.converter.ConversionListener;
 import org.vincentyeh.IMG2PDF.converter.PDFConverter;
+import org.vincentyeh.IMG2PDF.pdf.doc.ImagesDocumentAdaptor;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskList;
 import org.vincentyeh.IMG2PDF.util.FileUtil;
@@ -85,28 +85,29 @@ public class ConvertAction extends AbstractAction {
 
             ExecutorService executor = Executors.newSingleThreadExecutor();
             for (Task task : tasks) {
-                PDDocument result = null;
-                File dst = task.getDocumentArgument().getPdf_destination();
+                ImagesDocumentAdaptor result = null;
+                File dst = task.getDocumentArgument().getDestination();
                 if (!overwrite_output && dst.exists()) {
                     System.err.printf(Configuration.getResString("err_overwrite"), dst.getAbsolutePath());
                     continue;
                 }
 
                 try {
-                    PDFConverter pdf = new PDFConverter(task);
-                    pdf.setListener(listener);
-                    Future<PDDocument> future = executor.submit(pdf);
+                    PDFConverter converter = new PDFConverter(task);
+                    converter.setListener(listener);
+                    Future<ImagesDocumentAdaptor> future = executor.submit(converter);
                     try {
                         result = future.get();
                     } catch (InterruptedException | ExecutionException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
+                        continue;
                     }
 
 
                     FileUtil.makeDirectoryIfNotExists(dst);
                     FileUtil.checkWritableFile(dst);
-                    result.save(dst);
+                    result.save();
 
                     if (open_when_complete) {
                         Desktop desktop = Desktop.getDesktop();
@@ -125,11 +126,8 @@ public class ConvertAction extends AbstractAction {
                 } catch (RuntimeException e) {
                     System.err.println(e.getMessage());
                 } finally {
-                    try {
-                        if (result != null)
-                            result.close();
-                    } catch (IOException ignore) {
-                    }
+                    if (result != null)
+                        result.closeDocument();
                 }
 
             }
@@ -167,9 +165,9 @@ public class ConvertAction extends AbstractAction {
             int size_of_imgs = task.getImgs().length;
             perImg = (10. / size_of_imgs);
             System.out.printf("###%s###\n", Configuration.getResString("pdf_conversion_task"));
-            System.out.printf("%s:%s\n", Configuration.getResString("arg_pdf_dst"), task.getDocumentArgument().getPdf_destination());
+            System.out.printf("%s:%s\n", Configuration.getResString("arg_pdf_dst"), task.getDocumentArgument().getDestination());
             System.out.printf("%s:%s\n", Configuration.getResString("common_name"),
-                    new File(task.getDocumentArgument().getPdf_destination().getName()));
+                    new File(task.getDocumentArgument().getDestination().getName()));
             System.out.printf("%s->", Configuration.getResString("common_progress"));
             System.out.print("0%[");
 

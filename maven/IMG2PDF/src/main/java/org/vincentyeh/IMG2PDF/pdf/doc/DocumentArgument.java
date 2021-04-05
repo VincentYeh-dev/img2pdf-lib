@@ -7,10 +7,10 @@ import org.jdom2.Element;
 import java.io.File;
 
 public class DocumentArgument {
-    private final String pdf_owner_password;
-    private final String pdf_user_password;
+    private final String owner_password;
+    private final String user_password;
     private final AccessPermission ap;
-    private final File pdf_destination;
+    private final File destination;
 
     public DocumentArgument(Element element) {
 
@@ -21,28 +21,28 @@ public class DocumentArgument {
         this.ap.setCanPrint(Boolean.parseBoolean(permission.getAttributeValue("canPrint")));
         this.ap.setCanModify(Boolean.parseBoolean(permission.getAttributeValue("canModify")));
 
-        this.pdf_user_password = user.getValue();
-        this.pdf_owner_password =  owner.getValue();
-        this.pdf_destination=new File(element.getChild("destination").getValue());
+        this.user_password = user.getValue();
+        this.owner_password =  owner.getValue();
+        this.destination=new File(element.getChild("destination").getValue());
 
     }
 
-    public DocumentArgument(String pdf_owner_password, String pdf_user_password, DocumentAccessPermission ap,File pdf_destination) {
-        this.pdf_owner_password = pdf_owner_password;
-        this.pdf_user_password = pdf_user_password;
+    public DocumentArgument(String owner_password, String user_password, DocumentAccessPermission ap,File destination) {
+        this.owner_password = owner_password;
+        this.user_password = user_password;
         this.ap = ap;
-        this.pdf_destination=pdf_destination;
+        this.destination=destination;
     }
 
     public Element toElement(){
         Element element = new Element("DocumentArgument");
 
-        element.addContent(new Element("destination").addContent(pdf_destination.getAbsolutePath()));
+        element.addContent(new Element("destination").addContent(destination.getAbsolutePath()));
         Element permission = new Element("permission");
         permission.setAttribute("canPrint", String.valueOf(ap.canPrint()));
         permission.setAttribute("canModify", String.valueOf(ap.canModify()));
-        permission.addContent(new Element("OWNER-PASSWORD").addContent(pdf_owner_password));
-        permission.addContent(new Element("USER-PASSWORD").addContent(pdf_user_password));
+        permission.addContent(new Element("OWNER-PASSWORD").addContent(owner_password));
+        permission.addContent(new Element("USER-PASSWORD").addContent(user_password));
         element.addContent(permission);
         return element;
 
@@ -53,19 +53,19 @@ public class DocumentArgument {
     }
 
     public StandardProtectionPolicy getSpp() {
-        return createProtectionPolicy(pdf_owner_password,pdf_user_password,ap);
+        return createProtectionPolicy(owner_password,user_password,ap);
     }
 
-    public String getPdf_owner_password() {
-        return pdf_owner_password;
+    public String getOwnerPassword() {
+        return owner_password;
     }
 
-    public String getPdf_user_password() {
-        return pdf_user_password;
+    public String getUserPassword() {
+        return user_password;
     }
 
-    public File getPdf_destination() {
-        return pdf_destination;
+    public File getDestination() {
+        return destination;
     }
 
     private StandardProtectionPolicy createProtectionPolicy(String owner_pwd, String user_pwd, AccessPermission ap) {

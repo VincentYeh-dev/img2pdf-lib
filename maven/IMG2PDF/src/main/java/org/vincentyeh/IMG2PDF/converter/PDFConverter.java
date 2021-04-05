@@ -6,10 +6,9 @@ import java.util.concurrent.Callable;
 
 import javax.imageio.ImageIO;
 
-import org.apache.pdfbox.pdmodel.PDDocument;
+import org.vincentyeh.IMG2PDF.pdf.doc.ImagesDocumentAdaptor;
 import org.vincentyeh.IMG2PDF.pdf.doc.ImgFile;
 import org.vincentyeh.IMG2PDF.pdf.page.ImagePage;
-import org.vincentyeh.IMG2PDF.pdf.page.PageSize;
 import org.vincentyeh.IMG2PDF.pdf.page.PageArgument;
 import org.vincentyeh.IMG2PDF.task.Task;
 
@@ -20,10 +19,9 @@ import org.vincentyeh.IMG2PDF.task.Task;
  *
  * @author VincentYeh
  */
-public class PDFConverter implements Callable<PDDocument> {
+public class PDFConverter implements Callable<ImagesDocumentAdaptor> {
 
-    private final PDDocument doc;
-    //	private boolean isProtectedByPwd;
+    private final ImagesDocumentAdaptor documentAdaptor;
     private ConversionListener listener;
     private final Task task;
 
@@ -37,8 +35,8 @@ public class PDFConverter implements Callable<PDDocument> {
         if (task == null)
             throw new NullPointerException("task is null.");
         this.task = task;
-        doc = new PDDocument();
-        doc.protect(task.getDocumentArgument().getSpp());
+        documentAdaptor = new ImagesDocumentAdaptor(task.getDocumentArgument());
+//        documentAdaptor.protect(task.getDocumentArgument().getSpp());
     }
 
     /**
@@ -49,7 +47,7 @@ public class PDFConverter implements Callable<PDDocument> {
      * If listener is null,call() will throw the exception.
      */
     @Override
-    public PDDocument call() throws Exception {
+    public ImagesDocumentAdaptor call() throws Exception {
         ImgFile[] imgs = task.getImgs();
         if (listener != null)
             listener.onConversionPreparing(task);
@@ -63,7 +61,7 @@ public class PDFConverter implements Callable<PDDocument> {
                 image = ImageIO.read(imgs[i]);
 
             } catch (IOException e) {
-                closeDocument();
+                documentAdaptor.closeDocument();
                 if (listener != null) {
                     listener.onImageReadFail(i, e);
                     return null;
@@ -73,10 +71,10 @@ public class PDFConverter implements Callable<PDDocument> {
             }
 
             try {
-                doc.addPage(createImgPage(image));
+                documentAdaptor.addPage(createImgPage(image));
 
             } catch (Exception e) {
-                closeDocument();
+                documentAdaptor.closeDocument();
                 if (listener != null) {
                     listener.onConversionFail(i, e);
                     return null;
@@ -90,7 +88,7 @@ public class PDFConverter implements Callable<PDDocument> {
         if (listener != null)
             listener.onConversionComplete();
 
-        return doc;
+        return documentAdaptor;
     }
 
     /**
@@ -103,24 +101,13 @@ public class PDFConverter implements Callable<PDDocument> {
     private ImagePage createImgPage(BufferedImage img) throws Exception {
         PageArgument pageArgument = task.getPageArgument();
 
-        ImagePage imgpage = new ImagePage(pageArgument.getPdf_align(), pageArgument.getPdf_size(), pageArgument.getAutoRotate(), pageArgument.getPdf_direction(),
+        ImagePage imgpage = new ImagePage(pageArgument.getAlign(), pageArgument.getSize(), pageArgument.getAutoRotate(), pageArgument.getDirection(),
                 img);
 
-        imgpage.drawImageToPage(doc);
+        imgpage.drawImageToPage(documentAdaptor.getDocument());
         return imgpage;
     }
 
-    /**
-     * Close PDF Document.
-     */
-    private void closeDocument() {
-        try {
-            if (doc != null)
-                doc.close();
-        } catch (IOException ignore) {
-            ignore.printStackTrace();
-        }
-    }
 
     /**
      * Setup the listener.

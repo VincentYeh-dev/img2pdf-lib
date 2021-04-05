@@ -10,8 +10,6 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
-import org.vincentyeh.IMG2PDF.pdf.page.PageAlign.HorizontalAlign;
-import org.vincentyeh.IMG2PDF.pdf.page.PageAlign.VerticalAlign;
 import org.vincentyeh.IMG2PDF.pdf.page.core.Position;
 import org.vincentyeh.IMG2PDF.pdf.page.core.PositionCalculator;
 import org.vincentyeh.IMG2PDF.pdf.page.core.Size;
