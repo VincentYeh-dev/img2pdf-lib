@@ -3,6 +3,7 @@ package org.vincentyeh.IMG2PDF.pdf.page;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -11,198 +12,119 @@ import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.vincentyeh.IMG2PDF.pdf.page.PageAlign.HorizontalAlign;
 import org.vincentyeh.IMG2PDF.pdf.page.PageAlign.VerticalAlign;
+import org.vincentyeh.IMG2PDF.pdf.page.core.Position;
 import org.vincentyeh.IMG2PDF.pdf.page.core.PositionCalculator;
+import org.vincentyeh.IMG2PDF.pdf.page.core.Size;
 
 /**
  * Page that contain image in PDF File.
- * 
+ *
  * @author VincentYeh
  */
 public class ImagePage extends PDPage {
-	private final PageAlign align;
-	private final BufferedImage image;
-	private final float img_height;
-	private final float img_width;
-	private final float position_y;
-	private final float position_x;
+    private final BufferedImage image;
+    private final Size img_size;
+    private final Position position;
+    public ImagePage(PageAlign align, PageSize size, boolean autoRotate, PageDirection direction, BufferedImage image) {
 
-	public ImagePage(PageAlign align, PageSize size, boolean autoRotate, PageDirection direction, BufferedImage image) {
-		this.align = align;
-		float page_height;
-		float page_width;
-		if (size == PageSize.DEPEND_ON_IMG) {
-			this.img_width = image.getWidth();
-			this.img_height = image.getHeight();
-			page_width = this.img_width;
-			page_height = this.img_height;
+        final Size page_size;
 
-			this.image = image;
+        if (size == PageSize.DEPEND_ON_IMG) {
+            page_size = new Size(image.getHeight(), image.getWidth());
+        } else {
+            PDRectangle rect = size.getPdrectangle();
+            page_size = new Size(rect.getHeight(), rect.getWidth());
+        }
+        setMediaBox(new PDRectangle(page_size.getWidth(), page_size.getHeight()));
 
-			setMediaBox(new PDRectangle(page_width, page_height));
-		} else {
-			if (autoRotate) {
-				direction = PageDirection.getDirection(image);
-			}
-			
-			PDRectangle rect = size.getPdrectangle();
-			page_width = rect.getWidth();
-			page_height = rect.getHeight();
-			this.setRotation(direction.getPageRotateAngle());
-			this.image = rotateImg(image, direction.getImageRotateAngle());
-			
-			float rotated_img_width = this.image.getWidth();
-			float rotated_img_height = this.image.getHeight();
+        if (size == PageSize.DEPEND_ON_IMG) {
+            img_size = new Size(image.getHeight(), image.getWidth());
+            this.image = image;
 
-			float[] f_size = sizeCalculate(rotated_img_height, rotated_img_width, page_height, page_width);
-			this.img_height = f_size[0];
-			this.img_width = f_size[1];
+        } else {
+            if (autoRotate) {
+                direction = PageDirection.getDirection(image);
+            }
 
-			setMediaBox(rect);
-		}
-		PositionCalculator calculator=new PositionCalculator(this.getRotation() != 0, img_height, img_width, page_height, page_width);
-//		float[] f_position = positionCalculate(this.getRotation() != 0, img_height, img_width, page_height, page_width);
-		PositionCalculator.Position result=calculator.calculate(align);
-		position_y = result.getY();
-		position_x = result.getX();
-	}
+            this.setRotation(direction.getPageRotateAngle());
+            this.image = rotateImg(image, direction.getImageRotateAngle());
+            Size rotated_img_size = new Size(this.image.getHeight(), this.image.getWidth());
+            img_size = sizeCalculate(rotated_img_size,page_size);
+        }
+        PositionCalculator calculator = new PositionCalculator(this.getRotation() != 0, img_size.getHeight(), img_size.getWidth(), page_size.getHeight(), page_size.getWidth());
+        position = calculator.calculate(align);
+    }
 
-	public ImagePage(PageAlign align, PageSize size, BufferedImage image) {
-		this(align, size,true,PageDirection.Vertical,image);
-	}
-	
-	public ImagePage(PageAlign align, BufferedImage image) {
-		this(align,PageSize.DEPEND_ON_IMG,false,PageDirection.Vertical,image);
-	}
+    public ImagePage(PageAlign align, PageSize size, BufferedImage image) {
+        this(align, size, true, PageDirection.Vertical, image);
+    }
 
-	public void drawImageToPage(PDDocument doc) throws Exception {
+    public ImagePage(PageAlign align, BufferedImage image) {
+        this(align, PageSize.DEPEND_ON_IMG, false, PageDirection.Vertical, image);
+    }
 
-		PDImageXObject pdImageXObject = LosslessFactory.createFromImage(doc, image);
-		PDPageContentStream contentStream = new PDPageContentStream(doc, this);
-		contentStream.drawImage(pdImageXObject, position_x, position_y, img_width, img_height);
-		contentStream.close();
-	}
+    public void drawImageToPage(PDDocument doc) throws Exception {
 
-//	/**
-//	 * Compute the position of image by align value.
-//	 *
-//	 * @return
-//	 *         <ol>
-//	 *         <li>x</li>
-//	 *         <li>y</li>
-//	 *         <li>image width</li>
-//	 *         <li>image height</li>
-//	 *         </ol>
-//	 */
-//	private float[] positionCalculate(boolean isRotated, float img_height, float img_width, float page_height,
-//			float page_width) {
-//
-//		float position_x = 0, position_y = 0;
-//
-//		HorizontalAlign hori_align = align.getHorizontal();
-//		VerticalAlign verti_align = align.getVertical();
-//
-//		float x_space = page_width - img_width;
-//		float y_space = page_height - img_height;
-//
-//		if (y_space == 0) {
-//			if (!isRotated) {
-//				switch (hori_align) {
-//				case LEFT:
-//					position_x = 0;
-//					break;
-//				case RIGHT:
-//					position_x = x_space;
-//					break;
-//				case CENTER:
-//					position_x = x_space / 2;
-//					break;
-//				default:
-//					break;
-//				}
-//			} else {
-//				switch (verti_align) {
-//				case TOP:
-//					position_x = 0;
-//					break;
-//				case BOTTOM:
-//					position_x = x_space;
-//					break;
-//				case CENTER:
-//					position_x = x_space / 2;
-//					break;
-//				default:
-//					break;
-//
-//				}
-//			}
-//		} else if (x_space == 0) {
-//
-//			if (!isRotated) {
-//				switch (verti_align) {
-//				case BOTTOM:
-//					position_y = 0;
-//					break;
-//				case TOP:
-//					position_y = y_space;
-//					break;
-//				case CENTER:
-//					position_y = y_space / 2;
-//					break;
-//				default:
-//					break;
-//
-//				}
-//			} else {
-//				switch (hori_align) {
-//				case LEFT:
-//					position_y = 0;
-//					break;
-//				case RIGHT:
-//					position_y = y_space;
-//					break;
-//				case CENTER:
-//					position_y = y_space / 2;
-//					break;
-//				default:
-//					break;
-//				}
-//			}
-//
-//		}
-//		return new float[] { position_y, position_x };
-//	}
+        PDImageXObject pdImageXObject = LosslessFactory.createFromImage(doc, image);
+        PDPageContentStream contentStream = new PDPageContentStream(doc, this);
+        contentStream.drawImage(pdImageXObject, position.getX(), position.getY(), img_size.getWidth(), img_size.getHeight());
+        contentStream.close();
+    }
 
-	private float[] sizeCalculate(float img_height, float img_width, float page_height, float page_width) {
+    private Size sizeCalculate(Size img_size, Size page_size) {
+        float img_height=img_size.getHeight();
+        float img_width=img_size.getWidth();
+        float page_height=page_size.getHeight();
+        float page_width=page_size.getWidth();
 
-		float out_width = (img_width / img_height) * page_height;
-		float out_height = (img_height / img_width) * page_width;
-		if (out_height <= page_height) {
+        float out_width = (img_width / img_height) * page_height;
+        float out_height = (img_height / img_width) * page_width;
+        if (out_height <= page_height) {
 //			width fill
-			out_width = page_width;
+            out_width = page_width;
 //			out_height = (img_height / img_width) * page_width;
-		} else if (out_width <= page_width) {
+        } else if (out_width <= page_width) {
 //			height fill
-			out_height = page_height;
+            out_height = page_height;
 //			out_width = (img_width / img_height) * page_height;
-		}
+        }
 
-		return new float[] { out_height, out_width };
-	}
+        return new Size(out_height, out_width);
+    }
 
-	public BufferedImage rotateImg(BufferedImage raw, int rotate_angle) {
-		if(rotate_angle==0)return raw;
-		final double rads = Math.toRadians(rotate_angle);
-		final double sin = Math.abs(Math.sin(rads));
-		final double cos = Math.abs(Math.cos(rads));
-		final int w = (int) Math.floor(raw.getWidth() * cos + raw.getHeight() * sin);
-		final int h = (int) Math.floor(raw.getHeight() * cos + raw.getWidth() * sin);
-		final BufferedImage rotatedImage = new BufferedImage(w, h, raw.getType());
-		final AffineTransform at = new AffineTransform();
-		at.translate(w / 2, h / 2);
-		at.rotate(rads, 0, 0);
-		at.translate(-raw.getWidth() / 2, -raw.getHeight() / 2);
-		AffineTransformOp rotateOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
-		rotateOp.filter(raw, rotatedImage);
-		return rotatedImage;
-	}
+
+    private float[] sizeCalculate(float img_height, float img_width, float page_height, float page_width) {
+
+        float out_width = (img_width / img_height) * page_height;
+        float out_height = (img_height / img_width) * page_width;
+        if (out_height <= page_height) {
+//			width fill
+            out_width = page_width;
+//			out_height = (img_height / img_width) * page_width;
+        } else if (out_width <= page_width) {
+//			height fill
+            out_height = page_height;
+//			out_width = (img_width / img_height) * page_height;
+        }
+
+        return new float[]{out_height, out_width};
+    }
+
+
+    public BufferedImage rotateImg(BufferedImage raw, int rotate_angle) {
+        if (rotate_angle == 0) return raw;
+        final double rads = Math.toRadians(rotate_angle);
+        final double sin = Math.abs(Math.sin(rads));
+        final double cos = Math.abs(Math.cos(rads));
+        final int w = (int) Math.floor(raw.getWidth() * cos + raw.getHeight() * sin);
+        final int h = (int) Math.floor(raw.getHeight() * cos + raw.getWidth() * sin);
+        final BufferedImage rotatedImage = new BufferedImage(w, h, raw.getType());
+        final AffineTransform at = new AffineTransform();
+        at.translate(w / 2, h / 2);
+        at.rotate(rads, 0, 0);
+        at.translate(-raw.getWidth() / 2, -raw.getHeight() / 2);
+        AffineTransformOp rotateOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
+        rotateOp.filter(raw, rotatedImage);
+        return rotatedImage;
+    }
 }
