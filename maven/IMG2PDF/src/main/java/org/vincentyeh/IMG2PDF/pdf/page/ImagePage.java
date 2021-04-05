@@ -29,12 +29,14 @@ public class ImagePage extends PDPage {
     private final BufferedImage image;
     private final Size img_size;
     private final Position position;
+
     public ImagePage(PageAlign align, PageSize size, boolean autoRotate, PageDirection page_direction, BufferedImage image) {
 
         final Size page_size;
 
         if (size == PageSize.DEPEND_ON_IMG) {
             page_size = new Size(image.getHeight(), image.getWidth());
+
         } else {
             PDRectangle rect = size.getPdrectangle();
             page_size = new Size(rect.getHeight(), rect.getWidth());
@@ -42,29 +44,24 @@ public class ImagePage extends PDPage {
         setMediaBox(new PDRectangle(page_size.getWidth(), page_size.getHeight()));
 
 
-        PageDirection img_direction=getDirection(image);
-
-        if (autoRotate) {
-            page_direction =img_direction;
-        }
-
-
         if (size == PageSize.DEPEND_ON_IMG) {
             img_size = new Size(image.getHeight(), image.getWidth());
             this.image = image;
-
+            position = new Position(0, 0);
         } else {
-
-            super.setRotation(page_direction== Landscape?-90:0);
-            this.image = rotateImg(image, page_direction== Landscape?90:0);
+            if (autoRotate) {
+                page_direction = getDirection(image);
+            }
+            super.setRotation(page_direction == Landscape ? -90 : 0);
+            this.image = rotateImg(image, page_direction == Landscape ? 90 : 0);
 
             Size rotated_img_size = new Size(this.image.getHeight(), this.image.getWidth());
-
-            SizeCalculator sizeCalculator=new SizeCalculator(rotated_img_size,page_size);
+            SizeCalculator sizeCalculator = new SizeCalculator(rotated_img_size, page_size);
             img_size = sizeCalculator.scaleUpToMax();
+
+            PositionCalculator calculator = new PositionCalculator(this.getRotation() != 0, img_size.getHeight(), img_size.getWidth(), page_size.getHeight(), page_size.getWidth());
+            position = calculator.calculate(align);
         }
-        PositionCalculator calculator = new PositionCalculator(this.getRotation() != 0, img_size.getHeight(), img_size.getWidth(), page_size.getHeight(), page_size.getWidth());
-        position = calculator.calculate(align);
     }
 
     public ImagePage(PageAlign align, PageSize size, BufferedImage image) {
@@ -82,7 +79,6 @@ public class ImagePage extends PDPage {
         contentStream.drawImage(pdImageXObject, position.getX(), position.getY(), img_size.getWidth(), img_size.getHeight());
         contentStream.close();
     }
-
 
 
     public BufferedImage rotateImg(BufferedImage raw, int rotate_angle) {

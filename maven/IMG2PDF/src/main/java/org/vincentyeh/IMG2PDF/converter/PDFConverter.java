@@ -17,124 +17,118 @@ import org.vincentyeh.IMG2PDF.task.Task;
  * The core of this program. At first,this class will be initialized by task.
  * When call() being called by other program,this program will start conversion
  * and finally return ImagesPDFDocument.
- * 
+ *
  * @author VincentYeh
  */
 public class PDFConverter implements Callable<PDDocument> {
 
-	private final PDDocument doc;
-//	private boolean isProtectedByPwd;
-	private ConversionListener listener;
-	private final Task task;
+    private final PDDocument doc;
+    //	private boolean isProtectedByPwd;
+    private ConversionListener listener;
+    private final Task task;
 
-	/**
-	 * Setup the pdf converter.
-	 * 
-	 * @param task
-	 * @throws IOException
-	 */
-	public PDFConverter(Task task) throws IOException {
-		if (task == null)
-			throw new NullPointerException("task is null.");
-		this.task = task;
-		doc = new PDDocument();
-		doc.protect(task.getDocumentArgument().getSpp());
-	}
+    /**
+     * Setup the pdf converter.
+     *
+     * @param task
+     * @throws IOException
+     */
+    public PDFConverter(Task task) throws IOException {
+        if (task == null)
+            throw new NullPointerException("task is null.");
+        this.task = task;
+        doc = new PDDocument();
+        doc.protect(task.getDocumentArgument().getSpp());
+    }
 
-	/**
-	 * Start conversion process.
-	 * If listener isn't null,the return value will be null and 
-	 * call onImageReadFail or onConversionFail.
-	 * 
-	 * If listener is null,call() will throw the exception.
-	 * 
-	 */
-	@Override
-	public PDDocument call() throws Exception {
-		ImgFile[] imgs = task.getImgs();
-		if (listener != null)
-			listener.onConversionPreparing(task);
+    /**
+     * Start conversion process.
+     * If listener isn't null,the return value will be null and
+     * call onImageReadFail or onConversionFail.
+     * <p>
+     * If listener is null,call() will throw the exception.
+     */
+    @Override
+    public PDDocument call() throws Exception {
+        ImgFile[] imgs = task.getImgs();
+        if (listener != null)
+            listener.onConversionPreparing(task);
 
-		for (int i = 0; i < imgs.length; i++) {
-			if (listener != null)
-				listener.onConverting(i);
+        for (int i = 0; i < imgs.length; i++) {
+            if (listener != null)
+                listener.onConverting(i);
 
-			BufferedImage image = null;
-			try {
-				image = ImageIO.read(imgs[i]);
+            BufferedImage image = null;
+            try {
+                image = ImageIO.read(imgs[i]);
 
-			} catch (IOException e) {
-				closeDocument();
-				if (listener != null) {
-					listener.onImageReadFail(i, e);
-					return null;
-				} else {
-					throw e;
-				}
-			}
+            } catch (IOException e) {
+                closeDocument();
+                if (listener != null) {
+                    listener.onImageReadFail(i, e);
+                    return null;
+                } else {
+                    throw e;
+                }
+            }
 
-			try {
-				doc.addPage(createImgPage(image));
-				
-			} catch (Exception e) {
-				closeDocument();
-				if (listener != null) {
-					listener.onConversionFail(i, e);
-					return null;
-				} else {
-					throw e;
-				}
-			}
-			
-		}
+            try {
+                doc.addPage(createImgPage(image));
 
-		if (listener != null)
-			listener.onConversionComplete();
+            } catch (Exception e) {
+                closeDocument();
+                if (listener != null) {
+                    listener.onConversionFail(i, e);
+                    return null;
+                } else {
+                    throw e;
+                }
+            }
 
-		return doc;
-	}
+        }
 
-	/**
-	 * Draw Image to Page
-	 * 
-	 * @param img The image written to the page
-	 * @return The page contain image
-	 * @throws Exception
-	 */
-	private ImagePage createImgPage(BufferedImage img) throws Exception  {
-		PageArgument pageArgument=task.getPageArgument();
+        if (listener != null)
+            listener.onConversionComplete();
 
-		PageSize size = task.getPageArgument().getPdf_size();
-		ImagePage imgpage = null;
-		if (size == PageSize.DEPEND_ON_IMG) {
-			imgpage = new ImagePage(pageArgument.getPdf_align(), img);
-		} else {
-			imgpage = new ImagePage(pageArgument.getPdf_align(),pageArgument.getPdf_size(),pageArgument.getAutoRotate(),pageArgument.getPdf_direction(),
-					img);
-		}
-		imgpage.drawImageToPage(doc);
-		return imgpage;
-	}
+        return doc;
+    }
 
-	/**
-	 * Close PDF Document.
-	 */
-	private void closeDocument() {
-		try {
-			if (doc != null)
-				doc.close();
-		} catch (IOException ignore) {
-			ignore.printStackTrace();
-		}
-	}
+    /**
+     * Draw Image to Page
+     *
+     * @param img The image written to the page
+     * @return The page contain image
+     * @throws Exception
+     */
+    private ImagePage createImgPage(BufferedImage img) throws Exception {
+        PageArgument pageArgument = task.getPageArgument();
 
-	/**
-	 * Setup the listener.
-	 * 
-	 * @param listener ConversionListener
-	 */
-	public void setListener(ConversionListener listener) {
-		this.listener = listener;
-	}
+        ImagePage imgpage = new ImagePage(pageArgument.getPdf_align(), pageArgument.getPdf_size(), pageArgument.getAutoRotate(), pageArgument.getPdf_direction(),
+                img);
+
+        imgpage.drawImageToPage(doc);
+        return imgpage;
+    }
+
+    /**
+     * Close PDF Document.
+     */
+    private void closeDocument() {
+        try {
+            if (doc != null)
+                doc.close();
+        } catch (IOException ignore) {
+            ignore.printStackTrace();
+        }
+    }
+
+    /**
+     * Setup the listener.
+     *
+     * @param listener ConversionListener
+     */
+    public void setListener(ConversionListener listener) {
+        this.listener = listener;
+    }
 
 }
