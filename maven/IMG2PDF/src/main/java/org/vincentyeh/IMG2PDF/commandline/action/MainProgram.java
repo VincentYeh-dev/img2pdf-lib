@@ -14,6 +14,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.vincentyeh.IMG2PDF.Configuration;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
+import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
 import org.vincentyeh.IMG2PDF.commandline.parser.RelaxedParser;
 
 public class MainProgram extends AbstractAction {
@@ -32,8 +33,7 @@ public class MainProgram extends AbstractAction {
         opt_help = createOption("h", "help", "root_help");
     }
 
-    private AbstractAction action;
-    private ActionMode mode;
+    private final AbstractAction action;
 
     public MainProgram(String[] args) throws ParseException, FileNotFoundException {
         super(getLocaleOptions());
@@ -49,6 +49,7 @@ public class MainProgram extends AbstractAction {
             throw new HelperException(options);
         }
 
+        ActionMode mode;
         if (mode_chooser.hasOption("mode")) {
             mode = ActionMode.getByString(mode_chooser.getOptionValue("mode"));
 
@@ -63,6 +64,8 @@ public class MainProgram extends AbstractAction {
             case convert:
                 action = new ConvertAction(args);
                 break;
+            default:
+                throw new RuntimeException("mode==??");
         }
     }
 
