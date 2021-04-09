@@ -5,15 +5,17 @@ import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumExcep
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class FileSorter implements Comparator<File> {
     private final Sortby sortby;
     private final Sequence sequence;
 
     public FileSorter(Sortby sortby, Sequence sequence) {
-        if(sortby==null)
+        if (sortby == null)
             throw new IllegalArgumentException("sortby==null");
-        if(sequence==null)
+        if (sequence == null)
             throw new IllegalArgumentException("sequence==null");
 
         this.sortby = sortby;
@@ -47,8 +49,8 @@ public class FileSorter implements Comparator<File> {
     }
 
     private int compareNumeric(String ThisStr, String OStr) {
-        String noNumThis = ThisStr.replaceAll("[0-9]{1,}", "*");
-        String noNumO = OStr.replaceAll("[0-9]{1,}", "*");
+        String noNumThis = ThisStr.replaceAll("[0-9]+", "*");
+        String noNumO = OStr.replaceAll("[0-9]+", "*");
 
         if (noNumThis.equals(noNumO)) {
             int[] a = getNumber(ThisStr);
@@ -66,18 +68,17 @@ public class FileSorter implements Comparator<File> {
     }
 
     private int[] getNumber(String str) {
-        String s[] = str.split("[^0-9]{1,}");
+        Pattern pattern = Pattern.compile("[0-9]+");
+        Matcher matcher = pattern.matcher(str);
         ArrayList<Integer> buf = new ArrayList<>();
-        for (int i = 0; i < s.length; i++) {
-            if (!s[i].isEmpty()) {
-                buf.add(Integer.valueOf(s[i]));
-            }
+        while (matcher.find()) {
+            buf.add(Integer.valueOf(matcher.group()));
         }
-        Integer[] result=new Integer[buf.size()];
+        Integer[] result = new Integer[buf.size()];
         buf.toArray(result);
-        int[] ints=new int[result.length];
-        for (int i=0;i<ints.length;i++){
-            ints[i]= result[i];
+        int[] ints = new int[result.length];
+        for (int i = 0; i < ints.length; i++) {
+            ints[i] = result[i];
         }
         return ints;
     }
