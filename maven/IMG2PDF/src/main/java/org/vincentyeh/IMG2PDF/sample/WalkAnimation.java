@@ -28,6 +28,9 @@ public class WalkAnimation {
 		}
 
 		String create_command = "-m create "
+//
+				+"-d "
+//
 				+"-ow "
 //				
 				+ "-pz A4 "

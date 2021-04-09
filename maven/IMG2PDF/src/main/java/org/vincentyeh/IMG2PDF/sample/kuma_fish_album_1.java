@@ -31,6 +31,9 @@ public class kuma_fish_album_1 {
 		}
 
 		String create_command = "-m create "
+//
+				+"-d "
+//
 				+"-ow "
 //				
 				+ "-pz A4 "
