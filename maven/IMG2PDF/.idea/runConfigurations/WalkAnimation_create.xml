@@ -2,7 +2,7 @@
   <configuration default="false" name="WalkAnimation create" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="org.vincentyeh.IMG2PDF.commandline.action.MainProgram" />
     <module name="IMG2PDF" />
-    <option name="PROGRAM_PARAMETERS" value="-m create -pz A4 -ps NUMERTIC -pa CENTER-CENTER -pdi Portrait -par YES -pseq INCREASE -pupwd 1234AAA -popwd 1234AAA -pp 11 -f &quot;glob:*.{PNG,JPG}&quot; -pdst &quot;D:\Projects\git\IMG2PDF\sample\walk-animation\output\$PARENT{0} $CY-$CM-$CD $CH-$CN-$CS.pdf&quot; -ldst &quot;D:\Projects\git\IMG2PDF\sample\walk-animation\taskslist\test.xml&quot; -src &quot;D:\Projects\git\IMG2PDF\sample\walk-animation\dirlist.txt&quot;" />
+    <option name="PROGRAM_PARAMETERS" value="-m create -d -ow -pz A4 -ps NUMERIC -pa CENTER-CENTER -pdi Portrait -par YES -pseq INCREASE -pupwd 1234AAA -popwd 1234AAA -pp 11 -f &quot;glob:*.{PNG,JPG}&quot; -pdst &quot;D:\Projects\git\IMG2PDF\sample\walk-animation\output\$PARENT{0} $CY-$CM-$CD $CH-$CN-$CS.pdf&quot; -ldst &quot;D:\Projects\git\IMG2PDF\sample\walk-animation\taskslist\test.xml&quot; -src &quot;D:\Projects\git\IMG2PDF\sample\walk-animation\dirlist.txt&quot;" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
