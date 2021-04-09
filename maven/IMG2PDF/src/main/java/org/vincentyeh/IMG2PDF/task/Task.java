@@ -42,7 +42,7 @@ public class Task {
 		this.pageArgument=new PageArgument(element.getChild("PageArgument"));
 
 		List<Element> contains_files = element.getChild("FILES").getChildren("FILE");
-		ArrayList<Element> xml_files = new ArrayList<Element>(contains_files);
+		ArrayList<Element> xml_files = new ArrayList<>(contains_files);
 		this.imgs=parseElementsToImages(xml_files);
 
 	}
