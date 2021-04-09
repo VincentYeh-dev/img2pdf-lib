@@ -1,7 +1,6 @@
 package org.vincentyeh.IMG2PDF.commandline.action;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -17,17 +16,18 @@ import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumExcep
 import org.vincentyeh.IMG2PDF.pdf.doc.DocumentArgument;
 import org.vincentyeh.IMG2PDF.pdf.page.PageArgument;
 import org.vincentyeh.IMG2PDF.util.FileFilterHelper;
-import org.vincentyeh.IMG2PDF.pdf.doc.ImgFile;
-import org.vincentyeh.IMG2PDF.pdf.doc.ImgFile.Sequence;
-import org.vincentyeh.IMG2PDF.pdf.doc.ImgFile.Sortby;
 import org.vincentyeh.IMG2PDF.pdf.doc.DocumentAccessPermission;
 import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
 import org.vincentyeh.IMG2PDF.pdf.page.PageDirection;
 import org.vincentyeh.IMG2PDF.pdf.page.PageSize;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskList;
+import org.vincentyeh.IMG2PDF.util.FileSorter;
 import org.vincentyeh.IMG2PDF.util.FileUtil;
 import org.vincentyeh.IMG2PDF.util.NameFormatter;
+
+import static org.vincentyeh.IMG2PDF.util.FileSorter.Sequence;
+import static org.vincentyeh.IMG2PDF.util.FileSorter.Sortby;
 
 public class CreateAction extends AbstractAction {
 
@@ -48,13 +48,11 @@ public class CreateAction extends AbstractAction {
     protected final String pdf_user_password;
     protected final DocumentAccessPermission pdf_permission;
     protected final String pdf_dst;
-    //    protected final String list_destination;
     protected final File list_dst;
     protected final boolean debug;
     protected final boolean overwrite_tasklist;
 
     protected final File[] sources;
-    //	protected final String str_path_filter;
     protected final FileFilterHelper ffh;
 
     private static final Option opt_help;
@@ -130,7 +128,7 @@ public class CreateAction extends AbstractAction {
             } catch (IOException e) {
                 System.out.println(e.getMessage());
             }
-       }
+        }
 
         sources = new File[verified_sources.size()];
         verified_sources.toArray(sources);
@@ -219,54 +217,33 @@ public class CreateAction extends AbstractAction {
     private Task parse2Task(File source_directory) throws IOException {
 
         NameFormatter nf = new NameFormatter(source_directory);
-        DocumentArgument documentArgument=new DocumentArgument(pdf_owner_password,pdf_user_password,pdf_permission,new File(nf.format(pdf_dst)));
-        PageArgument pageArgument=new PageArgument();
+        DocumentArgument documentArgument = new DocumentArgument(pdf_owner_password, pdf_user_password, pdf_permission, new File(nf.format(pdf_dst)));
+        PageArgument pageArgument = new PageArgument();
         pageArgument.setAlign(pdf_align);
         pageArgument.setSize(pdf_size);
         pageArgument.setDirection(pdf_direction);
         pageArgument.setAutoRotate(pdf_auto_rotate);
-
-
-        ImgFile[] imgs = importImagesFile(source_directory);
-        Arrays.sort(imgs);
-        if (debug) {
-            System.out.println("@Debug");
-            System.out.println("Sort Images:");
-            for (ImgFile img : imgs) {
-                System.out.println(img);
-            }
-            System.out.println();
-        }
-
-//        configuration.put("imgs", imgs);
-
-        return new Task(documentArgument,pageArgument, imgs);
+        return new Task(documentArgument, pageArgument, importSortedImagesFiles(source_directory));
     }
 
-    private ImgFile[] importImagesFile(File source_directory) throws FileNotFoundException {
-        if (debug) {
-            System.out.println("@Debug");
-            System.out.println("Import Images:");
-        }
-//        ArrayList<ImgFile> imgs = new ArrayList<>();
-
+    private File[] importSortedImagesFiles(File source_directory) throws IOException {
         File[] files = source_directory.listFiles(ffh);
         if (files == null)
             files = new File[0];
 
-        ImgFile[] imgFiles = new ImgFile[files.length];
 
-        for (int i = 0; i < imgFiles.length; i++) {
-            imgFiles[i] = new ImgFile(files[i].getAbsolutePath(), pdf_sortby, pdf_sequence);
-            if (debug)
-                System.out.println(imgFiles[i]);
+        FileSorter sorter = new FileSorter(pdf_sortby, pdf_sequence);
+        Arrays.sort(files, sorter);
+        if (debug) {
+            System.out.println("@Debug");
+            System.out.println("Sort Images:");
+            for (File img : files) {
+                System.out.println("\t"+img);
+            }
+            System.out.println();
         }
 
-
-        if (debug)
-            System.out.println();
-
-        return imgFiles;
+        return files;
     }
 
     private static <T> String dumpArrayString(T[] array) {

@@ -1,17 +1,16 @@
 package org.vincentyeh.IMG2PDF.converter;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 
-import javax.imageio.ImageIO;
-
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.vincentyeh.IMG2PDF.pdf.doc.ImagesDocumentAdaptor;
-import org.vincentyeh.IMG2PDF.pdf.doc.ImgFile;
 import org.vincentyeh.IMG2PDF.pdf.page.ImagePageAdaptor;
-import org.vincentyeh.IMG2PDF.pdf.page.PageArgument;
 import org.vincentyeh.IMG2PDF.task.Task;
+
+import javax.imageio.ImageIO;
 
 /**
  * The core of this program. At first,this class will be initialized by task.
@@ -49,7 +48,7 @@ public class PDFConverter implements Callable<ImagesDocumentAdaptor> {
      */
     @Override
     public ImagesDocumentAdaptor call() throws Exception {
-        ImgFile[] imgs = task.getImgs();
+        File[] imgs = task.getImgs();
         if (listener != null)
             listener.onConversionPreparing(task);
 
@@ -59,8 +58,7 @@ public class PDFConverter implements Callable<ImagesDocumentAdaptor> {
 
             BufferedImage image;
             try {
-                image = imgs[i].getImage();
-
+                image= ImageIO.read(imgs[i]);
             } catch (IOException e) {
                 documentAdaptor.closeDocument();
                 if (listener != null) {

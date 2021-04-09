@@ -2,12 +2,12 @@ package org.vincentyeh.IMG2PDF.task;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.jdom2.Element;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
-import org.vincentyeh.IMG2PDF.pdf.doc.ImgFile;
 import org.vincentyeh.IMG2PDF.pdf.doc.DocumentArgument;
 import org.vincentyeh.IMG2PDF.pdf.page.PageArgument;
 
@@ -15,10 +15,10 @@ public class Task {
 	private final DocumentArgument documentArgument;
 	private final PageArgument pageArgument;
 
-	private final ImgFile[] imgs;
+	private final File[] imgs;
 
 
-	public Task(DocumentArgument documentArgument,PageArgument pageArgument,ImgFile[] imgs) {
+	public Task(DocumentArgument documentArgument,PageArgument pageArgument,File[] imgs) {
 		if(imgs==null)
 			throw new IllegalArgumentException("imgs is null");
 		this.imgs=imgs;
@@ -55,7 +55,7 @@ public class Task {
 	public Element toElement() {
 		Element task = new Element("TASK");
 		Element xml_files = new Element("FILES");
-		for (ImgFile img : imgs) {
+		for (File img : imgs) {
 			Element xml_file = new Element("FILE");
 			xml_file.addContent(img.getAbsolutePath());
 			xml_files.addContent(xml_file);
@@ -68,17 +68,17 @@ public class Task {
 		return task;
 	}
 
-	private ImgFile[] parseElementsToImages(ArrayList<Element> el_files) throws FileNotFoundException {
-		ImgFile[] imgFiles=new ImgFile[el_files.size()];
+	private File[] parseElementsToImages(ArrayList<Element> el_files) throws FileNotFoundException {
+		File[] imgFiles=new File[el_files.size()];
 		for(int i=0;i<imgFiles.length;i++){
 			Element el=el_files.get(i);
-			imgFiles[i]=new ImgFile(new File(el.getValue()).getAbsolutePath());
+			imgFiles[i]=new File(new File(el.getValue()).getAbsolutePath());
 		}
 
 		return imgFiles;
 	}
 
-	public ImgFile[] getImgs() {
+	public File[] getImgs() {
 		return this.imgs;
 	}
 
