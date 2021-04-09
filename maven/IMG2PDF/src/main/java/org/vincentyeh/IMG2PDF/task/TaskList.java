@@ -37,7 +37,7 @@ public class TaskList extends ArrayList<Task> {
     }
 
     public TaskList(Element root) throws FileNotFoundException, UnrecognizedEnumException {
-        ArrayList<Element> importedTaskList = new ArrayList<Element>(root.getChildren("TASK"));
+        ArrayList<Element> importedTaskList = new ArrayList<>(root.getChildren("TASK"));
         for (Element task : importedTaskList) {
 
             this.add(new Task(task));

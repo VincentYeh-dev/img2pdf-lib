@@ -57,9 +57,9 @@ public class PDFConverter implements Callable<ImagesDocumentAdaptor> {
             if (listener != null)
                 listener.onConverting(i);
 
-            BufferedImage image = null;
+            BufferedImage image;
             try {
-                image = ImageIO.read(imgs[i]);
+                image = imgs[i].getImage();
 
             } catch (IOException e) {
                 documentAdaptor.closeDocument();

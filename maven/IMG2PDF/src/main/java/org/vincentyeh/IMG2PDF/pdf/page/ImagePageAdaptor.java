@@ -30,7 +30,6 @@ public class ImagePageAdaptor  {
     private final PDPage page;
 
     public ImagePageAdaptor(PageArgument argument,BufferedImage image) {
-//        PageAlign align, PageSize size, boolean autoRotate, PageDirection page_direction, BufferedImage image
 
         page=new PDPage();
         final Size page_size;
@@ -66,39 +65,7 @@ public class ImagePageAdaptor  {
             position = calculator.calculate(argument.getAlign());
         }
     }
-//    public ImagePageAdaptor(PageAlign align, PageSize size, boolean autoRotate, PageDirection page_direction, BufferedImage image) {
-//        page=new PDPage();
-//        final Size page_size;
-//
-//        if (size == PageSize.DEPEND_ON_IMG) {
-//            page_size = new Size(image.getHeight(), image.getWidth());
-//
-//        } else {
-//            PDRectangle rect = size.getPdrectangle();
-//            page_size = new Size(rect.getHeight(), rect.getWidth());
-//        }
-//        page.setMediaBox(new PDRectangle(page_size.getWidth(), page_size.getHeight()));
-//
-//
-//        if (size == PageSize.DEPEND_ON_IMG) {
-//            img_size = new Size(image.getHeight(), image.getWidth());
-//            this.image = image;
-//            position = new Position(0, 0);
-//        } else {
-//            if (autoRotate) {
-//                page_direction = getDirection(image);
-//            }
-//            page.setRotation(page_direction == Landscape ? -90 : 0);
-//            this.image = rotateImg(image, page_direction == Landscape ? 90 : 0);
-//
-//            Size rotated_img_size = new Size(this.image.getHeight(), this.image.getWidth());
-//            SizeCalculator sizeCalculator = new SizeCalculator(rotated_img_size, page_size);
-//            img_size = sizeCalculator.scaleUpToMax();
-//
-//            PositionCalculator calculator = new PositionCalculator(page.getRotation() != 0, img_size.getHeight(), img_size.getWidth(), page_size.getHeight(), page_size.getWidth());
-//            position = calculator.calculate(align);
-//        }
-//    }
+
 
     public void drawImageToPage(PDDocument doc) throws Exception {
 

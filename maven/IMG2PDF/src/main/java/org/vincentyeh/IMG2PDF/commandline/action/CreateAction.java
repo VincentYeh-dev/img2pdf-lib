@@ -3,6 +3,7 @@ package org.vincentyeh.IMG2PDF.commandline.action;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
 
@@ -129,19 +130,7 @@ public class CreateAction extends AbstractAction {
             } catch (IOException e) {
                 System.out.println(e.getMessage());
             }
-
-//            if (!raw.exists()) {
-//                System.err.printf(Configuration.getResString("err_filenotfound") + "\n", raw.getAbsolutePath());
-//                continue;
-//            } else if (raw.isDirectory()) {
-//                System.err.printf(Configuration.getResString("err_path_is_file") + "\n", raw.getAbsolutePath());
-//                continue;
-//            } else {
-//                System.out.printf("[" + Configuration.getResString("common_verified") + "] %s\n",
-//                        raw.getAbsolutePath());
-//            }
-//            verified_sources.add(raw);
-        }
+       }
 
         sources = new File[verified_sources.size()];
         verified_sources.toArray(sources);
@@ -149,11 +138,11 @@ public class CreateAction extends AbstractAction {
         System.out.printf("### " + Configuration.getResString("tasklist_config")
                         + " ###\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s############\n",
 //
-                Configuration.getResString("arg_align"), pdf_align.toString(),
+                Configuration.getResString("arg_align"), pdf_align,
 //
-                Configuration.getResString("arg_size"), pdf_size.toString(),
+                Configuration.getResString("arg_size"), pdf_size,
 //
-                Configuration.getResString("arg_direction"), pdf_direction.toString(),
+                Configuration.getResString("arg_direction"), pdf_direction,
 //
                 Configuration.getResString("arg_auto_rotate"), pdf_auto_rotate,
 //
@@ -188,7 +177,7 @@ public class CreateAction extends AbstractAction {
         TaskList tasks = new TaskList();
         System.out.printf(Configuration.getResString("import_from_list") + "\n", dirlist.getName());
 
-        List<String> lines = Files.readAllLines(dirlist.toPath());
+        List<String> lines = Files.readAllLines(dirlist.toPath(), StandardCharsets.UTF_8);
         for (int line_counter = 0; line_counter < lines.size(); line_counter++) {
             String line = lines.get(line_counter);
 
@@ -237,21 +226,9 @@ public class CreateAction extends AbstractAction {
         pageArgument.setDirection(pdf_direction);
         pageArgument.setAutoRotate(pdf_auto_rotate);
 
-//        HashMap<String, Object> configuration = new HashMap<>();
-//        NameFormatter nf = new NameFormatter(source_directory);
-//        configuration.put("pdf_permission", pdf_permission);
-//        configuration.put("pdf_destination", nf.format(pdf_dst));
-//        configuration.put("pdf_align", pdf_align);
-//        configuration.put("pdf_size", pdf_size);
-//        configuration.put("pdf_direction", pdf_direction);
-//        configuration.put("pdf_auto_rotate", pdf_auto_rotate);
-//
-//        configuration.put("pdf_user_password", pdf_user_password);
-//        configuration.put("pdf_owner_password", pdf_owner_password);
 
         ImgFile[] imgs = importImagesFile(source_directory);
         Arrays.sort(imgs);
-//        Collections.sort(imgs);
         if (debug) {
             System.out.println("@Debug");
             System.out.println("Sort Images:");
@@ -281,17 +258,10 @@ public class CreateAction extends AbstractAction {
 
         for (int i = 0; i < imgFiles.length; i++) {
             imgFiles[i] = new ImgFile(files[i].getAbsolutePath(), pdf_sortby, pdf_sequence);
-//            imgs.add(img);
             if (debug)
                 System.out.println(imgFiles[i]);
         }
 
-//        for (File f : files) {
-//            ImgFile img = new ImgFile(f.getAbsolutePath(), pdf_sortby, pdf_sequence);
-//            imgs.add(img);
-//            if (debug)
-//                System.out.println(img);
-//        }
 
         if (debug)
             System.out.println();
