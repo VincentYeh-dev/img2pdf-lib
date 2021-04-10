@@ -10,7 +10,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.vincentyeh.IMG2PDF.pdf.doc.ImagesDocumentAdaptor;
 import org.vincentyeh.IMG2PDF.pdf.page.ImagePageAdaptor;
 import org.vincentyeh.IMG2PDF.task.Task;
-import org.vincentyeh.IMG2PDF.util.FileUtil;
+import org.vincentyeh.IMG2PDF.util.FileChecker;
 
 import javax.imageio.ImageIO;
 
@@ -38,7 +38,7 @@ public class PDFConverter implements Callable<ImagesDocumentAdaptor> {
             throw new NullPointerException("task is null.");
         if(tempFolder==null)
             throw new IllegalArgumentException("tempFolder is null");
-        FileUtil.checkWritableFolder(tempFolder);
+        FileChecker.checkWritableFolder(tempFolder);
 
         this.task = task;
         MemoryUsageSetting memoryUsageSetting = MemoryUsageSetting.setupMixed(maxMainMemoryBytes).setTempDir(tempFolder);

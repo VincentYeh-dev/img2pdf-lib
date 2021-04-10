@@ -1,6 +1,7 @@
 package org.vincentyeh.IMG2PDF.commandline.action;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -35,7 +36,7 @@ public class MainProgram extends AbstractAction {
 
     private final AbstractAction action;
 
-    public MainProgram(String[] args) throws ParseException, FileNotFoundException {
+    public MainProgram(String[] args) throws ParseException, IOException {
         super(getLocaleOptions());
 
         System.out.println("##IMG2PDF##");

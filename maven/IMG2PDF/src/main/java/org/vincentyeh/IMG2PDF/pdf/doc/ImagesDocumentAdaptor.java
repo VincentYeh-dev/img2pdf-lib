@@ -3,10 +3,8 @@ package org.vincentyeh.IMG2PDF.pdf.doc;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.vincentyeh.IMG2PDF.pdf.page.ImagePageAdaptor;
-import org.vincentyeh.IMG2PDF.util.FileUtil;
+import org.vincentyeh.IMG2PDF.util.FileChecker;
 
-import java.io.File;
 import java.io.IOException;
 
 public class ImagesDocumentAdaptor {

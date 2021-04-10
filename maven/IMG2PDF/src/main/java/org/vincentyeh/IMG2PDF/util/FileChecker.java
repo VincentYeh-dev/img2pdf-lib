@@ -7,7 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 
-public class FileUtil {
+public class FileChecker {
 
     public static void checkWritableFile(File raw) throws IOException {
         checkAbsolute(raw);
@@ -44,7 +44,7 @@ public class FileUtil {
             throw new IOException("File path is not absolute:"+raw.getPath());
     }
 
-    public static boolean makeDirectoryIfNotExists(File file) throws IOException {
+    public static boolean makeParentDirsIfNotExists(File file) throws IOException {
         checkAbsolute(file);
         boolean done=file.getParentFile().mkdirs();
         if (done) {

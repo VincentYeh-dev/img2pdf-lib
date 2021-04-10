@@ -9,7 +9,7 @@ import java.nio.file.*;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-public class FileUtilTest {
+public class FileCheckerTest {
     static {
 //		Language Setting:
 
@@ -24,37 +24,37 @@ public class FileUtilTest {
 
     @Test(expected = IOException.class)
     public void testAbsolute() throws IOException {
-        FileUtil.checkAbsolute(new File("aa\\bb.txt"));
+        FileChecker.checkAbsolute(new File("aa\\bb.txt"));
     }
 
     @Test(expected = IOException.class)
     public void testWriteFileInSystemFolder() throws IOException {
-        FileUtil.checkWritableFile(new File("C:\\test.xml"));
+        FileChecker.checkWritableFile(new File("C:\\test.xml"));
     }
 
     @Test(expected = IOException.class)
     public void testWriteInSystemFolder() throws IOException {
-        FileUtil.checkWritableFolder(new File("C:\\"));
+        FileChecker.checkWritableFolder(new File("C:\\"));
     }
 
     @Test
     public void testWriteFileInDataFolder() throws IOException {
-        FileUtil.checkWritableFile(new File("D:\\test.xml"));
+        FileChecker.checkWritableFile(new File("D:\\test.xml"));
     }
 
     @Test
     public void testWriteInDataFolder() throws IOException {
-        FileUtil.checkWritableFolder(new File("D:\\"));
+        FileChecker.checkWritableFolder(new File("D:\\"));
     }
 
     @Test(expected = IOException.class)
     public void testReadFileInSystemFolder() throws IOException {
-        FileUtil.checkReadableFile(new File("C:\\AAA"));
+        FileChecker.checkReadableFile(new File("C:\\AAA"));
     }
 
     @Test
     public void testReadInSystemFolder() throws IOException {
-        FileUtil.checkReadableFolder(new File("C:\\"));
+        FileChecker.checkReadableFolder(new File("C:\\"));
     }
 
     @Test
@@ -63,13 +63,13 @@ public class FileUtilTest {
         Path p = Paths.get("D:\\test.xml");
         Files.createFile(p);
 
-        FileUtil.checkReadableFolder(p.toFile());
+        FileChecker.checkReadableFolder(p.toFile());
         Files.delete(p);
     }
 
     @Test
     public void testReadInDataFolder() throws IOException {
-        FileUtil.checkReadableFolder(new File("D:\\"));
+        FileChecker.checkReadableFolder(new File("D:\\"));
     }
 
 
