@@ -5,10 +5,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 
+import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.vincentyeh.IMG2PDF.pdf.doc.ImagesDocumentAdaptor;
 import org.vincentyeh.IMG2PDF.pdf.page.ImagePageAdaptor;
 import org.vincentyeh.IMG2PDF.task.Task;
+import org.vincentyeh.IMG2PDF.util.FileUtil;
 
 import javax.imageio.ImageIO;
 
@@ -31,11 +33,17 @@ public class PDFConverter implements Callable<ImagesDocumentAdaptor> {
      * @param task
      * @throws IOException
      */
-    public PDFConverter(Task task) throws IOException {
+    public PDFConverter(Task task,long maxMainMemoryBytes,File tempFolder) throws IOException {
         if (task == null)
             throw new NullPointerException("task is null.");
+        if(tempFolder==null)
+            throw new IllegalArgumentException("tempFolder is null");
+        FileUtil.checkWritableFolder(tempFolder);
+
         this.task = task;
-        documentAdaptor = new ImagesDocumentAdaptor(task.getDocumentArgument());
+        MemoryUsageSetting memoryUsageSetting = MemoryUsageSetting.setupMixed(maxMainMemoryBytes).setTempDir(tempFolder);
+
+        documentAdaptor = new ImagesDocumentAdaptor(task.getDocumentArgument(), memoryUsageSetting);
 //        documentAdaptor.protect(task.getDocumentArgument().getSpp());
     }
 
@@ -58,7 +66,7 @@ public class PDFConverter implements Callable<ImagesDocumentAdaptor> {
 
             BufferedImage image;
             try {
-                image= ImageIO.read(imgs[i]);
+                image = ImageIO.read(imgs[i]);
             } catch (IOException e) {
                 documentAdaptor.closeDocument();
                 if (listener != null) {
