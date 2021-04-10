@@ -35,7 +35,7 @@ public class WalkAnimation {
 //				
 				+ "-pz A4 "
 //				
-				+ "-ps NUMERTIC "
+				+ "-ps NUMERIC "
 //				
 				+ "-pa CENTER-CENTER "
 //				
