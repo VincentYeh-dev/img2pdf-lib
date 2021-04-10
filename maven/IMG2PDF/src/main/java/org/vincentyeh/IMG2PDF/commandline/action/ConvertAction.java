@@ -34,6 +34,11 @@ public class ConvertAction extends AbstractAction {
         opt_help = createOption("h", "help", "help_convert");
     }
 
+    //  TODO:Make below code editable
+    private File tempFolder=new File("D:\\.org.vincentyeh.IMG2PDF.tmp");
+    //  TODO:Make below code editable
+    private long maxMainMemoryBytes= (50*(long)Math.pow(2,20-3));
+
     public ConvertAction(String[] args) throws ParseException, FileNotFoundException {
         super(getLocaleOptions());
 
@@ -65,7 +70,7 @@ public class ConvertAction extends AbstractAction {
             }
 
         }
-
+        tempFolder.mkdirs();
     }
 
     @Override
@@ -88,12 +93,12 @@ public class ConvertAction extends AbstractAction {
                 ImagesDocumentAdaptor result = null;
                 File dst = task.getDocumentArgument().getDestination();
                 if (!overwrite_output && dst.exists()) {
-                    System.err.printf(Configuration.getResString("err_overwrite"), dst.getAbsolutePath());
+                    System.err.printf(Configuration.getResString("err_overwrite")+"\n", dst.getAbsolutePath());
                     continue;
                 }
 
                 try {
-                    PDFConverter converter = new PDFConverter(task);
+                    PDFConverter converter = new PDFConverter(task,maxMainMemoryBytes,tempFolder);
                     converter.setListener(listener);
                     Future<ImagesDocumentAdaptor> future = executor.submit(converter);
                     try {
@@ -103,8 +108,9 @@ public class ConvertAction extends AbstractAction {
                         continue;
                     }
 
-
+//                  TODO: merge method below into PDFConverter
                     FileUtil.makeDirectoryIfNotExists(dst);
+//                  TODO: merge method below into PDFConverter
                     FileUtil.checkWritableFile(dst);
                     result.save();
 
@@ -163,10 +169,10 @@ public class ConvertAction extends AbstractAction {
             int size_of_imgs = task.getImgs().length;
             perImg = (10. / size_of_imgs);
             System.out.printf("###%s###\n", Configuration.getResString("pdf_conversion_task"));
-            System.out.printf("%s:%s\n", Configuration.getResString("arg_pdf_dst"), task.getDocumentArgument().getDestination());
-            System.out.printf("%s:%s\n", Configuration.getResString("common_name"),
+            System.out.printf("\t%s:%s\n", Configuration.getResString("arg_pdf_dst"), task.getDocumentArgument().getDestination());
+            System.out.printf("\t%s:%s\n", Configuration.getResString("common_name"),
                     new File(task.getDocumentArgument().getDestination().getName()));
-            System.out.printf("%s->", Configuration.getResString("common_progress"));
+            System.out.printf("\t%s->", Configuration.getResString("common_progress"));
             System.out.print("0%[");
 
         }
@@ -182,13 +188,13 @@ public class ConvertAction extends AbstractAction {
 
         @Override
         public void onConversionComplete() {
-            System.out.print("]%100\n");
+            System.out.print("]%100\n\n");
 
         }
 
         @Override
         public void onConversionFail(int index, Exception e) {
-            System.out.print("CONVERSION FAIL]\n");
+            System.out.print("CONVERSION FAIL]\n\n");
             System.err.println(e.getMessage());
 //			e.printStackTrace();
 
@@ -196,7 +202,7 @@ public class ConvertAction extends AbstractAction {
 
         @Override
         public void onImageReadFail(int index, IOException e) {
-            System.out.print("IMAGE READ FAIL]\n");
+            System.out.print("IMAGE READ FAIL]\n\n");
             System.err.println(e.getMessage());
 //			e.printStackTrace();
         }
