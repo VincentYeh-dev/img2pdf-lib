@@ -1,12 +1,8 @@
 package org.vincentyeh.IMG2PDF.util;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.FileTime;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.regex.Matcher;
@@ -39,7 +35,7 @@ public class NameFormatter {
 //	private final File file;
 
 	public NameFormatter(File raw) throws IOException {
-	    FileUtil.checkReadableFile(raw);
+	    FileChecker.checkReadableFile(raw);
 		file=raw;
 		Path p=raw.toPath();
 		parents = new File[p.getNameCount()-1];

@@ -21,7 +21,8 @@ import org.vincentyeh.IMG2PDF.converter.PDFConverter;
 import org.vincentyeh.IMG2PDF.pdf.doc.ImagesDocumentAdaptor;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskList;
-import org.vincentyeh.IMG2PDF.util.FileUtil;
+import org.vincentyeh.IMG2PDF.util.BytesSize;
+import org.vincentyeh.IMG2PDF.util.FileChecker;
 
 public class ConvertAction extends AbstractAction {
 
@@ -34,10 +35,8 @@ public class ConvertAction extends AbstractAction {
         opt_help = createOption("h", "help", "help_convert");
     }
 
-    //  TODO:Make below code editable
-    private File tempFolder=new File("D:\\.org.vincentyeh.IMG2PDF.tmp");
-    //  TODO:Make below code editable
-    private long maxMainMemoryBytes= (50*(long)Math.pow(2,20-3));
+    private final File tempFolder  ;
+    private final long maxMainMemoryBytes;
 
     public ConvertAction(String[] args) throws ParseException, FileNotFoundException {
         super(getLocaleOptions());
@@ -48,6 +47,11 @@ public class ConvertAction extends AbstractAction {
             throw new HelperException(options);
 
         String[] str_sources = cmd.getOptionValues("tasklist_source");
+
+        tempFolder=new File(cmd.getOptionValue("temp_folder",".org.vincentyeh.IMG2PDF.tmp"));
+        tempFolder.mkdirs();
+
+        maxMainMemoryBytes= BytesSize.parseString(cmd.getOptionValue("memory_max_usage","50MB")).getBytes();
 
         open_when_complete = cmd.hasOption("open_when_complete");
         overwrite_output = cmd.hasOption("overwrite");
@@ -70,7 +74,6 @@ public class ConvertAction extends AbstractAction {
             }
 
         }
-        tempFolder.mkdirs();
     }
 
     @Override
@@ -93,12 +96,12 @@ public class ConvertAction extends AbstractAction {
                 ImagesDocumentAdaptor result = null;
                 File dst = task.getDocumentArgument().getDestination();
                 if (!overwrite_output && dst.exists()) {
-                    System.err.printf(Configuration.getResString("err_overwrite")+"\n", dst.getAbsolutePath());
+                    System.err.printf(Configuration.getResString("err_overwrite") + "\n", dst.getAbsolutePath());
                     continue;
                 }
 
                 try {
-                    PDFConverter converter = new PDFConverter(task,maxMainMemoryBytes,tempFolder);
+                    PDFConverter converter = new PDFConverter(task, maxMainMemoryBytes, tempFolder);
                     converter.setListener(listener);
                     Future<ImagesDocumentAdaptor> future = executor.submit(converter);
                     try {
@@ -108,10 +111,10 @@ public class ConvertAction extends AbstractAction {
                         continue;
                     }
 
-//                  TODO: merge method below into PDFConverter
-                    FileUtil.makeDirectoryIfNotExists(dst);
-//                  TODO: merge method below into PDFConverter
-                    FileUtil.checkWritableFile(dst);
+//                  TODO: merge to another class
+                    FileChecker.makeParentDirsIfNotExists(dst);
+//                  TODO: merge to another class
+                    FileChecker.checkWritableFile(dst);
                     result.save();
 
                     if (open_when_complete) {
@@ -149,8 +152,15 @@ public class ConvertAction extends AbstractAction {
 
         Option opt_overwrite = createOption("ow", "overwrite", "help_create_overwrite_output");
 
+//      TODO: change description
+        Option opt_tmp_folder = createArgOption("tmp", "temp_folder", "help_convert_tmp_folder");
+//      TODO: change description
+        Option opt_max_memory_usage = createArgOption("mx", "memory_max_usage", "help_convert_memory_max_usage");
+
         options.addOption(opt_help);
         options.addOption(opt_tasklist_source);
+        options.addOption(opt_tmp_folder);
+        options.addOption(opt_max_memory_usage);
         options.addOption(opt_open_when_complete);
         options.addOption(opt_overwrite);
 
@@ -168,7 +178,7 @@ public class ConvertAction extends AbstractAction {
         public void onConversionPreparing(Task task) {
             int size_of_imgs = task.getImgs().length;
             perImg = (10. / size_of_imgs);
-            System.out.printf("###%s###\n", Configuration.getResString("pdf_conversion_task"));
+            System.out.printf("\t###%s###\n", Configuration.getResString("pdf_conversion_task"));
             System.out.printf("\t%s:%s\n", Configuration.getResString("arg_pdf_dst"), task.getDocumentArgument().getDestination());
             System.out.printf("\t%s:%s\n", Configuration.getResString("common_name"),
                     new File(task.getDocumentArgument().getDestination().getName()));

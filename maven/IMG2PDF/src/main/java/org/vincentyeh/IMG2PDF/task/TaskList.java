@@ -15,7 +15,7 @@ import org.jdom2.input.DOMBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
-import org.vincentyeh.IMG2PDF.util.FileUtil;
+import org.vincentyeh.IMG2PDF.util.FileChecker;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -51,8 +51,8 @@ public class TaskList extends ArrayList<Task> {
      * @throws IOException
      */
     public void toXMLFile(File file) throws IOException {
-        FileUtil.makeDirectoryIfNotExists(file);
-        FileUtil.checkWritableFile(file);
+        FileChecker.makeParentDirsIfNotExists(file);
+        FileChecker.checkWritableFile(file);
 //
 //        if (file.getParentFile().mkdirs()) {
 //            System.out.printf(Configuration.getResString("info_required_folder_created") + "\n", file.getParent());
@@ -78,7 +78,7 @@ public class TaskList extends ArrayList<Task> {
 
     private static Document getDOMParsedDocument(final File xml_file)
             throws ParserConfigurationException, SAXException, IOException {
-        FileUtil.checkReadableFile(xml_file);
+        FileChecker.checkReadableFile(xml_file);
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         // If want to make namespace aware.
         // factory.setNamespaceAware(true);

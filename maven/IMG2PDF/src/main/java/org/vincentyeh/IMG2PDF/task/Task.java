@@ -2,7 +2,6 @@ package org.vincentyeh.IMG2PDF.task;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +9,7 @@ import org.jdom2.Element;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
 import org.vincentyeh.IMG2PDF.pdf.doc.DocumentArgument;
 import org.vincentyeh.IMG2PDF.pdf.page.PageArgument;
+import org.vincentyeh.IMG2PDF.util.FileChecker;
 
 public class Task {
     private final DocumentArgument documentArgument;
@@ -73,8 +73,9 @@ public class Task {
         for (int i = 0; i < imgFiles.length; i++) {
             Element el = el_files.get(i);
             imgFiles[i] = new File(new File(el.getValue()).getAbsolutePath());
-            if (!imgFiles[i].exists())
-                throw new FileNotFoundException(imgFiles[i].getAbsolutePath() + " not found.");
+            FileChecker.checkExists(imgFiles[i]);
+//            if (!imgFiles[i].exists())
+//                throw new FileNotFoundException(imgFiles[i].getAbsolutePath() + " not found.");
             if (imgFiles[i].isDirectory())
                 throw new RuntimeException(imgFiles[i].getAbsolutePath()+" is directory.");
 

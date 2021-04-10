@@ -23,7 +23,7 @@ import org.vincentyeh.IMG2PDF.pdf.page.PageSize;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskList;
 import org.vincentyeh.IMG2PDF.util.FileSorter;
-import org.vincentyeh.IMG2PDF.util.FileUtil;
+import org.vincentyeh.IMG2PDF.util.FileChecker;
 import org.vincentyeh.IMG2PDF.util.NameFormatter;
 
 import static org.vincentyeh.IMG2PDF.util.FileSorter.Sequence;
@@ -119,7 +119,7 @@ public class CreateAction extends AbstractAction {
             System.out.print("\t");
 
             try {
-                FileUtil.checkReadableFile(raw);
+                FileChecker.checkReadableFile(raw);
 
                 System.out.printf("[" + Configuration.getResString("common_verified") + "] %s\n",
                         raw.getAbsolutePath());
@@ -158,7 +158,7 @@ public class CreateAction extends AbstractAction {
         TaskList tasks = new TaskList();
 
         for (File source : sources) {
-            FileUtil.checkExists(source);
+            FileChecker.checkExists(source);
             tasks.addAll(importTasksFromTXT(source));
         }
 
@@ -171,7 +171,7 @@ public class CreateAction extends AbstractAction {
     }
 
     protected TaskList importTasksFromTXT(File dirlist) throws IOException {
-        FileUtil.checkReadableFile(dirlist);
+        FileChecker.checkReadableFile(dirlist);
         TaskList tasks = new TaskList();
         System.out.printf(Configuration.getResString("import_from_list") + "\n", dirlist.getName());
 
