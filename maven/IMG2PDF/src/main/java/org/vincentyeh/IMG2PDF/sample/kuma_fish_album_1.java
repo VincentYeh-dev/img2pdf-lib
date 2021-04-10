@@ -38,7 +38,7 @@ public class kuma_fish_album_1 {
 //				
 				+ "-pz A4 "
 //				
-				+ "-ps NUMERTIC "
+				+ "-ps NUMERIC "
 //				
 				+ "-pa CENTER-CENTER "
 //				
