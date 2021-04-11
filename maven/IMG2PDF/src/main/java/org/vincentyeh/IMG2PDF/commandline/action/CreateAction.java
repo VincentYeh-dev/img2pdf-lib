@@ -2,7 +2,6 @@ package org.vincentyeh.IMG2PDF.commandline.action;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
 
@@ -13,6 +12,7 @@ import org.apache.commons.cli.ParseException;
 import org.vincentyeh.IMG2PDF.commandline.parser.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
+import org.vincentyeh.IMG2PDF.commandline.parser.HandledException;
 import org.vincentyeh.IMG2PDF.commandline.parser.PropertiesOption;
 import org.vincentyeh.IMG2PDF.pdf.doc.DocumentArgument;
 import org.vincentyeh.IMG2PDF.pdf.page.PageArgument;
@@ -53,7 +53,7 @@ public class CreateAction extends AbstractAction {
     protected final boolean debug;
     protected final boolean overwrite_tasklist;
 
-    protected final File[] sources;
+    protected final File[] dirlists;
     protected final FileFilterHelper ffh;
 
     private static final Option opt_help;
@@ -92,47 +92,15 @@ public class CreateAction extends AbstractAction {
         String list_destination = cmd.getOptionValue("list_destination");
         list_dst = (new File(list_destination)).getAbsoluteFile();
 
-        if (!overwrite_tasklist && list_dst.exists())
-            throw new RuntimeException(String.format(SharedSpace.getResString("err_overwrite"), list_dst.getAbsolutePath()));
-
         try {
             ffh = new FileFilterHelper(cmd.getOptionValue("filter", DEFV_PDF_FILTER));
         } catch (UnsupportedOperationException e) {
+//            TODO:handle and throw HandledException
             throw new RuntimeException(String.format(SharedSpace.getResString("err_filter"), e.getMessage()));
         }
 
         String[] str_sources = cmd.getOptionValues("source");
-        if (str_sources == null) {
-            str_sources = new String[0];
-        }
-
-        System.out.println(SharedSpace.getResString("source_folder_verifying"));
-
-        ArrayList<File> verified_sources = new ArrayList<>();
-
-
-//        Directory List:
-        for (String str_source : str_sources) {
-            File raw = (new File(str_source)).getAbsoluteFile();
-
-            System.out.printf("\t[" + SharedSpace.getResString("common_verifying") + "] %s\n", raw.getAbsolutePath());
-
-            System.out.print("\t");
-
-            try {
-                FileChecker.checkReadableFile(raw);
-
-                System.out.printf("[" + SharedSpace.getResString("common_verified") + "] %s\n",
-                        raw.getAbsolutePath());
-
-                verified_sources.add(raw);
-            } catch (IOException e) {
-                System.out.println(e.getMessage());
-            }
-        }
-
-        sources = new File[verified_sources.size()];
-        verified_sources.toArray(sources);
+        this.dirlists = verifyAndImportSources(str_sources);
 
         System.out.printf("### " + SharedSpace.getResString("tasklist_config")
                         + " ###\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s############\n",
@@ -149,7 +117,7 @@ public class CreateAction extends AbstractAction {
 //
                 SharedSpace.getResString("arg_tasklist_dst"), list_destination,
 //
-                SharedSpace.getResString("arg_source"), dumpArrayString(sources)
+                SharedSpace.getResString("arg_source"), dumpArrayString(dirlists)
 //
         );
     }
@@ -158,9 +126,53 @@ public class CreateAction extends AbstractAction {
     public void start() throws Exception {
         TaskList tasks = new TaskList();
 
-        for (File source : sources) {
-            FileChecker.checkExists(source);
-            tasks.addAll(importTasksFromTXT(source));
+        for (File dirlist : dirlists) {
+//          In dirlist
+            FileChecker.checkReadableFile(dirlist);
+            System.out.printf(SharedSpace.getResString("import_from_list") + "\n", dirlist.getName());
+
+            List<String> lines = Files.readAllLines(dirlist.toPath(), SharedSpace.Configuration.DEFAULT_CHARSET);
+            for (int line_counter = 0; line_counter < lines.size(); line_counter++) {
+//              In line
+                String line = lines.get(line_counter);
+
+//            Ignore BOM Header:
+                line = line.replace("\uFEFF", "");
+
+                if (line.trim().isEmpty() || line.isEmpty())
+                    continue;
+
+                File dir = new File(line);
+
+//                TODO:Improve dirlist to make it able to handle relative path
+                if (!dir.isAbsolute()) {
+                    dir = new File(dirlist.getParent(), line);
+                }
+
+
+                if (!dir.exists()) {
+                    System.err.printf(SharedSpace.getResString("err_source_filenotfound") + "\n", dirlist.getName(),
+                            line_counter, dir.getAbsolutePath());
+                }
+
+                if (dir.isFile()) {
+                    System.err.printf(SharedSpace.getResString("err_source_path_is_file") + "\n", dirlist.getName(),
+                            line_counter, dir.getAbsolutePath());
+                }
+
+                System.out.printf("\t[" + SharedSpace.getResString("common_importing") + "] %s\n",
+                        dir.getAbsolutePath());
+
+                tasks.add(mergeArgumentsToTask(dir));
+
+                System.out.printf("\t[" + SharedSpace.getResString("common_imported") + "] %s\n",
+                        dir.getAbsolutePath());
+            }
+
+        }
+        if(!overwrite_tasklist && list_dst.exists()){
+            System.err.printf(SharedSpace.getResString("err_overwrite")+"\n",list_dst.getAbsolutePath());
+            throw new HandledException();
         }
 
         try {
@@ -168,54 +180,11 @@ public class CreateAction extends AbstractAction {
             System.out.printf("[" + SharedSpace.getResString("common_exported") + "] %s\n", list_dst.getAbsolutePath());
         } catch (IOException e) {
             System.err.printf(SharedSpace.getResString("err_tasklist_create") + "\n", e.getMessage());
+            throw new HandledException();
         }
     }
 
-    protected TaskList importTasksFromTXT(File dirlist) throws IOException {
-        FileChecker.checkReadableFile(dirlist);
-        TaskList tasks = new TaskList();
-        System.out.printf(SharedSpace.getResString("import_from_list") + "\n", dirlist.getName());
-
-        List<String> lines = Files.readAllLines(dirlist.toPath(), SharedSpace.Configuration.DEFAULT_CHARSET);
-        for (int line_counter = 0; line_counter < lines.size(); line_counter++) {
-            String line = lines.get(line_counter);
-
-//            Ignore BOM Header:
-            line = line.replace("\uFEFF", "");
-
-            if (line.trim().isEmpty() || line.isEmpty())
-                continue;
-
-            File dir = new File(line);
-
-            if (!dir.isAbsolute()) {
-                dir = new File(dirlist.getParent(), line);
-            }
-
-
-            if (!dir.exists()) {
-                System.err.printf(SharedSpace.getResString("err_source_filenotfound") + "\n", dirlist.getName(),
-                        line_counter, dir.getAbsolutePath());
-            }
-
-            if (dir.isFile()) {
-                System.err.printf(SharedSpace.getResString("err_source_path_is_file") + "\n", dirlist.getName(),
-                        line_counter, dir.getAbsolutePath());
-            }
-
-            System.out.printf("\t[" + SharedSpace.getResString("common_importing") + "] %s\n",
-                    dir.getAbsolutePath());
-
-            tasks.add(parse2Task(dir));
-
-            System.out.printf("\t[" + SharedSpace.getResString("common_imported") + "] %s\n",
-                    dir.getAbsolutePath());
-        }
-
-        return tasks;
-    }
-
-    private Task parse2Task(File source_directory) throws IOException {
+    private Task mergeArgumentsToTask(File source_directory) throws IOException {
 
         NameFormatter nf = new NameFormatter(source_directory);
         DocumentArgument documentArgument = new DocumentArgument(pdf_owner_password, pdf_user_password, pdf_permission, new File(nf.format(pdf_dst)));
@@ -259,6 +228,40 @@ public class CreateAction extends AbstractAction {
         }
         sb.append("]\n");
         return sb.toString();
+    }
+
+    private File[] verifyAndImportSources(String[] strSources) {
+        if (strSources == null) {
+            throw new IllegalArgumentException("strSources==null");
+        }
+        if (strSources.length == 0) {
+            throw new IllegalArgumentException("strSources is empty");
+        }
+        System.out.println(SharedSpace.getResString("source_folder_verifying"));
+
+        ArrayList<File> verified_sources = new ArrayList<>();
+//        Directory List:
+        for (String str_source : strSources) {
+            File raw = (new File(str_source)).getAbsoluteFile();
+            System.out.printf("\t[" + SharedSpace.getResString("common_verifying") + "] %s\n", raw.getAbsolutePath());
+
+            System.out.print("\t");
+
+            try {
+                FileChecker.checkReadableFile(raw);
+
+                System.out.printf("[" + SharedSpace.getResString("common_verified") + "] %s\n",
+                        raw.getAbsolutePath());
+
+                verified_sources.add(raw);
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+
+        File[] sources = new File[verified_sources.size()];
+        verified_sources.toArray(sources);
+        return sources;
     }
 
     private static Options getLocaleOptions() {

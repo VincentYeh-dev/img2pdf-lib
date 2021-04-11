@@ -14,6 +14,8 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
+import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
+import org.vincentyeh.IMG2PDF.commandline.parser.HandledException;
 import org.vincentyeh.IMG2PDF.commandline.parser.PropertiesOption;
 import org.vincentyeh.IMG2PDF.commandline.parser.RelaxedParser;
 
@@ -79,7 +81,7 @@ public class MainProgram extends AbstractAction {
 
     public static void main(String[] args) {
 //		dumpArray(args);
-        MainProgram main  ;
+        MainProgram main;
         try {
             main = new MainProgram(args);
         } catch (HelperException e) {
@@ -93,7 +95,6 @@ public class MainProgram extends AbstractAction {
             System.err.println(createMissingArgumentOptionsMessage(e.getOption()));
             return;
         } catch (UnrecognizedOptionException e) {
-//		e.printStackTrace();
             System.err.println(createUnrecognizedOptionMessage(e.getOption()));
             System.err.println(e.getMessage());
             return;
@@ -104,6 +105,8 @@ public class MainProgram extends AbstractAction {
 
         try {
             main.start();
+        } catch (HandledException e) {
+//            do nothing
         } catch (Exception e) {
             e.printStackTrace();
         }
