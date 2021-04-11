@@ -10,16 +10,16 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class PositionCalculatorTester {
-    static {
-//		Language Setting:
-
-//	Local:
-        SharedSpace.setLanguageRes(ResourceBundle.getBundle("language_package", Locale.getDefault()));
-//	root:
-
-//		Configuration.setLagugRes(ResourceBundle.getBundle("language_package", Locale.ROOT));
-
-    }
+//    static {
+////		Language Setting:
+//
+////	Local:
+//        SharedSpace.setLanguageRes(ResourceBundle.getBundle("language_package", Locale.getDefault()));
+////	root:
+//
+////		Configuration.setLagugRes(ResourceBundle.getBundle("language_package", Locale.ROOT));
+//
+//    }
 
     @Test
     public void test() {

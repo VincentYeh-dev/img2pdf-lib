@@ -16,6 +16,7 @@ public class SharedSpace {
 
 	private static ResourceBundle language_resource =null;
 	static {
+		System.out.println("Static SharedSpace");
 //		Language Setting:
 
 //	Local:
@@ -29,9 +30,6 @@ public class SharedSpace {
 		SharedSpace.language_resource = lagug_resource;
 	}
 
-//	public static ResourceBundle getLagugRes() {
-//		return SharedSpace.lagug_resource;
-//	}
 	
 	public static String getResString(String key) {
 		return SharedSpace.language_resource.getString(key);
