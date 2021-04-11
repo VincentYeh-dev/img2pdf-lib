@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.commandline.action;
+package org.vincentyeh.IMG2PDF.commandline.parser;
 
 import org.apache.commons.cli.Option;
 import org.vincentyeh.IMG2PDF.Configuration;

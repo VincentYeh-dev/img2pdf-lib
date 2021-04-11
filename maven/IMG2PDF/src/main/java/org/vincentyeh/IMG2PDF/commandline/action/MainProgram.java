@@ -1,6 +1,5 @@
 package org.vincentyeh.IMG2PDF.commandline.action;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -15,7 +14,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.vincentyeh.IMG2PDF.Configuration;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
-import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
+import org.vincentyeh.IMG2PDF.commandline.parser.PropertiesOption;
 import org.vincentyeh.IMG2PDF.commandline.parser.RelaxedParser;
 
 public class MainProgram extends AbstractAction {
