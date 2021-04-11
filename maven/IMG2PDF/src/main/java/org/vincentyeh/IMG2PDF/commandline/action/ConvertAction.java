@@ -16,6 +16,7 @@ import org.apache.commons.cli.ParseException;
 import org.vincentyeh.IMG2PDF.commandline.parser.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.Configuration;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
+import org.vincentyeh.IMG2PDF.commandline.parser.PropertiesOption;
 import org.vincentyeh.IMG2PDF.converter.ConversionListener;
 import org.vincentyeh.IMG2PDF.converter.PDFConverter;
 import org.vincentyeh.IMG2PDF.pdf.doc.ImagesDocumentAdaptor;

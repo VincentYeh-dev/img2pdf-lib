@@ -13,6 +13,7 @@ import org.apache.commons.cli.ParseException;
 import org.vincentyeh.IMG2PDF.commandline.parser.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.Configuration;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
+import org.vincentyeh.IMG2PDF.commandline.parser.PropertiesOption;
 import org.vincentyeh.IMG2PDF.pdf.doc.DocumentArgument;
 import org.vincentyeh.IMG2PDF.pdf.page.PageArgument;
 import org.vincentyeh.IMG2PDF.util.FileFilterHelper;
