@@ -1,6 +1,6 @@
 package org.vincentyeh.IMG2PDF.commandline.action.exception;
 
-import org.vincentyeh.IMG2PDF.Configuration;
+import org.vincentyeh.IMG2PDF.SharedSpace;
 
 public class UnrecognizedEnumException extends RuntimeException {
 
@@ -10,17 +10,17 @@ public class UnrecognizedEnumException extends RuntimeException {
 	private static final long serialVersionUID = 5818347104393060334L;
 
 	public <T> UnrecognizedEnumException(String unrecognizable_enum, Class<T> _class) {
-		super(String.format(Configuration.getResString("err_unrecognizable_enum_long"),unrecognizable_enum,
+		super(String.format(SharedSpace.getResString("err_unrecognizable_enum_long"),unrecognizable_enum,
 				_class.getSimpleName(), listEnum(_class)));
 
 	}
 
 	public UnrecognizedEnumException(String unrecognizable_enum, String _enum) {
-		super(String.format(Configuration.getResString("err_unrecognizable_enum_short"), unrecognizable_enum, _enum));
+		super(String.format(SharedSpace.getResString("err_unrecognizable_enum_short"), unrecognizable_enum, _enum));
 	}
 
 	public <T> UnrecognizedEnumException(String unrecognizable_enum, String _enum, Class<T> _class) {
-		super(String.format(Configuration.getResString("err_unrecognizable_enum_long"), unrecognizable_enum, _enum,
+		super(String.format(SharedSpace.getResString("err_unrecognizable_enum_long"), unrecognizable_enum, _enum,
 				listEnum(_class)));
 
 	}

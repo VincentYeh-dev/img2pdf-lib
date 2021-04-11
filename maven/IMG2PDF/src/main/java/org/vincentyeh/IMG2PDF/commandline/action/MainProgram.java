@@ -12,7 +12,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
-import org.vincentyeh.IMG2PDF.Configuration;
+import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
 import org.vincentyeh.IMG2PDF.commandline.parser.PropertiesOption;
 import org.vincentyeh.IMG2PDF.commandline.parser.RelaxedParser;
@@ -22,14 +22,6 @@ public class MainProgram extends AbstractAction {
     private static final Option opt_help;
 
     static {
-//		Language Setting:
-
-//	Local:
-        Configuration.setLagugRes(ResourceBundle.getBundle("language_package", Locale.getDefault()));
-//	root:
-
-//		Configuration.setLagugRes(ResourceBundle.getBundle("language_package", Locale.ROOT));
-
         opt_help = PropertiesOption.getOption("h", "help", "root_help");
     }
 
@@ -39,8 +31,8 @@ public class MainProgram extends AbstractAction {
         super(getLocaleOptions());
 
         System.out.println("##IMG2PDF##");
-        System.out.printf("%s: %s", Configuration.getResString("common_developer"), Configuration.DEVELOPER);
-        System.out.printf("\n%s: %s\n", Configuration.getResString("common_version"), Configuration.PROGRAM_VER);
+        System.out.printf("%s: %s", SharedSpace.getResString("common_developer"), SharedSpace.Configuration.DEVELOPER);
+        System.out.printf("\n%s: %s\n", SharedSpace.getResString("common_version"), SharedSpace.Configuration.PROGRAM_VER);
         System.out.println("-----------------------");
 
         CommandLine mode_chooser = (new RelaxedParser()).parse(options, args);
@@ -92,7 +84,7 @@ public class MainProgram extends AbstractAction {
             main = new MainProgram(args);
         } catch (HelperException e) {
             HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp(Configuration.PROGRAM_NAME, e.opt);
+            formatter.printHelp(SharedSpace.Configuration.PROGRAM_NAME, e.opt);
             return;
         } catch (MissingOptionException e) {
             System.err.println(createMissingOptionsMessage(e.getMissingOptions()));
@@ -112,8 +104,6 @@ public class MainProgram extends AbstractAction {
 
         try {
             main.start();
-		}catch (RuntimeException e){
-			System.err.println(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -14,7 +14,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.vincentyeh.IMG2PDF.commandline.parser.CheckHelpParser;
-import org.vincentyeh.IMG2PDF.Configuration;
+import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
 import org.vincentyeh.IMG2PDF.commandline.parser.PropertiesOption;
 import org.vincentyeh.IMG2PDF.converter.ConversionListener;
@@ -59,18 +59,18 @@ public class ConvertAction extends AbstractAction {
 
         tasklist_sources = new File[str_sources.length];
         for (int i = 0; i < tasklist_sources.length; i++) {
-            System.out.println(Configuration.getResString("source_tasklist_verifying"));
+            System.out.println(SharedSpace.getResString("source_tasklist_verifying"));
             tasklist_sources[i] = new File(str_sources[i]);
 
-            System.out.println("\t[" + Configuration.getResString("common_verifying") + "] "
+            System.out.println("\t[" + SharedSpace.getResString("common_verifying") + "] "
                     + tasklist_sources[i].getAbsolutePath());
             System.out.print("\t");
             if (!tasklist_sources[i].exists()) {
-                throw new FileNotFoundException(String.format(Configuration.getResString("err_filenotfound"), tasklist_sources[i].getAbsolutePath()));
+                throw new FileNotFoundException(String.format(SharedSpace.getResString("err_filenotfound"), tasklist_sources[i].getAbsolutePath()));
             } else if (tasklist_sources[i].isDirectory()) {
-                throw new RuntimeException(String.format(Configuration.getResString("err_path_is_folder"), tasklist_sources[i].getAbsolutePath()));
+                throw new RuntimeException(String.format(SharedSpace.getResString("err_path_is_folder"), tasklist_sources[i].getAbsolutePath()));
             } else {
-                System.out.println("[" + Configuration.getResString("common_verified") + "] "
+                System.out.println("[" + SharedSpace.getResString("common_verified") + "] "
                         + tasklist_sources[i].getAbsolutePath());
             }
 
@@ -79,25 +79,25 @@ public class ConvertAction extends AbstractAction {
 
     @Override
     public void start() throws Exception {
-        System.out.println(Configuration.getResString("import_tasklists"));
+        System.out.println(SharedSpace.getResString("import_tasklists"));
         for (File src : tasklist_sources) {
             System.out.print(
-                    "\t[" + Configuration.getResString("common_importing") + "] " + src.getAbsolutePath() + "\n");
+                    "\t[" + SharedSpace.getResString("common_importing") + "] " + src.getAbsolutePath() + "\n");
             System.out.print("\t");
 
             TaskList tasks = new TaskList(src);
 
             System.out
-                    .print("[" + Configuration.getResString("common_imported") + "] " + src.getAbsolutePath() + "\n");
+                    .print("[" + SharedSpace.getResString("common_imported") + "] " + src.getAbsolutePath() + "\n");
 
-            System.out.println(Configuration.getResString("common_start_conversion"));
+            System.out.println(SharedSpace.getResString("common_start_conversion"));
 
             ExecutorService executor = Executors.newSingleThreadExecutor();
             for (Task task : tasks) {
                 ImagesDocumentAdaptor result = null;
                 File dst = task.getDocumentArgument().getDestination();
                 if (!overwrite_output && dst.exists()) {
-                    System.err.printf(Configuration.getResString("err_overwrite") + "\n", dst.getAbsolutePath());
+                    System.err.printf(SharedSpace.getResString("err_overwrite") + "\n", dst.getAbsolutePath());
                     continue;
                 }
 
@@ -179,11 +179,11 @@ public class ConvertAction extends AbstractAction {
         public void onConversionPreparing(Task task) {
             int size_of_imgs = task.getImgs().length;
             perImg = (10. / size_of_imgs);
-            System.out.printf("\t###%s###\n", Configuration.getResString("pdf_conversion_task"));
-            System.out.printf("\t%s:%s\n", Configuration.getResString("arg_pdf_dst"), task.getDocumentArgument().getDestination());
-            System.out.printf("\t%s:%s\n", Configuration.getResString("common_name"),
+            System.out.printf("\t###%s###\n", SharedSpace.getResString("pdf_conversion_task"));
+            System.out.printf("\t%s:%s\n", SharedSpace.getResString("arg_pdf_dst"), task.getDocumentArgument().getDestination());
+            System.out.printf("\t%s:%s\n", SharedSpace.getResString("common_name"),
                     new File(task.getDocumentArgument().getDestination().getName()));
-            System.out.printf("\t%s->", Configuration.getResString("common_progress"));
+            System.out.printf("\t%s->", SharedSpace.getResString("common_progress"));
             System.out.print("0%[");
 
         }

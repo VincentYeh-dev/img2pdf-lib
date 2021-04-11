@@ -1,5 +1,7 @@
 package org.vincentyeh.IMG2PDF.sample;
 
+import org.vincentyeh.IMG2PDF.SharedSpace;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,7 +22,7 @@ public class WalkAnimation {
 		File sources_list = new File(sample_root, "dirlist.txt").getAbsoluteFile();
 		BufferedWriter writer = null;
 		try {
-			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(sources_list), StandardCharsets.UTF_8));
+			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(sources_list), SharedSpace.Configuration.DEFAULT_CHARSET));
 			writer.write(image_sources_dir.getAbsolutePath() + "\n\n");
 			writer.close();
 		} catch (IOException e) {

@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.vincentyeh.IMG2PDF.Configuration;
+import org.vincentyeh.IMG2PDF.SharedSpace;
 
 public abstract class AbstractAction implements Action {
 	protected Options options;
@@ -34,7 +34,7 @@ public abstract class AbstractAction implements Action {
 	 * @param missingOptions the list of missing options and groups
 	 */
 	protected static String createMissingOptionsMessage(List<?> missingOptions) {
-		StringBuilder buf = new StringBuilder(Configuration.getResString("err_missing_option"));
+		StringBuilder buf = new StringBuilder(SharedSpace.getResString("err_missing_option"));
 		buf.append(": ");
 
 		Iterator<?> it = missingOptions.iterator();
@@ -49,11 +49,11 @@ public abstract class AbstractAction implements Action {
 	}
 	
 	protected static String createMissingArgumentOptionsMessage(Option option) {
-		 return String.format(Configuration.getResString("err_missing_argument_option"),option.getOpt());
+		 return String.format(SharedSpace.getResString("err_missing_argument_option"),option.getOpt());
 	}
 	
 	protected static String createUnrecognizedOptionMessage(String option) {
-		 return String.format(Configuration.getResString("err_missing_argument_option"),option);
+		 return String.format(SharedSpace.getResString("err_missing_argument_option"),option);
 	}
 	
 

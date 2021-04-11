@@ -11,7 +11,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.vincentyeh.IMG2PDF.commandline.parser.CheckHelpParser;
-import org.vincentyeh.IMG2PDF.Configuration;
+import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
 import org.vincentyeh.IMG2PDF.commandline.parser.PropertiesOption;
 import org.vincentyeh.IMG2PDF.pdf.doc.DocumentArgument;
@@ -93,12 +93,12 @@ public class CreateAction extends AbstractAction {
         list_dst = (new File(list_destination)).getAbsoluteFile();
 
         if (!overwrite_tasklist && list_dst.exists())
-            throw new RuntimeException(String.format(Configuration.getResString("err_overwrite"), list_dst.getAbsolutePath()));
+            throw new RuntimeException(String.format(SharedSpace.getResString("err_overwrite"), list_dst.getAbsolutePath()));
 
         try {
             ffh = new FileFilterHelper(cmd.getOptionValue("filter", DEFV_PDF_FILTER));
         } catch (UnsupportedOperationException e) {
-            throw new RuntimeException(String.format(Configuration.getResString("err_filter"), e.getMessage()));
+            throw new RuntimeException(String.format(SharedSpace.getResString("err_filter"), e.getMessage()));
         }
 
         String[] str_sources = cmd.getOptionValues("source");
@@ -106,7 +106,7 @@ public class CreateAction extends AbstractAction {
             str_sources = new String[0];
         }
 
-        System.out.println(Configuration.getResString("source_folder_verifying"));
+        System.out.println(SharedSpace.getResString("source_folder_verifying"));
 
         ArrayList<File> verified_sources = new ArrayList<>();
 
@@ -115,14 +115,14 @@ public class CreateAction extends AbstractAction {
         for (String str_source : str_sources) {
             File raw = (new File(str_source)).getAbsoluteFile();
 
-            System.out.printf("\t[" + Configuration.getResString("common_verifying") + "] %s\n", raw.getAbsolutePath());
+            System.out.printf("\t[" + SharedSpace.getResString("common_verifying") + "] %s\n", raw.getAbsolutePath());
 
             System.out.print("\t");
 
             try {
                 FileChecker.checkReadableFile(raw);
 
-                System.out.printf("[" + Configuration.getResString("common_verified") + "] %s\n",
+                System.out.printf("[" + SharedSpace.getResString("common_verified") + "] %s\n",
                         raw.getAbsolutePath());
 
                 verified_sources.add(raw);
@@ -134,22 +134,22 @@ public class CreateAction extends AbstractAction {
         sources = new File[verified_sources.size()];
         verified_sources.toArray(sources);
 
-        System.out.printf("### " + Configuration.getResString("tasklist_config")
+        System.out.printf("### " + SharedSpace.getResString("tasklist_config")
                         + " ###\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s############\n",
 //
-                Configuration.getResString("arg_align"), pdf_align,
+                SharedSpace.getResString("arg_align"), pdf_align,
 //
-                Configuration.getResString("arg_size"), pdf_size,
+                SharedSpace.getResString("arg_size"), pdf_size,
 //
-                Configuration.getResString("arg_direction"), pdf_direction,
+                SharedSpace.getResString("arg_direction"), pdf_direction,
 //
-                Configuration.getResString("arg_auto_rotate"), pdf_auto_rotate,
+                SharedSpace.getResString("arg_auto_rotate"), pdf_auto_rotate,
 //
-                Configuration.getResString("arg_filter"), ffh.getOperator(),
+                SharedSpace.getResString("arg_filter"), ffh.getOperator(),
 //
-                Configuration.getResString("arg_tasklist_dst"), list_destination,
+                SharedSpace.getResString("arg_tasklist_dst"), list_destination,
 //
-                Configuration.getResString("arg_source"), dumpArrayString(sources)
+                SharedSpace.getResString("arg_source"), dumpArrayString(sources)
 //
         );
     }
@@ -165,18 +165,18 @@ public class CreateAction extends AbstractAction {
 
         try {
             tasks.toXMLFile(list_dst);
-            System.out.printf("[" + Configuration.getResString("common_exported") + "] %s\n", list_dst.getAbsolutePath());
+            System.out.printf("[" + SharedSpace.getResString("common_exported") + "] %s\n", list_dst.getAbsolutePath());
         } catch (IOException e) {
-            System.err.printf(Configuration.getResString("err_tasklist_create") + "\n", e.getMessage());
+            System.err.printf(SharedSpace.getResString("err_tasklist_create") + "\n", e.getMessage());
         }
     }
 
     protected TaskList importTasksFromTXT(File dirlist) throws IOException {
         FileChecker.checkReadableFile(dirlist);
         TaskList tasks = new TaskList();
-        System.out.printf(Configuration.getResString("import_from_list") + "\n", dirlist.getName());
+        System.out.printf(SharedSpace.getResString("import_from_list") + "\n", dirlist.getName());
 
-        List<String> lines = Files.readAllLines(dirlist.toPath(), StandardCharsets.UTF_8);
+        List<String> lines = Files.readAllLines(dirlist.toPath(), SharedSpace.Configuration.DEFAULT_CHARSET);
         for (int line_counter = 0; line_counter < lines.size(); line_counter++) {
             String line = lines.get(line_counter);
 
@@ -194,21 +194,21 @@ public class CreateAction extends AbstractAction {
 
 
             if (!dir.exists()) {
-                System.err.printf(Configuration.getResString("err_source_filenotfound") + "\n", dirlist.getName(),
+                System.err.printf(SharedSpace.getResString("err_source_filenotfound") + "\n", dirlist.getName(),
                         line_counter, dir.getAbsolutePath());
             }
 
             if (dir.isFile()) {
-                System.err.printf(Configuration.getResString("err_source_path_is_file") + "\n", dirlist.getName(),
+                System.err.printf(SharedSpace.getResString("err_source_path_is_file") + "\n", dirlist.getName(),
                         line_counter, dir.getAbsolutePath());
             }
 
-            System.out.printf("\t[" + Configuration.getResString("common_importing") + "] %s\n",
+            System.out.printf("\t[" + SharedSpace.getResString("common_importing") + "] %s\n",
                     dir.getAbsolutePath());
 
             tasks.add(parse2Task(dir));
 
-            System.out.printf("\t[" + Configuration.getResString("common_imported") + "] %s\n",
+            System.out.printf("\t[" + SharedSpace.getResString("common_imported") + "] %s\n",
                     dir.getAbsolutePath());
         }
 
@@ -239,7 +239,7 @@ public class CreateAction extends AbstractAction {
             System.out.println("@Debug");
             System.out.println("Sort Images:");
             for (File img : files) {
-                System.out.println("\t"+img);
+                System.out.println("\t" + img);
             }
             System.out.println();
         }
@@ -267,7 +267,7 @@ public class CreateAction extends AbstractAction {
         Option opt_debug = PropertiesOption.getOption("d", "debug", "help_create_debug");
         Option opt_overwrite = PropertiesOption.getOption("ow", "overwrite", "help_create_overwrite_tasklist");
 
-        Option opt_pdf_size = PropertiesOption.getArgumentOption("pz", "pdf_size", "help_create_pdf_size",listEnum(PageSize.class));
+        Option opt_pdf_size = PropertiesOption.getArgumentOption("pz", "pdf_size", "help_create_pdf_size", listEnum(PageSize.class));
         Option opt_pdf_align = PropertiesOption.getArgumentOption("pa", "pdf_align", "help_create_pdf_align");
         Option opt_pdf_direction = PropertiesOption.getArgumentOption("pdi", "pdf_direction", "help_create_pdf_direction",
                 listEnum(PageDirection.class));
