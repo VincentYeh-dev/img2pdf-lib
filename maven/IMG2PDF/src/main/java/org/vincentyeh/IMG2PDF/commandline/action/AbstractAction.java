@@ -53,7 +53,7 @@ public abstract class AbstractAction implements Action {
 	}
 	
 	protected static String createUnrecognizedOptionMessage(String option) {
-		 return String.format(SharedSpace.getResString("err_missing_argument_option"),option);
+		 return String.format(SharedSpace.getResString("err_unrecognized_argument_option"),option);
 	}
 	
 

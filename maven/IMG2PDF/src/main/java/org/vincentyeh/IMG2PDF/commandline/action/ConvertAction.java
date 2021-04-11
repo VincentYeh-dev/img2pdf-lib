@@ -36,7 +36,7 @@ public class ConvertAction extends AbstractAction {
         opt_help = PropertiesOption.getOption("h", "help", "help_convert");
     }
 
-    private final File tempFolder  ;
+    private final File tempFolder;
     private final long maxMainMemoryBytes;
 
     public ConvertAction(String[] args) throws ParseException, FileNotFoundException {
@@ -49,10 +49,10 @@ public class ConvertAction extends AbstractAction {
 
         String[] str_sources = cmd.getOptionValues("tasklist_source");
 
-        tempFolder=new File(cmd.getOptionValue("temp_folder",".org.vincentyeh.IMG2PDF.tmp"));
+        tempFolder = new File(cmd.getOptionValue("temp_folder", ".org.vincentyeh.IMG2PDF.tmp"));
         tempFolder.mkdirs();
 
-        maxMainMemoryBytes= BytesSize.parseString(cmd.getOptionValue("memory_max_usage","50MB")).getBytes();
+        maxMainMemoryBytes = BytesSize.parseString(cmd.getOptionValue("memory_max_usage", "50MB")).getBytes();
 
         open_when_complete = cmd.hasOption("open_when_complete");
         overwrite_output = cmd.hasOption("overwrite");
@@ -65,14 +65,14 @@ public class ConvertAction extends AbstractAction {
             System.out.println("\t[" + SharedSpace.getResString("common_verifying") + "] "
                     + tasklist_sources[i].getAbsolutePath());
             System.out.print("\t");
+            FileChecker.checkExists(tasklist_sources[i]);
             if (!tasklist_sources[i].exists()) {
-                throw new FileNotFoundException(String.format(SharedSpace.getResString("err_filenotfound"), tasklist_sources[i].getAbsolutePath()));
+//                throw new FileNotFoundException(String.format(SharedSpace.getResString("err_filenotfound"), tasklist_sources[i].getAbsolutePath()));
             } else if (tasklist_sources[i].isDirectory()) {
                 throw new RuntimeException(String.format(SharedSpace.getResString("err_path_is_folder"), tasklist_sources[i].getAbsolutePath()));
-            } else {
-                System.out.println("[" + SharedSpace.getResString("common_verified") + "] "
-                        + tasklist_sources[i].getAbsolutePath());
             }
+            System.out.println("[" + SharedSpace.getResString("common_verified") + "] "
+                    + tasklist_sources[i].getAbsolutePath());
 
         }
     }
@@ -154,9 +154,9 @@ public class ConvertAction extends AbstractAction {
         Option opt_overwrite = PropertiesOption.getOption("ow", "overwrite", "help_convert_overwrite_output");
 
 //      TODO: change description
-        Option opt_tmp_folder = PropertiesOption.getArgumentOption("tmp", "temp_folder", "help_convert_tmp_folder",".org.vincentyeh.IMG2PDF.tmp");
+        Option opt_tmp_folder = PropertiesOption.getArgumentOption("tmp", "temp_folder", "help_convert_tmp_folder", ".org.vincentyeh.IMG2PDF.tmp");
 //      TODO: change description
-        Option opt_max_memory_usage = PropertiesOption.getArgumentOption("mx", "memory_max_usage", "help_convert_memory_max_usage","50MB");
+        Option opt_max_memory_usage = PropertiesOption.getArgumentOption("mx", "memory_max_usage", "help_convert_memory_max_usage", "50MB");
 
         options.addOption(opt_help);
         options.addOption(opt_tasklist_source);
