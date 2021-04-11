@@ -58,7 +58,7 @@ public class CreateAction extends AbstractAction {
     private static final Option opt_help;
 
     static {
-        opt_help = createOption("h", "help", "help_create");
+        opt_help = PropertiesOption.getOption("h", "help", "help_create");
     }
 
     public CreateAction(String[] args) throws UnrecognizedEnumException, ParseException {
@@ -226,7 +226,7 @@ public class CreateAction extends AbstractAction {
         return new Task(documentArgument, pageArgument, importSortedImagesFiles(source_directory));
     }
 
-    private File[] importSortedImagesFiles(File source_directory) throws IOException {
+    private File[] importSortedImagesFiles(File source_directory) {
         File[] files = source_directory.listFiles(ffh);
         if (files == null)
             files = new File[0];
@@ -263,31 +263,31 @@ public class CreateAction extends AbstractAction {
     private static Options getLocaleOptions() {
 
         Options options = new Options();
-        Option opt_debug = createOption("d", "debug", "help_create_debug");
-        Option opt_overwrite = createOption("ow", "overwrite", "help_create_overwrite_tasklist");
+        Option opt_debug = PropertiesOption.getOption("d", "debug", "help_create_debug");
+        Option opt_overwrite = PropertiesOption.getOption("ow", "overwrite", "help_create_overwrite_tasklist");
 
-        Option opt_pdf_size = createEnumOption("pz", "pdf_size", "help_create_pdf_size", PageSize.class);
-        Option opt_pdf_align = createArgOption("pa", "pdf_align", "help_create_pdf_align");
-        Option opt_pdf_direction = createEnumOption("pdi", "pdf_direction", "help_create_pdf_direction",
-                PageDirection.class);
-        Option opt_pdf_auto_rotate = createOption("par", "pdf_auto_rotate", "help_create_pdf_auto_rotate");
-        Option opt_pdf_sortby = createEnumOption("ps", "pdf_sortby", "help_create_pdf_sortby", Sortby.class);
-        Option opt_pdf_sequence = createEnumOption("pseq", "pdf_sequence", "help_create_pdf_sequence", Sequence.class);
-        Option opt_pdf_owner_password = createArgOption("popwd", "pdf_owner_password",
+        Option opt_pdf_size = PropertiesOption.getArgumentOption("pz", "pdf_size", "help_create_pdf_size",listEnum(PageSize.class));
+        Option opt_pdf_align = PropertiesOption.getArgumentOption("pa", "pdf_align", "help_create_pdf_align");
+        Option opt_pdf_direction = PropertiesOption.getArgumentOption("pdi", "pdf_direction", "help_create_pdf_direction",
+                listEnum(PageDirection.class));
+        Option opt_pdf_auto_rotate = PropertiesOption.getOption("par", "pdf_auto_rotate", "help_create_pdf_auto_rotate");
+        Option opt_pdf_sortby = PropertiesOption.getArgumentOption("ps", "pdf_sortby", "help_create_pdf_sortby", listEnum(Sortby.class));
+        Option opt_pdf_sequence = PropertiesOption.getArgumentOption("pseq", "pdf_sequence", "help_create_pdf_sequence", listEnum(Sequence.class));
+        Option opt_pdf_owner_password = PropertiesOption.getArgumentOption("popwd", "pdf_owner_password",
                 "help_create_pdf_owner_password");
-        Option opt_pdf_user_password = createArgOption("pupwd", "pdf_user_password", "help_create_pdf_user_password");
+        Option opt_pdf_user_password = PropertiesOption.getArgumentOption("pupwd", "pdf_user_password", "help_create_pdf_user_password");
 
-        Option opt_pdf_permission = createArgOption("pp", "pdf_permission", "help_create_pdf_permission");
+        Option opt_pdf_permission = PropertiesOption.getArgumentOption("pp", "pdf_permission", "help_create_pdf_permission");
 
-        Option opt_pdf_destination = createArgOption("pdst", "pdf_destination", "help_create_pdf_destination");
+        Option opt_pdf_destination = PropertiesOption.getArgumentOption("pdst", "pdf_destination", "help_create_pdf_destination");
         opt_pdf_destination.setRequired(true);
 
-        Option opt_filter = createArgOption("f", "filter", "help_create_filter");
+        Option opt_filter = PropertiesOption.getArgumentOption("f", "filter", "help_create_filter");
 
-        Option opt_sources = createArgOption("src", "source", "help_create_source");
+        Option opt_sources = PropertiesOption.getArgumentOption("src", "source", "help_create_source");
         opt_sources.setRequired(true);
 
-        Option opt_list_destination = createArgOption("ldst", "list_destination", "help_create_list_destination");
+        Option opt_list_destination = PropertiesOption.getArgumentOption("ldst", "list_destination", "help_create_list_destination");
         opt_list_destination.setRequired(true);
 
         options.addOption(opt_debug);
