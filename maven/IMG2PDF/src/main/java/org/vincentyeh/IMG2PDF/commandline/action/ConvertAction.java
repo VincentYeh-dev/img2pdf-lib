@@ -32,7 +32,7 @@ public class ConvertAction extends AbstractAction {
     private static final Option opt_help;
 
     static {
-        opt_help = createOption("h", "help", "help_convert");
+        opt_help = PropertiesOption.getOption("h", "help", "help_convert");
     }
 
     private final File tempFolder  ;
@@ -145,17 +145,17 @@ public class ConvertAction extends AbstractAction {
 
     private static Options getLocaleOptions() {
         Options options = new Options();
-        Option opt_tasklist_source = createArgOption("lsrc", "tasklist_source", "help_convert_tasklist_source");
+        Option opt_tasklist_source = PropertiesOption.getArgumentOption("lsrc", "tasklist_source", "help_convert_tasklist_source");
         opt_tasklist_source.setRequired(true);
 
-        Option opt_open_when_complete = createOption("o", "open_when_complete", "help_create_pdf_align");
+        Option opt_open_when_complete = PropertiesOption.getOption("o", "open_when_complete", "help_convert_open_when_complete");
 
-        Option opt_overwrite = createOption("ow", "overwrite", "help_create_overwrite_output");
+        Option opt_overwrite = PropertiesOption.getOption("ow", "overwrite", "help_convert_overwrite_output");
 
 //      TODO: change description
-        Option opt_tmp_folder = createArgOption("tmp", "temp_folder", "help_convert_tmp_folder");
+        Option opt_tmp_folder = PropertiesOption.getArgumentOption("tmp", "temp_folder", "help_convert_tmp_folder",".org.vincentyeh.IMG2PDF.tmp");
 //      TODO: change description
-        Option opt_max_memory_usage = createArgOption("mx", "memory_max_usage", "help_convert_memory_max_usage");
+        Option opt_max_memory_usage = PropertiesOption.getArgumentOption("mx", "memory_max_usage", "help_convert_memory_max_usage","50MB");
 
         options.addOption(opt_help);
         options.addOption(opt_tasklist_source);

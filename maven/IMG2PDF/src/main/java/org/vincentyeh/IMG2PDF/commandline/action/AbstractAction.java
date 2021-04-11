@@ -14,18 +14,19 @@ public abstract class AbstractAction implements Action {
 		this.options = options;
 	}
 
-	protected static Option createArgOption(String opt, String longOpt, String res_description, String... strings) {
-		return new Option(opt, longOpt, true, Configuration.getResString(res_description));
-	}
+//	protected static Option createArgOption(String opt, String longOpt, String res_description,Object ...values) {
+//	    return new PropertiesOption(opt,longOpt,true,res_description,values);
+//		return new Option(opt, longOpt, true, Configuration.getResString(res_description));
+//	}
 
-	protected static <T> Option createEnumOption(String opt, String longOpt, String res_description, Class<T> _enum) {
-		return new Option(opt, longOpt, true,
-				String.format(Configuration.getResString(res_description), listEnum(_enum)));
-	}
+//	protected static <T> Option createEnumOption(String opt, String longOpt, String res_description, Class<T> _enum) {
+//		return new Option(opt, longOpt, true,
+//				String.format(Configuration.getResString(res_description), listEnum(_enum)));
+//	}
 
-	protected static Option createOption(String opt, String longOpt, String res_description) {
-		return new Option(opt, longOpt, false, Configuration.getResString(res_description));
-	}
+//	protected static Option createOption(String opt, String longOpt, String res_description) {
+//		return new Option(opt, longOpt, false, Configuration.getResString(res_description));
+//	}
 
 	/**
 	 * Build the exception message from the specified list of options.

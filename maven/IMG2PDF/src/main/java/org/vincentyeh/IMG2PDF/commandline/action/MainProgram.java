@@ -31,7 +31,7 @@ public class MainProgram extends AbstractAction {
 
 //		Configuration.setLagugRes(ResourceBundle.getBundle("language_package", Locale.ROOT));
 
-        opt_help = createOption("h", "help", "root_help");
+        opt_help = PropertiesOption.getOption("h", "help", "root_help");
     }
 
     private final AbstractAction action;
@@ -78,7 +78,7 @@ public class MainProgram extends AbstractAction {
     private static Options getLocaleOptions() {
 
         Options options = new Options();
-        Option opt_mode = createEnumOption("m", "mode", "root_mode", ActionMode.class);
+        Option opt_mode = PropertiesOption.getArgumentOption("m", "mode", "root_mode", listEnum(ActionMode.class));
 //		opt_mode.setRequired(true);
         options.addOption(opt_mode);
         options.addOption(opt_help);
@@ -88,7 +88,7 @@ public class MainProgram extends AbstractAction {
 
     public static void main(String[] args) {
 //		dumpArray(args);
-        MainProgram main = null;
+        MainProgram main  ;
         try {
             main = new MainProgram(args);
         } catch (HelperException e) {
@@ -104,15 +104,6 @@ public class MainProgram extends AbstractAction {
         } catch (UnrecognizedOptionException e) {
 //		e.printStackTrace();
             System.err.println(createUnrecognizedOptionMessage(e.getOption()));
-            System.err.println(e.getMessage());
-            return;
-        } catch (ParseException e) {
-            System.err.println(e.getMessage());
-            return;
-        } catch (FileNotFoundException e) {
-            System.err.println(e.getMessage());
-            return;
-        } catch (RuntimeException e) {
             System.err.println(e.getMessage());
             return;
         } catch (Exception e) {
