@@ -1,6 +1,6 @@
 package org.vincentyeh.IMG2PDF.util;
 
-import org.vincentyeh.IMG2PDF.Configuration;
+import org.vincentyeh.IMG2PDF.SharedSpace;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -36,7 +36,7 @@ public class FileChecker {
     public static void checkExists(File raw) throws FileNotFoundException {
         if (!raw.exists())
             throw new FileNotFoundException(
-                    String.format(Configuration.getResString("err_filenotfound"), raw.getPath()));
+                    String.format(SharedSpace.getResString("err_filenotfound"), raw.getPath()));
     }
 
     public static void checkAbsolute(File raw) throws IOException {
@@ -48,7 +48,7 @@ public class FileChecker {
         checkAbsolute(file);
         boolean done=file.getParentFile().mkdirs();
         if (done) {
-            System.out.printf(Configuration.getResString("info_required_folder_created") + "\n", file.getParent());
+            System.out.printf(SharedSpace.getResString("info_required_folder_created") + "\n", file.getParent());
         }
         return done;
     }

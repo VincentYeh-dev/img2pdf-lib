@@ -1,7 +1,6 @@
 package org.vincentyeh.IMG2PDF;
 
 import org.junit.Assert;
-import org.junit.ComparisonFailure;
 import org.junit.Test;
 import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
 import org.vincentyeh.IMG2PDF.pdf.page.core.Position;
@@ -15,7 +14,7 @@ public class PositionCalculatorTester {
 //		Language Setting:
 
 //	Local:
-        Configuration.setLagugRes(ResourceBundle.getBundle("language_package", Locale.getDefault()));
+        SharedSpace.setLanguageRes(ResourceBundle.getBundle("language_package", Locale.getDefault()));
 //	root:
 
 //		Configuration.setLagugRes(ResourceBundle.getBundle("language_package", Locale.ROOT));

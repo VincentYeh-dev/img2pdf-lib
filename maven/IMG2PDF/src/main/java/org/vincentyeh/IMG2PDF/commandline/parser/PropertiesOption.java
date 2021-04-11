@@ -1,7 +1,7 @@
 package org.vincentyeh.IMG2PDF.commandline.parser;
 
 import org.apache.commons.cli.Option;
-import org.vincentyeh.IMG2PDF.Configuration;
+import org.vincentyeh.IMG2PDF.SharedSpace;
 
 public class PropertiesOption extends Option {
 //    private PropertiesOption(String opt, String description_res, Object... values) throws IllegalArgumentException {
@@ -13,7 +13,7 @@ public class PropertiesOption extends Option {
 //    }
 
     private PropertiesOption(String opt, String longOpt, boolean hasArg, String description_res,Object... values) throws IllegalArgumentException {
-        super(opt,longOpt, hasArg, String.format(Configuration.getResString(description_res), values));
+        super(opt,longOpt, hasArg, String.format(SharedSpace.getResString(description_res), values));
     }
 
     public static PropertiesOption getArgumentOption(String opt, String longOpt, String description_res,Object... values){

@@ -14,6 +14,7 @@ import org.jdom2.Element;
 import org.jdom2.input.DOMBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
 import org.vincentyeh.IMG2PDF.util.FileChecker;
 import org.xml.sax.InputSource;
@@ -21,7 +22,6 @@ import org.xml.sax.SAXException;
 
 public class TaskList extends ArrayList<Task> {
 
-    private static final Charset charset = StandardCharsets.UTF_8;
     private static final long serialVersionUID = 7305144027050402452L;
 
     public TaskList() {
@@ -65,7 +65,7 @@ public class TaskList extends ArrayList<Task> {
         Format format = Format.getPrettyFormat();
         outter.setFormat(format);
 
-        outter.output(doc, new OutputStreamWriter(new FileOutputStream(file), charset));
+        outter.output(doc, new OutputStreamWriter(new FileOutputStream(file), SharedSpace.Configuration.DEFAULT_CHARSET));
     }
 
     public Element toElement() {
@@ -83,7 +83,7 @@ public class TaskList extends ArrayList<Task> {
         // If want to make namespace aware.
         // factory.setNamespaceAware(true);
         DocumentBuilder documentBuilder = factory.newDocumentBuilder();
-        InputSource source = new InputSource(new InputStreamReader(new FileInputStream(xml_file), charset));
+        InputSource source = new InputSource(new InputStreamReader(new FileInputStream(xml_file), SharedSpace.Configuration.DEFAULT_CHARSET));
         org.w3c.dom.Document w3cDocument = documentBuilder.parse(source);
         return new DOMBuilder().build(w3cDocument);
     }

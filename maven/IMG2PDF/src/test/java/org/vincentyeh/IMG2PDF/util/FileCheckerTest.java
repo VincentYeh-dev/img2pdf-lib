@@ -1,7 +1,7 @@
 package org.vincentyeh.IMG2PDF.util;
 
 import org.junit.Test;
-import org.vincentyeh.IMG2PDF.Configuration;
+import org.vincentyeh.IMG2PDF.SharedSpace;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +14,7 @@ public class FileCheckerTest {
 //		Language Setting:
 
 //	Local:
-        Configuration.setLagugRes(ResourceBundle.getBundle("language_package", Locale.getDefault()));
+        SharedSpace.setLanguageRes(ResourceBundle.getBundle("language_package", Locale.getDefault()));
 //	root:
 
 //		Configuration.setLagugRes(ResourceBundle.getBundle("language_package", Locale.ROOT));
