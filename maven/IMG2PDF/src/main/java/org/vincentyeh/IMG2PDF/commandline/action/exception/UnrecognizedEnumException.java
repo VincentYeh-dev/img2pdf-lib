@@ -2,7 +2,7 @@ package org.vincentyeh.IMG2PDF.commandline.action.exception;
 
 import org.vincentyeh.IMG2PDF.SharedSpace;
 
-public class UnrecognizedEnumException extends RuntimeException {
+public class UnrecognizedEnumException extends IllegalArgumentException {
 
 	/**
 	 * 

@@ -16,6 +16,7 @@ import org.apache.commons.cli.ParseException;
 import org.vincentyeh.IMG2PDF.commandline.parser.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
+import org.vincentyeh.IMG2PDF.commandline.parser.HandledException;
 import org.vincentyeh.IMG2PDF.commandline.parser.PropertiesOption;
 import org.vincentyeh.IMG2PDF.converter.ConversionListener;
 import org.vincentyeh.IMG2PDF.converter.PDFConverter;
@@ -39,7 +40,7 @@ public class ConvertAction extends AbstractAction {
     private final File tempFolder;
     private final long maxMainMemoryBytes;
 
-    public ConvertAction(String[] args) throws ParseException, FileNotFoundException {
+    public ConvertAction(String[] args) throws ParseException, FileNotFoundException, HandledException {
         super(getLocaleOptions());
 
         CommandLine cmd = (new CheckHelpParser(opt_help)).parse(options, args);
@@ -52,11 +53,16 @@ public class ConvertAction extends AbstractAction {
         tempFolder = new File(cmd.getOptionValue("temp_folder", ".org.vincentyeh.IMG2PDF.tmp"));
         tempFolder.mkdirs();
 
-        maxMainMemoryBytes = BytesSize.parseString(cmd.getOptionValue("memory_max_usage", "50MB")).getBytes();
+        try {
+            maxMainMemoryBytes = BytesSize.parseString(cmd.getOptionValue("memory_max_usage", "50MB")).getBytes();
+        }catch (IllegalArgumentException e){
+            System.err.println(e.getMessage());
+            throw new HandledException();
+        }
 
         open_when_complete = cmd.hasOption("open_when_complete");
         overwrite_output = cmd.hasOption("overwrite");
-
+//      TODO:Create another method to contain code below.
         tasklist_sources = new File[str_sources.length];
         for (int i = 0; i < tasklist_sources.length; i++) {
             System.out.println(SharedSpace.getResString("source_tasklist_verifying"));
@@ -153,9 +159,7 @@ public class ConvertAction extends AbstractAction {
 
         Option opt_overwrite = PropertiesOption.getOption("ow", "overwrite", "help_convert_overwrite_output");
 
-//      TODO: change description
         Option opt_tmp_folder = PropertiesOption.getArgumentOption("tmp", "temp_folder", "help_convert_tmp_folder", ".org.vincentyeh.IMG2PDF.tmp");
-//      TODO: change description
         Option opt_max_memory_usage = PropertiesOption.getArgumentOption("mx", "memory_max_usage", "help_convert_memory_max_usage", "50MB");
 
         options.addOption(opt_help);

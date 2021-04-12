@@ -4,11 +4,10 @@ import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 
 public class DocumentAccessPermission extends AccessPermission{
 	
-	public DocumentAccessPermission() {
-		
-	}
 
-	public DocumentAccessPermission(String str) {
+
+	public DocumentAccessPermission(String str) throws IllegalArgumentException{
+//	    TODO:Check argument before new.
 		char[] permissions=str.toCharArray();
 		setCanPrint(permissions[0]!='0');
 		setCanModify(permissions[0]!='0');
