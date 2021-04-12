@@ -29,7 +29,7 @@ public class MainProgram extends AbstractAction {
 
     private final AbstractAction action;
 
-    public MainProgram(String[] args) throws ParseException, IOException {
+    public MainProgram(String[] args) throws ParseException, IOException, HandledException {
         super(getLocaleOptions());
 
         System.out.println("##IMG2PDF##");
@@ -97,6 +97,8 @@ public class MainProgram extends AbstractAction {
         } catch (UnrecognizedOptionException e) {
             System.err.println(createUnrecognizedOptionMessage(e.getOption()));
             System.err.println(e.getMessage());
+            return;
+        } catch (HandledException e) {
             return;
         } catch (Exception e) {
             e.printStackTrace();

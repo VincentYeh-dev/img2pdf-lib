@@ -62,23 +62,28 @@ public class CreateAction extends AbstractAction {
         opt_help = PropertiesOption.getOption("h", "help", "help_create");
     }
 
-    public CreateAction(String[] args) throws UnrecognizedEnumException, ParseException {
+    public CreateAction(String[] args) throws ParseException, HandledException {
         super(getLocaleOptions());
 
         CommandLine cmd = (new CheckHelpParser(opt_help)).parse(options, args);
 
         debug = cmd.hasOption("debug");
         overwrite_tasklist = cmd.hasOption("overwrite");
+        try{
+            pdf_size = PageSize.getByString(cmd.getOptionValue("pdf_size", DEF_PDF_SIZE));
 
-        pdf_size = PageSize.getByString(cmd.getOptionValue("pdf_size", DEF_PDF_SIZE));
+            pdf_align = new PageAlign(cmd.getOptionValue("pdf_align", DEF_PDF_ALIGN));
 
-        pdf_align = new PageAlign(cmd.getOptionValue("pdf_align", DEF_PDF_ALIGN));
+            pdf_direction = PageDirection.getByString(cmd.getOptionValue("pdf_direction", DEF_PDF_DIRECTION));
 
-        pdf_direction = PageDirection.getByString(cmd.getOptionValue("pdf_direction", DEF_PDF_DIRECTION));
+            pdf_sortby = Sortby.getByString(cmd.getOptionValue("pdf_sortby", DEFV_PDF_SORTBY));
 
-        pdf_sortby = Sortby.getByString(cmd.getOptionValue("pdf_sortby", DEFV_PDF_SORTBY));
+            pdf_sequence = Sequence.getByString(cmd.getOptionValue("pdf_sequence", DEFV_PDF_SEQUENCE));
 
-        pdf_sequence = Sequence.getByString(cmd.getOptionValue("pdf_sequence", DEFV_PDF_SEQUENCE));
+        }catch (UnrecognizedEnumException e){
+            System.err.println(e.getMessage());
+            throw new HandledException();
+        }
 
         pdf_permission = new DocumentAccessPermission(cmd.getOptionValue("pdf_permission", "11"));
 
@@ -95,8 +100,9 @@ public class CreateAction extends AbstractAction {
         try {
             ffh = new FileFilterHelper(cmd.getOptionValue("filter", DEFV_PDF_FILTER));
         } catch (UnsupportedOperationException e) {
-//            TODO:handle and throw HandledException
-            throw new RuntimeException(String.format(SharedSpace.getResString("err_filter"), e.getMessage()));
+            System.err.printf(SharedSpace.getResString("err_filter")+"\n",e.getMessage());
+            throw new HandledException();
+//            throw new RuntimeException(String.format(SharedSpace.getResString("err_filter"), e.getMessage()));
         }
 
         String[] str_sources = cmd.getOptionValues("source");

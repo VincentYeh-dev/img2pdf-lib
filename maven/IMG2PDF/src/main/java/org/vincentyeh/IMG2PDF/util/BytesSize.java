@@ -42,8 +42,7 @@ public class BytesSize {
         if (matcher.find()) {
             return new BytesSize(Integer.parseInt(matcher.group(1)),Suffix.getInstance(matcher.group(2)));
         }
-//        TODO:Write error message
-        throw new RuntimeException();
+        throw new IllegalArgumentException("Invalid format:"+raw);
     }
 
     public long getBytes() {
