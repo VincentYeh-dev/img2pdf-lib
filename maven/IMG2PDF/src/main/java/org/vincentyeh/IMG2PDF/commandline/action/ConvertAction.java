@@ -56,7 +56,7 @@ public class ConvertAction extends AbstractAction {
             maxMainMemoryBytes = BytesSize.parseString(cmd.getOptionValue("memory_max_usage", "50MB")).getBytes();
         } catch (IllegalArgumentException e) {
             System.err.println(e.getMessage());
-            throw new HandledException();
+            throw new HandledException(e,getClass());
         }
 
         open_when_complete = cmd.hasOption("open_when_complete");
@@ -65,7 +65,7 @@ public class ConvertAction extends AbstractAction {
             tasklist_sources = verifyFiles(str_sources);
         } catch (IOException e) {
             System.err.println(e.getMessage());
-            throw new HandledException();
+            throw new HandledException(e,getClass());
         }
 
     }
@@ -89,6 +89,7 @@ public class ConvertAction extends AbstractAction {
             for (Task task : tasks.getArray()) {
                 ImagesDocumentAdaptor result = null;
                 File dst = task.getDocumentArgument().getDestination();
+
                 if (!overwrite_output && dst.exists()) {
                     System.err.printf(SharedSpace.getResString("err_overwrite") + "\n", dst.getAbsolutePath());
                     continue;
