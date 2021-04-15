@@ -106,7 +106,12 @@ public class CreateAction extends AbstractAction {
         }
 
         String[] str_sources = cmd.getOptionValues("source");
-        this.dirlists = verifyAndImportSources(str_sources);
+        try {
+            this.dirlists = verifyFiles(str_sources);
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+            throw new HandledException();
+        }
 
         System.out.printf("### " + SharedSpace.getResString("tasklist_config")
                         + " ###\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s############\n",
@@ -236,39 +241,39 @@ public class CreateAction extends AbstractAction {
         return sb.toString();
     }
 
-    private File[] verifyAndImportSources(String[] strSources) {
-        if (strSources == null) {
-            throw new IllegalArgumentException("strSources==null");
-        }
-        if (strSources.length == 0) {
-            throw new IllegalArgumentException("strSources is empty");
-        }
-        System.out.println(SharedSpace.getResString("source_folder_verifying"));
-
-        ArrayList<File> verified_sources = new ArrayList<>();
-//        Directory List:
-        for (String str_source : strSources) {
-            File raw = (new File(str_source)).getAbsoluteFile();
-            System.out.printf("\t[" + SharedSpace.getResString("common_verifying") + "] %s\n", raw.getAbsolutePath());
-
-            System.out.print("\t");
-
-            try {
-                FileChecker.checkReadableFile(raw);
-
-                System.out.printf("[" + SharedSpace.getResString("common_verified") + "] %s\n",
-                        raw.getAbsolutePath());
-
-                verified_sources.add(raw);
-            } catch (IOException e) {
-                System.out.println(e.getMessage());
-            }
-        }
-
-        File[] sources = new File[verified_sources.size()];
-        verified_sources.toArray(sources);
-        return sources;
-    }
+//    private File[] verifyAndImportSources(String[] strSources) {
+//        if (strSources == null) {
+//            throw new IllegalArgumentException("strSources==null");
+//        }
+//        if (strSources.length == 0) {
+//            throw new IllegalArgumentException("strSources is empty");
+//        }
+//        System.out.println(SharedSpace.getResString("source_folder_verifying"));
+//
+//        ArrayList<File> verified_sources = new ArrayList<>();
+////        Directory List:
+//        for (String str_source : strSources) {
+//            File raw = (new File(str_source)).getAbsoluteFile();
+//            System.out.printf("\t[" + SharedSpace.getResString("common_verifying") + "] %s\n", raw.getAbsolutePath());
+//
+//            System.out.print("\t");
+//
+//            try {
+//                FileChecker.checkReadableFile(raw);
+//
+//                System.out.printf("[" + SharedSpace.getResString("common_verified") + "] %s\n",
+//                        raw.getAbsolutePath());
+//
+//                verified_sources.add(raw);
+//            } catch (IOException e) {
+//                System.out.println(e.getMessage());
+//            }
+//        }
+//
+//        File[] sources = new File[verified_sources.size()];
+//        verified_sources.toArray(sources);
+//        return sources;
+//    }
 
     private static Options getLocaleOptions() {
 

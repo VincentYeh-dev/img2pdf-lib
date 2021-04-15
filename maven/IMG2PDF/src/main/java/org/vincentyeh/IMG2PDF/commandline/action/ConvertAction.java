@@ -40,7 +40,7 @@ public class ConvertAction extends AbstractAction {
     private final File tempFolder;
     private final long maxMainMemoryBytes;
 
-    public ConvertAction(String[] args) throws ParseException, FileNotFoundException, HandledException {
+    public ConvertAction(String[] args) throws ParseException, HandledException {
         super(getLocaleOptions());
 
         CommandLine cmd = (new CheckHelpParser(opt_help)).parse(options, args);
@@ -55,32 +55,20 @@ public class ConvertAction extends AbstractAction {
 
         try {
             maxMainMemoryBytes = BytesSize.parseString(cmd.getOptionValue("memory_max_usage", "50MB")).getBytes();
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             System.err.println(e.getMessage());
             throw new HandledException();
         }
 
         open_when_complete = cmd.hasOption("open_when_complete");
         overwrite_output = cmd.hasOption("overwrite");
-//      TODO:Create another method to contain code below.
-        tasklist_sources = new File[str_sources.length];
-        for (int i = 0; i < tasklist_sources.length; i++) {
-            System.out.println(SharedSpace.getResString("source_tasklist_verifying"));
-            tasklist_sources[i] = new File(str_sources[i]);
-
-            System.out.println("\t[" + SharedSpace.getResString("common_verifying") + "] "
-                    + tasklist_sources[i].getAbsolutePath());
-            System.out.print("\t");
-            FileChecker.checkExists(tasklist_sources[i]);
-            if (!tasklist_sources[i].exists()) {
-//                throw new FileNotFoundException(String.format(SharedSpace.getResString("err_filenotfound"), tasklist_sources[i].getAbsolutePath()));
-            } else if (tasklist_sources[i].isDirectory()) {
-                throw new RuntimeException(String.format(SharedSpace.getResString("err_path_is_folder"), tasklist_sources[i].getAbsolutePath()));
-            }
-            System.out.println("[" + SharedSpace.getResString("common_verified") + "] "
-                    + tasklist_sources[i].getAbsolutePath());
-
+        try {
+            tasklist_sources = verifyFiles(str_sources);
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+            throw new HandledException();
         }
+
     }
 
     @Override
@@ -211,15 +199,12 @@ public class ConvertAction extends AbstractAction {
         public void onConversionFail(int index, Exception e) {
             System.out.print("CONVERSION FAIL]\n\n");
             System.err.println(e.getMessage());
-//			e.printStackTrace();
-
         }
 
         @Override
         public void onImageReadFail(int index, IOException e) {
             System.out.print("IMAGE READ FAIL]\n\n");
             System.err.println(e.getMessage());
-//			e.printStackTrace();
         }
 
     };
