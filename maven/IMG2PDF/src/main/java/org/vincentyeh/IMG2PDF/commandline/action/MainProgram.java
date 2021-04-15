@@ -20,7 +20,7 @@ public class MainProgram extends AbstractAction {
     private static final Option opt_help;
 
     static {
-        opt_help = PropertiesOption.getOption("h", "help", "root_help");
+        opt_help = PropertiesOption.getOption("h", "help", "main.help");
     }
 
     private final AbstractAction action;
@@ -29,8 +29,8 @@ public class MainProgram extends AbstractAction {
         super(getLocaleOptions());
 
         System.out.println("##IMG2PDF##");
-        System.out.printf("%s: %s", SharedSpace.getResString("common_developer"), SharedSpace.Configuration.DEVELOPER);
-        System.out.printf("\n%s: %s\n", SharedSpace.getResString("common_version"), SharedSpace.Configuration.PROGRAM_VER);
+        System.out.printf("%s: %s", SharedSpace.getResString("public.info.developer"), SharedSpace.Configuration.DEVELOPER);
+        System.out.printf("\n%s: %s\n", SharedSpace.getResString("public.info.version"), SharedSpace.Configuration.PROGRAM_VER);
         System.out.println("-----------------------");
 
         CommandLine mode_chooser = (new RelaxedParser()).parse(options, args);
@@ -67,7 +67,7 @@ public class MainProgram extends AbstractAction {
     private static Options getLocaleOptions() {
 
         Options options = new Options();
-        Option opt_mode = PropertiesOption.getArgumentOption("m", "mode", "root_mode", listEnum(ActionMode.class));
+        Option opt_mode = PropertiesOption.getArgumentOption("m", "mode", "main.arg.mode.help", listEnum(ActionMode.class));
         options.addOption(opt_mode);
         options.addOption(opt_help);
 
