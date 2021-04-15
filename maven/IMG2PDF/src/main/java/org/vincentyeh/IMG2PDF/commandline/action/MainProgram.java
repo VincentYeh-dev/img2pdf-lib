@@ -1,8 +1,5 @@
 package org.vincentyeh.IMG2PDF.commandline.action;
 
-import java.io.IOException;
-import java.util.Locale;
-import java.util.ResourceBundle;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
@@ -14,7 +11,6 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
-import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
 import org.vincentyeh.IMG2PDF.commandline.parser.HandledException;
 import org.vincentyeh.IMG2PDF.commandline.parser.PropertiesOption;
 import org.vincentyeh.IMG2PDF.commandline.parser.RelaxedParser;
@@ -29,7 +25,7 @@ public class MainProgram extends AbstractAction {
 
     private final AbstractAction action;
 
-    public MainProgram(String[] args) throws ParseException, IOException, HandledException {
+    public MainProgram(String[] args) throws ParseException, HandledException {
         super(getLocaleOptions());
 
         System.out.println("##IMG2PDF##");
@@ -72,7 +68,6 @@ public class MainProgram extends AbstractAction {
 
         Options options = new Options();
         Option opt_mode = PropertiesOption.getArgumentOption("m", "mode", "root_mode", listEnum(ActionMode.class));
-//		opt_mode.setRequired(true);
         options.addOption(opt_mode);
         options.addOption(opt_help);
 
@@ -80,7 +75,6 @@ public class MainProgram extends AbstractAction {
     }
 
     public static void main(String[] args) {
-//		dumpArray(args);
         MainProgram main;
         try {
             main = new MainProgram(args);
@@ -99,6 +93,7 @@ public class MainProgram extends AbstractAction {
             System.err.println(e.getMessage());
             return;
         } catch (HandledException e) {
+            System.err.println(e.getMessage());
             return;
         } catch (Exception e) {
             e.printStackTrace();
@@ -109,19 +104,20 @@ public class MainProgram extends AbstractAction {
             main.start();
         } catch (HandledException e) {
 //            do nothing
+            System.err.println(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static <T> void dumpArray(T[] array) {
-        System.out.print("[");
-        System.out.print(array[0]);
-        for (int i = 1; i < array.length; i++) {
-            System.out.print(",");
-            System.out.print(array[i]);
-        }
-        System.out.print("]\n");
-    }
+//    public static <T> void dumpArray(T[] array) {
+//        System.out.print("[");
+//        System.out.print(array[0]);
+//        for (int i = 1; i < array.length; i++) {
+//            System.out.print(",");
+//            System.out.print(array[i]);
+//        }
+//        System.out.print("]\n");
+//    }
 
 }
