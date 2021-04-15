@@ -26,6 +26,8 @@ import org.vincentyeh.IMG2PDF.util.BytesSize;
 import org.vincentyeh.IMG2PDF.util.FileChecker;
 
 public class ConvertAction extends AbstractAction {
+    private static final String DEFAULT_TEMP_FOLDER=".org.vincentyeh.IMG2PDF.tmp";
+    private static final String DEFAULT_MAX_MEMORY_USAGE="50MB";
 
     protected final File[] tasklist_sources;
     protected final boolean open_when_complete;
@@ -49,11 +51,11 @@ public class ConvertAction extends AbstractAction {
 
         String[] str_sources = cmd.getOptionValues("tasklist_source");
 
-        tempFolder = new File(cmd.getOptionValue("temp_folder", ".org.vincentyeh.IMG2PDF.tmp"));
+        tempFolder = new File(cmd.getOptionValue("temp_folder", DEFAULT_TEMP_FOLDER));
         tempFolder.mkdirs();
 
         try {
-            maxMainMemoryBytes = BytesSize.parseString(cmd.getOptionValue("memory_max_usage", "50MB")).getBytes();
+            maxMainMemoryBytes = BytesSize.parseString(cmd.getOptionValue("memory_max_usage", DEFAULT_MAX_MEMORY_USAGE)).getBytes();
         } catch (IllegalArgumentException e) {
             System.err.println(e.getMessage());
             throw new HandledException(e,getClass());
