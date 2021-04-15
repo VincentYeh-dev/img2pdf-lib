@@ -3,16 +3,12 @@
 ## 環境
 ### 開發環境
 
-#### 已棄用
-- eclipse java-2020-12
-    - [ResourceBundle Editor 1.0.5](https://marketplace.eclipse.org/content/resourcebundle-editor)
-- jdk-15.0.2
-- jre1.8.0_281
-
 #### 使用中
 - IntelliJ IDEA Community Edition 2020.3.2 x64
     - [PlantUML integration](https://plugins.jetbrains.com/plugin/7017-plantuml-integration)
     - [PlantUML Parser](https://plugins.jetbrains.com/plugin/index?xmlId=plantuml-parser)
+    - [IdeaVim](https://plugins.jetbrains.com/plugin/164-ideavim)
+    - [IntelliJ IDEA Properties Sorter](https://plugins.jetbrains.com/plugin/9883-intellij-idea-properties-sorter)
 - jdk-15.0.2
 - jre1.8.0_281
 
