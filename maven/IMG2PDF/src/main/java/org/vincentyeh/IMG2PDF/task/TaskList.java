@@ -1,8 +1,6 @@
 package org.vincentyeh.IMG2PDF.task;
 
 import java.io.*;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -20,9 +18,8 @@ import org.vincentyeh.IMG2PDF.util.FileChecker;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-public class TaskList extends ArrayList<Task> {
-
-    private static final long serialVersionUID = 7305144027050402452L;
+public class TaskList {
+    private final ArrayList<Task> arrayList = new ArrayList<>();
 
     public TaskList() {
 
@@ -44,36 +41,36 @@ public class TaskList extends ArrayList<Task> {
         }
     }
 
-    /**
-     * Write XML Element to the file.
-     *
-     * @param file destination of output XML file.
-     * @throws IOException
-     */
     public void toXMLFile(File file) throws IOException {
         FileChecker.makeParentDirsIfNotExists(file);
         FileChecker.checkWritableFile(file);
-//
-//        if (file.getParentFile().mkdirs()) {
-//            System.out.printf(Configuration.getResString("info_required_folder_created") + "\n", file.getParent());
-//        }
 
         Document doc = new Document();
         Element root = toElement();
         doc.setRootElement(root);
-        XMLOutputter outter = new XMLOutputter();
+        XMLOutputter outer = new XMLOutputter();
         Format format = Format.getPrettyFormat();
-        outter.setFormat(format);
+        outer.setFormat(format);
 
-        outter.output(doc, new OutputStreamWriter(new FileOutputStream(file), SharedSpace.Configuration.DEFAULT_CHARSET));
+        outer.output(doc, new OutputStreamWriter(new FileOutputStream(file), SharedSpace.Configuration.DEFAULT_CHARSET));
     }
 
     public Element toElement() {
         Element root = new Element("TASKLIST");
-        for (Task task : this) {
+        for (Task task : arrayList) {
             root.addContent(task.toElement());
         }
         return root;
+    }
+
+    public void add(Task task) {
+        arrayList.add(task);
+    }
+
+    public Task[] getArray() {
+        Task[] array=new Task[arrayList.size()];
+        arrayList.toArray(array);
+        return array;
     }
 
     private static Document getDOMParsedDocument(final File xml_file)

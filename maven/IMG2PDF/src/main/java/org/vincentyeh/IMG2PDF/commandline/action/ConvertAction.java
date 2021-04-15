@@ -2,7 +2,6 @@ package org.vincentyeh.IMG2PDF.commandline.action;
 
 import java.awt.Desktop;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -87,7 +86,7 @@ public class ConvertAction extends AbstractAction {
             System.out.println(SharedSpace.getResString("common_start_conversion"));
 
             ExecutorService executor = Executors.newSingleThreadExecutor();
-            for (Task task : tasks) {
+            for (Task task : tasks.getArray()) {
                 ImagesDocumentAdaptor result = null;
                 File dst = task.getDocumentArgument().getDestination();
                 if (!overwrite_output && dst.exists()) {
