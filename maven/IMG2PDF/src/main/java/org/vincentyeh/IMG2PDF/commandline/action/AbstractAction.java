@@ -65,16 +65,12 @@ public abstract class AbstractAction implements Action {
 
             System.out.print("\t");
 
-//            try {
             FileChecker.checkReadableFile(raw);
 
             System.out.printf("[" + SharedSpace.getResString("common_verified") + "] %s\n",
                     raw.getAbsolutePath());
 
             verified_sources.add(raw);
-//            } catch (IOException e) {
-//                System.out.println(e.getMessage());
-//            }
         }
 
         File[] sources = new File[verified_sources.size()];
