@@ -26,7 +26,7 @@ public abstract class AbstractAction implements Action {
      * @param missingOptions the list of missing options and groups
      */
     protected static String createMissingOptionsMessage(List<?> missingOptions) {
-        StringBuilder buf = new StringBuilder(SharedSpace.getResString("err_missing_option"));
+        StringBuilder buf = new StringBuilder(SharedSpace.getResString("argperser.err.missing_option"));
         buf.append(": ");
 
         Iterator<?> it = missingOptions.iterator();
@@ -41,11 +41,11 @@ public abstract class AbstractAction implements Action {
     }
 
     protected static String createMissingArgumentOptionsMessage(Option option) {
-        return String.format(SharedSpace.getResString("err_missing_argument_option"), option.getOpt());
+        return String.format(SharedSpace.getResString("argperser.err.missing_argument_option"), option.getOpt());
     }
 
     protected static String createUnrecognizedOptionMessage(String option) {
-        return String.format(SharedSpace.getResString("err_unrecognized_argument_option"), option);
+        return String.format(SharedSpace.getResString("public.err.unrecognized_argument_option"), option);
     }
 
     protected File[] verifyFiles(String[] strSources) throws IOException {
@@ -61,13 +61,13 @@ public abstract class AbstractAction implements Action {
         ArrayList<File> verified_sources = new ArrayList<>();
         for (String str_source : strSources) {
             File raw = (new File(str_source)).getAbsoluteFile();
-            System.out.printf("\t[" + SharedSpace.getResString("common_verifying") + "] %s\n", raw.getAbsolutePath());
+            System.out.printf("\t[" + SharedSpace.getResString("public.info.verifying") + "] %s\n", raw.getAbsolutePath());
 
             System.out.print("\t");
 
             FileChecker.checkReadableFile(raw);
 
-            System.out.printf("[" + SharedSpace.getResString("common_verified") + "] %s\n",
+            System.out.printf("[" + SharedSpace.getResString("public.info.verified") + "] %s\n",
                     raw.getAbsolutePath());
 
             verified_sources.add(raw);

@@ -35,7 +35,7 @@ public class ConvertAction extends AbstractAction {
     private static final Option opt_help;
 
     static {
-        opt_help = PropertiesOption.getOption("h", "help", "help_convert");
+        opt_help = PropertiesOption.getOption("h", "help", "convert.help");
     }
 
     private final File tempFolder;
@@ -74,18 +74,18 @@ public class ConvertAction extends AbstractAction {
 
     @Override
     public void start() throws Exception {
-        System.out.println(SharedSpace.getResString("import_tasklists"));
+        System.out.println(SharedSpace.getResString("convert.import_tasklists"));
         for (File src : tasklist_sources) {
             System.out.print(
-                    "\t[" + SharedSpace.getResString("common_importing") + "] " + src.getAbsolutePath() + "\n");
+                    "\t[" + SharedSpace.getResString("public.info.importing") + "] " + src.getAbsolutePath() + "\n");
             System.out.print("\t");
 
             TaskList tasks = new TaskList(src);
 
             System.out
-                    .print("[" + SharedSpace.getResString("common_imported") + "] " + src.getAbsolutePath() + "\n");
+                    .print("[" + SharedSpace.getResString("public.info.imported") + "] " + src.getAbsolutePath() + "\n");
 
-            System.out.println(SharedSpace.getResString("common_start_conversion"));
+            System.out.println(SharedSpace.getResString("convert.start_conversion"));
 
             ExecutorService executor = Executors.newSingleThreadExecutor();
             for (Task task : tasks.getArray()) {
@@ -93,7 +93,7 @@ public class ConvertAction extends AbstractAction {
                 File dst = task.getDocumentArgument().getDestination();
 
                 if (!overwrite_output && dst.exists()) {
-                    System.err.printf(SharedSpace.getResString("err_overwrite") + "\n", dst.getAbsolutePath());
+                    System.err.printf(SharedSpace.getResString("public.err.overwrite") + "\n", dst.getAbsolutePath());
                     continue;
                 }
 
@@ -142,15 +142,15 @@ public class ConvertAction extends AbstractAction {
 
     private static Options getLocaleOptions() {
         Options options = new Options();
-        Option opt_tasklist_source = PropertiesOption.getArgumentOption("lsrc", "tasklist_source", "help_convert_tasklist_source");
+        Option opt_tasklist_source = PropertiesOption.getArgumentOption("lsrc", "tasklist_source", "convert.arg.tasklist_source.help");
         opt_tasklist_source.setRequired(true);
 
-        Option opt_open_when_complete = PropertiesOption.getOption("o", "open_when_complete", "help_convert_open_when_complete");
+        Option opt_open_when_complete = PropertiesOption.getOption("o", "open_when_complete", "convert.arg.open_when_complete.help");
 
-        Option opt_overwrite = PropertiesOption.getOption("ow", "overwrite", "help_convert_overwrite_output");
+        Option opt_overwrite = PropertiesOption.getOption("ow", "overwrite", "convert.arg.overwrite_output.help");
 
-        Option opt_tmp_folder = PropertiesOption.getArgumentOption("tmp", "temp_folder", "help_convert_tmp_folder", ".org.vincentyeh.IMG2PDF.tmp");
-        Option opt_max_memory_usage = PropertiesOption.getArgumentOption("mx", "memory_max_usage", "help_convert_memory_max_usage", "50MB");
+        Option opt_tmp_folder = PropertiesOption.getArgumentOption("tmp", "temp_folder", "convert.arg.tmp_folder.help", ".org.vincentyeh.IMG2PDF.tmp");
+        Option opt_max_memory_usage = PropertiesOption.getArgumentOption("mx", "memory_max_usage", "convert.arg.memory_max_usage.help", "50MB");
 
         options.addOption(opt_help);
         options.addOption(opt_tasklist_source);
@@ -173,11 +173,11 @@ public class ConvertAction extends AbstractAction {
         public void onConversionPreparing(Task task) {
             int size_of_imgs = task.getImgs().length;
             perImg = (10. / size_of_imgs);
-            System.out.printf("\t###%s###\n", SharedSpace.getResString("pdf_conversion_task"));
-            System.out.printf("\t%s:%s\n", SharedSpace.getResString("arg_pdf_dst"), task.getDocumentArgument().getDestination());
-            System.out.printf("\t%s:%s\n", SharedSpace.getResString("common_name"),
+            System.out.printf("\t###%s###\n", SharedSpace.getResString("convert.pdf_conversion_task"));
+            System.out.printf("\t%s:%s\n", SharedSpace.getResString("create.arg.pdf_destination.name"), task.getDocumentArgument().getDestination());
+            System.out.printf("\t%s:%s\n", SharedSpace.getResString("public.info.name"),
                     new File(task.getDocumentArgument().getDestination().getName()));
-            System.out.printf("\t%s->", SharedSpace.getResString("common_progress"));
+            System.out.printf("\t%s->", SharedSpace.getResString("public.info.progress"));
             System.out.print("0%[");
 
         }

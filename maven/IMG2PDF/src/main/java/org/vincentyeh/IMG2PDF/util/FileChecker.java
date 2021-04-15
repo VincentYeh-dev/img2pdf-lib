@@ -36,7 +36,7 @@ public class FileChecker {
     public static void checkExists(File raw) throws FileNotFoundException {
         if (!raw.exists())
             throw new FileNotFoundException(
-                    String.format(SharedSpace.getResString("err_filenotfound"), raw.getPath()));
+                    String.format(SharedSpace.getResString("public.err.filenotfound"), raw.getPath()));
     }
 
     public static void checkAbsolute(File raw) throws IOException {
@@ -48,7 +48,7 @@ public class FileChecker {
         checkAbsolute(file);
         boolean done=file.getParentFile().mkdirs();
         if (done) {
-            System.out.printf(SharedSpace.getResString("info_required_folder_created") + "\n", file.getParent());
+            System.out.printf(SharedSpace.getResString("public.info.required_folder_created") + "\n", file.getParent());
         }
         return done;
     }

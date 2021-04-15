@@ -60,7 +60,7 @@ public class CreateAction extends AbstractAction {
     private static final Option opt_help;
 
     static {
-        opt_help = PropertiesOption.getOption("h", "help", "help_create");
+        opt_help = PropertiesOption.getOption("h", "help", "create.help");
     }
 
     public CreateAction(String[] args) throws ParseException, HandledException {
@@ -103,7 +103,7 @@ public class CreateAction extends AbstractAction {
         try {
             ffh = new FileFilterHelper(cmd.getOptionValue("filter", DEFAULT_PDF_FILTER));
         } catch (UnsupportedOperationException e) {
-            System.err.printf(SharedSpace.getResString("err_filter") + "\n", e.getMessage());
+            System.err.printf(SharedSpace.getResString("create.err.filter") + "\n", e.getMessage());
             throw new HandledException(e,getClass());
         }
 
@@ -115,22 +115,22 @@ public class CreateAction extends AbstractAction {
             throw new HandledException(e,getClass());
         }
 
-        System.out.printf("### " + SharedSpace.getResString("tasklist_config")
+        System.out.printf("### " + SharedSpace.getResString("create.tasklist_config")
                         + " ###\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s############\n",
 //
-                SharedSpace.getResString("arg_align"), pdf_align,
+                SharedSpace.getResString("create.arg.pdf_align.name"), pdf_align,
 //
-                SharedSpace.getResString("arg_size"), pdf_size,
+                SharedSpace.getResString("create.arg.pdf_size.name"), pdf_size,
 //
-                SharedSpace.getResString("arg_direction"), pdf_direction,
+                SharedSpace.getResString("create.arg.pdf_direction.name"), pdf_direction,
 //
-                SharedSpace.getResString("arg_auto_rotate"), pdf_auto_rotate,
+                SharedSpace.getResString("create.arg.pdf_auto_rotate.name"), pdf_auto_rotate,
 //
-                SharedSpace.getResString("arg_filter"), ffh.getOperator(),
+                SharedSpace.getResString("create.arg.filter.name"), ffh.getOperator(),
 //
-                SharedSpace.getResString("arg_tasklist_dst"), list_destination,
+                SharedSpace.getResString("create.arg.list_destination.name"), list_destination,
 //
-                SharedSpace.getResString("arg_source"), dumpArrayString(dirlists)
+                SharedSpace.getResString("create.arg.source.name"), dumpArrayString(dirlists)
 //
         );
     }
@@ -142,7 +142,7 @@ public class CreateAction extends AbstractAction {
         for (File dirlist : dirlists) {
 //          In dirlist
             FileChecker.checkReadableFile(dirlist);
-            System.out.printf(SharedSpace.getResString("import_from_list") + "\n", dirlist.getName());
+            System.out.printf(SharedSpace.getResString("create.import_from_list") + "\n", dirlist.getName());
 
             List<String> lines = Files.readAllLines(dirlist.toPath(), SharedSpace.Configuration.DEFAULT_CHARSET);
             for (int line_counter = 0; line_counter < lines.size(); line_counter++) {
@@ -165,40 +165,40 @@ public class CreateAction extends AbstractAction {
 
 
                 if (!dir.exists()) {
-                    RuntimeException e=new RuntimeException(String.format(SharedSpace.getResString("err_source_filenotfound") + "\n", dirlist.getName(),
+                    RuntimeException e=new RuntimeException(String.format(SharedSpace.getResString("create.err.source_filenotfound") + "\n", dirlist.getName(),
                             line_counter, dir.getAbsolutePath()));
                     System.err.println(e.getMessage());
                     throw new HandledException(e,getClass());
                 }
 
                 if (dir.isFile()) {
-                    RuntimeException e=new RuntimeException(String.format(SharedSpace.getResString("err_source_path_is_file") + "\n", dirlist.getName(),
+                    RuntimeException e=new RuntimeException(String.format(SharedSpace.getResString("create.err.source_path_is_file") + "\n", dirlist.getName(),
                             line_counter, dir.getAbsolutePath()));
                     System.err.println(e.getMessage());
                     throw new HandledException(e,getClass());
                 }
 
-                System.out.printf("\t[" + SharedSpace.getResString("common_importing") + "] %s\n",
+                System.out.printf("\t[" + SharedSpace.getResString("public.info.importing") + "] %s\n",
                         dir.getAbsolutePath());
 
                 tasks.add(mergeArgumentsToTask(dir));
 
-                System.out.printf("\t[" + SharedSpace.getResString("common_imported") + "] %s\n",
+                System.out.printf("\t[" + SharedSpace.getResString("public.info.imported") + "] %s\n",
                         dir.getAbsolutePath());
             }
 
         }
         if (!overwrite_tasklist && list_dst.exists()) {
-            RuntimeException e=new RuntimeException(String.format(SharedSpace.getResString("err_overwrite") + "\n", list_dst.getAbsolutePath()));
+            RuntimeException e=new RuntimeException(String.format(SharedSpace.getResString("public.err.overwrite") + "\n", list_dst.getAbsolutePath()));
             System.err.println(e.getMessage());
             throw new HandledException(e,getClass());
         }
 
         try {
             tasks.toXMLFile(list_dst);
-            System.out.printf("[" + SharedSpace.getResString("common_exported") + "] %s\n", list_dst.getAbsolutePath());
+            System.out.printf("[" + SharedSpace.getResString("public.info.exported") + "] %s\n", list_dst.getAbsolutePath());
         } catch (IOException e) {
-            IOException e2=new IOException(String.format(SharedSpace.getResString("err_tasklist_create") + "\n", e.getMessage()));
+            IOException e2=new IOException(String.format(SharedSpace.getResString("create.err.tasklist_create") + "\n", e.getMessage()));
             System.err.println(e2.getMessage());
             throw new HandledException(e2,getClass());
         }
@@ -252,31 +252,31 @@ public class CreateAction extends AbstractAction {
 
     private static Options getLocaleOptions() {
         Options options = new Options();
-        Option opt_debug = PropertiesOption.getOption("d", "debug", "help_create_debug");
-        Option opt_overwrite = PropertiesOption.getOption("ow", "overwrite", "help_create_overwrite_tasklist");
+        Option opt_debug = PropertiesOption.getOption("d", "debug", "create.arg.debug.help");
+        Option opt_overwrite = PropertiesOption.getOption("ow", "overwrite", "create.arg.overwrite_tasklist.help");
 
-        Option opt_pdf_size = PropertiesOption.getArgumentOption("pz", "pdf_size", "help_create_pdf_size", listEnum(PageSize.class));
-        Option opt_pdf_align = PropertiesOption.getArgumentOption("pa", "pdf_align", "help_create_pdf_align");
-        Option opt_pdf_direction = PropertiesOption.getArgumentOption("pdi", "pdf_direction", "help_create_pdf_direction",
+        Option opt_pdf_size = PropertiesOption.getArgumentOption("pz", "pdf_size", "create.arg.pdf_size.help", listEnum(PageSize.class));
+        Option opt_pdf_align = PropertiesOption.getArgumentOption("pa", "pdf_align", "create.arg.pdf_align.help");
+        Option opt_pdf_direction = PropertiesOption.getArgumentOption("pdi", "pdf_direction", "create.arg.pdf_direction.help",
                 listEnum(PageDirection.class));
-        Option opt_pdf_auto_rotate = PropertiesOption.getOption("par", "pdf_auto_rotate", "help_create_pdf_auto_rotate");
-        Option opt_pdf_sortby = PropertiesOption.getArgumentOption("ps", "pdf_sortby", "help_create_pdf_sortby", listEnum(Sortby.class));
-        Option opt_pdf_sequence = PropertiesOption.getArgumentOption("pseq", "pdf_sequence", "help_create_pdf_sequence", listEnum(Sequence.class));
+        Option opt_pdf_auto_rotate = PropertiesOption.getOption("par", "pdf_auto_rotate", "create.arg.pdf_auto_rotate.help");
+        Option opt_pdf_sortby = PropertiesOption.getArgumentOption("ps", "pdf_sortby", "create.arg.pdf_sortby.help", listEnum(Sortby.class));
+        Option opt_pdf_sequence = PropertiesOption.getArgumentOption("pseq", "pdf_sequence", "create.arg.pdf_sequence.help", listEnum(Sequence.class));
         Option opt_pdf_owner_password = PropertiesOption.getArgumentOption("popwd", "pdf_owner_password",
-                "help_create_pdf_owner_password");
-        Option opt_pdf_user_password = PropertiesOption.getArgumentOption("pupwd", "pdf_user_password", "help_create_pdf_user_password");
+                "create.arg.pdf_owner_password.help");
+        Option opt_pdf_user_password = PropertiesOption.getArgumentOption("pupwd", "pdf_user_password", "create.arg.pdf_user_password.help");
 
-        Option opt_pdf_permission = PropertiesOption.getArgumentOption("pp", "pdf_permission", "help_create_pdf_permission");
+        Option opt_pdf_permission = PropertiesOption.getArgumentOption("pp", "pdf_permission", "create.arg.pdf_permission.help");
 
-        Option opt_pdf_destination = PropertiesOption.getArgumentOption("pdst", "pdf_destination", "help_create_pdf_destination");
+        Option opt_pdf_destination = PropertiesOption.getArgumentOption("pdst", "pdf_destination", "create.arg.pdf_destination.help");
         opt_pdf_destination.setRequired(true);
 
-        Option opt_filter = PropertiesOption.getArgumentOption("f", "filter", "help_create_filter");
+        Option opt_filter = PropertiesOption.getArgumentOption("f", "filter", "create.arg.filter.help");
 
-        Option opt_sources = PropertiesOption.getArgumentOption("src", "source", "help_create_source");
+        Option opt_sources = PropertiesOption.getArgumentOption("src", "source", "create.arg.source.help");
         opt_sources.setRequired(true);
 
-        Option opt_list_destination = PropertiesOption.getArgumentOption("ldst", "list_destination", "help_create_list_destination");
+        Option opt_list_destination = PropertiesOption.getArgumentOption("ldst", "list_destination", "create.arg.list_destination.help");
         opt_list_destination.setRequired(true);
 
         options.addOption(opt_debug);
