@@ -38,12 +38,9 @@ public class ImagePageConverter implements Callable<PDPage> {
 
     @Override
     public PDPage call() throws Exception {
-        final BufferedImage imageOut;
-        final Size img_size;
-        final Position position;
-        final Size page_size;
         final PDPage page = new PDPage();
 
+        final Size page_size;
         if (argument.getSize() == PageSize.DEPEND_ON_IMG) {
             page_size = new Size(rawImage.getHeight(), rawImage.getWidth());
 
@@ -53,6 +50,10 @@ public class ImagePageConverter implements Callable<PDPage> {
         }
 
         page.setMediaBox(new PDRectangle(page_size.getWidth(), page_size.getHeight()));
+
+        final Size img_size;
+        final Position position;
+        final BufferedImage imageOut;
 
         if (argument.getSize() == PageSize.DEPEND_ON_IMG) {
             img_size = new Size(rawImage.getHeight(), rawImage.getWidth());

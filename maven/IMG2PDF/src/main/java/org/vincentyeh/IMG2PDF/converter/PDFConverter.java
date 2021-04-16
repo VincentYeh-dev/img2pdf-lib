@@ -109,7 +109,7 @@ public class PDFConverter implements Callable<File> {
         FileChecker.makeParentDirsIfNotExists(task.getDocumentArgument().getDestination());
         FileChecker.checkWritableFile(task.getDocumentArgument().getDestination());
         document.save(task.getDocumentArgument().getDestination());
-
+        document.close();
         executor.shutdown();
         return task.getDocumentArgument().getDestination();
     }
