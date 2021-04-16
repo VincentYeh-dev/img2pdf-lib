@@ -42,30 +42,26 @@ public class CustomConversionListener implements ConversionListener {
             progress -= 1;
             counter++;
         }
-//        TODO:Add to language pack.
-        System.out.printf("\t[%s] %d/%d images added. %s\r",new String(progress_bar),index+1,total,file.getName());
+        System.out.printf("\t"+SharedSpace.getResString("convert.listener.converting")+"\r",new String(progress_bar),index+1,total,file.getName());
     }
 
     @Override
     public void onConversionComplete(File dst) {
 
-//        TODO:Add to language pack.
-        System.out.printf("\tDONE!! %s\r\n",dst.getPath());
+        System.out.printf("\t"+SharedSpace.getResString("convert.listener.done")+"\r\n",dst.getPath());
         counter=total=0;
     }
 
 
     @Override
     public void onConversionFail(int index, Exception e) {
-//        TODO:Add to language pack.
-        System.out.printf("\tConversion Fail!! %s\r\n",e.getMessage());
+        System.out.printf("\t"+SharedSpace.getResString("convert.listener.err.image")+"\r\n",e.getMessage());
         counter=total=0;
     }
 
     @Override
     public void onImageReadFail(int index,File image ,IOException e) {
-//        TODO:Add to language pack.
-        System.out.printf("\tImage Read Fail!! %s : %s\r\n",image.getPath(),e.getMessage());
+        System.out.printf("\t"+SharedSpace.getResString("convert.listener.err.conversion")+"\r\n",image.getPath(),e.getMessage());
         counter=total=0;
     }
 

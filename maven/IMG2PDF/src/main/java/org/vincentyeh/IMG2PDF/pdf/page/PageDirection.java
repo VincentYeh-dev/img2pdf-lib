@@ -1,7 +1,5 @@
 package org.vincentyeh.IMG2PDF.pdf.page;
 
-import java.awt.image.BufferedImage;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
 
 /**
