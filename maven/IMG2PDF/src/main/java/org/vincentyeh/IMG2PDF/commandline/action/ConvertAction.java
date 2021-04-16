@@ -83,6 +83,7 @@ public class ConvertAction extends AbstractAction {
             System.out
                     .print("[" + SharedSpace.getResString("public.info.imported") + "] " + src.getAbsolutePath() + "\n");
 
+            System.out.println();
             System.out.println(SharedSpace.getResString("convert.start_conversion"));
 
             ExecutorService executor = Executors.newSingleThreadExecutor();
