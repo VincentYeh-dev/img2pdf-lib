@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.util.concurrent.Callable;
 
 import org.apache.pdfbox.io.MemoryUsageSetting;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.vincentyeh.IMG2PDF.pdf.doc.ImagesDocumentAdaptor;
 import org.vincentyeh.IMG2PDF.pdf.page.ImagePageAdaptor;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.util.FileChecker;
@@ -21,9 +21,9 @@ import javax.imageio.ImageIO;
  *
  * @author VincentYeh
  */
-public class PDFConverter implements Callable<ImagesDocumentAdaptor> {
+public class PDFConverter implements Callable<File> {
 
-    private final ImagesDocumentAdaptor documentAdaptor;
+    private final PDDocument document;
     private ConversionListener listener;
     private final Task task;
 
@@ -33,18 +33,18 @@ public class PDFConverter implements Callable<ImagesDocumentAdaptor> {
      * @param task
      * @throws IOException
      */
-    public PDFConverter(Task task,long maxMainMemoryBytes,File tempFolder) throws IOException {
+    public PDFConverter(Task task, long maxMainMemoryBytes, File tempFolder) throws IOException {
         if (task == null)
             throw new NullPointerException("task is null.");
-        if(tempFolder==null)
+        if (tempFolder == null)
             throw new IllegalArgumentException("tempFolder is null");
         FileChecker.checkWritableFolder(tempFolder);
 
         this.task = task;
         MemoryUsageSetting memoryUsageSetting = MemoryUsageSetting.setupMixed(maxMainMemoryBytes).setTempDir(tempFolder);
 
-        documentAdaptor = new ImagesDocumentAdaptor(task.getDocumentArgument(), memoryUsageSetting);
-//        documentAdaptor.protect(task.getDocumentArgument().getSpp());
+        document = new PDDocument(memoryUsageSetting);
+        document.protect(task.getDocumentArgument().getSpp());
     }
 
     /**
@@ -55,7 +55,7 @@ public class PDFConverter implements Callable<ImagesDocumentAdaptor> {
      * If listener is null,call() will throw the exception.
      */
     @Override
-    public ImagesDocumentAdaptor call() throws Exception {
+    public File call() throws Exception {
         File[] imgs = task.getImgs();
         if (listener != null)
             listener.onConversionPreparing(task);
@@ -68,7 +68,11 @@ public class PDFConverter implements Callable<ImagesDocumentAdaptor> {
             try {
                 image = ImageIO.read(imgs[i]);
             } catch (IOException e) {
-                documentAdaptor.closeDocument();
+                try {
+                    document.close();
+                } catch (Exception ignored) {
+                }
+
                 if (listener != null) {
                     listener.onImageReadFail(i, e);
                     return null;
@@ -78,10 +82,13 @@ public class PDFConverter implements Callable<ImagesDocumentAdaptor> {
             }
 
             try {
-                documentAdaptor.addPage(createImgPage(image));
-
+                document.addPage(createImgPage(image));
             } catch (Exception e) {
-                documentAdaptor.closeDocument();
+                try {
+                    document.close();
+                } catch (Exception ignored) {
+                }
+
                 if (listener != null) {
                     listener.onConversionFail(i, e);
                     return null;
@@ -95,7 +102,10 @@ public class PDFConverter implements Callable<ImagesDocumentAdaptor> {
         if (listener != null)
             listener.onConversionComplete();
 
-        return documentAdaptor;
+        FileChecker.makeParentDirsIfNotExists(task.getDocumentArgument().getDestination());
+        FileChecker.checkWritableFile(task.getDocumentArgument().getDestination());
+        document.save(task.getDocumentArgument().getDestination());
+        return task.getDocumentArgument().getDestination();
     }
 
     /**
@@ -107,7 +117,7 @@ public class PDFConverter implements Callable<ImagesDocumentAdaptor> {
      */
     private PDPage createImgPage(BufferedImage img) throws Exception {
         ImagePageAdaptor imgpage = new ImagePageAdaptor(task.getPageArgument(), img);
-        imgpage.drawImageToPage(documentAdaptor.getDocument());
+        imgpage.drawImageToPage(document);
         return imgpage.getPage();
     }
 

@@ -19,15 +19,13 @@ import org.vincentyeh.IMG2PDF.commandline.parser.HandledException;
 import org.vincentyeh.IMG2PDF.commandline.parser.PropertiesOption;
 import org.vincentyeh.IMG2PDF.converter.ConversionListener;
 import org.vincentyeh.IMG2PDF.converter.PDFConverter;
-import org.vincentyeh.IMG2PDF.pdf.doc.ImagesDocumentAdaptor;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskList;
 import org.vincentyeh.IMG2PDF.util.BytesSize;
-import org.vincentyeh.IMG2PDF.util.FileChecker;
 
 public class ConvertAction extends AbstractAction {
-    private static final String DEFAULT_TEMP_FOLDER=".org.vincentyeh.IMG2PDF.tmp";
-    private static final String DEFAULT_MAX_MEMORY_USAGE="50MB";
+    private static final String DEFAULT_TEMP_FOLDER = ".org.vincentyeh.IMG2PDF.tmp";
+    private static final String DEFAULT_MAX_MEMORY_USAGE = "50MB";
 
     protected final File[] tasklist_sources;
     protected final boolean open_when_complete;
@@ -58,7 +56,7 @@ public class ConvertAction extends AbstractAction {
             maxMainMemoryBytes = BytesSize.parseString(cmd.getOptionValue("memory_max_usage", DEFAULT_MAX_MEMORY_USAGE)).getBytes();
         } catch (IllegalArgumentException e) {
             System.err.println(e.getMessage());
-            throw new HandledException(e,getClass());
+            throw new HandledException(e, getClass());
         }
 
         open_when_complete = cmd.hasOption("open_when_complete");
@@ -67,7 +65,7 @@ public class ConvertAction extends AbstractAction {
             tasklist_sources = verifyFiles(str_sources);
         } catch (IOException e) {
             System.err.println(e.getMessage());
-            throw new HandledException(e,getClass());
+            throw new HandledException(e, getClass());
         }
 
     }
@@ -89,7 +87,7 @@ public class ConvertAction extends AbstractAction {
 
             ExecutorService executor = Executors.newSingleThreadExecutor();
             for (Task task : tasks.getArray()) {
-                ImagesDocumentAdaptor result = null;
+                File result;
                 File dst = task.getDocumentArgument().getDestination();
 
                 if (!overwrite_output && dst.exists()) {
@@ -100,7 +98,7 @@ public class ConvertAction extends AbstractAction {
                 try {
                     PDFConverter converter = new PDFConverter(task, maxMainMemoryBytes, tempFolder);
                     converter.setListener(listener);
-                    Future<ImagesDocumentAdaptor> future = executor.submit(converter);
+                    Future<File> future = executor.submit(converter);
                     try {
                         result = future.get();
                     } catch (InterruptedException | ExecutionException e) {
@@ -108,18 +106,12 @@ public class ConvertAction extends AbstractAction {
                         continue;
                     }
 
-//                  TODO: merge to another class
-                    FileChecker.makeParentDirsIfNotExists(dst);
-//                  TODO: merge to another class
-                    FileChecker.checkWritableFile(dst);
-                    result.save();
-
                     if (open_when_complete) {
                         Desktop desktop = Desktop.getDesktop();
 
-                        if (dst.exists())
+                        if (result.exists())
                             try {
-                                desktop.open(dst);
+                                desktop.open(result);
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -129,9 +121,6 @@ public class ConvertAction extends AbstractAction {
                     e.printStackTrace();
                 } catch (RuntimeException e) {
                     System.err.println(e.getMessage());
-                } finally {
-                    if (result != null)
-                        result.closeDocument();
                 }
 
             }
