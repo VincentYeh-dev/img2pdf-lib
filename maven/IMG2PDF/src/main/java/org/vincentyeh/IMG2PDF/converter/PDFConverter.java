@@ -8,6 +8,7 @@ import java.util.concurrent.*;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.pdf.page.ImagePageConverter;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.util.FileChecker;
@@ -27,12 +28,6 @@ public class PDFConverter implements Callable<File> {
     private ConversionListener listener;
     private final Task task;
 
-    /**
-     * Setup the pdf converter.
-     *
-     * @param task
-     * @throws IOException
-     */
     public PDFConverter(Task task, long maxMainMemoryBytes, File tempFolder) throws IOException {
         if (task == null)
             throw new NullPointerException("task is null.");
@@ -75,7 +70,7 @@ public class PDFConverter implements Callable<File> {
                 }
 
                 if (listener != null) {
-                    listener.onImageReadFail(i, e);
+                    listener.onImageReadFail(i, imgs[i], e);
                     return null;
                 } else {
                     throw e;
@@ -100,9 +95,13 @@ public class PDFConverter implements Callable<File> {
 
         }
 
-
-        FileChecker.makeParentDirsIfNotExists(task.getDocumentArgument().getDestination());
+        if (!task.getDocumentArgument().getDestination().getParentFile().exists()) {
+//            TODO:remove usage of print.
+            if (task.getDocumentArgument().getDestination().mkdirs())
+                System.out.printf(SharedSpace.getResString("public.info.required_folder_created") + "\n", task.getDocumentArgument().getDestination().getParentFile());
+        }
         FileChecker.checkWritableFile(task.getDocumentArgument().getDestination());
+
         document.save(task.getDocumentArgument().getDestination());
         document.close();
 
