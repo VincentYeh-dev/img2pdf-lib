@@ -3,6 +3,7 @@ package org.vincentyeh.IMG2PDF.pdf.page;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.util.concurrent.Callable;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -23,59 +24,61 @@ import static org.vincentyeh.IMG2PDF.pdf.page.PageDirection.Portrait;
  *
  * @author VincentYeh
  */
-public class ImagePageAdaptor  {
-    private final BufferedImage image;
-    private final Size img_size;
-    private final Position position;
-    private final PDPage page;
+public class ImagePageConverter implements Callable<PDPage> {
 
-    public ImagePageAdaptor(PageArgument argument,BufferedImage image) {
+    private final PDDocument document;
+    private final BufferedImage rawImage;
+    private final PageArgument argument;
 
-        page=new PDPage();
+    public ImagePageConverter(PDDocument document, PageArgument argument, BufferedImage image) {
+        this.document = document;
+        this.rawImage = image;
+        this.argument = argument;
+    }
+
+    @Override
+    public PDPage call() throws Exception {
+        final BufferedImage imageOut;
+        final Size img_size;
+        final Position position;
         final Size page_size;
+        final PDPage page = new PDPage();
 
         if (argument.getSize() == PageSize.DEPEND_ON_IMG) {
-            page_size = new Size(image.getHeight(), image.getWidth());
+            page_size = new Size(rawImage.getHeight(), rawImage.getWidth());
 
         } else {
             PDRectangle rect = argument.getSize().getPdrectangle();
             page_size = new Size(rect.getHeight(), rect.getWidth());
         }
+
         page.setMediaBox(new PDRectangle(page_size.getWidth(), page_size.getHeight()));
 
-
         if (argument.getSize() == PageSize.DEPEND_ON_IMG) {
-            img_size = new Size(image.getHeight(), image.getWidth());
-            this.image = image;
+            img_size = new Size(rawImage.getHeight(), rawImage.getWidth());
+            imageOut = rawImage;
             position = new Position(0, 0);
         } else {
-            PageDirection page_direction=argument.getDirection();
+            PageDirection page_direction = argument.getDirection();
             if (argument.getAutoRotate()) {
-                page_direction = getDirection(image);
+                page_direction = getDirection(rawImage);
             }
 
             page.setRotation(page_direction == Landscape ? -90 : 0);
-            this.image = rotateImg(image, page_direction == Landscape ? 90 : 0);
+            imageOut = rotateImg(rawImage, page_direction == Landscape ? 90 : 0);
 
-            Size rotated_img_size = new Size(this.image.getHeight(), this.image.getWidth());
+            Size rotated_img_size = new Size(imageOut.getHeight(), imageOut.getWidth());
             SizeCalculator sizeCalculator = new SizeCalculator(rotated_img_size, page_size);
             img_size = sizeCalculator.scaleUpToMax();
 
             PositionCalculator calculator = new PositionCalculator(page.getRotation() != 0, img_size.getHeight(), img_size.getWidth(), page_size.getHeight(), page_size.getWidth());
             position = calculator.calculate(argument.getAlign());
         }
-    }
 
-
-    public void drawImageToPage(PDDocument doc) throws Exception {
-
-        PDImageXObject pdImageXObject = LosslessFactory.createFromImage(doc, image);
-        PDPageContentStream contentStream = new PDPageContentStream(doc, page);
+        PDImageXObject pdImageXObject = LosslessFactory.createFromImage(document, imageOut);
+        PDPageContentStream contentStream = new PDPageContentStream(document, page);
         contentStream.drawImage(pdImageXObject, position.getX(), position.getY(), img_size.getWidth(), img_size.getHeight());
         contentStream.close();
-    }
-
-    public PDPage getPage() {
         return page;
     }
 
@@ -112,5 +115,4 @@ public class ImagePageAdaptor  {
     private PageDirection getDirection(float height, float width) {
         return height / width > 1 ? Portrait : Landscape;
     }
-
 }
