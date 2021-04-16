@@ -44,12 +44,11 @@ public class FileChecker {
             throw new IOException("File path is not absolute:"+raw.getPath());
     }
 
-    public static boolean makeParentDirsIfNotExists(File file) throws IOException {
-        checkAbsolute(file);
-        boolean done=file.getParentFile().mkdirs();
-        if (done) {
-            System.out.printf(SharedSpace.getResString("public.info.required_folder_created") + "\n", file.getParent());
-        }
-        return done;
-    }
+//    public static void makeParentDirsIfNotExists(File file) throws IOException {
+//        checkAbsolute(file);
+//        boolean done=file.getParentFile().mkdirs();
+//        if (done) {
+//            System.out.printf(SharedSpace.getResString("public.info.required_folder_created") + "\n", file.getParent());
+//        }
+//    }
 }

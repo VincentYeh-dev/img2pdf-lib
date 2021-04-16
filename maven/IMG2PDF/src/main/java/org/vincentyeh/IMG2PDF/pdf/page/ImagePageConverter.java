@@ -105,14 +105,6 @@ public class ImagePageConverter implements Callable<PDPage> {
         return getDirection(image.getHeight(), image.getWidth());
     }
 
-    private PageDirection getDirection(Size size) {
-        return getDirection(size.getHeight(), size.getWidth());
-    }
-
-    private PageDirection getDirection(PDRectangle rectangle) {
-        return getDirection(rectangle.getHeight(), rectangle.getWidth());
-    }
-
     private PageDirection getDirection(float height, float width) {
         return height / width > 1 ? Portrait : Landscape;
     }

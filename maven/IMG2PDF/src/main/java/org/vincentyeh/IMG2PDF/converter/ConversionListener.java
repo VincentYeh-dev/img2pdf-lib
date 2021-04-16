@@ -34,11 +34,11 @@ public interface ConversionListener {
 	 * @param index the index of image files
 	 * @param e exception of reading image
 	 */
-	void onImageReadFail(int index, IOException e);
+	void onImageReadFail(int index,File image,IOException e);
 	/**
 	 * When conversion fail.
 	 * @param index
 	 * @param e exception
 	 */
-	void onConversionFail(int index, Exception e);
+	void onConversionFail(int index,Exception e);
 }
