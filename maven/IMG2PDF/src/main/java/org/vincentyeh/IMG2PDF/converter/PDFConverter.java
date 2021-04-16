@@ -26,7 +26,7 @@ import javax.imageio.ImageIO;
  */
 public class PDFConverter implements Callable<File> {
 
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final ExecutorService executor = Executors.newCachedThreadPool();
     private final PDDocument document;
     private ConversionListener listener;
     private final Task task;
