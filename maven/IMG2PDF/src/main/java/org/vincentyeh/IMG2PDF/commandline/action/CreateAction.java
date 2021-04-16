@@ -84,7 +84,8 @@ public class CreateAction extends AbstractAction {
             pdf_sequence = Sequence.getByString(cmd.getOptionValue("pdf_sequence", DEFAULT_PDF_SEQUENCE));
 
         } catch (UnrecognizedEnumException e) {
-            System.err.println(e.getMessage());
+            String list=listEnum(e.getEnumClass());
+            System.err.printf(SharedSpace.getResString("public.err.unrecognizable_enum_long")+"\n",e.getUnrecognizableEnum(),e.getEnumClass().getSimpleName(),list);
             throw new HandledException(e,getClass());
         }
 
