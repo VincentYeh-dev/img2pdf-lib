@@ -3,10 +3,7 @@ package org.vincentyeh.IMG2PDF.converter;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -26,7 +23,6 @@ import javax.imageio.ImageIO;
  */
 public class PDFConverter implements Callable<File> {
 
-    private final ExecutorService executor = Executors.newCachedThreadPool();
     private final PDDocument document;
     private ConversionListener listener;
     private final Task task;
@@ -60,6 +56,7 @@ public class PDFConverter implements Callable<File> {
      */
     @Override
     public File call() throws Exception {
+        final ExecutorService page_executor = Executors.newCachedThreadPool();
         File[] imgs = task.getImgs();
         if (listener != null)
             listener.onConversionPreparing(task);
@@ -86,7 +83,7 @@ public class PDFConverter implements Callable<File> {
             }
 
             try {
-                document.addPage(getImagePage(image));
+                document.addPage(getImagePage(image,page_executor));
             } catch (Exception e) {
                 try {
                     document.close();
@@ -110,7 +107,7 @@ public class PDFConverter implements Callable<File> {
         FileChecker.checkWritableFile(task.getDocumentArgument().getDestination());
         document.save(task.getDocumentArgument().getDestination());
         document.close();
-        executor.shutdown();
+        page_executor.shutdown();
         return task.getDocumentArgument().getDestination();
     }
 
@@ -121,9 +118,9 @@ public class PDFConverter implements Callable<File> {
      * @return The page contain image
      * @throws Exception
      */
-    private PDPage getImagePage(BufferedImage img) throws Exception {
+    private PDPage getImagePage(BufferedImage img, ExecutorService page_executor) throws Exception {
         ImagePageConverter converter = new ImagePageConverter(document,task.getPageArgument(), img);
-        Future<PDPage> future=executor.submit(converter);
+        Future<PDPage> future=page_executor.submit(converter);
         return future.get();
     }
 
