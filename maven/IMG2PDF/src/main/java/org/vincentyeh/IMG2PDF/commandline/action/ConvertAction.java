@@ -12,12 +12,12 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.vincentyeh.IMG2PDF.commandline.CustomConversionListener;
 import org.vincentyeh.IMG2PDF.commandline.parser.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
 import org.vincentyeh.IMG2PDF.commandline.parser.HandledException;
 import org.vincentyeh.IMG2PDF.commandline.parser.PropertiesOption;
-import org.vincentyeh.IMG2PDF.converter.ConversionListener;
 import org.vincentyeh.IMG2PDF.converter.PDFConverter;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskList;
@@ -97,7 +97,7 @@ public class ConvertAction extends AbstractAction {
 
                 try {
                     PDFConverter converter = new PDFConverter(task, maxMainMemoryBytes, tempFolder);
-                    converter.setListener(listener);
+                    converter.setListener(new CustomConversionListener());
                     Future<File> future = executor.submit(converter);
                     try {
                         result = future.get();
@@ -154,49 +154,4 @@ public class ConvertAction extends AbstractAction {
         return options;
     }
 
-    private final ConversionListener listener = new ConversionListener() {
-        private double perImg;
-        private double progress = 0;
-
-        @Override
-        public void onConversionPreparing(Task task) {
-            int size_of_imgs = task.getImgs().length;
-            perImg = (10. / size_of_imgs);
-            System.out.printf("\t###%s###\n", SharedSpace.getResString("convert.pdf_conversion_task"));
-            System.out.printf("\t%s:%s\n", SharedSpace.getResString("create.arg.pdf_destination.name"), task.getDocumentArgument().getDestination());
-            System.out.printf("\t%s:%s\n", SharedSpace.getResString("public.info.name"),
-                    new File(task.getDocumentArgument().getDestination().getName()));
-            System.out.printf("\t%s->", SharedSpace.getResString("public.info.progress"));
-            System.out.print("0%[");
-
-        }
-
-        @Override
-        public void onConverting(int index) {
-            progress += perImg;
-            while (progress >= 1) {
-                System.out.print("=");
-                progress -= 1;
-            }
-        }
-
-        @Override
-        public void onConversionComplete() {
-            System.out.print("]%100\n\n");
-
-        }
-
-        @Override
-        public void onConversionFail(int index, Exception e) {
-            System.out.print("CONVERSION FAIL]\n\n");
-            System.err.println(e.getMessage());
-        }
-
-        @Override
-        public void onImageReadFail(int index, IOException e) {
-            System.out.print("IMAGE READ FAIL]\n\n");
-            System.err.println(e.getMessage());
-        }
-
-    };
 }
