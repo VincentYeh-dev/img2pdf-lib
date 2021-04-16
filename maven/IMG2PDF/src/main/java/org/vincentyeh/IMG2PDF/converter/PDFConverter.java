@@ -63,7 +63,7 @@ public class PDFConverter implements Callable<File> {
 
         for (int i = 0; i < imgs.length; i++) {
             if (listener != null)
-                listener.onConverting(i);
+                listener.onConverting(i, imgs[i]);
 
             BufferedImage image;
             try {
@@ -83,7 +83,7 @@ public class PDFConverter implements Callable<File> {
             }
 
             try {
-                document.addPage(getImagePage(image,page_executor));
+                document.addPage(getImagePage(image, page_executor));
             } catch (Exception e) {
                 try {
                     document.close();
@@ -100,14 +100,15 @@ public class PDFConverter implements Callable<File> {
 
         }
 
-        if (listener != null)
-            listener.onConversionComplete();
 
         FileChecker.makeParentDirsIfNotExists(task.getDocumentArgument().getDestination());
         FileChecker.checkWritableFile(task.getDocumentArgument().getDestination());
         document.save(task.getDocumentArgument().getDestination());
         document.close();
+
         page_executor.shutdown();
+        if (listener != null)
+            listener.onConversionComplete(task.getDocumentArgument().getDestination());
         return task.getDocumentArgument().getDestination();
     }
 
@@ -119,8 +120,8 @@ public class PDFConverter implements Callable<File> {
      * @throws Exception
      */
     private PDPage getImagePage(BufferedImage img, ExecutorService page_executor) throws Exception {
-        ImagePageConverter converter = new ImagePageConverter(document,task.getPageArgument(), img);
-        Future<PDPage> future=page_executor.submit(converter);
+        ImagePageConverter converter = new ImagePageConverter(document, task.getPageArgument(), img);
+        Future<PDPage> future = page_executor.submit(converter);
         return future.get();
     }
 
