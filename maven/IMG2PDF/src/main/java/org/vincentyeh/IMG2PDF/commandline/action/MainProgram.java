@@ -15,6 +15,8 @@ import org.vincentyeh.IMG2PDF.commandline.parser.HandledException;
 import org.vincentyeh.IMG2PDF.commandline.parser.PropertiesOption;
 import org.vincentyeh.IMG2PDF.commandline.parser.RelaxedParser;
 
+import java.util.Iterator;
+
 public class MainProgram extends AbstractAction {
 
     private static final Option opt_help;
@@ -83,14 +85,23 @@ public class MainProgram extends AbstractAction {
             formatter.printHelp(SharedSpace.Configuration.PROGRAM_NAME, e.opt);
             return;
         } catch (MissingOptionException e) {
-            System.err.println(createMissingOptionsMessage(e.getMissingOptions()));
+            StringBuilder buf = new StringBuilder();
+
+            Iterator<?> it = e.getMissingOptions().iterator();
+            while (it.hasNext()) {
+                buf.append(it.next());
+                if (it.hasNext()) {
+                    buf.append(", ");
+                }
+            }
+
+            System.err.printf(SharedSpace.getResString("argperser.err.missing_option")+"\n",buf);
             return;
         } catch (MissingArgumentException e) {
-            System.err.println(createMissingArgumentOptionsMessage(e.getOption()));
+            System.err.printf(SharedSpace.getResString("argperser.err.missing_argument_option")+"\n", e.getOption().getOpt());
             return;
         } catch (UnrecognizedOptionException e) {
-            System.err.println(createUnrecognizedOptionMessage(e.getOption()));
-            System.err.println(e.getMessage());
+            System.err.printf(SharedSpace.getResString("public.err.unrecognized_argument_option")+"\n",e.getOption());
             return;
         } catch (HandledException e) {
             System.err.println(e.getMessage());

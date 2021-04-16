@@ -18,36 +18,6 @@ public abstract class AbstractAction implements Action {
         this.options = options;
     }
 
-
-
-    /**
-     * Build the exception message from the specified list of options.
-     *
-     * @param missingOptions the list of missing options and groups
-     */
-    protected static String createMissingOptionsMessage(List<?> missingOptions) {
-        StringBuilder buf = new StringBuilder(SharedSpace.getResString("argperser.err.missing_option"));
-        buf.append(": ");
-
-        Iterator<?> it = missingOptions.iterator();
-        while (it.hasNext()) {
-            buf.append(it.next());
-            if (it.hasNext()) {
-                buf.append(", ");
-            }
-        }
-
-        return buf.toString();
-    }
-
-    protected static String createMissingArgumentOptionsMessage(Option option) {
-        return String.format(SharedSpace.getResString("argperser.err.missing_argument_option"), option.getOpt());
-    }
-
-    protected static String createUnrecognizedOptionMessage(String option) {
-        return String.format(SharedSpace.getResString("public.err.unrecognized_argument_option"), option);
-    }
-
     protected File[] verifyFiles(String[] strSources) throws IOException {
         if (strSources == null) {
             throw new IllegalArgumentException("strSources==null");
