@@ -42,11 +42,7 @@ public class TaskList {
     }
 
     public void toXMLFile(File file) throws IOException {
-        if(!file.getParentFile().exists()){
-//            TODO:remove usage of print.
-            if(file.getParentFile().mkdirs())
-                System.out.printf(SharedSpace.getResString("public.info.required_folder_created") + "\n", file.getParentFile());
-        }
+        FileChecker.makeParentDirsIfNotExists(file);
         FileChecker.checkWritableFile(file);
 
         Document doc = new Document();
@@ -72,7 +68,7 @@ public class TaskList {
     }
 
     public Task[] getArray() {
-        Task[] array=new Task[arrayList.size()];
+        Task[] array = new Task[arrayList.size()];
         arrayList.toArray(array);
         return array;
     }

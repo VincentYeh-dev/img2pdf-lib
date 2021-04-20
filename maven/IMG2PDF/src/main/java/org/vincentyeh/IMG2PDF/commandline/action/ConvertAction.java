@@ -22,6 +22,7 @@ import org.vincentyeh.IMG2PDF.converter.PDFConverter;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskList;
 import org.vincentyeh.IMG2PDF.util.BytesSize;
+import org.vincentyeh.IMG2PDF.util.FileChecker;
 
 public class ConvertAction extends AbstractAction {
     private static final String DEFAULT_TEMP_FOLDER = ".org.vincentyeh.IMG2PDF.tmp";
@@ -49,8 +50,13 @@ public class ConvertAction extends AbstractAction {
 
         String[] str_sources = cmd.getOptionValues("tasklist_source");
 
-        tempFolder = new File(cmd.getOptionValue("temp_folder", DEFAULT_TEMP_FOLDER));
-        tempFolder.mkdirs();
+        tempFolder = new File(cmd.getOptionValue("temp_folder", DEFAULT_TEMP_FOLDER)).getAbsoluteFile();
+        try {
+            FileChecker.makeParentDirsIfNotExists(tempFolder);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new HandledException(e, getClass());
+        }
 
         try {
             maxMainMemoryBytes = BytesSize.parseString(cmd.getOptionValue("memory_max_usage", DEFAULT_MAX_MEMORY_USAGE)).getBytes();
@@ -90,7 +96,7 @@ public class ConvertAction extends AbstractAction {
             for (Task task : tasks.getArray()) {
                 File result;
                 File dst = task.getDocumentArgument().getDestination();
-
+//              TODO: Move to listener or another good place.
                 if (!overwrite_output && dst.exists()) {
                     System.err.printf(SharedSpace.getResString("public.err.overwrite") + "\n", dst.getAbsolutePath());
                     continue;
