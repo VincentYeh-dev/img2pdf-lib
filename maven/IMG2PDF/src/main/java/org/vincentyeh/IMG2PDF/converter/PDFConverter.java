@@ -3,6 +3,7 @@ package org.vincentyeh.IMG2PDF.converter;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.concurrent.*;
 
 import org.apache.pdfbox.io.MemoryUsageSetting;
@@ -95,11 +96,7 @@ public class PDFConverter implements Callable<File> {
 
         }
 
-        if (!task.getDocumentArgument().getDestination().getParentFile().exists()) {
-//            TODO:remove usage of print.
-            if (task.getDocumentArgument().getDestination().mkdirs())
-                System.out.printf(SharedSpace.getResString("public.info.required_folder_created") + "\n", task.getDocumentArgument().getDestination().getParentFile());
-        }
+        FileChecker.makeParentDirsIfNotExists(task.getDocumentArgument().getDestination());
         FileChecker.checkWritableFile(task.getDocumentArgument().getDestination());
 
         document.save(task.getDocumentArgument().getDestination());

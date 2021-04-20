@@ -35,7 +35,7 @@ public class NameFormatter {
 //	private final File file;
 
 	public NameFormatter(File raw) throws IOException {
-	    FileChecker.checkReadableFile(raw);
+	    FileChecker.checkReadableFolder(raw);
 		file=raw;
 		Path p=raw.toPath();
 		parents = new File[p.getNameCount()-1];
@@ -72,10 +72,10 @@ public class NameFormatter {
 
 	private String formatParents(String format, File[] parents)
 			throws NumberFormatException, ParentOverPointException {
-		Matcher matcher = Pattern.compile(".*?(\\$PARENT\\{[0-9]{1,}\\}).*?").matcher(format);
+		Matcher matcher = Pattern.compile(".*?(\\$PARENT\\{[0-9]+\\}).*?").matcher(format);
 		while (matcher.find()) {
 			String parent = matcher.group(1);
-			Matcher matcher_num = Pattern.compile("\\$PARENT\\{([0-9]{1,})\\}").matcher(parent);
+			Matcher matcher_num = Pattern.compile("\\$PARENT\\{([0-9]+)\\}").matcher(parent);
 			if (matcher_num.find()) {
 				int index = Integer.parseInt(matcher_num.group(1));
 				if (index >= parents.length) {
