@@ -53,7 +53,7 @@ public class ConvertAction extends AbstractAction {
 
         tempFolder = new File(cmd.getOptionValue("temp_folder", DEFAULT_TEMP_FOLDER)).getAbsoluteFile();
         try {
-            FileChecker.makeParentDirsIfNotExists(tempFolder);
+            FileChecker.makeDirsIfNotExists(tempFolder);
         } catch (IOException e) {
             e.printStackTrace();
             throw new HandledException(e, getClass());
