@@ -26,12 +26,6 @@ public class CustomConversionListener implements ConversionListener {
     public void onConversionPreparing(Task task) {
         total = task.getImgs().length;
         perImg = (10. / total);
-//        System.out.printf("\t###%s###\n", SharedSpace.getResString("convert.pdf_conversion_task"));
-//        System.out.printf("\t%s:%s\n", SharedSpace.getResString("create.arg.pdf_destination.name"), task.getDocumentArgument().getDestination());
-//        System.out.printf("\t%s:%s\n", SharedSpace.getResString("public.info.name"),
-//                new File(task.getDocumentArgument().getDestination().getName()));
-//        System.out.printf("\t%s:\n", SharedSpace.getResString("public.info.progress"));
-
     }
 
     @Override
@@ -48,7 +42,7 @@ public class CustomConversionListener implements ConversionListener {
     @Override
     public void onConversionComplete(File dst) {
 
-        System.out.printf("\t"+SharedSpace.getResString("convert.listener.done")+"\r\n",dst.getPath());
+        System.out.printf("\t"+SharedSpace.getResString("convert.listener.done")+"\r\n",dst.getName());
         counter=total=0;
     }
 
@@ -56,6 +50,12 @@ public class CustomConversionListener implements ConversionListener {
     @Override
     public void onConversionFail(int index, Exception e) {
         System.out.printf("\t"+SharedSpace.getResString("convert.listener.err.image")+"\r\n",e.getMessage());
+        counter=total=0;
+    }
+
+    @Override
+    public void onFileAlreadyExists(File file) {
+        System.err.printf("\t"+SharedSpace.getResString("public.err.overwrite")+"\r\n",file.getName());
         counter=total=0;
     }
 

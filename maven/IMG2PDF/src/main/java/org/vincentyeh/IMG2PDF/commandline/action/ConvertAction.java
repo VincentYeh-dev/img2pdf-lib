@@ -3,6 +3,7 @@ package org.vincentyeh.IMG2PDF.commandline.action;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -78,39 +79,35 @@ public class ConvertAction extends AbstractAction {
 
     @Override
     public void start() throws Exception {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
         System.out.println(SharedSpace.getResString("convert.import_tasklists"));
-        for (File src : tasklist_sources) {
-            System.out.print(
-                    "\t[" + SharedSpace.getResString("public.info.importing") + "] " + src.getAbsolutePath() + "\n");
-            System.out.print("\t");
+        try {
+            for (File src : tasklist_sources) {
+                System.out.print(
+                        "\t[" + SharedSpace.getResString("public.info.importing") + "] " + src.getAbsolutePath() + "\n");
+                System.out.print("\t");
 
-            TaskList tasks = new TaskList(src);
+                TaskList tasks = new TaskList(src);
 
-            System.out
-                    .print("[" + SharedSpace.getResString("public.info.imported") + "] " + src.getAbsolutePath() + "\n");
+                System.out
+                        .print("[" + SharedSpace.getResString("public.info.imported") + "] " + src.getAbsolutePath() + "\n");
 
-            System.out.println();
-            System.out.println(SharedSpace.getResString("convert.start_conversion"));
+                System.out.println();
+                System.out.println(SharedSpace.getResString("convert.start_conversion"));
 
-            ExecutorService executor = Executors.newSingleThreadExecutor();
-            for (Task task : tasks.getArray()) {
-                File result;
-                File dst = task.getDocumentArgument().getDestination();
-//              TODO: Move to listener or another good place.
-                if (!overwrite_output && dst.exists()) {
-                    System.err.printf(SharedSpace.getResString("public.err.overwrite") + "\n", dst.getAbsolutePath());
-                    continue;
-                }
-
-                try {
-                    PDFConverter converter = new PDFConverter(task, maxMainMemoryBytes, tempFolder);
-                    converter.setListener(new CustomConversionListener());
-                    Future<File> future = executor.submit(converter);
+                for (Task task : tasks.getArray()) {
+                    File result;
                     try {
+                        PDFConverter converter = new PDFConverter(task, maxMainMemoryBytes, tempFolder, overwrite_output);
+                        converter.setListener(new CustomConversionListener());
+                        Future<File> future = executor.submit(converter);
                         result = future.get();
-                    } catch (InterruptedException | ExecutionException e) {
-                        e.printStackTrace();
-                        continue;
+                    } catch (ExecutionException e) {
+                        if ((e.getCause() instanceof HandledException)) {
+                            continue;
+                        } else {
+                            throw e;
+                        }
                     }
 
                     if (open_when_complete) {
@@ -123,17 +120,11 @@ public class ConvertAction extends AbstractAction {
                                 e.printStackTrace();
                             }
                     }
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (RuntimeException e) {
-                    System.err.println(e.getMessage());
                 }
-
             }
+        } finally {
             executor.shutdown();
         }
-
     }
 
     private static Options getLocaleOptions() {

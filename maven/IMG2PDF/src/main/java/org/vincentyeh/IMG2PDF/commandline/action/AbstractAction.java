@@ -3,10 +3,6 @@ package org.vincentyeh.IMG2PDF.commandline.action;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.util.FileChecker;
