@@ -85,19 +85,18 @@ public class ConvertAction extends AbstractAction {
         try {
             for (File src : tasklist_sources) {
                 System.out.print(
-                        "\t[" + SharedSpace.getResString("public.info.importing") + "] " + src.getAbsolutePath() + "\n");
-                System.out.print("\t");
+                        "\t[" + SharedSpace.getResString("public.info.importing") + "] " + src.getAbsolutePath() + "\r");
                 TaskList tasks;
                 try {
                     tasks = new TaskList(src);
                 }catch (SAXException e){
 //                    TODO: add to language pack
-                    System.err.println("Wrong XML content."+e.getMessage());
+                    System.err.println("\n\tWrong XML content."+e.getMessage());
                     throw new HandledException(e,getClass());
                 }
 
                 System.out
-                        .print("[" + SharedSpace.getResString("public.info.imported") + "] " + src.getAbsolutePath() + "\n");
+                        .print("\t[" + SharedSpace.getResString("public.info.imported") + "] " + src.getAbsolutePath() + "\r\n");
 
                 System.out.println();
                 System.out.println(SharedSpace.getResString("convert.start_conversion"));

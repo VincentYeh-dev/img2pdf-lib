@@ -27,13 +27,12 @@ public abstract class AbstractAction implements Action {
         ArrayList<File> verified_sources = new ArrayList<>();
         for (String str_source : strSources) {
             File raw = (new File(str_source)).getAbsoluteFile();
-            System.out.printf("\t[" + SharedSpace.getResString("public.info.verifying") + "] %s\n", raw.getAbsolutePath());
+            System.out.printf("\t[" + SharedSpace.getResString("public.info.verifying") + "] %s\r", raw.getAbsolutePath());
 
-            System.out.print("\t");
 
             FileChecker.checkReadableFile(raw);
 
-            System.out.printf("[" + SharedSpace.getResString("public.info.verified") + "] %s\n",
+            System.out.printf("\t[" + SharedSpace.getResString("public.info.verified") + "] %s\r\n",
                     raw.getAbsolutePath());
 
             verified_sources.add(raw);
