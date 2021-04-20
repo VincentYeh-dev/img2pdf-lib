@@ -24,6 +24,7 @@ import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskList;
 import org.vincentyeh.IMG2PDF.util.BytesSize;
 import org.vincentyeh.IMG2PDF.util.FileChecker;
+import org.xml.sax.SAXException;
 
 public class ConvertAction extends AbstractAction {
     private static final String DEFAULT_TEMP_FOLDER = ".org.vincentyeh.IMG2PDF.tmp";
@@ -86,8 +87,14 @@ public class ConvertAction extends AbstractAction {
                 System.out.print(
                         "\t[" + SharedSpace.getResString("public.info.importing") + "] " + src.getAbsolutePath() + "\n");
                 System.out.print("\t");
-
-                TaskList tasks = new TaskList(src);
+                TaskList tasks;
+                try {
+                    tasks = new TaskList(src);
+                }catch (SAXException e){
+//                    TODO: add to language pack
+                    System.err.println("Wrong XML content."+e.getMessage());
+                    throw new HandledException(e,getClass());
+                }
 
                 System.out
                         .print("[" + SharedSpace.getResString("public.info.imported") + "] " + src.getAbsolutePath() + "\n");
