@@ -57,16 +57,16 @@ public class PDFConverter implements Callable<File> {
     @Override
     public File call() throws Exception {
 
-        if (!overwrite && task.getDocumentArgument().getDestination().exists()) {
-            if(listener!=null){
-               listener.onFileAlreadyExists(task.getDocumentArgument().getDestination());
-            }
-            throw new HandledException(new FileAlreadyExistsException(task.getDocumentArgument().getDestination().getAbsolutePath()),getClass());
-//            throw new FileAlreadyExistsException(task.getDocumentArgument().getDestination().getAbsolutePath());
-        }
 
         final ExecutorService page_executor = Executors.newCachedThreadPool();
         try {
+            if (!overwrite && task.getDocumentArgument().getDestination().exists()) {
+                if (listener != null) {
+                    listener.onFileAlreadyExists(task.getDocumentArgument().getDestination());
+                }
+                throw new HandledException(new FileAlreadyExistsException(task.getDocumentArgument().getDestination().getAbsolutePath()), getClass());
+            }
+
             File[] imgs = task.getImgs();
             if (listener != null)
                 listener.onConversionPreparing(task);
@@ -109,8 +109,9 @@ public class PDFConverter implements Callable<File> {
 
             return task.getDocumentArgument().getDestination();
 
-        }finally {
+        } finally {
             page_executor.shutdown();
+            closeDocument();
         }
     }
 
