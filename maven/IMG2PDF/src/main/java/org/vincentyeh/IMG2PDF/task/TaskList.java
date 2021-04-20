@@ -80,6 +80,10 @@ public class TaskList {
         // If want to make namespace aware.
         // factory.setNamespaceAware(true);
         DocumentBuilder documentBuilder = factory.newDocumentBuilder();
+
+//      Disable printing message to console
+        documentBuilder.setErrorHandler(null);
+
         InputSource source = new InputSource(new InputStreamReader(new FileInputStream(xml_file), SharedSpace.Configuration.DEFAULT_CHARSET));
         org.w3c.dom.Document w3cDocument = documentBuilder.parse(source);
         return new DOMBuilder().build(w3cDocument);
