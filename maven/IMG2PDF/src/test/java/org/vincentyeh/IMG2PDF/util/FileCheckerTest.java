@@ -10,17 +10,6 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class FileCheckerTest {
-//    static {
-////		Language Setting:
-//
-////	Local:
-//        SharedSpace.setLanguageRes(ResourceBundle.getBundle("language_package", Locale.getDefault()));
-////	root:
-//
-////		Configuration.setLagugRes(ResourceBundle.getBundle("language_package", Locale.ROOT));
-//
-//    }
-
 
     @Test(expected = IOException.class)
     public void testAbsolute() throws IOException {
@@ -59,11 +48,13 @@ public class FileCheckerTest {
 
     @Test
     public void testReadFileInDataFolder() throws IOException {
-
         Path p = Paths.get("D:\\test.xml");
-        Files.createFile(p);
+        try {
+            Files.createFile(p);
+        }catch (FileAlreadyExistsException ignored){
+        }
 
-        FileChecker.checkReadableFolder(p.toFile());
+        FileChecker.checkReadableFile(p.toFile());
         Files.delete(p);
     }
 

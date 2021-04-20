@@ -42,11 +42,11 @@ public class FileChecker {
     }
     public static void checkFile(File file) throws IOException {
         if(file.isDirectory())
-            throw new IOException(file.getAbsolutePath()+"is directory.");
+            throw new IOException(file.getAbsolutePath()+" is directory.");
     }
     public static void checkDirectory(File file) throws IOException {
         if(file.isFile())
-            throw new IOException(file.getAbsolutePath()+"is file");
+            throw new IOException(file.getAbsolutePath()+" is file");
     }
 
     public static void checkExists(File raw) throws FileNotFoundException {

@@ -41,4 +41,6 @@ public interface ConversionListener {
 	 * @param e exception
 	 */
 	void onConversionFail(int index,Exception e);
+
+	void onFileAlreadyExists(File file);
 }
