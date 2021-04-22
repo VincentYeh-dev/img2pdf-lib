@@ -35,7 +35,6 @@ public class NameFormatter {
 //	private final File file;
 
 	public NameFormatter(File raw) throws IOException {
-	    FileChecker.checkReadableFolder(raw);
 		file=raw;
 		Path p=raw.toPath();
 		parents = new File[p.getNameCount()-1];
