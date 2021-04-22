@@ -34,7 +34,7 @@ public enum PageSize {
 			if (size.toString().equals(str))
 				return size;
 		}
-		throw new UnrecognizedEnumException(str, PageSize.class);
+		throw new UnrecognizedEnumException(str,"PageSize",values());
 	}
 
 	public PDRectangle getPdrectangle() {

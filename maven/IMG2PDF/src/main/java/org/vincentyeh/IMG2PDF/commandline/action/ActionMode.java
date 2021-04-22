@@ -12,7 +12,7 @@ public enum ActionMode {
 			if (mode.toString().equals(str))
 				return mode;
 		}
-		throw new UnrecognizedEnumException(str,ActionMode.class);
+		throw new UnrecognizedEnumException(str,"ActionMode",values());
 	}
 
 }

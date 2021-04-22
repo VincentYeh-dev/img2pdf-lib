@@ -69,7 +69,7 @@ public class MainProgram extends AbstractAction {
     private static Options getLocaleOptions() {
 
         Options options = new Options();
-        Option opt_mode = PropertiesOption.getArgumentOption("m", "mode", "main.arg.mode.help", listEnum(ActionMode.class));
+        Option opt_mode = PropertiesOption.getArgumentOption("m", "mode", "main.arg.mode.help", listStringArray(ArrayToStringArray(ActionMode.values())));
         options.addOption(opt_mode);
         options.addOption(opt_help);
 
@@ -120,15 +120,5 @@ public class MainProgram extends AbstractAction {
             e.printStackTrace();
         }
     }
-
-//    public static <T> void dumpArray(T[] array) {
-//        System.out.print("[");
-//        System.out.print(array[0]);
-//        for (int i = 1; i < array.length; i++) {
-//            System.out.print(",");
-//            System.out.print(array[i]);
-//        }
-//        System.out.print("]\n");
-//    }
 
 }

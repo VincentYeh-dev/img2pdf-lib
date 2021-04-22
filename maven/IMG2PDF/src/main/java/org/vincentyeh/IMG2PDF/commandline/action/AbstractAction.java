@@ -29,7 +29,6 @@ public abstract class AbstractAction implements Action {
             File raw = (new File(str_source)).getAbsoluteFile();
             System.out.printf("\t[" + SharedSpace.getResString("public.info.verifying") + "] %s\r", raw.getAbsolutePath());
 
-
             FileChecker.checkReadableFile(raw);
 
             System.out.printf("\t[" + SharedSpace.getResString("public.info.verified") + "] %s\r\n",
@@ -43,14 +42,21 @@ public abstract class AbstractAction implements Action {
         return sources;
     }
 
-    protected static <T> String listEnum(Class<T> _class_enum) {
-        T[] enums = _class_enum.getEnumConstants();
+    protected static  String listStringArray(String[] values) {
         StringBuilder sb = new StringBuilder();
-        sb.append(enums[0].toString());
-        for (int i = 1; i < enums.length; i++) {
+        sb.append(values[0]);
+        for (int i = 1; i < values.length; i++) {
             sb.append(",");
-            sb.append(enums[i].toString());
+            sb.append(values[i]);
         }
         return sb.toString();
     }
+    protected static <T> String[] ArrayToStringArray(T[] arr1){
+        String[] string_array=new String[arr1.length];
+       for(int i = 0; i< arr1.length; i++){
+           string_array[i]= arr1[i].toString();
+       }
+        return string_array;
+    }
+
 }
