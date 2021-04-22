@@ -2,8 +2,9 @@ package org.vincentyeh.IMG2PDF.commandline.action;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
+import java.io.InputStreamReader;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -13,6 +14,8 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.jdom2.Document;
+import org.jdom2.input.DOMBuilder;
 import org.vincentyeh.IMG2PDF.commandline.CustomConversionListener;
 import org.vincentyeh.IMG2PDF.commandline.parser.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.SharedSpace;
@@ -24,7 +27,12 @@ import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskList;
 import org.vincentyeh.IMG2PDF.util.BytesSize;
 import org.vincentyeh.IMG2PDF.util.FileChecker;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 public class ConvertAction extends AbstractAction {
     private static final String DEFAULT_TEMP_FOLDER = ".org.vincentyeh.IMG2PDF.tmp";
@@ -88,7 +96,7 @@ public class ConvertAction extends AbstractAction {
                         "\t[" + SharedSpace.getResString("public.info.importing") + "] " + src.getAbsolutePath() + "\r");
                 TaskList tasks;
                 try {
-                    tasks = new TaskList(src);
+                    tasks = new TaskList(getDocumentFromFile(src));
                 }catch (SAXException e){
 //                    TODO: add to language pack
                     System.err.println("\n\tWrong XML content."+e.getMessage());
@@ -131,6 +139,22 @@ public class ConvertAction extends AbstractAction {
         } finally {
             executor.shutdown();
         }
+    }
+
+    private static Document getDocumentFromFile(final File file)
+            throws ParserConfigurationException, SAXException, IOException {
+        FileChecker.checkReadableFile(file);
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        // If want to make namespace aware.
+        // factory.setNamespaceAware(true);
+        DocumentBuilder documentBuilder = factory.newDocumentBuilder();
+
+//      Disable printing message to console
+        documentBuilder.setErrorHandler(null);
+
+        InputSource source = new InputSource(new InputStreamReader(new FileInputStream(file), SharedSpace.Configuration.DEFAULT_CHARSET));
+        org.w3c.dom.Document w3cDocument = documentBuilder.parse(source);
+        return new DOMBuilder().build(w3cDocument);
     }
 
     private static Options getLocaleOptions() {

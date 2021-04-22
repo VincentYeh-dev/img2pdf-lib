@@ -32,7 +32,7 @@ public class BytesSize {
                     return value;
                 }
             }
-            throw new UnrecognizedEnumException(raw, Suffix.class);
+            throw new UnrecognizedEnumException(raw,"Suffix",values());
         }
     }
 

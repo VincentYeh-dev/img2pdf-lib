@@ -9,19 +9,19 @@ import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumExcep
  */
 public class PageAlign {
 //	水平對齊
-	private final HorizontalAlign hori_algin;
+	private final HorizontalAlign hori_align;
 //	垂直對齊
-	private final VerticalAlign verti_algin;
+	private final VerticalAlign verti_align;
 
 	/**
 	 * Create Align by enums.
 	 * 
-	 * @param hori_algin Horizontal Align
-	 * @param verti_algin Vertical Align
+	 * @param hori_align Horizontal Align
+	 * @param verti_align Vertical Align
 	 */
-	public PageAlign(final HorizontalAlign hori_algin, final VerticalAlign verti_algin) {
-		this.hori_algin = hori_algin;
-		this.verti_algin = verti_algin;
+	public PageAlign(final HorizontalAlign hori_align, final VerticalAlign verti_align) {
+		this.hori_align = hori_align;
+		this.verti_align = verti_align;
 	}
 
 	/**
@@ -33,21 +33,21 @@ public class PageAlign {
 	 */
 	public PageAlign(final String str) throws UnrecognizedEnumException{
 		String[] verti_hori_align = str.split("-");
-		this.verti_algin = VerticalAlign.getByString(verti_hori_align[0]);
-		this.hori_algin = HorizontalAlign.getByString(verti_hori_align[1]);
+		this.verti_align = VerticalAlign.getByString(verti_hori_align[0]);
+		this.hori_align = HorizontalAlign.getByString(verti_hori_align[1]);
 	}
 
 	public HorizontalAlign getHorizontal() {
-		return hori_algin;
+		return hori_align;
 	}
 
 	public VerticalAlign getVertical() {
-		return verti_algin;
+		return verti_align;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("%s-%s", verti_algin,hori_algin);
+		return String.format("%s-%s", verti_align, hori_align);
 	}
 
 	public enum HorizontalAlign {
@@ -59,7 +59,7 @@ public class PageAlign {
 				if (align.toString().equals(str))
 					return align;
 			}
-			throw new UnrecognizedEnumException(str,HorizontalAlign.class);
+			throw new UnrecognizedEnumException(str,"HorizontalAlign",values());
 		}
 
 	}
@@ -73,7 +73,7 @@ public class PageAlign {
 				if (align.toString().equals(str))
 					return align;
 			}
-			throw new UnrecognizedEnumException(str,VerticalAlign.class);
+			throw new UnrecognizedEnumException(str,"VerticalAlign",values());
 		}
 	}
 

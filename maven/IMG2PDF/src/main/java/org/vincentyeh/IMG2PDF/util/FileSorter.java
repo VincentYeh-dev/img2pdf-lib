@@ -93,7 +93,7 @@ public class FileSorter implements Comparator<File> {
                 if (sequence.toString().equals(str))
                     return sequence;
             }
-            throw new UnrecognizedEnumException(str, Sequence.class);
+            throw new UnrecognizedEnumException(str,"Sequence",values());
         }
 
     }
@@ -107,7 +107,7 @@ public class FileSorter implements Comparator<File> {
                 if (sortby.toString().equals(str))
                     return sortby;
             }
-            throw new UnrecognizedEnumException(str, Sortby.class);
+            throw new UnrecognizedEnumException(str,"Sortby",values());
         }
 
     }

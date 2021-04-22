@@ -16,7 +16,7 @@ public enum PageDirection {
 			if (direction.toString().equals(str))
 				return direction;
 		}
-		throw new UnrecognizedEnumException(str,PageDirection.class);
+		throw new UnrecognizedEnumException(str,"PageDirection",values());
 	}
 
 }

@@ -26,14 +26,6 @@ public class Task {
         this.pageArgument = pageArgument;
     }
 
-    /**
-     * Initialize Task by element. This constructor is designed for parsed XML
-     * element.
-     *
-     * @param element
-     * @throws FileNotFoundException     When source image not found.
-     * @throws UnrecognizedEnumException
-     */
     public Task(Element element) throws FileNotFoundException, UnrecognizedEnumException {
         if (element == null)
             throw new NullPointerException("element is null");
@@ -47,12 +39,7 @@ public class Task {
 
     }
 
-    /**
-     * To Element that contain Task attribute.
-     *
-     * @return Element
-     */
-    public Element toElement() {
+   public Element toElement() {
         Element task = new Element("TASK");
         Element xml_files = new Element("FILES");
         for (File img : imgs) {
@@ -74,8 +61,6 @@ public class Task {
             Element el = el_files.get(i);
             imgFiles[i] = new File(new File(el.getValue()).getAbsolutePath());
             FileChecker.checkExists(imgFiles[i]);
-//            if (!imgFiles[i].exists())
-//                throw new FileNotFoundException(imgFiles[i].getAbsolutePath() + " not found.");
             if (imgFiles[i].isDirectory())
                 throw new RuntimeException(imgFiles[i].getAbsolutePath()+" is directory.");
 
