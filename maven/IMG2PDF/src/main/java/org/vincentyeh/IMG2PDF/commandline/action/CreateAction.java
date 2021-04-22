@@ -1,9 +1,6 @@
 package org.vincentyeh.IMG2PDF.commandline.action;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
 
@@ -46,22 +43,25 @@ public class CreateAction extends AbstractAction {
     private static final String DEFAULT_PDF_SEQUENCE = "INCREASE";
     private static final String DEFAULT_PDF_FILTER = "glob:*.{PNG,JPG}";
 
-    protected final PageSize pdf_size;
-    protected final PageAlign pdf_align;
-    protected final PageDirection pdf_direction;
-    protected final boolean pdf_auto_rotate;
+
+    //    For image files
     protected final Sortby pdf_sortby;
     protected final Sequence pdf_sequence;
+    protected final FileFilterHelper ffh;
+
+    //    For PDF
+    private final PageArgument pageArgument = new PageArgument();
     protected final String pdf_owner_password;
     protected final String pdf_user_password;
     protected final DocumentAccessPermission pdf_permission;
     protected final String pdf_dst;
+
+    //    For tasklist
     protected final File list_dst;
     protected final boolean debug;
-    protected final boolean overwrite_tasklist;
+    protected final boolean overwrite;
 
-    protected final File[] dirlists;
-    protected final FileFilterHelper ffh;
+    protected final File[] sourceFiles;
 
     private static final Option opt_help;
 
@@ -77,26 +77,22 @@ public class CreateAction extends AbstractAction {
             throw new HelperException(options);
 
         debug = cmd.hasOption("debug");
-        overwrite_tasklist = cmd.hasOption("overwrite");
+        overwrite = cmd.hasOption("overwrite");
         try {
-            pdf_size = PageSize.getByString(cmd.getOptionValue("pdf_size", DEFAULT_PDF_SIZE));
-
-            pdf_align = new PageAlign(cmd.getOptionValue("pdf_align", DEFAULT_PDF_ALIGN));
-
-            pdf_direction = PageDirection.getByString(cmd.getOptionValue("pdf_direction", DEFAULT_PDF_DIRECTION));
 
             pdf_sortby = Sortby.getByString(cmd.getOptionValue("pdf_sortby", DEFAULT_PDF_SORTBY));
-
             pdf_sequence = Sequence.getByString(cmd.getOptionValue("pdf_sequence", DEFAULT_PDF_SEQUENCE));
 
+            pageArgument.setAlign(new PageAlign(cmd.getOptionValue("pdf_align", DEFAULT_PDF_ALIGN)));
+            pageArgument.setSize(PageSize.getByString(cmd.getOptionValue("pdf_size", DEFAULT_PDF_SIZE)));
+            pageArgument.setDirection(PageDirection.getByString(cmd.getOptionValue("pdf_direction", DEFAULT_PDF_DIRECTION)));
+            pageArgument.setAutoRotate(cmd.hasOption("pdf_auto_rotate"));
         } catch (UnrecognizedEnumException e) {
-            System.err.printf(SharedSpace.getResString("public.err.unrecognizable_enum_long") + "\n", e.getUnrecognizableEnum(), e.getEnumName(),listStringArray(e.getAvailiableValues()));
+            System.err.printf(SharedSpace.getResString("public.err.unrecognizable_enum_long") + "\n", e.getUnrecognizableEnum(), e.getEnumName(), listStringArray(e.getAvailiableValues()));
             throw new HandledException(e, getClass());
         }
 
         pdf_permission = new DocumentAccessPermission(cmd.getOptionValue("pdf_permission", "11"));
-
-        pdf_auto_rotate = cmd.hasOption("pdf_auto_rotate");
 
         pdf_owner_password = cmd.getOptionValue("pdf_owner_password");
         pdf_user_password = cmd.getOptionValue("pdf_user_password");
@@ -114,44 +110,51 @@ public class CreateAction extends AbstractAction {
         }
 
         String[] str_sources = cmd.getOptionValues("source");
+        if (str_sources == null) {
+            throw new HandledException(new IllegalArgumentException("source==null"), getClass());
+        }
+
         try {
-            dirlists = verifyFiles(str_sources);
+            sourceFiles = verifyFiles(str_sources);
         } catch (IOException e) {
             System.err.println(e.getMessage());
             throw new HandledException(e, getClass());
         }
 
+        System.out.println();
         System.out.printf("### " + SharedSpace.getResString("create.tasklist_config")
-                        + " ###\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s############\n",
+                        + " ###\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n############\n",
 //
-                SharedSpace.getResString("create.arg.pdf_align.name"), pdf_align,
+                SharedSpace.getResString("create.arg.pdf_align.name"), pageArgument.getAlign(),
 //
-                SharedSpace.getResString("create.arg.pdf_size.name"), pdf_size,
+                SharedSpace.getResString("create.arg.pdf_size.name"), pageArgument.getSize(),
 //
-                SharedSpace.getResString("create.arg.pdf_direction.name"), pdf_direction,
+                SharedSpace.getResString("create.arg.pdf_direction.name"), pageArgument.getDirection(),
 //
-                SharedSpace.getResString("create.arg.pdf_auto_rotate.name"), pdf_auto_rotate,
+                SharedSpace.getResString("create.arg.pdf_auto_rotate.name"), pageArgument.getAutoRotate(),
 //
                 SharedSpace.getResString("create.arg.filter.name"), ffh.getOperator(),
 //
                 SharedSpace.getResString("create.arg.list_destination.name"), list_destination,
 //
-                SharedSpace.getResString("create.arg.source.name"), dumpArrayString(dirlists)
+                SharedSpace.getResString("create.arg.source.name"), listStringArray(ArrayToStringArray(sourceFiles))
 //
         );
+        System.out.println();
     }
 
     @Override
     public void start() throws Exception {
         TaskList tasks = new TaskList();
 
-        for (File dirlist : dirlists) {
+        for (File dirlist : sourceFiles) {
 //          In dirlist
             FileChecker.checkReadableFile(dirlist);
             System.out.printf(SharedSpace.getResString("create.import_from_list") + "\n", dirlist.getName());
 
             List<String> lines = Files.readAllLines(dirlist.toPath(), SharedSpace.Configuration.DEFAULT_CHARSET);
             for (int line_counter = 0; line_counter < lines.size(); line_counter++) {
+
 //              In line
                 String line = lines.get(line_counter);
 
@@ -163,61 +166,62 @@ public class CreateAction extends AbstractAction {
 
                 File dir = new File(line);
 
+                System.out.printf("\t[" + SharedSpace.getResString("public.info.importing") + "] %s\n",
+                        dir.getAbsolutePath());
+
                 if (!dir.isAbsolute()) {
                     dir = new File(dirlist.getParent(), line);
                 } else {
                     dir = new File(line);
                 }
 
+                try {
+                    FileChecker.checkExists(dir);
+                } catch (FileNotFoundException e) {
+                    System.err.printf(SharedSpace.getResString("create.err.source_filenotfound") + "\n", dirlist.getName(),
+                            line_counter, dir.getAbsolutePath());
+                    throw new HandledException(e,getClass());
+                }
 
-                if (!dir.exists()) {
-                    RuntimeException e = new RuntimeException(String.format(SharedSpace.getResString("create.err.source_filenotfound") + "\n", dirlist.getName(),
-                            line_counter, dir.getAbsolutePath()));
-                    System.err.println(e.getMessage());
+                try {
+                    FileChecker.checkDirectory(dir);
+                }catch (IOException e){
+                    System.err.printf(SharedSpace.getResString("create.err.source_path_is_file") + "\n", dirlist.getName(),
+                            line_counter, dir.getAbsolutePath());
                     throw new HandledException(e, getClass());
                 }
 
-                if (dir.isFile()) {
-                    RuntimeException e = new RuntimeException(String.format(SharedSpace.getResString("create.err.source_path_is_file") + "\n", dirlist.getName(),
-                            line_counter, dir.getAbsolutePath()));
-                    System.err.println(e.getMessage());
-                    throw new HandledException(e, getClass());
+                try {
+                    tasks.add(mergeArgumentsToTask(dir));
+                }catch (IOException e){
+
                 }
-
-                System.out.printf("\t[" + SharedSpace.getResString("public.info.importing") + "] %s\n",
-                        dir.getAbsolutePath());
-
-                tasks.add(mergeArgumentsToTask(dir));
 
                 System.out.printf("\t[" + SharedSpace.getResString("public.info.imported") + "] %s\n",
                         dir.getAbsolutePath());
             }
 
         }
-        if (!overwrite_tasklist && list_dst.exists()) {
-            RuntimeException e = new RuntimeException(String.format(SharedSpace.getResString("public.err.overwrite") + "\n", list_dst.getAbsolutePath()));
-            System.err.println(e.getMessage());
-            throw new HandledException(e, getClass());
+
+        if (!overwrite && list_dst.exists()) {
+            System.err.printf(SharedSpace.getResString("public.err.overwrite") + "\n", list_dst.getAbsolutePath());
+            throw new HandledException(new RuntimeException("Overwrite deny"), getClass());
         }
 
         try {
             writeTaskList(tasks, list_dst);
             System.out.printf("[" + SharedSpace.getResString("public.info.exported") + "] %s\n", list_dst.getAbsolutePath());
         } catch (IOException e) {
-            IOException e2 = new IOException(String.format(SharedSpace.getResString("create.err.tasklist_create") + "\n", e.getMessage()));
-            System.err.println(e2.getMessage());
-            throw new HandledException(e2, getClass());
+            System.err.printf(SharedSpace.getResString("create.err.tasklist_create") + "\n", e.getMessage());
+            throw new HandledException(e, getClass());
         }
     }
 
     private Task mergeArgumentsToTask(File source_directory) throws IOException {
+        FileChecker.checkReadableFolder(source_directory);
         NameFormatter nf = new NameFormatter(source_directory);
         DocumentArgument documentArgument = new DocumentArgument(pdf_owner_password, pdf_user_password, pdf_permission, new File(nf.format(pdf_dst)));
-        PageArgument pageArgument = new PageArgument();
-        pageArgument.setAlign(pdf_align);
-        pageArgument.setSize(pdf_size);
-        pageArgument.setDirection(pdf_direction);
-        pageArgument.setAutoRotate(pdf_auto_rotate);
+
         return new Task(documentArgument, pageArgument, importSortedImagesFiles(source_directory));
     }
 
@@ -256,32 +260,18 @@ public class CreateAction extends AbstractAction {
     }
 
 
-    private static <T> String dumpArrayString(T[] array) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("[");
-        if (array != null && array.length != 0) {
-            sb.append(array[0].toString());
-            for (int i = 1; i < array.length; i++) {
-                sb.append(",");
-                sb.append(array[i].toString());
-            }
-        }
-        sb.append("]\n");
-        return sb.toString();
-    }
-
     private static Options getLocaleOptions() {
         Options options = new Options();
         Option opt_debug = PropertiesOption.getOption("d", "debug", "create.arg.debug.help");
         Option opt_overwrite = PropertiesOption.getOption("ow", "overwrite", "create.arg.overwrite_tasklist.help");
 
-        Option opt_pdf_size = PropertiesOption.getArgumentOption("pz", "pdf_size", "create.arg.pdf_size.help",listStringArray(ArrayToStringArray(PageSize.values())));
+        Option opt_pdf_size = PropertiesOption.getArgumentOption("pz", "pdf_size", "create.arg.pdf_size.help", listStringArray(ArrayToStringArray(PageSize.values())));
         Option opt_pdf_align = PropertiesOption.getArgumentOption("pa", "pdf_align", "create.arg.pdf_align.help");
         Option opt_pdf_direction = PropertiesOption.getArgumentOption("pdi", "pdf_direction", "create.arg.pdf_direction.help",
                 listStringArray(ArrayToStringArray(PageDirection.values())));
 
         Option opt_pdf_auto_rotate = PropertiesOption.getOption("par", "pdf_auto_rotate", "create.arg.pdf_auto_rotate.help");
-        Option opt_pdf_sortby = PropertiesOption.getArgumentOption("ps", "pdf_sortby", "create.arg.pdf_sortby.help",listStringArray(ArrayToStringArray(Sortby.values())));
+        Option opt_pdf_sortby = PropertiesOption.getArgumentOption("ps", "pdf_sortby", "create.arg.pdf_sortby.help", listStringArray(ArrayToStringArray(Sortby.values())));
         Option opt_pdf_sequence = PropertiesOption.getArgumentOption("pseq", "pdf_sequence", "create.arg.pdf_sequence.help", listStringArray(ArrayToStringArray(Sequence.values())));
         Option opt_pdf_owner_password = PropertiesOption.getArgumentOption("popwd", "pdf_owner_password",
                 "create.arg.pdf_owner_password.help");
