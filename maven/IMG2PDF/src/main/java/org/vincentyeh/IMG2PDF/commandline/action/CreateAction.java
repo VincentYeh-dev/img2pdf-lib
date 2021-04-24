@@ -220,9 +220,9 @@ public class CreateAction extends AbstractAction {
     private Task mergeArgumentsToTask(File source_directory) throws IOException {
         FileChecker.checkReadableFolder(source_directory);
         NameFormatter nf = new NameFormatter(source_directory);
-        DocumentArgument documentArgument = new DocumentArgument(pdf_owner_password, pdf_user_password, pdf_permission, new File(nf.format(pdf_dst)));
+        DocumentArgument documentArgument = new DocumentArgument(pdf_owner_password, pdf_user_password, pdf_permission );
 
-        return new Task(documentArgument, pageArgument, importSortedImagesFiles(source_directory));
+        return new Task(documentArgument, pageArgument, importSortedImagesFiles(source_directory),new File(nf.format(pdf_dst)));
     }
 
     private File[] importSortedImagesFiles(File source_directory) {

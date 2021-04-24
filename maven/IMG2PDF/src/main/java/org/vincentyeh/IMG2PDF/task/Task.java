@@ -15,13 +15,15 @@ public class Task {
     private final DocumentArgument documentArgument;
     private final PageArgument pageArgument;
 
-    private final File[] imgs;
+    private final File[] images;
+    private final File destination;
 
 
-    public Task(DocumentArgument documentArgument, PageArgument pageArgument, File[] imgs) {
-        if (imgs == null)
-            throw new IllegalArgumentException("imgs is null");
-        this.imgs = imgs;
+    public Task(DocumentArgument documentArgument, PageArgument pageArgument, File[] images,File destination) {
+        if (images == null)
+            throw new IllegalArgumentException("images is null");
+        this.images = images;
+        this.destination = destination;
         this.documentArgument = documentArgument;
         this.pageArgument = pageArgument;
     }
@@ -32,23 +34,26 @@ public class Task {
 
         this.documentArgument = new DocumentArgument(element.getChild("DocumentArgument"));
         this.pageArgument = new PageArgument(element.getChild("PageArgument"));
-
-        List<Element> contains_files = element.getChild("FILES").getChildren("FILE");
+        this.destination=new File(element.getChild("destination").getValue());
+        List<Element> contains_files = element.getChild("files").getChildren("image");
         ArrayList<Element> xml_files = new ArrayList<>(contains_files);
-        this.imgs = parseElementsToImages(xml_files);
+        this.images = parseElementsToImages(xml_files);
 
     }
 
    public Element toElement() {
-        Element task = new Element("TASK");
-        Element xml_files = new Element("FILES");
-        for (File img : imgs) {
-            Element xml_file = new Element("FILE");
+        Element task = new Element("task");
+        Element xml_files = new Element("files");
+        for (File img : images) {
+            Element xml_file = new Element("image");
             xml_file.addContent(img.getAbsolutePath());
             xml_files.addContent(xml_file);
         }
         task.addContent(xml_files);
+        Element elm_destination=new Element("destination");
+        elm_destination.addContent(destination.getAbsolutePath());
 
+        task.addContent(elm_destination);
         task.addContent(documentArgument.toElement());
         task.addContent(pageArgument.toElement());
 
@@ -70,8 +75,12 @@ public class Task {
     }
 
 
-    public File[] getImgs() {
-        return this.imgs;
+    public File[] getImages() {
+        return this.images;
+    }
+
+    public File getDestination() {
+        return destination;
     }
 
     public DocumentArgument getDocumentArgument() {

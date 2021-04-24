@@ -26,7 +26,7 @@ public class CustomConversionListener implements ConversionListener {
     @Override
     public void onConversionPreparing(Task task) {
         this.task = task;
-        total = task.getImgs().length;
+        total = task.getImages().length;
         perImg = (10. / total);
     }
 
@@ -38,7 +38,7 @@ public class CustomConversionListener implements ConversionListener {
             progress -= 1;
             counter++;
         }
-        String name = task.getDocumentArgument().getDestination().getName();
+        String name = task.getDestination().getName();
         System.out.printf("\t" + SharedSpace.getResString("convert.listener.converting") + "\r", new String(progress_bar), getSimplifiedName(name), index + 1, total, file.getName());
     }
 

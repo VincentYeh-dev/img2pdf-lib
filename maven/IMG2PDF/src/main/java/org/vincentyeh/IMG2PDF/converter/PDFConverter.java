@@ -60,14 +60,14 @@ public class PDFConverter implements Callable<File> {
 
         final ExecutorService page_executor = Executors.newCachedThreadPool();
         try {
-            if (!overwrite && task.getDocumentArgument().getDestination().exists()) {
+            if (!overwrite && task.getDestination().exists()) {
                 if (listener != null) {
-                    listener.onFileAlreadyExists(task.getDocumentArgument().getDestination());
+                    listener.onFileAlreadyExists(task.getDestination());
                 }
-                throw new HandledException(new FileAlreadyExistsException(task.getDocumentArgument().getDestination().getAbsolutePath()), getClass());
+                throw new HandledException(new FileAlreadyExistsException(task.getDestination().getAbsolutePath()), getClass());
             }
 
-            File[] imgs = task.getImgs();
+            File[] imgs = task.getImages();
             if (listener != null)
                 listener.onConversionPreparing(task);
 
@@ -99,15 +99,15 @@ public class PDFConverter implements Callable<File> {
 
             }
 
-            FileChecker.makeParentDirsIfNotExists(task.getDocumentArgument().getDestination());
-            FileChecker.checkWritableFile(task.getDocumentArgument().getDestination());
+            FileChecker.makeParentDirsIfNotExists(task.getDestination());
+            FileChecker.checkWritableFile(task.getDestination());
 
-            document.save(task.getDocumentArgument().getDestination());
+            document.save(task.getDestination());
             document.close();
             if (listener != null)
-                listener.onConversionComplete(task.getDocumentArgument().getDestination());
+                listener.onConversionComplete(task.getDestination());
 
-            return task.getDocumentArgument().getDestination();
+            return task.getDestination();
 
         } finally {
             page_executor.shutdown();
