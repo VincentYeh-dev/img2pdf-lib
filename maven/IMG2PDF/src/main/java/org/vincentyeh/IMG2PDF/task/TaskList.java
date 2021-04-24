@@ -18,7 +18,7 @@ public class TaskList {
     }
 
     private TaskList(Element root) throws FileNotFoundException, UnrecognizedEnumException {
-        ArrayList<Element> importedTaskList = new ArrayList<>(root.getChildren("TASK"));
+        ArrayList<Element> importedTaskList = new ArrayList<>(root.getChildren("task"));
         for (Element task : importedTaskList) {
 
             this.add(new Task(task));

@@ -101,14 +101,18 @@ public class ConvertAction extends AbstractAction {
 //                    TODO: add to language pack
                     System.err.println("\n\tWrong XML content."+e.getMessage());
                     throw new HandledException(e,getClass());
+                }catch (Exception e){
+                    e.printStackTrace();
+                    throw e;
                 }
+//                TODO:Add more catch
 
                 System.out
                         .print("\t[" + SharedSpace.getResString("public.info.imported") + "] " + src.getAbsolutePath() + "\r\n");
 
                 System.out.println();
                 System.out.println(SharedSpace.getResString("convert.start_conversion"));
-
+//                TODO:No exception is thrown when task.getArray() is empty.Warning to the user when it happen.
                 for (Task task : tasks.getArray()) {
                     File result;
                     try {
