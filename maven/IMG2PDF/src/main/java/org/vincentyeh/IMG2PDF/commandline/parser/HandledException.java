@@ -5,4 +5,8 @@ public class HandledException extends Exception{
         super(String.format("Handled in %s:%s",where.getSimpleName(),e.getMessage()));
         setStackTrace(e.getStackTrace());
     }
+
+    public HandledException(Throwable cause) {
+        super(cause);
+    }
 }
