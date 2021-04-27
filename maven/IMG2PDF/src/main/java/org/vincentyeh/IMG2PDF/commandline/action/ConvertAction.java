@@ -1,10 +1,7 @@
 package org.vincentyeh.IMG2PDF.commandline.action;
 
 import java.awt.Desktop;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -50,98 +47,128 @@ public class ConvertAction extends AbstractAction {
     private final File tempFolder;
     private final long maxMainMemoryBytes;
 
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+
     public ConvertAction(String[] args) throws ParseException, HandledException {
         super(getLocaleOptions());
-
-        CommandLine cmd = (new CheckHelpParser(opt_help)).parse(options, args);
-
-        if (cmd.hasOption("-h"))
-            throw new HelperException(options);
-
-        String[] str_sources = cmd.getOptionValues("tasklist_source");
-
-        tempFolder = new File(cmd.getOptionValue("temp_folder", DEFAULT_TEMP_FOLDER)).getAbsoluteFile();
         try {
-            FileChecker.makeDirsIfNotExists(tempFolder);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new HandledException(e, getClass());
-        }
+            CommandLine cmd = (new CheckHelpParser(opt_help)).parse(options, args);
+            if (cmd.hasOption("-h"))
+                throw new HelperException(options);
 
-        try {
-            maxMainMemoryBytes = BytesSize.parseString(cmd.getOptionValue("memory_max_usage", DEFAULT_MAX_MEMORY_USAGE)).getBytes();
-        } catch (IllegalArgumentException e) {
-            System.err.println(e.getMessage());
-            throw new HandledException(e, getClass());
-        }
+            open_when_complete = cmd.hasOption("open_when_complete");
+            overwrite_output = cmd.hasOption("overwrite");
 
-        open_when_complete = cmd.hasOption("open_when_complete");
-        overwrite_output = cmd.hasOption("overwrite");
-        try {
-            tasklist_sources = verifyFiles(str_sources);
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-            throw new HandledException(e, getClass());
-        }
+            tempFolder = getTempFolder(cmd);
+            try {
+                FileChecker.makeDirsIfNotExists(tempFolder);
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new HandledException(e, getClass());
+            }
 
+            try {
+                maxMainMemoryBytes = getMaxMemoryBytes(cmd);
+            } catch (IllegalArgumentException e) {
+                System.err.println(e.getMessage());
+                throw new HandledException(e, getClass());
+            }
+
+            String[] str_sources = cmd.getOptionValues("tasklist_source");
+            try {
+                tasklist_sources = verifyFiles(str_sources);
+            } catch (IOException e) {
+                System.err.println(e.getMessage());
+                throw new HandledException(e, getClass());
+            }
+
+        } catch (Exception e) {
+            executor.shutdown();
+            throw e;
+        }
+    }
+
+    private long getMaxMemoryBytes(CommandLine cmd) {
+        return BytesSize.parseString(cmd.getOptionValue("memory_max_usage", DEFAULT_MAX_MEMORY_USAGE)).getBytes();
+
+    }
+
+    private File getTempFolder(CommandLine cmd) {
+        return new File(cmd.getOptionValue("temp_folder", DEFAULT_TEMP_FOLDER)).getAbsoluteFile();
     }
 
     @Override
     public void start() throws Exception {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        System.out.println(SharedSpace.getResString("convert.import_tasklists"));
         try {
+
+            System.out.println(SharedSpace.getResString("convert.import_tasklists"));
             for (File src : tasklist_sources) {
                 System.out.print(
                         "\t[" + SharedSpace.getResString("public.info.importing") + "] " + src.getAbsolutePath() + "\r");
-                TaskList tasks;
-                try {
-                    tasks = new TaskList(getDocumentFromFile(src));
-                }catch (SAXException e){
-//                    TODO: add to language pack
-                    System.err.println("\n\tWrong XML content."+e.getMessage());
-                    throw new HandledException(e,getClass());
-                }catch (Exception e){
-                    e.printStackTrace();
-                    throw e;
-                }
-//                TODO:Add more catch
-
-                System.out
-                        .print("\t[" + SharedSpace.getResString("public.info.imported") + "] " + src.getAbsolutePath() + "\r\n");
-
+                TaskList tasks = getTaskListFromFile(src);
+                System.out.print("\t[" + SharedSpace.getResString("public.info.imported") + "] " + src.getAbsolutePath() + "\r\n");
                 System.out.println();
                 System.out.println(SharedSpace.getResString("convert.start_conversion"));
-//                TODO:No exception is thrown when task.getArray() is empty.Warning to the user when it happen.
-                for (Task task : tasks.getArray()) {
-                    File result;
-                    try {
-                        PDFConverter converter = new PDFConverter(task, maxMainMemoryBytes, tempFolder, overwrite_output);
-                        converter.setListener(new CustomConversionListener());
-                        Future<File> future = executor.submit(converter);
-                        result = future.get();
-                    } catch (ExecutionException e) {
-                        if ((e.getCause() instanceof HandledException)) {
-                            continue;
-                        } else {
-                            throw e;
-                        }
-                    }
-
-                    if (open_when_complete) {
-                        Desktop desktop = Desktop.getDesktop();
-
-                        if (result.exists())
-                            try {
-                                desktop.open(result);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                    }
-                }
+                convertList(tasks);
             }
+
         } finally {
             executor.shutdown();
+        }
+    }
+
+    private void convertList(TaskList tasks) throws Exception {
+//                TODO:No exception is thrown when task.getArray() is empty.Warning to the user when it happen.
+        for (Task task : tasks.getArray()) {
+            try {
+                File result = convertToFile(task);
+
+                if (open_when_complete)
+                    openPDF(result);
+
+            } catch (HandledException ignored) {
+            }
+        }
+    }
+
+
+    private TaskList getTaskListFromFile(File src) throws HandledException, ParserConfigurationException, IOException {
+        try {
+            return new TaskList(getDocumentFromFile(src));
+        } catch (SAXException e) {
+//                    TODO: add to language pack
+            System.err.println("\n\tWrong XML content." + e.getMessage());
+            throw new HandledException(e, getClass());
+//                TODO:Add more catch
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    private void openPDF(File file) {
+        Desktop desktop = Desktop.getDesktop();
+        if (file.exists())
+            try {
+                desktop.open(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+    }
+
+    private File convertToFile(Task task) throws Exception {
+        try {
+            PDFConverter converter = new PDFConverter(task, maxMainMemoryBytes, tempFolder, overwrite_output);
+            converter.setListener(new CustomConversionListener());
+            Future<File> future = executor.submit(converter);
+            return future.get();
+        } catch (ExecutionException e) {
+            if ((e.getCause() instanceof HandledException)) {
+                throw new HandledException(e.getCause());
+            } else {
+                throw e;
+            }
         }
     }
 

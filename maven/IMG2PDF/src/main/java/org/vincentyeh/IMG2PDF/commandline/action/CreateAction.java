@@ -51,11 +51,11 @@ public class CreateAction extends AbstractAction {
 
     //    For PDF
     private final DocumentArgument documentArgument;
-    private final PageArgument pageArgument = new PageArgument();
+    private final PageArgument pageArgument;
     private final String pdf_dst;
 
     //    For tasklist
-    private final File list_dst;
+    private final File tasklist_dst;
     private final boolean debug;
     private final boolean overwrite;
 
@@ -76,33 +76,23 @@ public class CreateAction extends AbstractAction {
 
         debug = cmd.hasOption("debug");
         overwrite = cmd.hasOption("overwrite");
-        try {
+        pdf_dst = cmd.getOptionValue("pdf_destination");
 
+        tasklist_dst = getListDestination(cmd);
+
+        try {
             pdf_sortby = Sortby.getByString(cmd.getOptionValue("pdf_sortby", DEFAULT_PDF_SORTBY));
             pdf_sequence = Sequence.getByString(cmd.getOptionValue("pdf_sequence", DEFAULT_PDF_SEQUENCE));
+            pageArgument = getPageArgument(cmd);
+            documentArgument = getDocumentArgument(cmd);
 
-            pageArgument.setAlign(new PageAlign(cmd.getOptionValue("pdf_align", DEFAULT_PDF_ALIGN)));
-            pageArgument.setSize(PageSize.getByString(cmd.getOptionValue("pdf_size", DEFAULT_PDF_SIZE)));
-            pageArgument.setDirection(PageDirection.getByString(cmd.getOptionValue("pdf_direction", DEFAULT_PDF_DIRECTION)));
-            pageArgument.setAutoRotate(cmd.hasOption("pdf_auto_rotate"));
         } catch (UnrecognizedEnumException e) {
             System.err.printf(SharedSpace.getResString("public.err.unrecognizable_enum_long") + "\n", e.getUnrecognizableEnum(), e.getEnumName(), listStringArray(e.getAvailiableValues()));
             throw new HandledException(e, getClass());
         }
 
-        DocumentAccessPermission pdf_permission = new DocumentAccessPermission(cmd.getOptionValue("pdf_permission", "11"));
-
-        String pdf_owner_password = cmd.getOptionValue("pdf_owner_password");
-        String pdf_user_password = cmd.getOptionValue("pdf_user_password");
-        documentArgument = new DocumentArgument(pdf_owner_password, pdf_user_password, pdf_permission);
-
-        pdf_dst = cmd.getOptionValue("pdf_destination");
-
-        String list_destination = cmd.getOptionValue("list_destination");
-        list_dst = (new File(list_destination)).getAbsoluteFile();
-
         try {
-            ffh = new FileFilterHelper(cmd.getOptionValue("filter", DEFAULT_PDF_FILTER));
+            ffh = getFileFilterHelper(cmd);
         } catch (UnsupportedOperationException e) {
             System.err.printf(SharedSpace.getResString("create.err.filter") + "\n", e.getMessage());
             throw new HandledException(e, getClass());
@@ -120,6 +110,35 @@ public class CreateAction extends AbstractAction {
             throw new HandledException(e, getClass());
         }
 
+        printInformation();
+    }
+
+    private FileFilterHelper getFileFilterHelper(CommandLine cmd) {
+        return new FileFilterHelper(cmd.getOptionValue("filter", DEFAULT_PDF_FILTER));
+    }
+
+    private File getListDestination(CommandLine cmd) {
+        String list_destination = cmd.getOptionValue("list_destination");
+        return (new File(list_destination)).getAbsoluteFile();
+    }
+
+    private DocumentArgument getDocumentArgument(CommandLine cmd) {
+        DocumentAccessPermission pdf_permission = new DocumentAccessPermission(cmd.getOptionValue("pdf_permission", "11"));
+        String pdf_owner_password = cmd.getOptionValue("pdf_owner_password");
+        String pdf_user_password = cmd.getOptionValue("pdf_user_password");
+        return new DocumentArgument(pdf_owner_password, pdf_user_password, pdf_permission);
+    }
+
+    private PageArgument getPageArgument(CommandLine cmd) throws UnrecognizedEnumException {
+        PageArgument pageArgument = new PageArgument();
+        pageArgument.setAlign(new PageAlign(cmd.getOptionValue("pdf_align", DEFAULT_PDF_ALIGN)));
+        pageArgument.setSize(PageSize.getByString(cmd.getOptionValue("pdf_size", DEFAULT_PDF_SIZE)));
+        pageArgument.setDirection(PageDirection.getByString(cmd.getOptionValue("pdf_direction", DEFAULT_PDF_DIRECTION)));
+        pageArgument.setAutoRotate(cmd.hasOption("pdf_auto_rotate"));
+        return pageArgument;
+    }
+
+    private void printInformation() {
         System.out.println();
         System.out.printf("### " + SharedSpace.getResString("create.tasklist_config")
                         + " ###\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n############\n",
@@ -134,7 +153,7 @@ public class CreateAction extends AbstractAction {
 //
                 SharedSpace.getResString("create.arg.filter.name"), ffh.getOperator(),
 //
-                SharedSpace.getResString("create.arg.list_destination.name"), list_destination,
+                SharedSpace.getResString("create.arg.list_destination.name"), tasklist_dst,
 //
                 SharedSpace.getResString("create.arg.source.name"), listStringArray(ArrayToStringArray(sourceFiles))
 //
@@ -150,35 +169,25 @@ public class CreateAction extends AbstractAction {
 //          In dirlist
             FileChecker.checkReadableFile(dirlist);
             System.out.printf(SharedSpace.getResString("create.import_from_list") + "\n", dirlist.getName());
-
             List<String> lines = Files.readAllLines(dirlist.toPath(), SharedSpace.Configuration.DEFAULT_CHARSET);
-            for (int line_counter = 0; line_counter < lines.size(); line_counter++) {
 
-//              In line
-                String line = lines.get(line_counter);
+            for (int line_index = 0; line_index < lines.size(); line_index++) {
 
-//            Ignore BOM Header:
-                line = line.replace("\uFEFF", "");
+                String line = getFixedLine(lines.get(line_index));
 
-                if (line.trim().isEmpty() || line.isEmpty())
+                if (line == null)
                     continue;
 
-                File dir = new File(line);
+                File dir = getAbsoluteFileFromLine(line, dirlist);
 
                 System.out.printf("\t[" + SharedSpace.getResString("public.info.importing") + "] %s\n",
                         dir.getAbsolutePath());
-
-                if (!dir.isAbsolute()) {
-                    dir = new File(dirlist.getParent(), line);
-                } else {
-                    dir = new File(line);
-                }
 
                 try {
                     FileChecker.checkExists(dir);
                 } catch (FileNotFoundException e) {
                     System.err.printf(SharedSpace.getResString("create.err.source_filenotfound") + "\n", dirlist.getName(),
-                            line_counter, dir.getAbsolutePath());
+                            line_index, dir.getAbsolutePath());
                     throw new HandledException(e, getClass());
                 }
 
@@ -186,11 +195,11 @@ public class CreateAction extends AbstractAction {
                     FileChecker.checkDirectory(dir);
                 } catch (IOException e) {
                     System.err.printf(SharedSpace.getResString("create.err.source_path_is_file") + "\n", dirlist.getName(),
-                            line_counter, dir.getAbsolutePath());
+                            line_index, dir.getAbsolutePath());
                     throw new HandledException(e, getClass());
                 }
 
-                tasks.add(mergeArgumentsToTask(dir));
+                tasks.add(mergeAllIntoTask(dir));
 
                 System.out.printf("\t[" + SharedSpace.getResString("public.info.imported") + "] %s\n",
                         dir.getAbsolutePath());
@@ -198,24 +207,43 @@ public class CreateAction extends AbstractAction {
 
         }
 
-        if (!overwrite && list_dst.exists()) {
-            System.err.printf(SharedSpace.getResString("public.err.overwrite") + "\n", list_dst.getAbsolutePath());
+        if (!overwrite && tasklist_dst.exists()) {
+            System.err.printf(SharedSpace.getResString("public.err.overwrite") + "\n", tasklist_dst.getAbsolutePath());
             throw new HandledException(new RuntimeException("Overwrite deny"), getClass());
         }
 
         try {
-            writeTaskList(tasks, list_dst);
-            System.out.printf("[" + SharedSpace.getResString("public.info.exported") + "] %s\n", list_dst.getAbsolutePath());
+            save(tasks, tasklist_dst);
+            System.out.printf("[" + SharedSpace.getResString("public.info.exported") + "] %s\n", tasklist_dst.getAbsolutePath());
         } catch (IOException e) {
             System.err.printf(SharedSpace.getResString("create.err.tasklist_create") + "\n", e.getMessage());
             throw new HandledException(e, getClass());
         }
     }
 
-    private Task mergeArgumentsToTask(File source_directory) throws IOException {
+    private File getAbsoluteFileFromLine(String line, File directoryList) {
+        File dir = new File(line);
+        if (!dir.isAbsolute()) {
+            return new File(directoryList.getParent(), line).getAbsoluteFile();
+        } else {
+            return dir;
+        }
+    }
+
+    private String getFixedLine(String raw) {
+        if (raw.isEmpty() || raw.trim().isEmpty())
+            return null;
+        else
+            return removeBOMHeaderInUTF8Line(raw).trim();
+    }
+
+    private String removeBOMHeaderInUTF8Line(String raw) {
+        return raw.replace("\uFEFF", "");
+    }
+
+    private Task mergeAllIntoTask(File source_directory) throws IOException {
         FileChecker.checkReadableFolder(source_directory);
         NameFormatter nf = new NameFormatter(source_directory);
-
         return new Task(documentArgument, pageArgument, importSortedImagesFiles(source_directory), new File(nf.format(pdf_dst)));
     }
 
@@ -239,18 +267,18 @@ public class CreateAction extends AbstractAction {
         return files;
     }
 
-    public void writeTaskList(TaskList list, File file) throws IOException {
-        FileChecker.makeParentDirsIfNotExists(file);
-        FileChecker.checkWritableFile(file);
+    public void save(TaskList taskList, File destination) throws IOException {
+        FileChecker.makeParentDirsIfNotExists(destination);
+        FileChecker.checkWritableFile(destination);
 
         Document doc = new Document();
-        Element root = list.toElement();
+        Element root = taskList.toElement();
         doc.setRootElement(root);
         XMLOutputter outer = new XMLOutputter();
         Format format = Format.getPrettyFormat();
         outer.setFormat(format);
 
-        outer.output(doc, new OutputStreamWriter(new FileOutputStream(file), SharedSpace.Configuration.DEFAULT_CHARSET));
+        outer.output(doc, new OutputStreamWriter(new FileOutputStream(destination), SharedSpace.Configuration.DEFAULT_CHARSET));
     }
 
 
