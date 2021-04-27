@@ -50,18 +50,16 @@ public class CreateAction extends AbstractAction {
     protected final FileFilterHelper ffh;
 
     //    For PDF
+    private final DocumentArgument documentArgument;
     private final PageArgument pageArgument = new PageArgument();
-    protected final String pdf_owner_password;
-    protected final String pdf_user_password;
-    protected final DocumentAccessPermission pdf_permission;
-    protected final String pdf_dst;
+    private final String pdf_dst;
 
     //    For tasklist
-    protected final File list_dst;
-    protected final boolean debug;
-    protected final boolean overwrite;
+    private final File list_dst;
+    private final boolean debug;
+    private final boolean overwrite;
 
-    protected final File[] sourceFiles;
+    private final File[] sourceFiles;
 
     private static final Option opt_help;
 
@@ -92,10 +90,11 @@ public class CreateAction extends AbstractAction {
             throw new HandledException(e, getClass());
         }
 
-        pdf_permission = new DocumentAccessPermission(cmd.getOptionValue("pdf_permission", "11"));
+        DocumentAccessPermission pdf_permission = new DocumentAccessPermission(cmd.getOptionValue("pdf_permission", "11"));
 
-        pdf_owner_password = cmd.getOptionValue("pdf_owner_password");
-        pdf_user_password = cmd.getOptionValue("pdf_user_password");
+        String pdf_owner_password = cmd.getOptionValue("pdf_owner_password");
+        String pdf_user_password = cmd.getOptionValue("pdf_user_password");
+        documentArgument = new DocumentArgument(pdf_owner_password, pdf_user_password, pdf_permission);
 
         pdf_dst = cmd.getOptionValue("pdf_destination");
 
@@ -180,22 +179,18 @@ public class CreateAction extends AbstractAction {
                 } catch (FileNotFoundException e) {
                     System.err.printf(SharedSpace.getResString("create.err.source_filenotfound") + "\n", dirlist.getName(),
                             line_counter, dir.getAbsolutePath());
-                    throw new HandledException(e,getClass());
+                    throw new HandledException(e, getClass());
                 }
 
                 try {
                     FileChecker.checkDirectory(dir);
-                }catch (IOException e){
+                } catch (IOException e) {
                     System.err.printf(SharedSpace.getResString("create.err.source_path_is_file") + "\n", dirlist.getName(),
                             line_counter, dir.getAbsolutePath());
                     throw new HandledException(e, getClass());
                 }
 
-                try {
-                    tasks.add(mergeArgumentsToTask(dir));
-                }catch (IOException e){
-
-                }
+                tasks.add(mergeArgumentsToTask(dir));
 
                 System.out.printf("\t[" + SharedSpace.getResString("public.info.imported") + "] %s\n",
                         dir.getAbsolutePath());
@@ -220,9 +215,8 @@ public class CreateAction extends AbstractAction {
     private Task mergeArgumentsToTask(File source_directory) throws IOException {
         FileChecker.checkReadableFolder(source_directory);
         NameFormatter nf = new NameFormatter(source_directory);
-        DocumentArgument documentArgument = new DocumentArgument(pdf_owner_password, pdf_user_password, pdf_permission );
 
-        return new Task(documentArgument, pageArgument, importSortedImagesFiles(source_directory),new File(nf.format(pdf_dst)));
+        return new Task(documentArgument, pageArgument, importSortedImagesFiles(source_directory), new File(nf.format(pdf_dst)));
     }
 
     private File[] importSortedImagesFiles(File source_directory) {
