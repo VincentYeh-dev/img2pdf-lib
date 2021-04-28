@@ -14,15 +14,15 @@ import org.vincentyeh.IMG2PDF.util.FileChecker;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
-public class ConvertActionParser {
+public class ConvertActionParser extends ActionParser<ConvertAction> {
     private static final String DEFAULT_TEMP_FOLDER = ".org.vincentyeh.IMG2PDF.tmp";
     private static final String DEFAULT_MAX_MEMORY_USAGE = "50MB";
 
     private final Options options = new Options();
     private final CheckHelpParser parser;
 
+    @Override
     public ConvertAction parse(String[] arguments) throws ParseException, HandledException {
         CommandLine cmd = parser.parse(options, arguments);
 
@@ -55,35 +55,6 @@ public class ConvertActionParser {
             throw new HandledException(e, getClass());
         }
         return new ConvertAction(tempFolder, maxMainMemoryBytes, tasklist_sources, open_when_complete, overwrite_output);
-    }
-
-    protected File[] verifyFiles(String[] strSources) throws IOException {
-        if (strSources == null) {
-            throw new IllegalArgumentException("strSources==null");
-        }
-        if (strSources.length == 0) {
-            throw new IllegalArgumentException("strSources is empty");
-        }
-
-//        TODO:Add to language pack.
-        System.out.println(("Verifying files"));
-
-        ArrayList<File> verified_sources = new ArrayList<>();
-        for (String str_source : strSources) {
-            File raw = (new File(str_source)).getAbsoluteFile();
-            System.out.printf("\t[" + SharedSpace.getResString("public.info.verifying") + "] %s\r", raw.getAbsolutePath());
-
-            FileChecker.checkReadableFile(raw);
-
-            System.out.printf("\t[" + SharedSpace.getResString("public.info.verified") + "] %s\r\n",
-                    raw.getAbsolutePath());
-
-            verified_sources.add(raw);
-        }
-
-        File[] sources = new File[verified_sources.size()];
-        verified_sources.toArray(sources);
-        return sources;
     }
 
     private long getMaxMemoryBytes(CommandLine cmd) {

@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="kuma_fish_album_1 convert" type="Application" factoryName="Application" folderName="kuma_fish_album_1">
-    <option name="MAIN_CLASS_NAME" value="org.vincentyeh.IMG2PDF.commandline.action.MainProgram" />
+    <option name="MAIN_CLASS_NAME" value="org.vincentyeh.IMG2PDF.MainProgram" />
     <module name="IMG2PDF" />
     <option name="PROGRAM_PARAMETERS" value="-m convert -o -ow -lsrc &quot;D:\Projects\git\IMG2PDF\sample\kuma_fish_album_1\taskslist\test.xml&quot;" />
     <method v="2">

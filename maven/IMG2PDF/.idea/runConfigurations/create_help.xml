@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="create help" type="Application" factoryName="Application" folderName="help">
-    <option name="MAIN_CLASS_NAME" value="org.vincentyeh.IMG2PDF.commandline.action.MainProgram" />
+    <option name="MAIN_CLASS_NAME" value="org.vincentyeh.IMG2PDF.MainProgram" />
     <module name="IMG2PDF" />
     <option name="PROGRAM_PARAMETERS" value="-m create -h" />
     <method v="2">
