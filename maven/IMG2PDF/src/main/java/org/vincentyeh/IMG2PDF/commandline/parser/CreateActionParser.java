@@ -13,15 +13,13 @@ import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
 import org.vincentyeh.IMG2PDF.pdf.page.PageArgument;
 import org.vincentyeh.IMG2PDF.pdf.page.PageDirection;
 import org.vincentyeh.IMG2PDF.pdf.page.PageSize;
-import org.vincentyeh.IMG2PDF.util.FileChecker;
 import org.vincentyeh.IMG2PDF.util.FileFilterHelper;
 import org.vincentyeh.IMG2PDF.util.FileSorter;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
-public class CreateActionParser {
+public class CreateActionParser extends ActionParser<CreateAction> {
 
     private static final String DEFAULT_PDF_SIZE = "A4";
     private static final String DEFAULT_PDF_ALIGN = "CENTER-CENTER";
@@ -33,6 +31,7 @@ public class CreateActionParser {
     private final CheckHelpParser parser;
     private final Options options = new Options();
 
+    @Override
     public CreateAction parse(String[] arguments) throws ParseException, HandledException {
         CommandLine cmd = parser.parse(options, arguments);
 
@@ -80,34 +79,6 @@ public class CreateActionParser {
         return new CreateAction(pdf_sortby, pdf_sequence, ffh, documentArgument, pageArgument, pdf_dst, tasklist_dst, debug, overwrite, sourceFiles);
     }
 
-    protected File[] verifyFiles(String[] strSources) throws IOException {
-        if (strSources == null) {
-            throw new IllegalArgumentException("strSources==null");
-        }
-        if (strSources.length == 0) {
-            throw new IllegalArgumentException("strSources is empty");
-        }
-//        TODO:Add to language pack.
-        System.out.println(("Verifying files"));
-
-        ArrayList<File> verified_sources = new ArrayList<>();
-        for (String str_source : strSources) {
-            File raw = (new File(str_source)).getAbsoluteFile();
-            System.out.printf("\t[" + SharedSpace.getResString("public.info.verifying") + "] %s\r", raw.getAbsolutePath());
-
-            FileChecker.checkReadableFile(raw);
-
-            System.out.printf("\t[" + SharedSpace.getResString("public.info.verified") + "] %s\r\n",
-                    raw.getAbsolutePath());
-
-            verified_sources.add(raw);
-        }
-
-        File[] sources = new File[verified_sources.size()];
-        verified_sources.toArray(sources);
-        return sources;
-    }
-
     private FileFilterHelper getFileFilterHelper(CommandLine cmd) {
         return new FileFilterHelper(cmd.getOptionValue("filter", DEFAULT_PDF_FILTER));
     }
@@ -133,24 +104,6 @@ public class CreateActionParser {
         return pageArgument;
     }
 
-
-    protected static String listStringArray(String[] values) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(values[0]);
-        for (int i = 1; i < values.length; i++) {
-            sb.append(",");
-            sb.append(values[i]);
-        }
-        return sb.toString();
-    }
-
-    protected static <T> String[] ArrayToStringArray(T[] arr1) {
-        String[] string_array = new String[arr1.length];
-        for (int i = 0; i < arr1.length; i++) {
-            string_array[i] = arr1[i].toString();
-        }
-        return string_array;
-    }
 
     public CreateActionParser() {
         Option opt_help = PropertiesOption.getOption("h", "help", "create.help");
