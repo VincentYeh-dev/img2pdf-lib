@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.commandline.action.exception;
+package org.vincentyeh.IMG2PDF.commandline.parser.exception;
 
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;

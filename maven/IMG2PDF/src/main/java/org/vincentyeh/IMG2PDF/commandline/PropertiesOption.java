@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.commandline.parser;
+package org.vincentyeh.IMG2PDF.commandline;
 
 import org.apache.commons.cli.Option;
 import org.vincentyeh.IMG2PDF.SharedSpace;

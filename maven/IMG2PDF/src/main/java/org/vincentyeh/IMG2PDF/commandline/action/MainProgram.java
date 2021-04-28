@@ -1,19 +1,12 @@
 package org.vincentyeh.IMG2PDF.commandline.action;
 
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.MissingArgumentException;
-import org.apache.commons.cli.MissingOptionException;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.UnrecognizedOptionException;
+import org.apache.commons.cli.*;
 import org.vincentyeh.IMG2PDF.SharedSpace;
-import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
-import org.vincentyeh.IMG2PDF.commandline.parser.HandledException;
-import org.vincentyeh.IMG2PDF.commandline.parser.PropertiesOption;
-import org.vincentyeh.IMG2PDF.commandline.parser.RelaxedParser;
+import org.vincentyeh.IMG2PDF.commandline.parser.CreateActionParser;
+import org.vincentyeh.IMG2PDF.commandline.parser.exception.HelperException;
+import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
+import org.vincentyeh.IMG2PDF.commandline.PropertiesOption;
 
 import java.util.Iterator;
 
@@ -25,7 +18,7 @@ public class MainProgram extends AbstractAction {
         opt_help = PropertiesOption.getOption("h", "help", "main.help");
     }
 
-    private final AbstractAction action;
+    private final Action action;
 
     public MainProgram(String[] args) throws ParseException, HandledException {
         super(getLocaleOptions());
@@ -35,7 +28,7 @@ public class MainProgram extends AbstractAction {
         System.out.printf("\n%s: %s\n", SharedSpace.getResString("public.info.version"), SharedSpace.Configuration.PROGRAM_VER);
         System.out.println("-----------------------");
 
-        CommandLine mode_chooser = (new RelaxedParser()).parse(options, args);
+        CommandLine mode_chooser = (new DefaultParser()).parse(options, args,true);
 
         if (args.length == 0 || mode_chooser.hasOption("help") && !mode_chooser.hasOption("mode")) {
             throw new HelperException(options);
@@ -51,7 +44,8 @@ public class MainProgram extends AbstractAction {
 
         switch (mode) {
             case create:
-                action = new CreateAction(args);
+                CreateActionParser createActionParser=new CreateActionParser();
+                action=createActionParser.parse(args);
                 break;
             case convert:
                 action = new ConvertAction(args);
