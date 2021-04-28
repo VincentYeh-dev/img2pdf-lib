@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TASKLIST>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\kuma_fish_album_1\output\kuma_fish_album_1.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\kuma_fish_album_1\image-sources\Horizontal_1.jpg</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\kuma_fish_album_1\image-sources\Horizontal_2.jpg</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\kuma_fish_album_1\image-sources\Vertical_1.jpg</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\kuma_fish_album_1\image-sources\Vertical_2.jpg</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\kuma_fish_album_1\image-sources\Vertical_3.jpg</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\kuma_fish_album_1\image-sources\Vertical_4.jpg</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\kuma_fish_album_1\image-sources\Vertical_5.jpg</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\kuma_fish_album_1\image-sources\Vertical_6.jpg</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+  <TASK destination="C:\Users\vince\git\IMG2PDF\sample\kuma_fish_album_1\output\kuma_fish_album_1.pdf" size="A4" align="CENTER-CENTER" default-direction="Vertical" auto-rotate="true">
+    <FILES>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\kuma_fish_album_1\image-sources\Horizontal_1.jpg</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\kuma_fish_album_1\image-sources\Horizontal_2.jpg</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\kuma_fish_album_1\image-sources\Vertical_1.jpg</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\kuma_fish_album_1\image-sources\Vertical_2.jpg</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\kuma_fish_album_1\image-sources\Vertical_3.jpg</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\kuma_fish_album_1\image-sources\Vertical_4.jpg</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\kuma_fish_album_1\image-sources\Vertical_5.jpg</FILE>
+      <FILE>C:\Users\vince\git\IMG2PDF\sample\kuma_fish_album_1\image-sources\Vertical_6.jpg</FILE>
+    </FILES>
+    <PERMISSION canPrint="true" canModify="true">
+      <OWNER-PASSWORD>1234AAA</OWNER-PASSWORD>
+      <USER-PASSWORD>1234AAA</USER-PASSWORD>
+    </PERMISSION>
+  </TASK>
+</TASKLIST>
