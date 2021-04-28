@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.commandline.parser;
+package org.vincentyeh.IMG2PDF.commandline.parser.core;
 
 import java.util.ArrayList;
 import java.util.List;

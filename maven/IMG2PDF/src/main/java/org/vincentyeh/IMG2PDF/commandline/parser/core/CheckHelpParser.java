@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.commandline.parser;
+package org.vincentyeh.IMG2PDF.commandline.parser.core;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -6,7 +6,7 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.vincentyeh.IMG2PDF.commandline.action.exception.HelperException;
+import org.vincentyeh.IMG2PDF.commandline.parser.exception.HelperException;
 
 public class CheckHelpParser extends DefaultParser {
 	private final Option helperOption;
