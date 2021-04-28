@@ -9,7 +9,6 @@ import org.vincentyeh.IMG2PDF.commandline.PropertiesOption;
 import org.vincentyeh.IMG2PDF.commandline.action.ConvertAction;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
-import org.vincentyeh.IMG2PDF.commandline.parser.exception.HelperException;
 import org.vincentyeh.IMG2PDF.util.BytesSize;
 import org.vincentyeh.IMG2PDF.util.FileChecker;
 
@@ -25,20 +24,13 @@ public class ConvertActionParser {
     private final CheckHelpParser parser;
 
     public ConvertAction parse(String[] arguments) throws ParseException, HandledException {
-        File tempFolder;
-        long maxMainMemoryBytes;
-        File[] tasklist_sources;
-        boolean open_when_complete;
-        boolean overwrite_output;
-
         CommandLine cmd = parser.parse(options, arguments);
-        if (cmd.hasOption("-h"))
-            throw new HelperException(options);
 
-        open_when_complete = cmd.hasOption("open_when_complete");
-        overwrite_output = cmd.hasOption("overwrite");
+        boolean open_when_complete = cmd.hasOption("open_when_complete");
+        boolean overwrite_output = cmd.hasOption("overwrite");
+        String[] str_sources = cmd.getOptionValues("tasklist_source");
+        File tempFolder = getTempFolder(cmd);
 
-        tempFolder = getTempFolder(cmd);
         try {
             FileChecker.makeDirsIfNotExists(tempFolder);
         } catch (IOException e) {
@@ -46,6 +38,7 @@ public class ConvertActionParser {
             throw new HandledException(e, getClass());
         }
 
+        long maxMainMemoryBytes;
         try {
             maxMainMemoryBytes = getMaxMemoryBytes(cmd);
         } catch (IllegalArgumentException e) {
@@ -53,7 +46,8 @@ public class ConvertActionParser {
             throw new HandledException(e, getClass());
         }
 
-        String[] str_sources = cmd.getOptionValues("tasklist_source");
+
+        File[] tasklist_sources;
         try {
             tasklist_sources = verifyFiles(str_sources);
         } catch (IOException e) {
@@ -70,6 +64,7 @@ public class ConvertActionParser {
         if (strSources.length == 0) {
             throw new IllegalArgumentException("strSources is empty");
         }
+
 //        TODO:Add to language pack.
         System.out.println(("Verifying files"));
 

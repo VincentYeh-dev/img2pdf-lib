@@ -3,7 +3,6 @@ package org.vincentyeh.IMG2PDF.commandline.parser;
 import org.apache.commons.cli.*;
 import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.commandline.action.CreateAction;
-import org.vincentyeh.IMG2PDF.commandline.parser.exception.HelperException;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
@@ -33,31 +32,21 @@ public class CreateActionParser {
 
     private final CheckHelpParser parser;
     private final Options options = new Options();
+
     public CreateAction parse(String[] arguments) throws ParseException, HandledException {
+        CommandLine cmd = parser.parse(options, arguments);
+
+        boolean debug = cmd.hasOption("debug");
+        boolean overwrite = cmd.hasOption("overwrite");
+
+        String pdf_dst = cmd.getOptionValue("pdf_destination");
+
+        File tasklist_dst = getTaskListDestination(cmd);
+
         FileSorter.Sortby pdf_sortby;
         FileSorter.Sequence pdf_sequence;
-        FileFilterHelper ffh;
-
         DocumentArgument documentArgument;
         PageArgument pageArgument;
-        String pdf_dst;
-
-        File tasklist_dst;
-        boolean debug;
-        boolean overwrite;
-
-        File[] sourceFiles;
-
-        CommandLine cmd = parser.parse(options, arguments);
-        if (cmd.hasOption("-h"))
-            throw new HelperException(options);
-
-        debug = cmd.hasOption("debug");
-        overwrite = cmd.hasOption("overwrite");
-        pdf_dst = cmd.getOptionValue("pdf_destination");
-
-        tasklist_dst = getTaskListDestination(cmd);
-
         try {
             pdf_sortby = FileSorter.Sortby.getByString(cmd.getOptionValue("pdf_sortby", DEFAULT_PDF_SORTBY));
             pdf_sequence = FileSorter.Sequence.getByString(cmd.getOptionValue("pdf_sequence", DEFAULT_PDF_SEQUENCE));
@@ -68,6 +57,7 @@ public class CreateActionParser {
             throw new HandledException(e, getClass());
         }
 
+        FileFilterHelper ffh;
         try {
             ffh = getFileFilterHelper(cmd);
         } catch (UnsupportedOperationException e) {
@@ -80,6 +70,7 @@ public class CreateActionParser {
             throw new HandledException(new IllegalArgumentException("source==null"), getClass());
         }
 
+        File[] sourceFiles;
         try {
             sourceFiles = verifyFiles(str_sources);
         } catch (IOException e) {
@@ -209,7 +200,7 @@ public class CreateActionParser {
         options.addOption(opt_sources);
         options.addOption(opt_list_destination);
 
-        parser=new CheckHelpParser(opt_help);
+        parser = new CheckHelpParser(opt_help);
 
         Option opt_mode = new Option("m", "mode", true, "mode");
 
