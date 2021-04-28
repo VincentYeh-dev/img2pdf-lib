@@ -30,7 +30,7 @@ public class ConvertAction implements Action{
     private final boolean open_when_complete;
     private final boolean overwrite_output;
 
-
+//  TODO:Only be closed start() is finish.
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public ConvertAction(File tempFolder, long maxMainMemoryBytes, File[] tasklist_sources, boolean open_when_complete, boolean overwrite_output) {
