@@ -6,7 +6,7 @@ import org.vincentyeh.IMG2PDF.commandline.action.CreateAction;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
-import org.vincentyeh.IMG2PDF.commandline.PropertiesOption;
+import org.vincentyeh.IMG2PDF.commandline.option.MultiLanguageOptionFactory;
 import org.vincentyeh.IMG2PDF.pdf.doc.DocumentAccessPermission;
 import org.vincentyeh.IMG2PDF.pdf.doc.DocumentArgument;
 import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
@@ -106,34 +106,34 @@ public class CreateActionParser extends ActionParser<CreateAction> {
 
 
     public CreateActionParser() {
-        Option opt_help = PropertiesOption.getOption("h", "help", "create.help");
+        Option opt_help = MultiLanguageOptionFactory.getOption("h", "help", "create.help");
 
-        Option opt_debug = PropertiesOption.getOption("d", "debug", "create.arg.debug.help");
-        Option opt_overwrite = PropertiesOption.getOption("ow", "overwrite", "create.arg.overwrite_tasklist.help");
+        Option opt_debug = MultiLanguageOptionFactory.getOption("d", "debug", "create.arg.debug.help");
+        Option opt_overwrite = MultiLanguageOptionFactory.getOption("ow", "overwrite", "create.arg.overwrite_tasklist.help");
 
-        Option opt_pdf_size = PropertiesOption.getArgumentOption("pz", "pdf_size", "create.arg.pdf_size.help", listStringArray(ArrayToStringArray(PageSize.values())));
-        Option opt_pdf_align = PropertiesOption.getArgumentOption("pa", "pdf_align", "create.arg.pdf_align.help");
-        Option opt_pdf_direction = PropertiesOption.getArgumentOption("pdi", "pdf_direction", "create.arg.pdf_direction.help",
+        Option opt_pdf_size = MultiLanguageOptionFactory.getArgumentOption("pz", "pdf_size", "create.arg.pdf_size.help", listStringArray(ArrayToStringArray(PageSize.values())));
+        Option opt_pdf_align = MultiLanguageOptionFactory.getArgumentOption("pa", "pdf_align", "create.arg.pdf_align.help");
+        Option opt_pdf_direction = MultiLanguageOptionFactory.getArgumentOption("pdi", "pdf_direction", "create.arg.pdf_direction.help",
                 listStringArray(ArrayToStringArray(PageDirection.values())));
 
-        Option opt_pdf_auto_rotate = PropertiesOption.getOption("par", "pdf_auto_rotate", "create.arg.pdf_auto_rotate.help");
-        Option opt_pdf_sortby = PropertiesOption.getArgumentOption("ps", "pdf_sortby", "create.arg.pdf_sortby.help", listStringArray(ArrayToStringArray(FileSorter.Sortby.values())));
-        Option opt_pdf_sequence = PropertiesOption.getArgumentOption("pseq", "pdf_sequence", "create.arg.pdf_sequence.help", listStringArray(ArrayToStringArray(FileSorter.Sequence.values())));
-        Option opt_pdf_owner_password = PropertiesOption.getArgumentOption("popwd", "pdf_owner_password",
+        Option opt_pdf_auto_rotate = MultiLanguageOptionFactory.getOption("par", "pdf_auto_rotate", "create.arg.pdf_auto_rotate.help");
+        Option opt_pdf_sortby = MultiLanguageOptionFactory.getArgumentOption("ps", "pdf_sortby", "create.arg.pdf_sortby.help", listStringArray(ArrayToStringArray(FileSorter.Sortby.values())));
+        Option opt_pdf_sequence = MultiLanguageOptionFactory.getArgumentOption("pseq", "pdf_sequence", "create.arg.pdf_sequence.help", listStringArray(ArrayToStringArray(FileSorter.Sequence.values())));
+        Option opt_pdf_owner_password = MultiLanguageOptionFactory.getArgumentOption("popwd", "pdf_owner_password",
                 "create.arg.pdf_owner_password.help");
-        Option opt_pdf_user_password = PropertiesOption.getArgumentOption("pupwd", "pdf_user_password", "create.arg.pdf_user_password.help");
+        Option opt_pdf_user_password = MultiLanguageOptionFactory.getArgumentOption("pupwd", "pdf_user_password", "create.arg.pdf_user_password.help");
 
-        Option opt_pdf_permission = PropertiesOption.getArgumentOption("pp", "pdf_permission", "create.arg.pdf_permission.help");
+        Option opt_pdf_permission = MultiLanguageOptionFactory.getArgumentOption("pp", "pdf_permission", "create.arg.pdf_permission.help");
 
-        Option opt_pdf_destination = PropertiesOption.getArgumentOption("pdst", "pdf_destination", "create.arg.pdf_destination.help");
+        Option opt_pdf_destination = MultiLanguageOptionFactory.getArgumentOption("pdst", "pdf_destination", "create.arg.pdf_destination.help");
         opt_pdf_destination.setRequired(true);
 
-        Option opt_filter = PropertiesOption.getArgumentOption("f", "filter", "create.arg.filter.help");
+        Option opt_filter = MultiLanguageOptionFactory.getArgumentOption("f", "filter", "create.arg.filter.help");
 
-        Option opt_sources = PropertiesOption.getArgumentOption("src", "source", "create.arg.source.help");
+        Option opt_sources = MultiLanguageOptionFactory.getArgumentOption("src", "source", "create.arg.source.help");
         opt_sources.setRequired(true);
 
-        Option opt_list_destination = PropertiesOption.getArgumentOption("ldst", "list_destination", "create.arg.list_destination.help");
+        Option opt_list_destination = MultiLanguageOptionFactory.getArgumentOption("ldst", "list_destination", "create.arg.list_destination.help");
         opt_list_destination.setRequired(true);
 
         options.addOption(opt_debug);
