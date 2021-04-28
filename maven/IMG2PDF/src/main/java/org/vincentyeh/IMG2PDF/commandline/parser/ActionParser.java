@@ -1,13 +1,25 @@
 package org.vincentyeh.IMG2PDF.commandline.parser;
 
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
 import org.vincentyeh.IMG2PDF.SharedSpace;
+import org.vincentyeh.IMG2PDF.commandline.action.Action;
+import org.vincentyeh.IMG2PDF.commandline.parser.core.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.util.FileChecker;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public abstract class ActionParser<T> {
+public abstract class ActionParser<T extends Action> {
+
+    protected final Options options = new Options();
+    protected final CheckHelpParser parser;
+
+    protected ActionParser(Option opt_help) {
+        parser=new CheckHelpParser(opt_help);
+    }
+
     public abstract T parse(String[] arguments)throws Exception;
 
     protected String listStringArray(String[] values) {

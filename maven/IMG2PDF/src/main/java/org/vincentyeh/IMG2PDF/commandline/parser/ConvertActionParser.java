@@ -2,11 +2,9 @@ package org.vincentyeh.IMG2PDF.commandline.parser;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.vincentyeh.IMG2PDF.commandline.option.MultiLanguageOptionFactory;
 import org.vincentyeh.IMG2PDF.commandline.action.ConvertAction;
-import org.vincentyeh.IMG2PDF.commandline.parser.core.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
 import org.vincentyeh.IMG2PDF.util.BytesSize;
 import org.vincentyeh.IMG2PDF.util.FileChecker;
@@ -17,9 +15,6 @@ import java.io.IOException;
 public class ConvertActionParser extends ActionParser<ConvertAction> {
     private static final String DEFAULT_TEMP_FOLDER = ".org.vincentyeh.IMG2PDF.tmp";
     private static final String DEFAULT_MAX_MEMORY_USAGE = "50MB";
-
-    private final Options options = new Options();
-    private final CheckHelpParser parser;
 
     @Override
     public ConvertAction parse(String[] arguments) throws ParseException, HandledException {
@@ -66,6 +61,8 @@ public class ConvertActionParser extends ActionParser<ConvertAction> {
     }
 
     public ConvertActionParser() {
+        super(MultiLanguageOptionFactory.getOption("h", "help", "convert.help"));
+
         Option opt_help = MultiLanguageOptionFactory.getOption("h", "help", "convert.help");
 
         Option opt_tasklist_source = MultiLanguageOptionFactory.getArgumentOption("lsrc", "tasklist_source", "convert.arg.tasklist_source.help");
@@ -85,8 +82,7 @@ public class ConvertActionParser extends ActionParser<ConvertAction> {
         options.addOption(opt_open_when_complete);
         options.addOption(opt_overwrite);
 
-        parser = new CheckHelpParser(opt_help);
-
+//        parser = new CheckHelpParser();
         Option opt_mode = new Option("m", "mode", true, "mode");
         options.addOption(opt_mode);
 

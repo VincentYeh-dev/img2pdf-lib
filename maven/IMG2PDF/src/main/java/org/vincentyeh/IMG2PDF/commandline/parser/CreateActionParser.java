@@ -28,9 +28,6 @@ public class CreateActionParser extends ActionParser<CreateAction> {
     private static final String DEFAULT_PDF_SEQUENCE = "INCREASE";
     private static final String DEFAULT_PDF_FILTER = "glob:*.{PNG,JPG}";
 
-    private final CheckHelpParser parser;
-    private final Options options = new Options();
-
     @Override
     public CreateAction parse(String[] arguments) throws ParseException, HandledException {
         CommandLine cmd = parser.parse(options, arguments);
@@ -106,6 +103,7 @@ public class CreateActionParser extends ActionParser<CreateAction> {
 
 
     public CreateActionParser() {
+        super(MultiLanguageOptionFactory.getOption("h", "help", "create.help"));
         Option opt_help = MultiLanguageOptionFactory.getOption("h", "help", "create.help");
 
         Option opt_debug = MultiLanguageOptionFactory.getOption("d", "debug", "create.arg.debug.help");
@@ -153,7 +151,6 @@ public class CreateActionParser extends ActionParser<CreateAction> {
         options.addOption(opt_sources);
         options.addOption(opt_list_destination);
 
-        parser = new CheckHelpParser(opt_help);
 
         Option opt_mode = new Option("m", "mode", true, "mode");
 
