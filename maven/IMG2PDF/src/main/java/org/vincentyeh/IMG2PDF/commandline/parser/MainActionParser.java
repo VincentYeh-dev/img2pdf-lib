@@ -8,11 +8,9 @@ import org.vincentyeh.IMG2PDF.commandline.parser.exception.HelperException;
 
 public class MainActionParser extends ActionParser<MainAction> {
 
-    private final Options options = new Options();
-
     @Override
     public MainAction parse(String[] arguments) throws ParseException {
-        CommandLine mode_chooser = (new DefaultParser()).parse(options, arguments, true);
+        CommandLine mode_chooser = parser.parse(options, arguments, true);
 
         if (arguments.length == 0 || mode_chooser.hasOption("help") && !mode_chooser.hasOption("mode")) {
             throw new HelperException(options);
@@ -30,8 +28,9 @@ public class MainActionParser extends ActionParser<MainAction> {
 
 
     public MainActionParser() {
-        Option opt_mode = MultiLanguageOptionFactory.getArgumentOption("m", "mode", "main.arg.mode.help", listStringArray(ArrayToStringArray(ActionMode.values())));
+        super(MultiLanguageOptionFactory.getOption("h", "help", "main.help"));
         Option opt_help = MultiLanguageOptionFactory.getOption("h", "help", "main.help");
+        Option opt_mode = MultiLanguageOptionFactory.getArgumentOption("m", "mode", "main.arg.mode.help", listStringArray(ArrayToStringArray(ActionMode.values())));
         options.addOption(opt_mode);
         options.addOption(opt_help);
 
