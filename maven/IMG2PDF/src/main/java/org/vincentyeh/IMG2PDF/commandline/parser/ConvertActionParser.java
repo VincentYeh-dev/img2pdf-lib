@@ -4,8 +4,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.vincentyeh.IMG2PDF.SharedSpace;
-import org.vincentyeh.IMG2PDF.commandline.PropertiesOption;
+import org.vincentyeh.IMG2PDF.commandline.option.MultiLanguageOptionFactory;
 import org.vincentyeh.IMG2PDF.commandline.action.ConvertAction;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
@@ -67,17 +66,17 @@ public class ConvertActionParser extends ActionParser<ConvertAction> {
     }
 
     public ConvertActionParser() {
-        Option opt_help = PropertiesOption.getOption("h", "help", "convert.help");
+        Option opt_help = MultiLanguageOptionFactory.getOption("h", "help", "convert.help");
 
-        Option opt_tasklist_source = PropertiesOption.getArgumentOption("lsrc", "tasklist_source", "convert.arg.tasklist_source.help");
+        Option opt_tasklist_source = MultiLanguageOptionFactory.getArgumentOption("lsrc", "tasklist_source", "convert.arg.tasklist_source.help");
         opt_tasklist_source.setRequired(true);
 
-        Option opt_open_when_complete = PropertiesOption.getOption("o", "open_when_complete", "convert.arg.open_when_complete.help");
+        Option opt_open_when_complete = MultiLanguageOptionFactory.getOption("o", "open_when_complete", "convert.arg.open_when_complete.help");
 
-        Option opt_overwrite = PropertiesOption.getOption("ow", "overwrite", "convert.arg.overwrite_output.help");
+        Option opt_overwrite = MultiLanguageOptionFactory.getOption("ow", "overwrite", "convert.arg.overwrite_output.help");
 
-        Option opt_tmp_folder = PropertiesOption.getArgumentOption("tmp", "temp_folder", "convert.arg.tmp_folder.help", ".org.vincentyeh.IMG2PDF.tmp");
-        Option opt_max_memory_usage = PropertiesOption.getArgumentOption("mx", "memory_max_usage", "convert.arg.memory_max_usage.help", "50MB");
+        Option opt_tmp_folder = MultiLanguageOptionFactory.getArgumentOption("tmp", "temp_folder", "convert.arg.tmp_folder.help", ".org.vincentyeh.IMG2PDF.tmp");
+        Option opt_max_memory_usage = MultiLanguageOptionFactory.getArgumentOption("mx", "memory_max_usage", "convert.arg.memory_max_usage.help", "50MB");
 
         options.addOption(opt_help);
         options.addOption(opt_tasklist_source);
