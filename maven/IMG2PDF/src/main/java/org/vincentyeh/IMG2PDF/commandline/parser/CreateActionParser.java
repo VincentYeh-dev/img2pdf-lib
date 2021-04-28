@@ -22,7 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class CreateActionParser{
+public class CreateActionParser {
 
     private static final String DEFAULT_PDF_SIZE = "A4";
     private static final String DEFAULT_PDF_ALIGN = "CENTER-CENTER";

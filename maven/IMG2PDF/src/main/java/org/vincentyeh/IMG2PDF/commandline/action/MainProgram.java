@@ -3,6 +3,7 @@ package org.vincentyeh.IMG2PDF.commandline.action;
 
 import org.apache.commons.cli.*;
 import org.vincentyeh.IMG2PDF.SharedSpace;
+import org.vincentyeh.IMG2PDF.commandline.parser.ConvertActionParser;
 import org.vincentyeh.IMG2PDF.commandline.parser.CreateActionParser;
 import org.vincentyeh.IMG2PDF.commandline.parser.exception.HelperException;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
@@ -48,7 +49,8 @@ public class MainProgram extends AbstractAction {
                 action=createActionParser.parse(args);
                 break;
             case convert:
-                action = new ConvertAction(args);
+                ConvertActionParser convertActionParser=new ConvertActionParser();
+                action =convertActionParser.parse(args);
                 break;
             default:
                 throw new RuntimeException("mode==??");
