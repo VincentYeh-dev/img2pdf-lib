@@ -7,22 +7,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.jdom2.Document;
 import org.jdom2.input.DOMBuilder;
 import org.vincentyeh.IMG2PDF.commandline.CustomConversionListener;
-import org.vincentyeh.IMG2PDF.commandline.parser.core.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.SharedSpace;
-import org.vincentyeh.IMG2PDF.commandline.parser.exception.HelperException;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
-import org.vincentyeh.IMG2PDF.commandline.PropertiesOption;
 import org.vincentyeh.IMG2PDF.converter.PDFConverter;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskList;
-import org.vincentyeh.IMG2PDF.util.BytesSize;
 import org.vincentyeh.IMG2PDF.util.FileChecker;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -31,70 +23,22 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-public class ConvertAction extends AbstractAction {
-    private static final String DEFAULT_TEMP_FOLDER = ".org.vincentyeh.IMG2PDF.tmp";
-    private static final String DEFAULT_MAX_MEMORY_USAGE = "50MB";
-
-    protected final File[] tasklist_sources;
-    protected final boolean open_when_complete;
-    protected final boolean overwrite_output;
-    private static final Option opt_help;
-
-    static {
-        opt_help = PropertiesOption.getOption("h", "help", "convert.help");
-    }
-
+public class ConvertAction implements Action{
     private final File tempFolder;
     private final long maxMainMemoryBytes;
+    private final File[] tasklist_sources;
+    private final boolean open_when_complete;
+    private final boolean overwrite_output;
+
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    public ConvertAction(String[] args) throws ParseException, HandledException {
-        super(getLocaleOptions());
-        try {
-            CommandLine cmd = (new CheckHelpParser(opt_help)).parse(options, args);
-            if (cmd.hasOption("-h"))
-                throw new HelperException(options);
-
-            open_when_complete = cmd.hasOption("open_when_complete");
-            overwrite_output = cmd.hasOption("overwrite");
-
-            tempFolder = getTempFolder(cmd);
-            try {
-                FileChecker.makeDirsIfNotExists(tempFolder);
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new HandledException(e, getClass());
-            }
-
-            try {
-                maxMainMemoryBytes = getMaxMemoryBytes(cmd);
-            } catch (IllegalArgumentException e) {
-                System.err.println(e.getMessage());
-                throw new HandledException(e, getClass());
-            }
-
-            String[] str_sources = cmd.getOptionValues("tasklist_source");
-            try {
-                tasklist_sources = verifyFiles(str_sources);
-            } catch (IOException e) {
-                System.err.println(e.getMessage());
-                throw new HandledException(e, getClass());
-            }
-
-        } catch (Exception e) {
-            executor.shutdown();
-            throw e;
-        }
-    }
-
-    private long getMaxMemoryBytes(CommandLine cmd) {
-        return BytesSize.parseString(cmd.getOptionValue("memory_max_usage", DEFAULT_MAX_MEMORY_USAGE)).getBytes();
-
-    }
-
-    private File getTempFolder(CommandLine cmd) {
-        return new File(cmd.getOptionValue("temp_folder", DEFAULT_TEMP_FOLDER)).getAbsoluteFile();
+    public ConvertAction(File tempFolder, long maxMainMemoryBytes, File[] tasklist_sources, boolean open_when_complete, boolean overwrite_output) {
+        this.tempFolder = tempFolder;
+        this.maxMainMemoryBytes = maxMainMemoryBytes;
+        this.tasklist_sources = tasklist_sources;
+        this.open_when_complete = open_when_complete;
+        this.overwrite_output = overwrite_output;
     }
 
     @Override
@@ -188,29 +132,5 @@ public class ConvertAction extends AbstractAction {
         return new DOMBuilder().build(w3cDocument);
     }
 
-    private static Options getLocaleOptions() {
-        Options options = new Options();
-        Option opt_tasklist_source = PropertiesOption.getArgumentOption("lsrc", "tasklist_source", "convert.arg.tasklist_source.help");
-        opt_tasklist_source.setRequired(true);
-
-        Option opt_open_when_complete = PropertiesOption.getOption("o", "open_when_complete", "convert.arg.open_when_complete.help");
-
-        Option opt_overwrite = PropertiesOption.getOption("ow", "overwrite", "convert.arg.overwrite_output.help");
-
-        Option opt_tmp_folder = PropertiesOption.getArgumentOption("tmp", "temp_folder", "convert.arg.tmp_folder.help", ".org.vincentyeh.IMG2PDF.tmp");
-        Option opt_max_memory_usage = PropertiesOption.getArgumentOption("mx", "memory_max_usage", "convert.arg.memory_max_usage.help", "50MB");
-
-        options.addOption(opt_help);
-        options.addOption(opt_tasklist_source);
-        options.addOption(opt_tmp_folder);
-        options.addOption(opt_max_memory_usage);
-        options.addOption(opt_open_when_complete);
-        options.addOption(opt_overwrite);
-
-        Option opt_mode = new Option("m", "mode", true, "mode");
-        options.addOption(opt_mode);
-
-        return options;
-    }
 
 }
