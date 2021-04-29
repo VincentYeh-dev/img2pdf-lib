@@ -3,19 +3,26 @@ package org.vincentyeh.IMG2PDF.pdf.page.core;
 import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
 
 public class PositionCalculator {
-    private final float x_space;
-    private final float y_space;
-    private final boolean rotated;
+    private static PositionCalculator calculator = null;
 
-    public PositionCalculator(boolean rotated, float img_height, float img_width, float page_height,
-                              float page_width) {
-        this.rotated = rotated;
+    public static PositionCalculator getInstance() {
+        if (calculator == null) {
+            calculator = new PositionCalculator();
+        }
+        return calculator;
+    }
+
+    public static void init(boolean rotated, float img_height, float img_width, float page_height,
+                            float page_width) {
+//        calculator=getInstance();
+
+        calculator.rotated = rotated;
         if (rotated) {
-            x_space = page_height - img_height;
-            y_space = page_width - img_width;
+            calculator.x_space = page_height - img_height;
+            calculator.y_space = page_width - img_width;
         } else {
-            x_space = page_width - img_width;
-            y_space = page_height - img_height;
+            calculator.x_space = page_width - img_width;
+            calculator.y_space = page_height - img_height;
         }
 
     }
@@ -78,10 +85,12 @@ public class PositionCalculator {
 
     }
 
-
     public Position toRotatedPosition(Position raw) {
         return new Position(y_space - raw.getY(), raw.getX() + 0);
     }
 
+    private float x_space;
+    private float y_space;
+    private boolean rotated;
 
 }

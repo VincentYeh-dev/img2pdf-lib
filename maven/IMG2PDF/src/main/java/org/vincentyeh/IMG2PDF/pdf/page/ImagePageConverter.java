@@ -69,11 +69,11 @@ public class ImagePageConverter implements Callable<PDPage> {
             imageOut = rotateImg(rawImage, page_direction == Landscape ? 90 : 0);
 
             Size rotated_img_size = new Size(imageOut.getHeight(), imageOut.getWidth());
-            SizeCalculator sizeCalculator = new SizeCalculator(rotated_img_size, page_size);
-            img_size = sizeCalculator.scaleUpToMax();
+            img_size = SizeCalculator.getInstance().scaleUpToMax(rotated_img_size,page_size);
 
-            PositionCalculator calculator = new PositionCalculator(page.getRotation() != 0, img_size.getHeight(), img_size.getWidth(), page_size.getHeight(), page_size.getWidth());
-            position = calculator.calculate(argument.getAlign());
+            PositionCalculator positionCalculator=PositionCalculator.getInstance();
+            PositionCalculator.init(page.getRotation() != 0, img_size.getHeight(), img_size.getWidth(), page_size.getHeight(), page_size.getWidth());
+            position = positionCalculator.calculate(argument.getAlign());
         }
 
         PDImageXObject pdImageXObject = LosslessFactory.createFromImage(document, imageOut);
