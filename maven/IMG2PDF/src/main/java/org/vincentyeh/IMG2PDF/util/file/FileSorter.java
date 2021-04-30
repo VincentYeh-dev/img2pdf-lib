@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.util;
+package org.vincentyeh.IMG2PDF.util.file;
 
 import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
 

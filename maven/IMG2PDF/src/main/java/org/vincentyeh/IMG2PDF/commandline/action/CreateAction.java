@@ -12,15 +12,15 @@ import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
 import org.vincentyeh.IMG2PDF.pdf.doc.DocumentArgument;
 import org.vincentyeh.IMG2PDF.pdf.page.PageArgument;
-import org.vincentyeh.IMG2PDF.util.FileFilterHelper;
+import org.vincentyeh.IMG2PDF.util.file.FileFilterHelper;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskList;
-import org.vincentyeh.IMG2PDF.util.FileSorter;
-import org.vincentyeh.IMG2PDF.util.FileChecker;
+import org.vincentyeh.IMG2PDF.util.file.FileSorter;
+import org.vincentyeh.IMG2PDF.util.file.FileChecker;
 import org.vincentyeh.IMG2PDF.util.NameFormatter;
 
-import static org.vincentyeh.IMG2PDF.util.FileSorter.Sequence;
-import static org.vincentyeh.IMG2PDF.util.FileSorter.Sortby;
+import static org.vincentyeh.IMG2PDF.util.file.FileSorter.Sequence;
+import static org.vincentyeh.IMG2PDF.util.file.FileSorter.Sortby;
 
 public class CreateAction implements Action{
 

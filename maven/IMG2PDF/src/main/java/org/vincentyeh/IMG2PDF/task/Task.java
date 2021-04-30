@@ -9,7 +9,7 @@ import org.jdom2.Element;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
 import org.vincentyeh.IMG2PDF.pdf.doc.DocumentArgument;
 import org.vincentyeh.IMG2PDF.pdf.page.PageArgument;
-import org.vincentyeh.IMG2PDF.util.FileChecker;
+import org.vincentyeh.IMG2PDF.util.file.FileChecker;
 
 public class Task {
     private final DocumentArgument documentArgument;

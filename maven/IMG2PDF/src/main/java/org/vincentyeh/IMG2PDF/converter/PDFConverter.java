@@ -12,7 +12,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
 import org.vincentyeh.IMG2PDF.pdf.page.ImagePageFactory;
 import org.vincentyeh.IMG2PDF.task.Task;
-import org.vincentyeh.IMG2PDF.util.FileChecker;
+import org.vincentyeh.IMG2PDF.util.file.FileChecker;
 
 import javax.imageio.ImageIO;
 

@@ -4,7 +4,6 @@ import org.apache.commons.cli.*;
 import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.commandline.action.CreateAction;
 import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
-import org.vincentyeh.IMG2PDF.commandline.parser.core.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
 import org.vincentyeh.IMG2PDF.commandline.option.MultiLanguageOptionFactory;
 import org.vincentyeh.IMG2PDF.pdf.doc.DocumentAccessPermission;
@@ -13,8 +12,8 @@ import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
 import org.vincentyeh.IMG2PDF.pdf.page.PageArgument;
 import org.vincentyeh.IMG2PDF.pdf.page.PageDirection;
 import org.vincentyeh.IMG2PDF.pdf.page.PageSize;
-import org.vincentyeh.IMG2PDF.util.FileFilterHelper;
-import org.vincentyeh.IMG2PDF.util.FileSorter;
+import org.vincentyeh.IMG2PDF.util.file.FileFilterHelper;
+import org.vincentyeh.IMG2PDF.util.file.FileSorter;
 
 import java.io.File;
 import java.io.IOException;

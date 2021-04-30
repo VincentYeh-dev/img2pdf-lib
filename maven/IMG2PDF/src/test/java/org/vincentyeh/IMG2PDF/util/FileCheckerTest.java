@@ -1,13 +1,11 @@
 package org.vincentyeh.IMG2PDF.util;
 
 import org.junit.Test;
-import org.vincentyeh.IMG2PDF.SharedSpace;
+import org.vincentyeh.IMG2PDF.util.file.FileChecker;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.Locale;
-import java.util.ResourceBundle;
 
 public class FileCheckerTest {
 

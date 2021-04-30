@@ -3,7 +3,7 @@
     <module name="IMG2PDF" />
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="org.vincentyeh.IMG2PDF.util.*" />
+        <option name="PATTERN" value="org.vincentyeh.IMG2PDF.util.file.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>
