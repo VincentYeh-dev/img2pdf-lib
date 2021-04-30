@@ -7,7 +7,7 @@ import org.vincentyeh.IMG2PDF.commandline.option.MultiLanguageOptionFactory;
 import org.vincentyeh.IMG2PDF.commandline.action.ConvertAction;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
 import org.vincentyeh.IMG2PDF.util.BytesSize;
-import org.vincentyeh.IMG2PDF.util.FileChecker;
+import org.vincentyeh.IMG2PDF.util.file.FileChecker;
 
 import java.io.File;
 import java.io.IOException;

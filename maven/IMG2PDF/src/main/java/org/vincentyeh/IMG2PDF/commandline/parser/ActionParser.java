@@ -5,7 +5,7 @@ import org.apache.commons.cli.Options;
 import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.commandline.action.Action;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.CheckHelpParser;
-import org.vincentyeh.IMG2PDF.util.FileChecker;
+import org.vincentyeh.IMG2PDF.util.file.FileChecker;
 
 import java.io.File;
 import java.io.IOException;

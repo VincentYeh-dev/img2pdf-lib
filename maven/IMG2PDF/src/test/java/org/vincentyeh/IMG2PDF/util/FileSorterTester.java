@@ -1,7 +1,7 @@
 package org.vincentyeh.IMG2PDF.util;
 
-import org.junit.Assert;
 import org.junit.Test;
+import org.vincentyeh.IMG2PDF.util.file.FileSorter;
 
 import java.io.File;
 import java.util.Arrays;
