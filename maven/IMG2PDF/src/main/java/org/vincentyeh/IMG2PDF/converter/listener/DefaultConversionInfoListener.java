@@ -1,18 +1,17 @@
-package org.vincentyeh.IMG2PDF.commandline;
+package org.vincentyeh.IMG2PDF.converter.listener;
 
 import org.vincentyeh.IMG2PDF.SharedSpace;
-import org.vincentyeh.IMG2PDF.converter.ConversionListener;
+import org.vincentyeh.IMG2PDF.converter.listener.ConversionInfoListener;
 import org.vincentyeh.IMG2PDF.task.Task;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 
-public class CustomConversionListener implements ConversionListener {
+public class DefaultConversionInfoListener implements ConversionInfoListener {
     private final char[] progress_bar;
     private Task task;
 
-    public CustomConversionListener() {
+    public DefaultConversionInfoListener() {
         progress_bar = new char[10];
         Arrays.fill(progress_bar, ' ');
     }
@@ -49,24 +48,24 @@ public class CustomConversionListener implements ConversionListener {
         counter = total = 0;
     }
 
-
-    @Override
-    public void onConversionFail(int index, Exception e) {
-        System.out.printf("\t" + SharedSpace.getResString("convert.listener.err.image") + "\r\n", e.getMessage());
-        counter = total = 0;
-    }
-
-    @Override
-    public void onFileAlreadyExists(File file) {
-        System.err.printf("\t" + SharedSpace.getResString("convert.listener.err.overwrite") + "\r\n", file.getName());
-        counter = total = 0;
-    }
-
-    @Override
-    public void onImageReadFail(int index, File image, IOException e) {
-        System.out.printf("\t" + SharedSpace.getResString("convert.listener.err.conversion") + "\r\n", image.getPath(), e.getMessage());
-        counter = total = 0;
-    }
+//
+//    @Override
+//    public void onConversionFail(int index, Exception e) {
+//        System.out.printf("\t" + SharedSpace.getResString("convert.listener.err.image") + "\r\n", e.getMessage());
+//        counter = total = 0;
+//    }
+//
+//    @Override
+//    public void onFileAlreadyExists(File file) {
+//        System.err.printf("\t" + SharedSpace.getResString("convert.listener.err.overwrite") + "\r\n", file.getName());
+//        counter = total = 0;
+//    }
+//
+//    @Override
+//    public void onImageReadFail(int index, File image, IOException e) {
+//        System.out.printf("\t" + SharedSpace.getResString("convert.listener.err.conversion") + "\r\n", image.getPath(), e.getMessage());
+//        counter = total = 0;
+//    }
 
     private String getSimplifiedName(String raw){
 
