@@ -2,14 +2,10 @@ package org.vincentyeh.IMG2PDF.commandline.action;
 
 import java.awt.Desktop;
 import java.io.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import org.jdom2.Document;
 import org.jdom2.input.DOMBuilder;
-import org.vincentyeh.IMG2PDF.commandline.CustomConversionListener;
+import org.vincentyeh.IMG2PDF.converter.listener.DefaultConversionInfoListener;
 import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
 import org.vincentyeh.IMG2PDF.converter.PDFConverter;
@@ -23,15 +19,13 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-public class ConvertAction implements Action{
+public class ConvertAction implements Action {
+
     private final File tempFolder;
     private final long maxMainMemoryBytes;
     private final File[] tasklist_sources;
     private final boolean open_when_complete;
     private final boolean overwrite_output;
-
-//  TODO:Only be closed start() is finish.
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public ConvertAction(File tempFolder, long maxMainMemoryBytes, File[] tasklist_sources, boolean open_when_complete, boolean overwrite_output) {
         this.tempFolder = tempFolder;
@@ -43,35 +37,36 @@ public class ConvertAction implements Action{
 
     @Override
     public void start() throws Exception {
-        try {
-
-            System.out.println(SharedSpace.getResString("convert.import_tasklists"));
-            for (File src : tasklist_sources) {
-                System.out.print(
-                        "\t[" + SharedSpace.getResString("public.info.importing") + "] " + src.getAbsolutePath() + "\r");
-                TaskList tasks = getTaskListFromFile(src);
-                System.out.print("\t[" + SharedSpace.getResString("public.info.imported") + "] " + src.getAbsolutePath() + "\r\n");
-                System.out.println();
-                System.out.println(SharedSpace.getResString("convert.start_conversion"));
-                convertList(tasks);
-            }
-
-        } finally {
-            executor.shutdown();
+        System.out.println(SharedSpace.getResString("convert.import_tasklists"));
+        for (File src : tasklist_sources) {
+            System.out.print(
+                    "\t[" + SharedSpace.getResString("public.info.importing") + "] " + src.getAbsolutePath() + "\r");
+            TaskList tasks = getTaskListFromFile(src);
+            System.out.print("\t[" + SharedSpace.getResString("public.info.imported") + "] " + src.getAbsolutePath() + "\r\n");
+            System.out.println();
+            System.out.println(SharedSpace.getResString("convert.start_conversion"));
+            convertList(tasks);
         }
+
     }
 
-    private void convertList(TaskList tasks) throws Exception {
+    private void convertList(TaskList tasks) {
 //                TODO:No exception is thrown when task.getArray() is empty.Warning to the user when it happen.
-        for (Task task : tasks.getArray()) {
+        for (Task task : tasks) {
             try {
                 File result = convertToFile(task);
-
                 if (open_when_complete)
                     openPDF(result);
-
-            } catch (HandledException ignored) {
+            } catch (PDFConverter.OverwriteDenyException e) {
+                System.err.printf("\t" + SharedSpace.getResString("convert.listener.err.overwrite") + "\n",e.getFile().getAbsolutePath());
+            }catch (PDFConverter.ReadImageException e){
+                System.err.printf("\n\t\t" + SharedSpace.getResString("convert.listener.err.image") + "\n", e.getMessage());
+            }catch (PDFConverter.ConversionException e){
+                System.err.printf("\n\t\t" + SharedSpace.getResString("convert.listener.err.conversion") + "\n", e.getMessage());
+            }catch (IOException e){
+               e.printStackTrace();
             }
+
         }
     }
 
@@ -101,19 +96,10 @@ public class ConvertAction implements Action{
 
     }
 
-    private File convertToFile(Task task) throws Exception {
-        try {
-            PDFConverter converter = new PDFConverter(task, maxMainMemoryBytes, tempFolder, overwrite_output);
-            converter.setListener(new CustomConversionListener());
-            Future<File> future = executor.submit(converter);
-            return future.get();
-        } catch (ExecutionException e) {
-            if ((e.getCause() instanceof HandledException)) {
-                throw new HandledException(e.getCause());
-            } else {
-                throw e;
-            }
-        }
+    private File convertToFile(Task task) throws PDFConverter.ReadImageException, PDFConverter.ConversionException, IOException {
+        PDFConverter converter = new PDFConverter(task, maxMainMemoryBytes, tempFolder, overwrite_output);
+        converter.setInfoListener(new DefaultConversionInfoListener());
+        return converter.convert();
     }
 
     private static Document getDocumentFromFile(final File file)
