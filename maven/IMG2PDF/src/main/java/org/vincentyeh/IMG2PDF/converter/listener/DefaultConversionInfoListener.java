@@ -1,7 +1,6 @@
 package org.vincentyeh.IMG2PDF.converter.listener;
 
 import org.vincentyeh.IMG2PDF.SharedSpace;
-import org.vincentyeh.IMG2PDF.converter.listener.ConversionInfoListener;
 import org.vincentyeh.IMG2PDF.task.Task;
 
 import java.io.File;
@@ -10,6 +9,7 @@ import java.util.Arrays;
 public class DefaultConversionInfoListener implements ConversionInfoListener {
     private final char[] progress_bar;
     private Task task;
+    private long startSeconds;
 
     public DefaultConversionInfoListener() {
         progress_bar = new char[10];
@@ -27,6 +27,7 @@ public class DefaultConversionInfoListener implements ConversionInfoListener {
         this.task = task;
         total = task.getImages().length;
         perImg = (10. / total);
+        startSeconds =(System.currentTimeMillis()/1000);
     }
 
     @Override
@@ -43,29 +44,9 @@ public class DefaultConversionInfoListener implements ConversionInfoListener {
 
     @Override
     public void onConversionComplete(File dst) {
-
-        System.out.printf("\t" + SharedSpace.getResString("convert.listener.done") + "\r\n", dst.getName());
-        counter = total = 0;
+        long completeSeconds = System.currentTimeMillis()/1000;
+        System.out.printf("\t" + SharedSpace.getResString("convert.listener.done") + "\r\n", (completeSeconds - startSeconds),dst.getAbsolutePath());
     }
-
-//
-//    @Override
-//    public void onConversionFail(int index, Exception e) {
-//        System.out.printf("\t" + SharedSpace.getResString("convert.listener.err.image") + "\r\n", e.getMessage());
-//        counter = total = 0;
-//    }
-//
-//    @Override
-//    public void onFileAlreadyExists(File file) {
-//        System.err.printf("\t" + SharedSpace.getResString("convert.listener.err.overwrite") + "\r\n", file.getName());
-//        counter = total = 0;
-//    }
-//
-//    @Override
-//    public void onImageReadFail(int index, File image, IOException e) {
-//        System.out.printf("\t" + SharedSpace.getResString("convert.listener.err.conversion") + "\r\n", image.getPath(), e.getMessage());
-//        counter = total = 0;
-//    }
 
     private String getSimplifiedName(String raw){
 
