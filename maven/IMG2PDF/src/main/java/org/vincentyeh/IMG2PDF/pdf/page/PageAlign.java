@@ -1,6 +1,5 @@
 package org.vincentyeh.IMG2PDF.pdf.page;
 
-import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
 
 /**
  * The class which define Alignment of page of PDF
@@ -29,12 +28,11 @@ public class PageAlign {
 	 * format.
 	 * 
 	 * @param str Alignment
-	 * @throws UnrecognizedEnumException When unrecognizable enum pass in to constructor.
 	 */
-	public PageAlign(final String str) throws UnrecognizedEnumException{
+	public PageAlign(final String str) throws IllegalArgumentException{
 		String[] verti_hori_align = str.split("-");
-		this.verti_align = VerticalAlign.getByString(verti_hori_align[0]);
-		this.hori_align = HorizontalAlign.getByString(verti_hori_align[1]);
+		this.verti_align = VerticalAlign.valueOf(verti_hori_align[0]);
+		this.hori_align = HorizontalAlign.valueOf(verti_hori_align[1]);
 	}
 
 	public HorizontalAlign getHorizontal() {
@@ -51,30 +49,12 @@ public class PageAlign {
 	}
 
 	public enum HorizontalAlign {
-		RIGHT, LEFT, CENTER;
-
-		public static HorizontalAlign getByString(String str) throws UnrecognizedEnumException {
-			HorizontalAlign[] aligns = HorizontalAlign.values();
-			for (HorizontalAlign align : aligns) {
-				if (align.toString().equals(str))
-					return align;
-			}
-			throw new UnrecognizedEnumException(str,"HorizontalAlign",values());
-		}
+		RIGHT, LEFT, CENTER
 
 	}
 
 	public enum VerticalAlign {
-		TOP, BOTTOM, CENTER;
-
-		public static VerticalAlign getByString(String str) throws UnrecognizedEnumException {
-			VerticalAlign[] aligns = VerticalAlign.values();
-			for (VerticalAlign align : aligns) {
-				if (align.toString().equals(str))
-					return align;
-			}
-			throw new UnrecognizedEnumException(str,"VerticalAlign",values());
-		}
+		TOP, BOTTOM, CENTER
 	}
 
 }

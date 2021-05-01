@@ -4,20 +4,18 @@ import java.io.*;
 import java.util.ArrayList;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
 
 public class TaskList extends ArrayList<Task>{
 //    private final ArrayList<Task> arrayList = new ArrayList<>();
 
     public TaskList() {
-
     }
 
-    public TaskList(Document doc) throws FileNotFoundException, UnrecognizedEnumException {
+    public TaskList(Document doc) throws FileNotFoundException, IllegalArgumentException {
         this(doc.getRootElement());
     }
 
-    private TaskList(Element root) throws FileNotFoundException, UnrecognizedEnumException {
+    private TaskList(Element root) throws FileNotFoundException, IllegalArgumentException {
         ArrayList<Element> importedTaskList = new ArrayList<>(root.getChildren("task"));
         for (Element task : importedTaskList) {
             this.add(new Task(task));

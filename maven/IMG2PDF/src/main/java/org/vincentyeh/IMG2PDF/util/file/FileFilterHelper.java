@@ -14,12 +14,10 @@ public class FileFilterHelper implements FileFilter {
 
 	/**
 	 * @param operator filter operator
-	 * @throws IllegalArgumentException 
 	 * @throws PatternSyntaxException when using regex
-	 * @throws UnsupportedOperationException 
 	 */
 	public FileFilterHelper(String operator)
-			throws IllegalArgumentException, PatternSyntaxException, UnsupportedOperationException {
+			throws PatternSyntaxException, UnsupportedOperationException {
 		this.operator = operator;
 		FileSystem fs = FileSystems.getDefault();
 		matcher = fs.getPathMatcher(operator);

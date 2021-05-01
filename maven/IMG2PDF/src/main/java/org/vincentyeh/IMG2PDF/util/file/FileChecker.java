@@ -38,7 +38,7 @@ public class FileChecker {
         checkDirectory(folder);
         checkExists(folder);
         if(!Files.isReadable(folder.toPath()))
-            throw new IOException("Folder is not readable:"+folder.toString());
+            throw new IOException("Folder is not readable:"+ folder);
     }
     public static void checkFile(File file) throws IOException {
         if(file.isDirectory())
@@ -66,7 +66,7 @@ public class FileChecker {
     }
     public static void makeDirsIfNotExists(File file) throws IOException {
         checkAbsolute(file);
-        if(!file.mkdirs());
+        file.mkdirs();
 //            System.err.println("No folders was created");
     }
 }

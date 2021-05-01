@@ -52,7 +52,7 @@ public class ConvertActionParser extends ActionParser<ConvertAction> {
     }
 
     private long getMaxMemoryBytes(CommandLine cmd) {
-        return BytesSize.parseString(cmd.getOptionValue("memory_max_usage", DEFAULT_MAX_MEMORY_USAGE)).getBytes();
+        return BytesSize.valueOf(cmd.getOptionValue("memory_max_usage", DEFAULT_MAX_MEMORY_USAGE)).getBytes();
 
     }
 

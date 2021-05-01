@@ -1,6 +1,5 @@
 package org.vincentyeh.IMG2PDF.util.file;
 
-import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -85,30 +84,12 @@ public class FileSorter implements Comparator<File> {
 
 
     public enum Sequence {
-        INCREASE, DECREASE;
-
-        public static Sequence getByString(String str) throws UnrecognizedEnumException {
-            Sequence[] sequences = Sequence.values();
-            for (Sequence sequence : sequences) {
-                if (sequence.toString().equals(str))
-                    return sequence;
-            }
-            throw new UnrecognizedEnumException(str,"Sequence",values());
-        }
+        INCREASE, DECREASE
 
     }
 
     public enum Sortby {
-        NAME, DATE, NUMERIC;
-
-        public static Sortby getByString(String str) throws UnrecognizedEnumException {
-            Sortby[] sortbys = Sortby.values();
-            for (Sortby sortby : sortbys) {
-                if (sortby.toString().equals(str))
-                    return sortby;
-            }
-            throw new UnrecognizedEnumException(str,"Sortby",values());
-        }
+        NAME, DATE, NUMERIC
 
     }
 

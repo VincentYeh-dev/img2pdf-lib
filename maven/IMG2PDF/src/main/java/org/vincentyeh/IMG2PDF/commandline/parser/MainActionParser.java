@@ -18,7 +18,7 @@ public class MainActionParser extends ActionParser<MainAction> {
 
         ActionMode mode;
         if (mode_chooser.hasOption("mode")) {
-            mode = ActionMode.getByString(mode_chooser.getOptionValue("mode"));
+            mode = ActionMode.valueOf(mode_chooser.getOptionValue("mode"));
 
         } else {
             throw new HelperException(options);
