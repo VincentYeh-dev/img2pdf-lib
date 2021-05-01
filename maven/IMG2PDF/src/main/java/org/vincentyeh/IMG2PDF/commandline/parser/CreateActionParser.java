@@ -3,7 +3,6 @@ package org.vincentyeh.IMG2PDF.commandline.parser;
 import org.apache.commons.cli.*;
 import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.commandline.action.CreateAction;
-import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
 import org.vincentyeh.IMG2PDF.commandline.option.MultiLanguageOptionFactory;
 import org.vincentyeh.IMG2PDF.pdf.doc.DocumentAccessPermission;
@@ -17,6 +16,7 @@ import org.vincentyeh.IMG2PDF.util.file.FileSorter;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class CreateActionParser extends ActionParser<CreateAction> {
 
@@ -36,29 +36,15 @@ public class CreateActionParser extends ActionParser<CreateAction> {
 
         String pdf_dst = cmd.getOptionValue("pdf_destination");
 
+
         File tasklist_dst = getTaskListDestination(cmd);
 
-        FileSorter.Sortby pdf_sortby;
-        FileSorter.Sequence pdf_sequence;
-        DocumentArgument documentArgument;
-        PageArgument pageArgument;
-        try {
-            pdf_sortby = FileSorter.Sortby.getByString(cmd.getOptionValue("pdf_sortby", DEFAULT_PDF_SORTBY));
-            pdf_sequence = FileSorter.Sequence.getByString(cmd.getOptionValue("pdf_sequence", DEFAULT_PDF_SEQUENCE));
-            pageArgument = getPageArgument(cmd);
-            documentArgument = getDocumentArgument(cmd);
-        } catch (UnrecognizedEnumException e) {
-            System.err.printf(SharedSpace.getResString("public.err.unrecognizable_enum_long") + "\n", e.getUnrecognizableEnum(), e.getEnumName(), listStringArray(e.getAvailiableValues()));
-            throw new HandledException(e, getClass());
-        }
+        FileSorter.Sortby pdf_sortby = getValueOfSortby(cmd.getOptionValue("pdf_sortby", DEFAULT_PDF_SORTBY));
+        FileSorter.Sequence pdf_sequence = getValueOfSequence(cmd.getOptionValue("pdf_sequence", DEFAULT_PDF_SEQUENCE));
+        DocumentArgument documentArgument = getDocumentArgument(cmd);
+        PageArgument pageArgument = getPageArgument(cmd);
 
-        FileFilterHelper ffh;
-        try {
-            ffh = getFileFilterHelper(cmd);
-        } catch (UnsupportedOperationException e) {
-            System.err.printf(SharedSpace.getResString("create.err.filter") + "\n", e.getMessage());
-            throw new HandledException(e, getClass());
-        }
+        FileFilterHelper ffh = getFileFilterHelper(cmd);
 
         String[] str_sources = cmd.getOptionValues("source");
         if (str_sources == null) {
@@ -75,8 +61,14 @@ public class CreateActionParser extends ActionParser<CreateAction> {
         return new CreateAction(pdf_sortby, pdf_sequence, ffh, documentArgument, pageArgument, pdf_dst, tasklist_dst, debug, overwrite, sourceFiles);
     }
 
-    private FileFilterHelper getFileFilterHelper(CommandLine cmd) {
-        return new FileFilterHelper(cmd.getOptionValue("filter", DEFAULT_PDF_FILTER));
+    private FileFilterHelper getFileFilterHelper(CommandLine cmd) throws HandledException {
+        try {
+            return new FileFilterHelper(cmd.getOptionValue("filter", DEFAULT_PDF_FILTER));
+
+        } catch (UnsupportedOperationException e) {
+            System.err.printf(SharedSpace.getResString("create.err.filter") + "\n", e.getMessage());
+            throw new HandledException(e, getClass());
+        }
     }
 
     private File getTaskListDestination(CommandLine cmd) {
@@ -91,15 +83,67 @@ public class CreateActionParser extends ActionParser<CreateAction> {
         return new DocumentArgument(pdf_owner_password, pdf_user_password, pdf_permission);
     }
 
-    private PageArgument getPageArgument(CommandLine cmd) throws UnrecognizedEnumException {
+    private PageArgument getPageArgument(CommandLine cmd) throws HandledException {
         PageArgument pageArgument = new PageArgument();
-        pageArgument.setAlign(new PageAlign(cmd.getOptionValue("pdf_align", DEFAULT_PDF_ALIGN)));
-        pageArgument.setSize(PageSize.getByString(cmd.getOptionValue("pdf_size", DEFAULT_PDF_SIZE)));
-        pageArgument.setDirection(PageDirection.getByString(cmd.getOptionValue("pdf_direction", DEFAULT_PDF_DIRECTION)));
+        pageArgument.setAlign(getValueOfAlign(cmd.getOptionValue("pdf_align", DEFAULT_PDF_ALIGN)));
+        pageArgument.setSize(getValueOfSize(cmd.getOptionValue("pdf_size", DEFAULT_PDF_SIZE)));
+        pageArgument.setDirection(getValueOfDirection(cmd.getOptionValue("pdf_direction", DEFAULT_PDF_DIRECTION)));
+
         pageArgument.setAutoRotate(cmd.hasOption("pdf_auto_rotate"));
         return pageArgument;
     }
 
+    private PageDirection getValueOfDirection(String value) throws HandledException {
+        try {
+            return PageDirection.valueOf(value);
+        } catch (IllegalArgumentException e) {
+//            TODO:Check
+            System.err.printf(SharedSpace.getResString("public.err.unrecognizable_enum_long") + "\n", value, PageDirection.class.getSimpleName(), Arrays.toString(PageDirection.values()));
+            throw new HandledException(e, getClass());
+        }
+    }
+
+    private PageSize getValueOfSize(String value) throws HandledException {
+        try {
+            return PageSize.valueOf(value);
+        } catch (IllegalArgumentException e) {
+//            TODO:Check
+            System.err.printf(SharedSpace.getResString("public.err.unrecognizable_enum_long") + "\n", value, PageSize.class.getSimpleName(), Arrays.toString(PageSize.values()));
+            throw new HandledException(e, getClass());
+        }
+    }
+
+
+    private PageAlign getValueOfAlign(String value) throws HandledException {
+        try {
+            return new PageAlign(value);
+        } catch (IllegalArgumentException e) {
+//            TODO:Check
+            System.err.printf(SharedSpace.getResString("public.err.unrecognizable_enum_long") + "\n", value, PageAlign.class.getSimpleName(), Arrays.toString(new String[]{""}));
+            throw new HandledException(e, getClass());
+        }
+    }
+
+
+    private FileSorter.Sequence getValueOfSequence(String value) throws HandledException {
+        try {
+            return FileSorter.Sequence.valueOf(value);
+        } catch (IllegalArgumentException e) {
+//            TODO:Check
+            System.err.printf(SharedSpace.getResString("public.err.unrecognizable_enum_long") + "\n", value, FileSorter.Sequence.class.getSimpleName(), Arrays.toString(FileSorter.Sequence.values()));
+            throw new HandledException(e, getClass());
+        }
+    }
+
+    private FileSorter.Sortby getValueOfSortby(String value) throws HandledException {
+        try {
+            return FileSorter.Sortby.valueOf(value);
+        } catch (IllegalArgumentException e) {
+//            TODO:Check
+            System.err.printf(SharedSpace.getResString("public.err.unrecognizable_enum_long") + "\n", value, FileSorter.Sortby.class.getSimpleName(), Arrays.toString(FileSorter.Sortby.values()));
+            throw new HandledException(e, getClass());
+        }
+    }
 
     public CreateActionParser() {
         super(MultiLanguageOptionFactory.getOption("h", "help", "create.help"));
@@ -156,5 +200,4 @@ public class CreateActionParser extends ActionParser<CreateAction> {
         options.addOption(opt_mode);
 
     }
-
 }

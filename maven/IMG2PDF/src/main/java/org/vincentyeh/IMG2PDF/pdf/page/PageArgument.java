@@ -15,8 +15,8 @@ public class PageArgument {
 
     public PageArgument(Element element){
         this.align = new PageAlign(element.getChild("align").getValue());
-        this.size = PageSize.getByString(element.getChild("size").getValue());
-        this.direction = PageDirection.getByString(element.getChild("default-direction").getValue());
+        this.size = PageSize.valueOf(element.getChild("size").getValue());
+        this.direction = PageDirection.valueOf(element.getChild("default-direction").getValue());
         this.auto_rotate = Boolean.parseBoolean(element.getChild("auto-rotate").getValue());
     }
 
@@ -26,10 +26,6 @@ public class PageArgument {
         element.addContent(new Element("align").addContent(align.toString()));
         element.addContent(new Element("default-direction").addContent(direction.toString()));
         element.addContent(new Element("auto-rotate").addContent(Boolean.toString(auto_rotate)));
-//		task.setAttribute("size", size.toString() + "");
-//		task.setAttribute("align", align.toString());
-//		task.setAttribute("default-direction", direction.toString());
-//		task.setAttribute("auto-rotate", String.valueOf(auto_rotate));
         return element;
 
     }

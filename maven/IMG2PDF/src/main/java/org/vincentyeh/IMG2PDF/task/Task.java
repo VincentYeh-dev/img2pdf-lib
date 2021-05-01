@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jdom2.Element;
-import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
 import org.vincentyeh.IMG2PDF.pdf.doc.DocumentArgument;
 import org.vincentyeh.IMG2PDF.pdf.page.PageArgument;
 import org.vincentyeh.IMG2PDF.util.file.FileChecker;
@@ -28,7 +27,7 @@ public class Task {
         this.pageArgument = pageArgument;
     }
 
-    public Task(Element element) throws FileNotFoundException, UnrecognizedEnumException {
+    public Task(Element element) throws FileNotFoundException,IllegalArgumentException{
         if (element == null)
             throw new NullPointerException("element is null");
 

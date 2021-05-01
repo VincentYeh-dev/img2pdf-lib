@@ -1,6 +1,5 @@
 package org.vincentyeh.IMG2PDF.util;
 
-import org.vincentyeh.IMG2PDF.commandline.action.exception.UnrecognizedEnumException;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,22 +24,13 @@ public class BytesSize {
             return bytes;
         }
 
-        public static Suffix getInstance(String raw) {
-            Suffix[] values = values();
-            for (Suffix value : values) {
-                if (value.toString().equals(raw)) {
-                    return value;
-                }
-            }
-            throw new UnrecognizedEnumException(raw,"Suffix",values());
-        }
     }
 
-    public static BytesSize parseString(String raw) {
+    public static BytesSize valueOf(String raw) {
         Pattern pattern = Pattern.compile("([0-9]+)(B|KB|MB|GB)");
         Matcher matcher = pattern.matcher(raw);
         if (matcher.find()) {
-            return new BytesSize(Integer.parseInt(matcher.group(1)),Suffix.getInstance(matcher.group(2)));
+            return new BytesSize(Integer.parseInt(matcher.group(1)),Suffix.valueOf(matcher.group(2)));
         }
         throw new IllegalArgumentException("Invalid format:"+raw);
     }
