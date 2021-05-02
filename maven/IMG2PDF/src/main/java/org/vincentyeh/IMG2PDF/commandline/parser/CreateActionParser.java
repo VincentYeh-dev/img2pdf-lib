@@ -97,8 +97,7 @@ public class CreateActionParser extends ActionParser<CreateAction> {
         try {
             return PageDirection.valueOf(value);
         } catch (IllegalArgumentException e) {
-//            TODO:Check
-            System.err.printf(SharedSpace.getResString("public.err.unrecognizable_enum_long") + "\n", value, PageDirection.class.getSimpleName(), Arrays.toString(PageDirection.values()));
+            printUnrecognizableEnumMessage(value, PageDirection.class);
             throw new HandledException(e, getClass());
         }
     }
@@ -107,8 +106,7 @@ public class CreateActionParser extends ActionParser<CreateAction> {
         try {
             return PageSize.valueOf(value);
         } catch (IllegalArgumentException e) {
-//            TODO:Check
-            System.err.printf(SharedSpace.getResString("public.err.unrecognizable_enum_long") + "\n", value, PageSize.class.getSimpleName(), Arrays.toString(PageSize.values()));
+            printUnrecognizableEnumMessage(value, PageSize.class);
             throw new HandledException(e, getClass());
         }
     }
@@ -118,7 +116,6 @@ public class CreateActionParser extends ActionParser<CreateAction> {
         try {
             return new PageAlign(value);
         } catch (IllegalArgumentException e) {
-//            TODO:Check
             System.err.printf(SharedSpace.getResString("public.err.unrecognizable_enum_long") + "\n", value, PageAlign.class.getSimpleName(), Arrays.toString(new String[]{""}));
             throw new HandledException(e, getClass());
         }
@@ -129,8 +126,7 @@ public class CreateActionParser extends ActionParser<CreateAction> {
         try {
             return FileSorter.Sequence.valueOf(value);
         } catch (IllegalArgumentException e) {
-//            TODO:Check
-            System.err.printf(SharedSpace.getResString("public.err.unrecognizable_enum_long") + "\n", value, FileSorter.Sequence.class.getSimpleName(), Arrays.toString(FileSorter.Sequence.values()));
+            printUnrecognizableEnumMessage(value, FileSorter.Sequence.class);
             throw new HandledException(e, getClass());
         }
     }
@@ -139,10 +135,13 @@ public class CreateActionParser extends ActionParser<CreateAction> {
         try {
             return FileSorter.Sortby.valueOf(value);
         } catch (IllegalArgumentException e) {
-//            TODO:Check
-            System.err.printf(SharedSpace.getResString("public.err.unrecognizable_enum_long") + "\n", value, FileSorter.Sortby.class.getSimpleName(), Arrays.toString(FileSorter.Sortby.values()));
+            printUnrecognizableEnumMessage(value, FileSorter.Sortby.class);
             throw new HandledException(e, getClass());
         }
+    }
+
+    private void printUnrecognizableEnumMessage(String unrecognizableEnum, Class<? extends Enum<?>> _class) {
+        System.err.printf(SharedSpace.getResString("public.err.unrecognizable_enum_long") + "\n", unrecognizableEnum, _class.getSimpleName(), Arrays.toString(_class.getEnumConstants()));
     }
 
     public CreateActionParser() {
