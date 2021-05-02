@@ -16,7 +16,7 @@ public class SharedSpace {
 
 	private static ResourceBundle language_resource =null;
 	static {
-		System.out.println("Static SharedSpace");
+//		System.out.println("Static SharedSpace");
 //		Language Setting:
 
 //	Local:
