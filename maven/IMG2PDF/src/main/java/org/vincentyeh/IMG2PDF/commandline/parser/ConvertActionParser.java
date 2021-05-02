@@ -20,11 +20,7 @@ public class ConvertActionParser extends ActionParser<ConvertAction> {
     public ConvertAction parse(String[] arguments) throws ParseException, HandledException {
         CommandLine cmd = parser.parse(options, arguments);
 
-        boolean open_when_complete = cmd.hasOption("open_when_complete");
-        boolean overwrite_output = cmd.hasOption("overwrite");
-        String[] str_sources = cmd.getOptionValues("tasklist_source");
         File tempFolder = getTempFolder(cmd);
-
         try {
             FileChecker.makeDirsIfNotExists(tempFolder);
         } catch (IOException e) {
@@ -32,27 +28,25 @@ public class ConvertActionParser extends ActionParser<ConvertAction> {
             throw new HandledException(e, getClass());
         }
 
-        long maxMainMemoryBytes;
-        try {
-            maxMainMemoryBytes = getMaxMemoryBytes(cmd);
-        } catch (IllegalArgumentException e) {
-            System.err.println(e.getMessage());
-            throw new HandledException(e, getClass());
-        }
+        return new ConvertAction(tempFolder, getMaxMemoryBytes(cmd), getTaskListSources(cmd), cmd.hasOption("open_when_complete"), cmd.hasOption("overwrite"));
+    }
 
-
-        File[] tasklist_sources;
+    private File[] getTaskListSources(CommandLine cmd) throws HandledException {
         try {
-            tasklist_sources = verifyFiles(str_sources);
+            return verifyFiles(cmd.getOptionValues("tasklist_source"));
         } catch (IOException e) {
             System.err.println(e.getMessage());
             throw new HandledException(e, getClass());
         }
-        return new ConvertAction(tempFolder, maxMainMemoryBytes, tasklist_sources, open_when_complete, overwrite_output);
     }
 
-    private long getMaxMemoryBytes(CommandLine cmd) {
-        return BytesSize.valueOf(cmd.getOptionValue("memory_max_usage", DEFAULT_MAX_MEMORY_USAGE)).getBytes();
+    private long getMaxMemoryBytes(CommandLine cmd) throws HandledException {
+        try {
+            return BytesSize.valueOf(cmd.getOptionValue("memory_max_usage", DEFAULT_MAX_MEMORY_USAGE)).getBytes();
+        } catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
+            throw new HandledException(e, getClass());
+        }
 
     }
 
