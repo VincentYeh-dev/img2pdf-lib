@@ -55,7 +55,7 @@ public class MainActionParser extends ActionParser<MainAction> {
     public MainActionParser() {
         super(MultiLanguageOptionFactory.getOption("h", "help", "main.help"));
         Option opt_help = MultiLanguageOptionFactory.getOption("h", "help", "main.help");
-        Option opt_mode = MultiLanguageOptionFactory.getArgumentOption("m", "mode", "main.arg.mode.help", listStringArray(ArrayToStringArray(ActionMode.values())));
+        Option opt_mode = MultiLanguageOptionFactory.getArgumentOption("m", "mode", "main.arg.mode.help", listEnum(ActionMode.class));
         options.addOption(opt_mode);
         options.addOption(opt_help);
     }

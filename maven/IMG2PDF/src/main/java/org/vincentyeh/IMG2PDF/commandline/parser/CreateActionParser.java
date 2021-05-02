@@ -116,6 +116,7 @@ public class CreateActionParser extends ActionParser<CreateAction> {
         try {
             return new PageAlign(value);
         } catch (IllegalArgumentException e) {
+//            TODO:check
             System.err.printf(SharedSpace.getResString("public.err.unrecognizable_enum_long") + "\n", value, PageAlign.class.getSimpleName(), Arrays.toString(new String[]{""}));
             throw new HandledException(e, getClass());
         }
@@ -144,6 +145,7 @@ public class CreateActionParser extends ActionParser<CreateAction> {
         System.err.printf(SharedSpace.getResString("public.err.unrecognizable_enum_long") + "\n", unrecognizableEnum, _class.getSimpleName(), Arrays.toString(_class.getEnumConstants()));
     }
 
+
     public CreateActionParser() {
         super(MultiLanguageOptionFactory.getOption("h", "help", "create.help"));
         Option opt_help = MultiLanguageOptionFactory.getOption("h", "help", "create.help");
@@ -151,14 +153,15 @@ public class CreateActionParser extends ActionParser<CreateAction> {
         Option opt_debug = MultiLanguageOptionFactory.getOption("d", "debug", "create.arg.debug.help");
         Option opt_overwrite = MultiLanguageOptionFactory.getOption("ow", "overwrite", "create.arg.overwrite_tasklist.help");
 
-        Option opt_pdf_size = MultiLanguageOptionFactory.getArgumentOption("pz", "pdf_size", "create.arg.pdf_size.help", listStringArray(ArrayToStringArray(PageSize.values())));
+        Option opt_pdf_size = MultiLanguageOptionFactory.getArgumentOption("pz", "pdf_size", "create.arg.pdf_size.help", listEnum(PageSize.class));
         Option opt_pdf_align = MultiLanguageOptionFactory.getArgumentOption("pa", "pdf_align", "create.arg.pdf_align.help");
         Option opt_pdf_direction = MultiLanguageOptionFactory.getArgumentOption("pdi", "pdf_direction", "create.arg.pdf_direction.help",
-                listStringArray(ArrayToStringArray(PageDirection.values())));
+                listEnum(PageDirection.class));
 
         Option opt_pdf_auto_rotate = MultiLanguageOptionFactory.getOption("par", "pdf_auto_rotate", "create.arg.pdf_auto_rotate.help");
-        Option opt_pdf_sortby = MultiLanguageOptionFactory.getArgumentOption("ps", "pdf_sortby", "create.arg.pdf_sortby.help", listStringArray(ArrayToStringArray(FileSorter.Sortby.values())));
-        Option opt_pdf_sequence = MultiLanguageOptionFactory.getArgumentOption("pseq", "pdf_sequence", "create.arg.pdf_sequence.help", listStringArray(ArrayToStringArray(FileSorter.Sequence.values())));
+        Option opt_pdf_sortby = MultiLanguageOptionFactory.getArgumentOption("ps", "pdf_sortby", "create.arg.pdf_sortby.help", listEnum(FileSorter.Sortby.class));
+        Option opt_pdf_sequence = MultiLanguageOptionFactory.getArgumentOption("pseq", "pdf_sequence", "create.arg.pdf_sequence.help", listEnum(FileSorter.Sequence.class));
+
         Option opt_pdf_owner_password = MultiLanguageOptionFactory.getArgumentOption("popwd", "pdf_owner_password",
                 "create.arg.pdf_owner_password.help");
         Option opt_pdf_user_password = MultiLanguageOptionFactory.getArgumentOption("pupwd", "pdf_user_password", "create.arg.pdf_user_password.help");

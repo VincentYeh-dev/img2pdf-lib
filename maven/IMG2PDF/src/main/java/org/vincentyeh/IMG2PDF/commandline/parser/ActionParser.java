@@ -10,6 +10,8 @@ import org.vincentyeh.IMG2PDF.util.file.FileChecker;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public abstract class ActionParser<T extends Action> {
 
@@ -22,22 +24,8 @@ public abstract class ActionParser<T extends Action> {
 
     public abstract T parse(String[] arguments)throws Exception;
 
-    protected String listStringArray(String[] values) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(values[0]);
-        for (int i = 1; i < values.length; i++) {
-            sb.append(",");
-            sb.append(values[i]);
-        }
-        return sb.toString();
-    }
-
-    protected <J> String[] ArrayToStringArray(J[] arr1) {
-        String[] string_array = new String[arr1.length];
-        for (int i = 0; i < arr1.length; i++) {
-            string_array[i] = arr1[i].toString();
-        }
-        return string_array;
+    protected String listEnum(Class<? extends Enum<?>> _class){
+        return Arrays.stream(_class.getEnumConstants()).map(Enum::toString).collect(Collectors.joining(","));
     }
 
     protected File[] verifyFiles(String[] strSources) throws IOException {
