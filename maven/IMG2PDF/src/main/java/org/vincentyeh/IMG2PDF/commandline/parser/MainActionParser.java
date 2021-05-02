@@ -10,22 +10,22 @@ public class MainActionParser extends ActionParser<MainAction> {
 
     @Override
     public MainAction parse(String[] arguments) throws ParseException {
-        CommandLine mode_chooser = parser.parse(options, arguments, true);
+        CommandLine cmd = parser.parse(options, arguments, true);
 
-        if (arguments.length == 0 || mode_chooser.hasOption("help") && !mode_chooser.hasOption("mode")) {
+        if (arguments.length == 0 || cmd.hasOption("help") && !cmd.hasOption("mode")) {
             throw new HelperException(options);
         }
 
-        ActionMode mode;
-        if (mode_chooser.hasOption("mode")) {
-            mode = ActionMode.valueOf(mode_chooser.getOptionValue("mode"));
+        return new MainAction(arguments, getActionMode(cmd));
+    }
 
+    private ActionMode getActionMode(CommandLine cmd) throws HelperException {
+        if (cmd.hasOption("mode")) {
+            return ActionMode.valueOf(cmd.getOptionValue("mode"));
         } else {
             throw new HelperException(options);
         }
-        return new MainAction(arguments, mode);
     }
-
 
     public MainActionParser() {
         super(MultiLanguageOptionFactory.getOption("h", "help", "main.help"));
@@ -33,7 +33,6 @@ public class MainActionParser extends ActionParser<MainAction> {
         Option opt_mode = MultiLanguageOptionFactory.getArgumentOption("m", "mode", "main.arg.mode.help", listStringArray(ArrayToStringArray(ActionMode.values())));
         options.addOption(opt_mode);
         options.addOption(opt_help);
-
     }
 
 }

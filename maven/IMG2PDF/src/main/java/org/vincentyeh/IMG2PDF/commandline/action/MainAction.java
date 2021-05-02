@@ -2,12 +2,10 @@ package org.vincentyeh.IMG2PDF.commandline.action;
 
 import org.apache.commons.cli.*;
 import org.vincentyeh.IMG2PDF.SharedSpace;
-import org.vincentyeh.IMG2PDF.commandline.parser.ConvertActionParser;
-import org.vincentyeh.IMG2PDF.commandline.parser.CreateActionParser;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
 import org.vincentyeh.IMG2PDF.commandline.parser.exception.HelperException;
 
-import java.util.Iterator;
+import java.util.stream.Collectors;
 
 public class MainAction implements Action {
     private final ActionMode mode;
@@ -29,36 +27,17 @@ public class MainAction implements Action {
         action.start();
     }
 
-    private Action getParsedAction(ActionMode mode) throws HandledException, ParseException {
+    private Action getParsedAction(ActionMode mode) throws Exception {
         try {
-            switch (mode) {
-                case create:
-                    CreateActionParser createActionParser = new CreateActionParser();
-                    return createActionParser.parse(arguments);
-                case convert:
-                    ConvertActionParser convertActionParser = new ConvertActionParser();
-                    return convertActionParser.parse(arguments);
-                default:
-                    throw new RuntimeException("mode==??");
-            }
+            return mode.getParser().parse(arguments);
 
         } catch (HelperException e) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp(SharedSpace.Configuration.PROGRAM_NAME, e.opt);
             throw new HandledException(e, getClass());
         } catch (MissingOptionException e) {
-            StringBuilder buf = new StringBuilder();
-
-            Iterator<?> it = e.getMissingOptions().iterator();
-            while (it.hasNext()) {
-                buf.append(it.next());
-                if (it.hasNext()) {
-                    buf.append(", ");
-                }
-            }
-            System.err.printf(SharedSpace.getResString("argperser.err.missing_option") + "\n", buf);
+            System.err.printf(SharedSpace.getResString("argperser.err.missing_option") + "\n", e.getMissingOptions().stream().map(Object::toString).collect(Collectors.joining(",")));
             throw new HandledException(e, getClass());
-
         } catch (MissingArgumentException e) {
             System.err.printf(SharedSpace.getResString("argperser.err.missing_argument_option") + "\n", e.getOption().getOpt());
             throw new HandledException(e, getClass());
