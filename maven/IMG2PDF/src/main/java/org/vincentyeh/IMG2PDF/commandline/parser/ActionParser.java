@@ -1,10 +1,8 @@
 package org.vincentyeh.IMG2PDF.commandline.parser;
 
-import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.commandline.action.Action;
-import org.vincentyeh.IMG2PDF.commandline.parser.core.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
 import org.vincentyeh.IMG2PDF.util.file.FileChecker;
 
