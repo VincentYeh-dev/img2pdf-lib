@@ -1,10 +1,12 @@
 package org.vincentyeh.IMG2PDF.commandline.parser;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 import org.vincentyeh.IMG2PDF.commandline.option.MultiLanguageOptionFactory;
 import org.vincentyeh.IMG2PDF.commandline.action.ConvertAction;
+import org.vincentyeh.IMG2PDF.commandline.parser.core.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
 import org.vincentyeh.IMG2PDF.util.BytesSize;
 import org.vincentyeh.IMG2PDF.util.file.FileChecker;
@@ -15,7 +17,7 @@ import java.io.IOException;
 public class ConvertActionParser extends ActionParser<ConvertAction> {
     private static final String DEFAULT_TEMP_FOLDER = ".org.vincentyeh.IMG2PDF.tmp";
     private static final String DEFAULT_MAX_MEMORY_USAGE = "50MB";
-
+    private final CommandLineParser parser;
     @Override
     public ConvertAction parse(String[] arguments) throws ParseException, HandledException {
         CommandLine cmd = parser.parse(options, arguments);
@@ -55,7 +57,6 @@ public class ConvertActionParser extends ActionParser<ConvertAction> {
     }
 
     public ConvertActionParser() {
-        super(MultiLanguageOptionFactory.getOption("h", "help", "convert.help"));
 
         Option opt_help = MultiLanguageOptionFactory.getOption("h", "help", "convert.help");
 
@@ -76,6 +77,7 @@ public class ConvertActionParser extends ActionParser<ConvertAction> {
         options.addOption(opt_open_when_complete);
         options.addOption(opt_overwrite);
 
+        parser=new CheckHelpParser(opt_help);
     }
 
 }

@@ -3,6 +3,7 @@ package org.vincentyeh.IMG2PDF.commandline.parser;
 import org.apache.commons.cli.*;
 import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.commandline.action.CreateAction;
+import org.vincentyeh.IMG2PDF.commandline.parser.core.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
 import org.vincentyeh.IMG2PDF.commandline.option.MultiLanguageOptionFactory;
 import org.vincentyeh.IMG2PDF.pdf.doc.DocumentAccessPermission;
@@ -27,6 +28,7 @@ public class CreateActionParser extends ActionParser<CreateAction> {
     private static final String DEFAULT_PDF_SEQUENCE = "INCREASE";
     private static final String DEFAULT_PDF_FILTER = "glob:*.{PNG,JPG}";
 
+    private final CommandLineParser parser;
     @Override
     public CreateAction parse(String[] arguments) throws ParseException, HandledException {
         CommandLine cmd = parser.parse(options, arguments);
@@ -124,7 +126,6 @@ public class CreateActionParser extends ActionParser<CreateAction> {
 
 
     public CreateActionParser() {
-        super(MultiLanguageOptionFactory.getOption("h", "help", "create.help"));
         Option opt_help = MultiLanguageOptionFactory.getOption("h", "help", "create.help");
 
         Option opt_debug = MultiLanguageOptionFactory.getOption("d", "debug", "create.arg.debug.help");
@@ -172,5 +173,7 @@ public class CreateActionParser extends ActionParser<CreateAction> {
         options.addOption(opt_filter);
         options.addOption(opt_sources);
         options.addOption(opt_list_destination);
+
+        parser=new CheckHelpParser(opt_help);
     }
 }
