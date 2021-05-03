@@ -5,12 +5,14 @@ import org.apache.commons.cli.Options;
 import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.commandline.action.Action;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.CheckHelpParser;
+import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
 import org.vincentyeh.IMG2PDF.util.file.FileChecker;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public abstract class ActionParser<T extends Action> {
@@ -26,6 +28,15 @@ public abstract class ActionParser<T extends Action> {
 
     protected String listEnum(Class<? extends Enum<?>> _class){
         return Arrays.stream(_class.getEnumConstants()).map(Enum::toString).collect(Collectors.joining(","));
+    }
+
+    protected <K extends Enum<K>> K getValueOfEnum(Class<K> _enum, String value) throws HandledException {
+        try {
+            return Enum.valueOf(_enum,value);
+        } catch (IllegalArgumentException e) {
+            System.err.printf(SharedSpace.getResString("public.err.unrecognizable_enum_long") + "\n", value, _enum.getSimpleName(), Arrays.stream(_enum.getEnumConstants()).map(Objects::toString).collect(Collectors.joining(",")));
+            throw new HandledException(e, getClass());
+        }
     }
 
     protected File[] verifyFiles(String[] strSources) throws IOException {

@@ -94,21 +94,11 @@ public class CreateActionParser extends ActionParser<CreateAction> {
     }
 
     private PageDirection getValueOfDirection(String value) throws HandledException {
-        try {
-            return PageDirection.valueOf(value);
-        } catch (IllegalArgumentException e) {
-            printUnrecognizableEnumMessage(value, PageDirection.class);
-            throw new HandledException(e, getClass());
-        }
+        return getValueOfEnum(PageDirection.class,value);
     }
 
     private PageSize getValueOfSize(String value) throws HandledException {
-        try {
-            return PageSize.valueOf(value);
-        } catch (IllegalArgumentException e) {
-            printUnrecognizableEnumMessage(value, PageSize.class);
-            throw new HandledException(e, getClass());
-        }
+        return getValueOfEnum(PageSize.class,value);
     }
 
 
@@ -124,26 +114,13 @@ public class CreateActionParser extends ActionParser<CreateAction> {
 
 
     private FileSorter.Sequence getValueOfSequence(String value) throws HandledException {
-        try {
-            return FileSorter.Sequence.valueOf(value);
-        } catch (IllegalArgumentException e) {
-            printUnrecognizableEnumMessage(value, FileSorter.Sequence.class);
-            throw new HandledException(e, getClass());
-        }
+        return getValueOfEnum(FileSorter.Sequence.class,value);
     }
 
     private FileSorter.Sortby getValueOfSortby(String value) throws HandledException {
-        try {
-            return FileSorter.Sortby.valueOf(value);
-        } catch (IllegalArgumentException e) {
-            printUnrecognizableEnumMessage(value, FileSorter.Sortby.class);
-            throw new HandledException(e, getClass());
-        }
+        return getValueOfEnum(FileSorter.Sortby.class,value);
     }
 
-    private void printUnrecognizableEnumMessage(String unrecognizableEnum, Class<? extends Enum<?>> _class) {
-        System.err.printf(SharedSpace.getResString("public.err.unrecognizable_enum_long") + "\n", unrecognizableEnum, _class.getSimpleName(), Arrays.toString(_class.getEnumConstants()));
-    }
 
 
     public CreateActionParser() {
