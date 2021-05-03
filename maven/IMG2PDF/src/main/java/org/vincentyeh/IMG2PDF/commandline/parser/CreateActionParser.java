@@ -172,11 +172,5 @@ public class CreateActionParser extends ActionParser<CreateAction> {
         options.addOption(opt_filter);
         options.addOption(opt_sources);
         options.addOption(opt_list_destination);
-
-
-        Option opt_mode = new Option("m", "mode", true, "mode");
-
-        options.addOption(opt_mode);
-
     }
 }

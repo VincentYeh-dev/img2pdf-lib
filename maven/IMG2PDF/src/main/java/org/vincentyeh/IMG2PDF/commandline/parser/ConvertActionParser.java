@@ -76,10 +76,6 @@ public class ConvertActionParser extends ActionParser<ConvertAction> {
         options.addOption(opt_open_when_complete);
         options.addOption(opt_overwrite);
 
-//        parser = new CheckHelpParser();
-        Option opt_mode = new Option("m", "mode", true, "mode");
-        options.addOption(opt_mode);
-
     }
 
 }
