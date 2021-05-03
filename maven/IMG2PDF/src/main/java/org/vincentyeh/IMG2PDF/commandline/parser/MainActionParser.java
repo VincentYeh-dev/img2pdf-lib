@@ -21,18 +21,22 @@ public class MainActionParser extends ActionParser<MainAction> {
             throw new HelperException(options);
         }
 
-        return new MainAction(getAction(cmd,arguments));
+        return new MainAction(getAction(cmd, arguments));
     }
 
     private Action getAction(CommandLine cmd, String[] arguments) throws Exception {
         if (cmd.hasOption("mode")) {
-            return parseSubAction(ActionMode.valueOf(cmd.getOptionValue("mode")),arguments);
+            return parseSubAction(getValueOfActionMode(cmd.getOptionValue("mode")), arguments);
         } else {
             throw new HelperException(options);
         }
     }
 
-    private Action parseSubAction(ActionMode mode,String[] arguments) throws Exception {
+    private ActionMode getValueOfActionMode(String value) throws HandledException {
+        return getValueOfEnum(ActionMode.class, value);
+    }
+
+    private Action parseSubAction(ActionMode mode, String[] arguments) throws Exception {
         try {
             return mode.getParser().parse(arguments);
         } catch (HelperException e) {
