@@ -16,17 +16,16 @@ public class CheckHelpParser extends RelaxedParser{
 
 	@Override
 	public CommandLine parse(Options options, String[] arguments) throws ParseException {
-		Options opts = new Options();
-		opts.addOption(helperOption);
-
-		CommandLineParser parser = new RelaxedParser();
-
-		CommandLine cmd = parser.parse(opts, arguments);
-
-		if (cmd.hasOption(helperOption.getOpt()))
-			throw new HelperException(options);
-
+		super.options=options;
+		checkHelpOption(arguments);
 		return super.parse(options, arguments);
 	}
 
+	protected void checkHelpOption(String[] arguments) throws ParseException {
+		Options opts = new Options();
+		opts.addOption(helperOption);
+		CommandLine cmd = ((CommandLineParser) new RelaxedParser()).parse(opts, arguments);
+		if (cmd.hasOption(helperOption.getOpt()))
+			throw new HelperException(options);
+	}
 }

@@ -6,20 +6,19 @@ import org.vincentyeh.IMG2PDF.commandline.action.Action;
 import org.vincentyeh.IMG2PDF.commandline.option.MultiLanguageOptionFactory;
 import org.vincentyeh.IMG2PDF.commandline.action.ActionMode;
 import org.vincentyeh.IMG2PDF.commandline.action.MainAction;
+import org.vincentyeh.IMG2PDF.commandline.parser.core.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
+import org.vincentyeh.IMG2PDF.commandline.parser.core.RelaxedParser;
 import org.vincentyeh.IMG2PDF.commandline.parser.exception.HelperException;
 
 import java.util.stream.Collectors;
 
 public class MainActionParser extends ActionParser<MainAction> {
+    private final CommandLineParser parser;
 
     @Override
     public MainAction parse(String[] arguments) throws Exception {
         CommandLine cmd = parser.parse(options, arguments);
-
-        if (arguments.length == 0 || cmd.hasOption("help") && !cmd.hasOption("mode")) {
-            throw new HelperException(options);
-        }
 
         return new MainAction(getAction(cmd, arguments));
     }
@@ -57,11 +56,30 @@ public class MainActionParser extends ActionParser<MainAction> {
 
 
     public MainActionParser() {
-        super(MultiLanguageOptionFactory.getOption("h", "help", "main.help"));
         Option opt_help = MultiLanguageOptionFactory.getOption("h", "help", "main.help");
         Option opt_mode = MultiLanguageOptionFactory.getArgumentOption("m", "mode", "main.arg.mode.help", listEnum(ActionMode.class));
-        options.addOption(opt_mode);
-        options.addOption(opt_help);
+        Options mainOption=options;
+        mainOption.addOption(opt_mode);
+        mainOption.addOption(opt_help);
+
+        parser = new CheckHelpParser(opt_help) {
+            @Override
+            protected void checkHelpOption(String[] arguments) throws HelperException {
+                RelaxedParser parser=new RelaxedParser();
+                CommandLine cmd;
+
+                try {
+                    cmd=parser.parse(mainOption,arguments);
+                } catch (ParseException e) {
+                    throw new RuntimeException();
+                }
+
+                if (arguments.length == 0 || cmd.hasOption("h") && !cmd.hasOption("m")) {
+                    throw new HelperException(mainOption);
+                }
+            }
+        };
+
     }
 
 }

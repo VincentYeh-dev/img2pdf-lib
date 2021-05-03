@@ -18,6 +18,7 @@ public class MainProgram {
             MainAction action = parser.parse(args);
             action.start();
         } catch (HelperException e) {
+            e.printStackTrace();
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp(SharedSpace.Configuration.PROGRAM_NAME, e.getOptions());
         } catch (MissingOptionException e) {

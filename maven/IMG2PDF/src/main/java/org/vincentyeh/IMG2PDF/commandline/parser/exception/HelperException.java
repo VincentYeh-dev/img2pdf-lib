@@ -4,7 +4,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 public class HelperException extends ParseException{
-	private Options options;
+	private final Options options;
 	public HelperException(Options options) {
 		super("help options");
 		this.options=options;

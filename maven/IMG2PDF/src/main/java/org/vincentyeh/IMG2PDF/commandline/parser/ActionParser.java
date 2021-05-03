@@ -18,11 +18,6 @@ import java.util.stream.Collectors;
 public abstract class ActionParser<T extends Action> {
 
     protected final Options options = new Options();
-    protected final CheckHelpParser parser;
-
-    protected ActionParser(Option opt_help) {
-        parser=new CheckHelpParser(opt_help);
-    }
 
     public abstract T parse(String[] arguments)throws Exception;
 
