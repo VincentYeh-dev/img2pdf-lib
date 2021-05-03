@@ -15,7 +15,7 @@ public class MainActionParser extends ActionParser<MainAction> {
 
     @Override
     public MainAction parse(String[] arguments) throws Exception {
-        CommandLine cmd = parser.parse(options, arguments, true);
+        CommandLine cmd = parser.parse(options, arguments);
 
         if (arguments.length == 0 || cmd.hasOption("help") && !cmd.hasOption("mode")) {
             throw new HelperException(options);
@@ -41,7 +41,7 @@ public class MainActionParser extends ActionParser<MainAction> {
             return mode.getParser().parse(arguments);
         } catch (HelperException e) {
             HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp(SharedSpace.Configuration.PROGRAM_NAME, e.opt);
+            formatter.printHelp(SharedSpace.Configuration.PROGRAM_NAME, e.getOptions());
             throw new HandledException(e, getClass());
         } catch (MissingOptionException e) {
             System.err.printf(SharedSpace.getResString("argperser.err.missing_option") + "\n", e.getMissingOptions().stream().map(Object::toString).collect(Collectors.joining(",")));

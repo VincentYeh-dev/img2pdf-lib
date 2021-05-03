@@ -19,7 +19,7 @@ public class MainProgram {
             action.start();
         } catch (HelperException e) {
             HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp(SharedSpace.Configuration.PROGRAM_NAME, e.opt);
+            formatter.printHelp(SharedSpace.Configuration.PROGRAM_NAME, e.getOptions());
         } catch (MissingOptionException e) {
             StringBuilder buf = new StringBuilder();
             Iterator<?> it = e.getMissingOptions().iterator();
