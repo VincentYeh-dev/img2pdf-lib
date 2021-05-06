@@ -1,7 +1,8 @@
-# Walk Animation 
+# kuma_fish_album_1
+
 
 ## Artwork
-![AAA](https://github.com/VincentYeh-dev/IMG2PDF/blob/master/sample/walk-animation/image-sources/walka1.png?raw=true)
+![AAA](https://github.com/VincentYeh-dev/IMG2PDF/blob/master/sample/kuma_fish_album_1/image-sources/Horizontal_2.jpg?raw=true)
 
 ### credit
 This drawing is credit by [kuma_fish](https://instagram.com/kuma_fishs?igshid=4o7rza34ha3p).
