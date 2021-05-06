@@ -28,41 +28,18 @@ public class ImagePageFactory {
     public static PDPage getImagePage(PDDocument document, PageArgument argument, BufferedImage rawImage) throws Exception {
         final PDPage page = new PDPage();
 
-        final Size page_size;
-        if (argument.getSize() == PageSize.DEPEND_ON_IMG) {
-            page_size = new Size(rawImage.getHeight(), rawImage.getWidth());
-
-        } else {
-            PDRectangle rect = argument.getSize().getPdrectangle();
-            page_size = new Size(rect.getHeight(), rect.getWidth());
-        }
+        final Size page_size = getPageSize(argument.getSize(), new Size(rawImage.getHeight(), rawImage.getWidth()));
+        final Size rawImageSize = new Size(rawImage.getHeight(), rawImage.getWidth());
 
         page.setMediaBox(new PDRectangle(page_size.getWidth(), page_size.getHeight()));
 
-        final Size img_size;
-        final Position position;
-        final BufferedImage imageOut;
+        final PageDirection page_direction = getPageDirection(argument.getSize(), rawImageSize, argument.getDirection(), argument.getAutoRotate());
+        page.setRotation(getRotateAngle(page_direction));
 
-        if (argument.getSize() == PageSize.DEPEND_ON_IMG) {
-            img_size = new Size(rawImage.getHeight(), rawImage.getWidth());
-            imageOut = rawImage;
-            position = new Position(0, 0);
-        } else {
-            PageDirection page_direction = argument.getDirection();
-            if (argument.getAutoRotate()) {
-                page_direction = getDirection(rawImage);
-            }
-
-            page.setRotation(page_direction == Landscape ? -90 : 0);
-            imageOut = rotateImg(rawImage, page_direction == Landscape ? 90 : 0);
-
-            Size rotated_img_size = new Size(imageOut.getHeight(), imageOut.getWidth());
-            img_size = SizeCalculator.getInstance().scaleUpToMax(rotated_img_size,page_size);
-
-            PositionCalculator positionCalculator=PositionCalculator.getInstance();
-            PositionCalculator.init(page.getRotation() != 0, img_size.getHeight(), img_size.getWidth(), page_size.getHeight(), page_size.getWidth());
-            position = positionCalculator.calculate(argument.getAlign());
-        }
+        final BufferedImage imageOut = getRotatedImage(rawImage, page_direction);
+        final Size rotated_img_size = new Size(imageOut.getHeight(), imageOut.getWidth());
+        final Size img_size = calculateImageSize(rotated_img_size, page_size);
+        final Position position = calculatePosition(page.getRotation() != 0, img_size, page_size, argument.getAlign());
 
         PDImageXObject pdImageXObject = LosslessFactory.createFromImage(document, imageOut);
         PDPageContentStream contentStream = new PDPageContentStream(document, page);
@@ -71,7 +48,46 @@ public class ImagePageFactory {
         return page;
     }
 
-    public static BufferedImage rotateImg(BufferedImage raw, int rotate_angle) {
+    private static int getRotateAngle(PageDirection page_direction) {
+        return page_direction == Landscape ? -90 : 0;
+    }
+
+    private static Size calculateImageSize(Size image_size, Size page_size) {
+        return SizeCalculator.getInstance().scaleUpToMax(image_size, page_size);
+    }
+
+    private static Position calculatePosition(boolean rotated, Size img_size, Size page_size, PageAlign align) {
+        PositionCalculator positionCalculator = PositionCalculator.getInstance();
+        PositionCalculator.init(rotated, img_size.getHeight(), img_size.getWidth(), page_size.getHeight(), page_size.getWidth());
+        return positionCalculator.calculate(align);
+    }
+
+    private static PageDirection getPageDirection(PageSize page_size, Size image_size, PageDirection direction, boolean autoRotate) {
+        if (page_size == PageSize.DEPEND_ON_IMG) {
+            return Portrait;
+        }
+        if (autoRotate) {
+            return detectDirection(image_size);
+        } else {
+            return direction;
+        }
+    }
+
+
+    private static BufferedImage getRotatedImage(BufferedImage rawImage, PageDirection page_direction) {
+        return rotateImg(rawImage, page_direction == Landscape ? 90 : 0);
+    }
+
+    private static Size getPageSize(PageSize pageSize, Size imageSize) {
+        if (pageSize == PageSize.DEPEND_ON_IMG) {
+            return new Size(imageSize.getHeight(), imageSize.getWidth());
+        } else {
+            PDRectangle rect = pageSize.getPdrectangle();
+            return new Size(rect.getHeight(), rect.getWidth());
+        }
+    }
+
+    private static BufferedImage rotateImg(BufferedImage raw, int rotate_angle) {
         if (rotate_angle == 0) return raw;
         final double rads = Math.toRadians(rotate_angle);
         final double sin = Math.abs(Math.sin(rads));
@@ -88,12 +104,8 @@ public class ImagePageFactory {
         return rotatedImage;
     }
 
-
-    private static PageDirection getDirection(BufferedImage image) {
-        return getDirection(image.getHeight(), image.getWidth());
+    private static PageDirection detectDirection(Size size) {
+        return PageDirection.detectDirection(size.getHeight(), size.getHeight());
     }
 
-    private static PageDirection getDirection(float height, float width) {
-        return height / width > 1 ? Portrait : Landscape;
-    }
 }
