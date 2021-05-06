@@ -7,7 +7,7 @@ import java.util.ResourceBundle;
 
 
 public class SharedSpace {
-    private static Locale[] supportedLocales = {
+    private static final Locale[] supportedLocales = {
             Locale.TRADITIONAL_CHINESE,
             Locale.ENGLISH
     };
