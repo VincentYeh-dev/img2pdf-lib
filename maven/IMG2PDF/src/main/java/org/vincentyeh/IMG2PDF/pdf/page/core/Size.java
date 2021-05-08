@@ -1,6 +1,6 @@
 package org.vincentyeh.IMG2PDF.pdf.page.core;
 
-public class Size {
+class Size {
     private final float height;
     private final float width;
 
