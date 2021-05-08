@@ -13,7 +13,7 @@ public class PositionCalculatorTester {
     public void test() {
 
         PositionCalculator calculator = PositionCalculator.getInstance();
-        PositionCalculator.init(false, 1024, 1024, 2048, 2048);
+        PositionCalculator.init(1024, 1024, 2048, 2048);
 
         Position pos = calculator.calculate(new PageAlign("TOP-CENTER"));
         EqualsPosition(new Position(2048-512-1024,1024),pos);
@@ -25,23 +25,6 @@ public class PositionCalculatorTester {
         pos = calculator.calculate(new PageAlign("TOP-RIGHT"));
         EqualsPosition(new Position(1024,1024),pos);
 
-
-    }
-
-
-    @Test
-    public void testRotated() {
-        PositionCalculator calculator = PositionCalculator.getInstance();
-        PositionCalculator.init(true, 1024, 1024, 2048, 2048);
-
-        Position pos = calculator.calculate(new PageAlign("TOP-CENTER"));
-        EqualsPosition(new Position(0,2048-512-1024),pos);
-
-        pos = calculator.calculate(new PageAlign("TOP-LEFT"));
-        EqualsPosition(new Position(0,0),pos);
-
-        pos = calculator.calculate(new PageAlign("TOP-RIGHT"));
-        EqualsPosition(new Position(0,1024),pos);
 
     }
 
