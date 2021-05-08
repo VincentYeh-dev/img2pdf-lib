@@ -26,9 +26,8 @@ public class ImagePageFactory {
 
     public static PDPage getImagePage(PDDocument document, PageArgument argument, BufferedImage rawImage) throws Exception {
         ProxyImage proxyImage = new ProxyImage(rawImage);
-        final PageDirection page_direction = getPageDirection(argument.getSize(), proxyImage.getSize(), argument.getDirection(), argument.getAutoRotate());
 
-        ProxyPage page=new ProxyPage(new PDPage(), getPageSize(page_direction, argument.getSize(), proxyImage.getSize()));
+        ProxyPage page=new ProxyPage(new PDPage(), getPageSize(getPageDirection(argument.getSize(), proxyImage.getSize(), argument.getDirection(), argument.getAutoRotate()), argument.getSize(), proxyImage.getSize()));
 
         ProxyImage outProxyImage = getCalculatedImage(proxyImage,page.getSize());
         final Position position = calculatePosition(outProxyImage.getSize(),page.getSize(), argument.getAlign());
@@ -86,9 +85,5 @@ public class ImagePageFactory {
     private static PageDirection detectDirection(Size size) {
         return PageDirection.detectDirection(size.getHeight(), size.getWidth());
     }
-
-
-
-
 
 }
