@@ -1,6 +1,6 @@
 package org.vincentyeh.IMG2PDF.pdf.page.core;
 
-public class SizeCalculator {
+class SizeCalculator {
     private static SizeCalculator calculator = null;
 
     public static SizeCalculator getInstance() {

@@ -1,6 +1,7 @@
-package org.vincentyeh.IMG2PDF.pdf.page;
+package org.vincentyeh.IMG2PDF.pdf.page.core;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -8,10 +9,10 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
-import org.vincentyeh.IMG2PDF.pdf.page.core.Position;
-import org.vincentyeh.IMG2PDF.pdf.page.core.PositionCalculator;
-import org.vincentyeh.IMG2PDF.pdf.page.core.Size;
-import org.vincentyeh.IMG2PDF.pdf.page.core.SizeCalculator;
+import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
+import org.vincentyeh.IMG2PDF.pdf.page.PageArgument;
+import org.vincentyeh.IMG2PDF.pdf.page.PageDirection;
+import org.vincentyeh.IMG2PDF.pdf.page.PageSize;
 
 import static org.vincentyeh.IMG2PDF.pdf.page.PageDirection.Landscape;
 import static org.vincentyeh.IMG2PDF.pdf.page.PageDirection.Portrait;
@@ -25,26 +26,27 @@ public class ImagePageFactory {
 
     public static PDPage getImagePage(PDDocument document, PageArgument argument, BufferedImage rawImage) throws Exception {
         ProxyImage proxyImage = new ProxyImage(rawImage);
-        final PDPage page = new PDPage();
         final PageDirection page_direction = getPageDirection(argument.getSize(), proxyImage.getSize(), argument.getDirection(), argument.getAutoRotate());
 
-        final Size page_size = getPageSize(page_direction, argument.getSize(), proxyImage.getSize());
-        page.setMediaBox(new PDRectangle(page_size.getWidth(), page_size.getHeight()));
+        ProxyPage page=new ProxyPage(new PDPage(), getPageSize(page_direction, argument.getSize(), proxyImage.getSize()));
 
-        ProxyImage outImage = getCalculatedImage(proxyImage, page_size);
-        final Position position = calculatePosition(outImage.getSize(), page_size, argument.getAlign());
+        ProxyImage outProxyImage = getCalculatedImage(proxyImage,page.getSize());
+        final Position position = calculatePosition(outProxyImage.getSize(),page.getSize(), argument.getAlign());
 
-//        drawImageToPage(document,)
-        PDImageXObject pdImageXObject = LosslessFactory.createFromImage(document, outImage.getImage());
-        PDPageContentStream contentStream = new PDPageContentStream(document, page);
+        return drawImageToPage(document,outProxyImage,page,position);
+    }
+
+    private static PDPage drawImageToPage(PDDocument document, ProxyImage outImage, ProxyPage page, Position position) throws IOException {
+        PDImageXObject pdImageXObject = LosslessFactory.createFromImage(document, outImage.get());
+        PDPageContentStream contentStream = new PDPageContentStream(document, page.get());
         contentStream.drawImage(pdImageXObject, position.getX(), position.getY(), outImage.getSize().getWidth(), outImage.getSize().getHeight());
         contentStream.close();
-        return page;
+        return page.get();
     }
 
     private static ProxyImage getCalculatedImage(ProxyImage proxyImage, Size page_size) {
         final Size img_size = calculateImageSize(proxyImage.getSize(), page_size);
-        return new ProxyImage(proxyImage.getImage(), img_size);
+        return new ProxyImage(proxyImage.get(), img_size);
     }
 
     private static Size calculateImageSize(Size image_size, Size page_size) {
@@ -81,46 +83,12 @@ public class ImagePageFactory {
         }
     }
 
-//    private static BufferedImage rotateImg(BufferedImage raw, int rotate_angle) {
-//        if (rotate_angle == 0) return raw;
-//        final double rads = Math.toRadians(rotate_angle);
-//        final double sin = Math.abs(Math.sin(rads));
-//        final double cos = Math.abs(Math.cos(rads));
-//        final int w = (int) Math.floor(raw.getWidth() * cos + raw.getHeight() * sin);
-//        final int h = (int) Math.floor(raw.getHeight() * cos + raw.getWidth() * sin);
-//        final BufferedImage rotatedImage = new BufferedImage(w, h, raw.getType());
-//        final AffineTransform at = new AffineTransform();
-//        at.translate(w / 2., h / 2.);
-//        at.rotate(rads, 0, 0);
-//        at.translate(-raw.getWidth() / 2., -raw.getHeight() / 2.);
-//        AffineTransformOp rotateOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
-//        rotateOp.filter(raw, rotatedImage);
-//        return rotatedImage;
-//    }
-
     private static PageDirection detectDirection(Size size) {
         return PageDirection.detectDirection(size.getHeight(), size.getWidth());
     }
 
-    private static class ProxyImage {
-        private final BufferedImage image;
-        private final Size size;
 
-        public ProxyImage(BufferedImage image) {
-            this(image, new Size(image.getHeight(), image.getWidth()));
-        }
 
-        public ProxyImage(BufferedImage image, Size size) {
-            this.image = image;
-            this.size = size;
-        }
 
-        public Size getSize() {
-            return size;
-        }
 
-        public BufferedImage getImage() {
-            return image;
-        }
-    }
 }

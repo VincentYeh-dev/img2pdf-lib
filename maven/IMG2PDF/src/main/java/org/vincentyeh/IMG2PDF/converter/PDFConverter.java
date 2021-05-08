@@ -9,7 +9,7 @@ import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.vincentyeh.IMG2PDF.converter.listener.ConversionInfoListener;
-import org.vincentyeh.IMG2PDF.pdf.page.ImagePageFactory;
+import org.vincentyeh.IMG2PDF.pdf.page.core.ImagePageFactory;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.util.file.FileChecker;
 
