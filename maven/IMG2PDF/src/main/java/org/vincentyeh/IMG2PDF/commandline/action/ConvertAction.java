@@ -41,48 +41,33 @@ public class ConvertAction implements Action {
         for (File src : tasklist_sources) {
             System.out.print(
                     "\t[" + SharedSpace.getResString("public.info.importing") + "] " + src.getAbsolutePath() + "\r");
-            TaskList tasks = getTaskListFromFile(src);
-            System.out.print("\t[" + SharedSpace.getResString("public.info.imported") + "] " + src.getAbsolutePath() + "\r\n");
-            System.out.println();
-            System.out.println(SharedSpace.getResString("convert.start_conversion"));
-            convertList(tasks);
+            try {
+                TaskList tasks = getTaskListFromFile(src);
+                System.out.print("\t[" + SharedSpace.getResString("public.info.imported") + "] " + src.getAbsolutePath() + "\r\n");
+                System.out.println();
+                System.out.println(SharedSpace.getResString("convert.start_conversion"));
+                convertList(tasks);
+            }catch (HandledException ignored){}
+
         }
 
     }
 
-    private void convertList(TaskList tasks) {
+    private void convertList(TaskList tasks) throws Exception {
 //                TODO:No exception is thrown when task.getArray() is empty.Warning to the user when it happen.
         for (Task task : tasks) {
             try {
                 File result = convertToFile(task);
                 if (open_when_complete)
                     openPDF(result);
-            } catch (PDFConverter.OverwriteDenyException e) {
-                System.err.printf("\t" + SharedSpace.getResString("convert.listener.err.overwrite") + "\n",e.getFile().getAbsolutePath());
-            }catch (PDFConverter.ReadImageException e){
-                System.err.printf("\n\t\t" + SharedSpace.getResString("convert.listener.err.image") + "\n", e.getMessage());
-            }catch (PDFConverter.ConversionException e){
-                System.err.printf("\n\t\t" + SharedSpace.getResString("convert.listener.err.conversion") + "\n", e.getMessage());
-            }catch (IOException e){
-               e.printStackTrace();
+            } catch (HandledException ignored) {
             }
-
         }
     }
 
 
-    private TaskList getTaskListFromFile(File src) throws HandledException, ParserConfigurationException, IOException {
-        try {
-            return new TaskList(getDocumentFromFile(src));
-        } catch (SAXException e) {
-//                    TODO: add to language pack
-            System.err.println("\n\tWrong XML content." + e.getMessage());
-            throw new HandledException(e, getClass());
-//                TODO:Add more catch
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
-        }
+    private TaskList getTaskListFromFile(File src) throws HandledException, IOException {
+        return new TaskList(getDocumentFromFile(src));
     }
 
     private void openPDF(File file) {
@@ -96,26 +81,60 @@ public class ConvertAction implements Action {
 
     }
 
-    private File convertToFile(Task task) throws PDFConverter.ReadImageException, PDFConverter.ConversionException, IOException {
-        PDFConverter converter = new PDFConverter(task, maxMainMemoryBytes, tempFolder, overwrite_output);
-        converter.setInfoListener(new DefaultConversionInfoListener());
-        return converter.convert();
+    private File convertToFile(Task task) throws IOException, HandledException {
+        try {
+            PDFConverter converter = new PDFConverter(task, maxMainMemoryBytes, tempFolder, overwrite_output);
+            converter.setInfoListener(new DefaultConversionInfoListener());
+            return converter.convert();
+        } catch (PDFConverter.OverwriteDenyException e) {
+            System.err.printf("\t" + SharedSpace.getResString("convert.listener.err.overwrite") + "\n", e.getFile().getAbsolutePath());
+            throw new HandledException(e, getClass());
+        } catch (PDFConverter.ReadImageException e) {
+            System.err.printf("\n\t\t" + SharedSpace.getResString("convert.listener.err.image") + "\n", e.getMessage());
+            throw new HandledException(e, getClass());
+        } catch (PDFConverter.ConversionException e) {
+            System.err.printf("\n\t\t" + SharedSpace.getResString("convert.listener.err.conversion") + "\n", e.getMessage());
+            throw new HandledException(e, getClass());
+        } catch (FileChecker.WrongTypeException e) {
+//            TODO:Print error message
+            throw new HandledException(e, getClass());
+        } catch (FileChecker.PathNotAbsoluteException e) {
+//            TODO:Print error message
+            throw new HandledException(e, getClass());
+        }
+
     }
 
-    private static Document getDocumentFromFile(final File file)
-            throws ParserConfigurationException, SAXException, IOException {
-        FileChecker.checkReadableFile(file);
+    private Document getDocumentFromFile(final File file)
+            throws HandledException, IOException {
+        try {
+            FileChecker.checkReadableFile(file);
+        } catch (FileChecker.WrongTypeException e) {
+//            TODO:Print error message
+            throw new HandledException(e,getClass());
+        } catch (FileChecker.PathNotAbsoluteException e) {
+//            TODO:Print error message
+        }
+
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         // If want to make namespace aware.
         // factory.setNamespaceAware(true);
-        DocumentBuilder documentBuilder = factory.newDocumentBuilder();
+
+        try {
+            DocumentBuilder documentBuilder = factory.newDocumentBuilder();
 
 //      Disable printing message to console
-        documentBuilder.setErrorHandler(null);
+            documentBuilder.setErrorHandler(null);
 
-        InputSource source = new InputSource(new InputStreamReader(new FileInputStream(file), SharedSpace.Configuration.DEFAULT_CHARSET));
-        org.w3c.dom.Document w3cDocument = documentBuilder.parse(source);
-        return new DOMBuilder().build(w3cDocument);
+            InputSource source = new InputSource(new InputStreamReader(new FileInputStream(file), SharedSpace.Configuration.DEFAULT_CHARSET));
+            org.w3c.dom.Document w3cDocument = documentBuilder.parse(source);
+            return new DOMBuilder().build(w3cDocument);
+        } catch (ParserConfigurationException e) {
+            throw new HandledException(e, getClass());
+        } catch (SAXException e) {
+            System.err.println("\n\tWrong XML content." + e.getMessage());
+            throw new HandledException(e, getClass());
+        }
     }
 
 

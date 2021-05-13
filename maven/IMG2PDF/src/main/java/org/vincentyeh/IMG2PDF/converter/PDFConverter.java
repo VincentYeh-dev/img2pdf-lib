@@ -95,7 +95,6 @@ public class PDFConverter implements  ConversionInfoListener {
 
         try {
             FileChecker.checkWritableFolder(tempFolder);
-
             MemoryUsageSetting memoryUsageSetting = MemoryUsageSetting.setupMixed(maxMainMemoryBytes).setTempDir(tempFolder);
 
             document = new PDDocument(memoryUsageSetting);
