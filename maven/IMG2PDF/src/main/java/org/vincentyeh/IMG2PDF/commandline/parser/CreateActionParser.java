@@ -1,12 +1,12 @@
 package org.vincentyeh.IMG2PDF.commandline.parser;
 
 import org.apache.commons.cli.*;
+import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.commandline.action.CreateAction;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
 import org.vincentyeh.IMG2PDF.commandline.option.MultiLanguageOptionFactory;
-import org.vincentyeh.IMG2PDF.pdf.doc.DocumentAccessPermission;
 import org.vincentyeh.IMG2PDF.pdf.doc.DocumentArgument;
 import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
 import org.vincentyeh.IMG2PDF.pdf.page.PageArgument;
@@ -79,12 +79,26 @@ public class CreateActionParser extends ActionParser<CreateAction> {
     }
 
     private DocumentArgument getDocumentArgument(CommandLine cmd) {
-        DocumentAccessPermission pdf_permission = new DocumentAccessPermission(cmd.getOptionValue("pdf_permission", "11"));
+        AccessPermission pdf_permission = getDocumentAccessPermission(cmd.getOptionValue("pdf_permission", "11"));
         String pdf_owner_password = cmd.getOptionValue("pdf_owner_password");
         String pdf_user_password = cmd.getOptionValue("pdf_user_password");
         return new DocumentArgument(pdf_owner_password, pdf_user_password, pdf_permission);
     }
 
+    private AccessPermission getDocumentAccessPermission(String symbol){
+        AccessPermission ap=new AccessPermission();
+
+        if(symbol==null||symbol.isEmpty())
+            throw new IllegalArgumentException("str is null or empty");
+        if(symbol.length()!=2)
+            throw new IllegalArgumentException("str invalid");
+
+        char[] permissions=symbol.toCharArray();
+        ap.setCanPrint(permissions[0]!='0');
+        ap.setCanModify(permissions[1]!='0');
+
+        return ap;
+    }
     private PageArgument getPageArgument(CommandLine cmd) throws HandledException {
         PageArgument pageArgument = new PageArgument();
         pageArgument.setAlign(getValueOfAlign(cmd.getOptionValue("pdf_align", DEFAULT_PDF_ALIGN)));

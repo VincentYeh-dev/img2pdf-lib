@@ -23,7 +23,7 @@ public class DocumentArgument {
 
     }
 
-    public DocumentArgument(String owner_password, String user_password, DocumentAccessPermission ap) {
+    public DocumentArgument(String owner_password, String user_password, AccessPermission ap) {
         this.owner_password = owner_password;
         this.user_password = user_password;
         this.ap = ap;
