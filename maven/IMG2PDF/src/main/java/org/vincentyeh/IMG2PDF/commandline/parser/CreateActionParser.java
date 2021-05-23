@@ -34,7 +34,7 @@ public class CreateActionParser extends ActionParser<CreateAction> {
     public CreateAction parse(String[] arguments) throws ParseException, HandledException {
         CommandLine cmd = parser.parse(options, arguments);
 
-        CreateAction.Builder builder=new CreateAction.Builder();
+        CreateAction.Builder builder = new CreateAction.Builder();
         builder.setDebug(cmd.hasOption("debug"));
         builder.setOverwrite(cmd.hasOption("overwrite"));
         builder.setPdfDestination(cmd.getOptionValue("pdf_destination"));
@@ -96,13 +96,13 @@ public class CreateActionParser extends ActionParser<CreateAction> {
     }
 
     private PageArgument getPageArgument(CommandLine cmd) throws HandledException {
-        PageArgument pageArgument = new PageArgument();
-        pageArgument.setAlign(getValueOfAlign(cmd.getOptionValue("pdf_align", DEFAULT_PDF_ALIGN)));
-        pageArgument.setSize(getValueOfSize(cmd.getOptionValue("pdf_size", DEFAULT_PDF_SIZE)));
-        pageArgument.setDirection(getValueOfDirection(cmd.getOptionValue("pdf_direction", DEFAULT_PDF_DIRECTION)));
+        PageArgument.Builder builder = new PageArgument.Builder();
+        builder.setAlign(getValueOfAlign(cmd.getOptionValue("pdf_align", DEFAULT_PDF_ALIGN)));
+        builder.setSize(getValueOfSize(cmd.getOptionValue("pdf_size", DEFAULT_PDF_SIZE)));
+        builder.setDirection(getValueOfDirection(cmd.getOptionValue("pdf_direction", DEFAULT_PDF_DIRECTION)));
 
-        pageArgument.setAutoRotate(cmd.hasOption("pdf_auto_rotate"));
-        return pageArgument;
+        builder.setAutoRotate(cmd.hasOption("pdf_auto_rotate"));
+        return builder.build();
     }
 
     private PageDirection getValueOfDirection(String value) throws HandledException {

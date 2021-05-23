@@ -32,7 +32,7 @@ public class Task {
             throw new NullPointerException("element is null");
 
         this.documentArgument = new DocumentArgument(element.getChild("DocumentArgument"));
-        this.pageArgument = new PageArgument(element.getChild("PageArgument"));
+        this.pageArgument = new PageArgument.Builder().buildFrom((element.getChild("PageArgument")));
         this.destination=new File(element.getChild("destination").getValue());
         List<Element> contains_files = element.getChild("files").getChildren("image");
         ArrayList<Element> xml_files = new ArrayList<>(contains_files);
