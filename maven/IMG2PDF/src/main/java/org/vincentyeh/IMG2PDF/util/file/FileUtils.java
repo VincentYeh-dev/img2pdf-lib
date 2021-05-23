@@ -53,7 +53,7 @@ public class FileUtils {
                     String.format("Not exist :%s", raw.getPath()));
     }
 
-    public static void checkAbsolute(File file) throws IOException {
+    public static void checkAbsolute(File file) throws PathNotAbsoluteException {
         if (!file.isAbsolute())
             throw new PathNotAbsoluteException(file);
     }
