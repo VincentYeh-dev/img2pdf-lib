@@ -16,13 +16,13 @@ import org.vincentyeh.IMG2PDF.util.file.FileFilterHelper;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskList;
 import org.vincentyeh.IMG2PDF.util.file.FileSorter;
-import org.vincentyeh.IMG2PDF.util.file.FileChecker;
+import org.vincentyeh.IMG2PDF.util.file.FileUtils;
 import org.vincentyeh.IMG2PDF.util.NameFormatter;
 
 import static org.vincentyeh.IMG2PDF.util.file.FileSorter.Sequence;
 import static org.vincentyeh.IMG2PDF.util.file.FileSorter.Sortby;
 
-public class CreateAction implements Action{
+public class CreateAction implements Action {
 
 
     //    For image files
@@ -83,7 +83,9 @@ public class CreateAction implements Action{
 
         for (File dirlist : sourceFiles) {
 //          In dirlist
-            FileChecker.checkReadableFile(dirlist);
+            FileUtils.checkAbsolute(dirlist);
+            FileUtils.checkIsFile(dirlist);
+
             System.out.printf(SharedSpace.getResString("create.import_from_list") + "\n", dirlist.getName());
             List<String> lines = Files.readAllLines(dirlist.toPath(), SharedSpace.Configuration.DEFAULT_CHARSET);
 
@@ -99,24 +101,9 @@ public class CreateAction implements Action{
                 System.out.printf("\t[" + SharedSpace.getResString("public.info.importing") + "] %s\n",
                         dir.getAbsolutePath());
 
-                try {
-                    FileChecker.checkExists(dir);
-                } catch (FileNotFoundException e) {
-                    System.err.printf(SharedSpace.getResString("create.err.source_filenotfound") + "\n", dirlist.getName(),
-                            line_index, dir.getAbsolutePath());
-                    throw new HandledException(e, getClass());
-                }
-
-                try {
-                    FileChecker.checkDirectory(dir);
-                } catch (IOException e) {
-                    System.err.printf(SharedSpace.getResString("create.err.source_path_is_file") + "\n", dirlist.getName(),
-                            line_index, dir.getAbsolutePath());
-                    throw new HandledException(e, getClass());
-                }
+                checkDirectoryInSource(dirlist,line_index,dir);
 
                 tasks.add(mergeAllIntoTask(dir));
-
                 System.out.printf("\t[" + SharedSpace.getResString("public.info.imported") + "] %s\n",
                         dir.getAbsolutePath());
             }
@@ -133,6 +120,21 @@ public class CreateAction implements Action{
             System.out.printf("[" + SharedSpace.getResString("public.info.exported") + "] %s\n", tasklist_dst.getAbsolutePath());
         } catch (IOException e) {
             System.err.printf(SharedSpace.getResString("create.err.tasklist_create") + "\n", e.getMessage());
+            throw new HandledException(e, getClass());
+        }
+    }
+
+    private void checkDirectoryInSource(File dirlist, int line, File directory) throws HandledException {
+        try {
+            FileUtils.checkExists(directory);
+            FileUtils.checkIsDirectory(directory);
+        } catch (FileNotFoundException e) {
+            System.err.printf(SharedSpace.getResString("create.err.source_filenotfound") + "\n", dirlist.getName(),
+                    line, directory.getAbsolutePath());
+            throw new HandledException(e, getClass());
+        } catch (FileUtils.WrongTypeException e) {
+            System.err.printf(SharedSpace.getResString("create.err.source_path_is_file") + "\n", dirlist.getName(),
+                    line, directory.getAbsolutePath());
             throw new HandledException(e, getClass());
         }
     }
@@ -158,7 +160,10 @@ public class CreateAction implements Action{
     }
 
     private Task mergeAllIntoTask(File source_directory) throws IOException {
-        FileChecker.checkReadableFolder(source_directory);
+        FileUtils.checkAbsolute(source_directory);
+        FileUtils.checkExists(source_directory);
+        FileUtils.checkIsDirectory(source_directory);
+
         NameFormatter nf = new NameFormatter(source_directory);
         return new Task(documentArgument, pageArgument, importSortedImagesFiles(source_directory), new File(nf.format(pdf_dst)));
     }
@@ -184,8 +189,9 @@ public class CreateAction implements Action{
     }
 
     public void save(TaskList taskList, File destination) throws IOException {
-        FileChecker.makeParentDirsIfNotExists(destination);
-        FileChecker.checkWritableFile(destination);
+        FileUtils.makeDirsIfNotExists(destination.getParentFile());
+        FileUtils.checkAbsolute(destination);
+        FileUtils.checkIsFile(destination);
 
         Document doc = new Document();
         Element root = taskList.toElement();

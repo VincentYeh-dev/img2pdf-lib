@@ -5,13 +5,16 @@ import java.io.*;
 
 import org.jdom2.Document;
 import org.jdom2.input.DOMBuilder;
+import org.vincentyeh.IMG2PDF.converter.exception.ConversionException;
+import org.vincentyeh.IMG2PDF.converter.exception.OverwriteDenyException;
+import org.vincentyeh.IMG2PDF.converter.exception.ReadImageException;
 import org.vincentyeh.IMG2PDF.converter.listener.DefaultConversionInfoListener;
 import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
 import org.vincentyeh.IMG2PDF.converter.PDFConverter;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskList;
-import org.vincentyeh.IMG2PDF.util.file.FileChecker;
+import org.vincentyeh.IMG2PDF.util.file.FileUtils;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -47,7 +50,8 @@ public class ConvertAction implements Action {
                 System.out.println();
                 System.out.println(SharedSpace.getResString("convert.start_conversion"));
                 convertList(tasks);
-            }catch (HandledException ignored){}
+            } catch (HandledException ignored) {
+            }
 
         }
 
@@ -82,24 +86,26 @@ public class ConvertAction implements Action {
     }
 
     private File convertToFile(Task task) throws IOException, HandledException {
+        PDFConverter converter;
         try {
-            PDFConverter converter = new PDFConverter(task, maxMainMemoryBytes, tempFolder, overwrite_output);
+            converter = new PDFConverter(task, maxMainMemoryBytes, tempFolder, overwrite_output);
             converter.setInfoListener(new DefaultConversionInfoListener());
-            return converter.convert();
-        } catch (PDFConverter.OverwriteDenyException e) {
+        } catch (IOException e) {
+//            TODO:print error message
+            throw new HandledException(e,getClass());
+        }
+
+        try {
+            return converter.start();
+
+        } catch (OverwriteDenyException e) {
             System.err.printf("\t" + SharedSpace.getResString("convert.listener.err.overwrite") + "\n", e.getFile().getAbsolutePath());
             throw new HandledException(e, getClass());
-        } catch (PDFConverter.ReadImageException e) {
+        } catch (ReadImageException e) {
             System.err.printf("\n\t\t" + SharedSpace.getResString("convert.listener.err.image") + "\n", e.getMessage());
             throw new HandledException(e, getClass());
-        } catch (PDFConverter.ConversionException e) {
+        } catch (ConversionException e) {
             System.err.printf("\n\t\t" + SharedSpace.getResString("convert.listener.err.conversion") + "\n", e.getMessage());
-            throw new HandledException(e, getClass());
-        } catch (FileChecker.WrongTypeException e) {
-//            TODO:Print error message
-            throw new HandledException(e, getClass());
-        } catch (FileChecker.PathNotAbsoluteException e) {
-//            TODO:Print error message
             throw new HandledException(e, getClass());
         }
 
@@ -108,12 +114,18 @@ public class ConvertAction implements Action {
     private Document getDocumentFromFile(final File file)
             throws HandledException, IOException {
         try {
-            FileChecker.checkReadableFile(file);
-        } catch (FileChecker.WrongTypeException e) {
+            FileUtils.checkAbsolute(file);
+            FileUtils.checkExists(file);
+            FileUtils.checkIsFile(file);
+        } catch (FileUtils.WrongTypeException e) {
 //            TODO:Print error message
-            throw new HandledException(e,getClass());
-        } catch (FileChecker.PathNotAbsoluteException e) {
+            throw new HandledException(e, getClass());
+        } catch (FileUtils.PathNotAbsoluteException e) {
 //            TODO:Print error message
+            throw new HandledException(e, getClass());
+        } catch (FileNotFoundException e) {
+//            TODO:Print error message
+            throw new HandledException(e, getClass());
         }
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
