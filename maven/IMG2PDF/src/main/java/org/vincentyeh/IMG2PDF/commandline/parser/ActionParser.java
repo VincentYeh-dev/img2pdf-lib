@@ -4,7 +4,7 @@ import org.apache.commons.cli.Options;
 import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.commandline.action.Action;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
-import org.vincentyeh.IMG2PDF.util.file.FileChecker;
+import org.vincentyeh.IMG2PDF.util.file.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,7 +48,9 @@ public abstract class ActionParser<T extends Action> {
             File raw = (new File(str_source)).getAbsoluteFile();
             System.out.printf("\t[" + SharedSpace.getResString("public.info.verifying") + "] %s\r", raw.getAbsolutePath());
 
-            FileChecker.checkReadableFile(raw);
+            FileUtils.checkIsFile(raw);
+            FileUtils.checkAbsolute(raw);
+            FileUtils.checkExists(raw);
 
             System.out.printf("\t[" + SharedSpace.getResString("public.info.verified") + "] %s\r\n",
                     raw.getAbsolutePath());

@@ -3,47 +3,46 @@ package org.vincentyeh.IMG2PDF.util.file;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
 
-public class FileChecker {
+public class FileUtils {
 
-    public static void checkWritableFile(File raw) throws IOException {
-        checkAbsolute(raw);
-        checkFile(raw);
-        checkWritableFolder(raw.getParentFile());
-    }
+//    public static void checkWritableFile(File raw) throws IOException {
+//        checkAbsolute(raw);
+//        checkFile(raw);
+//        checkWritableFolder(raw.getParentFile());
+//    }
+//
+//    public static void checkWritableFolder(File folder) throws IOException {
+//        checkAbsolute(folder);
+//        checkDirectory(folder);
+//        checkExists(folder);
+//
+//        if(!Files.isWritable(folder.toPath()))
+//            throw new IOException("Folder is not writable:"+folder);
+//    }
+//
+//
+//    public static void checkReadableFile(File raw) throws IOException {
+//        checkAbsolute(raw);
+//        checkExists(raw);
+//        checkFile(raw);
+//        checkReadableFolder(raw.getParentFile());
+//    }
+//
+//    public static void checkReadableFolder(File folder) throws IOException {
+//        checkAbsolute(folder);
+//        checkDirectory(folder);
+//        checkExists(folder);
+//        if(!Files.isReadable(folder.toPath()))
+//            throw new IOException("Folder is not readable:"+ folder);
+//    }
 
-    public static void checkWritableFolder(File folder) throws IOException {
-        checkAbsolute(folder);
-        checkDirectory(folder);
-        checkExists(folder);
-
-        if(!Files.isWritable(folder.toPath()))
-            throw new IOException("Folder is not writable:"+folder);
-    }
-
-
-    public static void checkReadableFile(File raw) throws IOException {
-        checkAbsolute(raw);
-        checkExists(raw);
-        checkFile(raw);
-        checkReadableFolder(raw.getParentFile());
-    }
-
-    public static void checkReadableFolder(File folder) throws IOException {
-        checkAbsolute(folder);
-        checkDirectory(folder);
-        checkExists(folder);
-        if(!Files.isReadable(folder.toPath()))
-            throw new IOException("Folder is not readable:"+ folder);
-    }
-
-    public static void checkFile(File file) throws WrongTypeException {
+    public static void checkIsFile(File file) throws WrongTypeException {
         if(file.isDirectory())
             throw new WrongTypeException("file",file);
     }
 
-    public static void checkDirectory(File file) throws WrongTypeException {
+    public static void checkIsDirectory(File file) throws WrongTypeException {
         if(file.isFile())
             throw new WrongTypeException("directory",file);
     }
@@ -59,13 +58,9 @@ public class FileChecker {
             throw new PathNotAbsoluteException(file);
     }
 
-    public static void makeParentDirsIfNotExists(File file) throws IOException {
-        checkAbsolute(file);
-        makeDirsIfNotExists(file.getParentFile());
-    }
-    public static void makeDirsIfNotExists(File file) throws IOException {
-        checkAbsolute(file);
-        file.mkdirs();
+
+    public static boolean makeDirsIfNotExists(File directory) {
+        return directory.mkdirs();
 //            System.err.println("No folders was created");
     }
 
