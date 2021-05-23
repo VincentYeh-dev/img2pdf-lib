@@ -19,15 +19,10 @@ import org.vincentyeh.IMG2PDF.util.file.FileSorter;
 import org.vincentyeh.IMG2PDF.util.file.FileUtils;
 import org.vincentyeh.IMG2PDF.util.NameFormatter;
 
-import static org.vincentyeh.IMG2PDF.util.file.FileSorter.Sequence;
-import static org.vincentyeh.IMG2PDF.util.file.FileSorter.Sortby;
-
 public class CreateAction implements Action {
 
 
-    //    For image files
-    protected final Sortby pdf_sortby;
-    protected final Sequence pdf_sequence;
+    private final FileSorter fileSorter;
     protected final FileFilterHelper ffh;
 
     //    For PDF
@@ -41,9 +36,8 @@ public class CreateAction implements Action {
     private final boolean overwrite;
     private final File[] sourceFiles;
 
-    public CreateAction(Sortby pdf_sortby, Sequence pdf_sequence, FileFilterHelper ffh, DocumentArgument documentArgument, PageArgument pageArgument, String pdf_dst, File tasklist_dst, boolean debug, boolean overwrite, File[] sourceFiles) {
-        this.pdf_sortby = pdf_sortby;
-        this.pdf_sequence = pdf_sequence;
+    private CreateAction(FileSorter fileSorter, FileFilterHelper ffh, DocumentArgument documentArgument, PageArgument pageArgument, String pdf_dst, File tasklist_dst, boolean debug, boolean overwrite, File[] sourceFiles) {
+        this.fileSorter = fileSorter;
         this.ffh = ffh;
         this.documentArgument = documentArgument;
         this.pageArgument = pageArgument;
@@ -101,7 +95,7 @@ public class CreateAction implements Action {
                 System.out.printf("\t[" + SharedSpace.getResString("public.info.importing") + "] %s\n",
                         dir.getAbsolutePath());
 
-                checkDirectoryInSource(dirlist,line_index,dir);
+                checkDirectoryInSource(dirlist, line_index, dir);
 
                 tasks.add(mergeAllIntoTask(dir));
                 System.out.printf("\t[" + SharedSpace.getResString("public.info.imported") + "] %s\n",
@@ -174,8 +168,7 @@ public class CreateAction implements Action {
             files = new File[0];
 
 
-        FileSorter sorter = new FileSorter(pdf_sortby, pdf_sequence);
-        Arrays.sort(files, sorter);
+        Arrays.sort(files,fileSorter);
         if (debug) {
             System.out.println("@Debug");
             System.out.println("Sort Images:");
@@ -203,4 +196,67 @@ public class CreateAction implements Action {
         outer.output(doc, new OutputStreamWriter(new FileOutputStream(destination), SharedSpace.Configuration.DEFAULT_CHARSET));
     }
 
+    public static class Builder{
+        private FileSorter fileSorter;
+        protected FileFilterHelper ffh;
+
+        private DocumentArgument documentArgument;
+        private PageArgument pageArgument;
+        private String pdf_dst;
+
+        private File tasklist_dst;
+        private boolean debug;
+        private boolean overwrite;
+        private File[] sourceFiles;
+
+        public Builder setFileSorter(FileSorter fileSorter) {
+            this.fileSorter = fileSorter;
+            return this;
+        }
+
+        public Builder setFileFilterHelper(FileFilterHelper ffh) {
+            this.ffh = ffh;
+            return this;
+        }
+
+        public Builder setDocumentArgument(DocumentArgument documentArgument) {
+            this.documentArgument = documentArgument;
+            return this;
+        }
+
+        public Builder setPageArgument(PageArgument pageArgument) {
+            this.pageArgument = pageArgument;
+            return this;
+        }
+
+        public Builder setPdfDestination(String pdf_dst) {
+            this.pdf_dst = pdf_dst;
+
+            return this;
+        }
+
+        public Builder setTasklistDestination(File tasklist_dst) {
+            this.tasklist_dst = tasklist_dst;
+            return this;
+        }
+
+        public Builder setDebug(boolean debug) {
+            this.debug = debug;
+            return this;
+        }
+
+        public Builder setOverwrite(boolean overwrite) {
+            this.overwrite = overwrite;
+            return this;
+        }
+
+        public Builder setSourceFiles(File[] sourceFiles) {
+            this.sourceFiles = sourceFiles;
+            return this;
+        }
+
+        public CreateAction build(){
+            return new CreateAction(fileSorter, ffh, documentArgument, pageArgument, pdf_dst, tasklist_dst, debug, overwrite, sourceFiles);
+        }
+    }
 }

@@ -47,7 +47,6 @@ public abstract class ActionParser<T extends Action> {
         for (String str_source : strSources) {
             File raw = (new File(str_source)).getAbsoluteFile();
             System.out.printf("\t[" + SharedSpace.getResString("public.info.verifying") + "] %s\r", raw.getAbsolutePath());
-
             FileUtils.checkIsFile(raw);
             FileUtils.checkAbsolute(raw);
             FileUtils.checkExists(raw);

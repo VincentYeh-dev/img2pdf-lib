@@ -30,7 +30,7 @@ public class ConvertAction implements Action {
     private final boolean open_when_complete;
     private final boolean overwrite_output;
 
-    public ConvertAction(File tempFolder, long maxMainMemoryBytes, File[] tasklist_sources, boolean open_when_complete, boolean overwrite_output) {
+    private ConvertAction(File tempFolder, long maxMainMemoryBytes, File[] tasklist_sources, boolean open_when_complete, boolean overwrite_output) {
         this.tempFolder = tempFolder;
         this.maxMainMemoryBytes = maxMainMemoryBytes;
         this.tasklist_sources = tasklist_sources;
@@ -45,11 +45,10 @@ public class ConvertAction implements Action {
             System.out.print(
                     "\t[" + SharedSpace.getResString("public.info.importing") + "] " + src.getAbsolutePath() + "\r");
             try {
-                TaskList tasks = getTaskListFromFile(src);
-                System.out.print("\t[" + SharedSpace.getResString("public.info.imported") + "] " + src.getAbsolutePath() + "\r\n");
-                System.out.println();
+                TaskList tasks = getTaskListFromDocument(getDocumentFromFile(src));
+                System.out.print("\t[" + SharedSpace.getResString("public.info.imported") + "] " + src.getAbsolutePath() + "\r\n\n");
                 System.out.println(SharedSpace.getResString("convert.start_conversion"));
-                convertList(tasks);
+                convertAllToFile(tasks);
             } catch (HandledException ignored) {
             }
 
@@ -57,7 +56,7 @@ public class ConvertAction implements Action {
 
     }
 
-    private void convertList(TaskList tasks) throws Exception {
+    private void convertAllToFile(TaskList tasks) throws Exception {
 //                TODO:No exception is thrown when task.getArray() is empty.Warning to the user when it happen.
         for (Task task : tasks) {
             try {
@@ -70,8 +69,8 @@ public class ConvertAction implements Action {
     }
 
 
-    private TaskList getTaskListFromFile(File src) throws HandledException, IOException {
-        return new TaskList(getDocumentFromFile(src));
+    private TaskList getTaskListFromDocument(Document document) throws IOException {
+        return new TaskList(document);
     }
 
     private void openPDF(File file) {
@@ -92,7 +91,7 @@ public class ConvertAction implements Action {
             converter.setInfoListener(new DefaultConversionInfoListener());
         } catch (IOException e) {
 //            TODO:print error message
-            throw new HandledException(e,getClass());
+            throw new HandledException(e, getClass());
         }
 
         try {
@@ -112,7 +111,7 @@ public class ConvertAction implements Action {
     }
 
     private Document getDocumentFromFile(final File file)
-            throws HandledException, IOException {
+            throws HandledException {
         try {
             FileUtils.checkAbsolute(file);
             FileUtils.checkExists(file);
@@ -146,8 +145,49 @@ public class ConvertAction implements Action {
         } catch (SAXException e) {
             System.err.println("\n\tWrong XML content." + e.getMessage());
             throw new HandledException(e, getClass());
+        } catch (IOException e) {
+//            TODO:Add error message
+            throw new HandledException(e, getClass());
         }
     }
 
+    public static class Builder {
+        private File tempFolder;
+        private long maxMainMemoryBytes;
+        private File[] tasklist_sources;
+        private boolean open_when_complete;
+        private boolean overwrite_output;
+
+        public ConvertAction build(){
+            return new ConvertAction(tempFolder,maxMainMemoryBytes,tasklist_sources,open_when_complete,overwrite_output);
+        }
+
+        public Builder setTempFolder(File tempFolder) {
+            this.tempFolder = tempFolder;
+            return this;
+        }
+
+        public Builder setMaxMainMemoryBytes(long maxMainMemoryBytes) {
+            this.maxMainMemoryBytes = maxMainMemoryBytes;
+
+            return this;
+        }
+
+        public Builder setTasklistSources(File[] tasklist_sources) {
+            this.tasklist_sources = tasklist_sources;
+
+            return this;
+        }
+
+        public Builder setOpenWhenComplete(boolean open_when_complete) {
+            this.open_when_complete = open_when_complete;
+            return this;
+        }
+
+        public Builder setOverwrite(boolean overwrite_output) {
+            this.overwrite_output = overwrite_output;
+            return this;
+        }
+    }
 
 }
