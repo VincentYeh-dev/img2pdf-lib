@@ -31,7 +31,7 @@ public class Task {
         if (element == null)
             throw new NullPointerException("element is null");
 
-        this.documentArgument = new DocumentArgument(element.getChild("DocumentArgument"));
+        this.documentArgument = new DocumentArgument.Builder().buildFrom(element.getChild("DocumentArgument"));
         this.pageArgument = new PageArgument.Builder().buildFrom((element.getChild("PageArgument")));
         this.destination=new File(element.getChild("destination").getValue());
         List<Element> contains_files = element.getChild("files").getChildren("image");
