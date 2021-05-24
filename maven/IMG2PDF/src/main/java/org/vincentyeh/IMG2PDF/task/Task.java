@@ -8,7 +8,7 @@ import java.util.List;
 import org.jdom2.Element;
 import org.vincentyeh.IMG2PDF.pdf.doc.DocumentArgument;
 import org.vincentyeh.IMG2PDF.pdf.page.PageArgument;
-import org.vincentyeh.IMG2PDF.util.file.FileChecker;
+import org.vincentyeh.IMG2PDF.util.file.FileUtils;
 
 public class Task {
     private final DocumentArgument documentArgument;
@@ -31,8 +31,8 @@ public class Task {
         if (element == null)
             throw new NullPointerException("element is null");
 
-        this.documentArgument = new DocumentArgument(element.getChild("DocumentArgument"));
-        this.pageArgument = new PageArgument(element.getChild("PageArgument"));
+        this.documentArgument = new DocumentArgument.Builder().buildFrom(element.getChild("DocumentArgument"));
+        this.pageArgument = new PageArgument.Builder().buildFrom((element.getChild("PageArgument")));
         this.destination=new File(element.getChild("destination").getValue());
         List<Element> contains_files = element.getChild("files").getChildren("image");
         ArrayList<Element> xml_files = new ArrayList<>(contains_files);
@@ -64,7 +64,7 @@ public class Task {
         for (int i = 0; i < imgFiles.length; i++) {
             Element el = el_files.get(i);
             imgFiles[i] = new File(new File(el.getValue()).getAbsolutePath());
-            FileChecker.checkExists(imgFiles[i]);
+            FileUtils.checkExists(imgFiles[i]);
             if (imgFiles[i].isDirectory())
                 throw new RuntimeException(imgFiles[i].getAbsolutePath()+" is directory.");
 

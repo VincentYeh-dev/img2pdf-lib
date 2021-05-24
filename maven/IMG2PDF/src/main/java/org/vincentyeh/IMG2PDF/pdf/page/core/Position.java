@@ -1,6 +1,6 @@
 package org.vincentyeh.IMG2PDF.pdf.page.core;
 
-public class Position {
+class Position {
     private final float x;
     private final float y;
 

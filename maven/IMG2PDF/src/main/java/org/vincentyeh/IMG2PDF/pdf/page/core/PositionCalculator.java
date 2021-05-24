@@ -12,30 +12,13 @@ public class PositionCalculator {
         return calculator;
     }
 
-    public static void init(boolean rotated, float img_height, float img_width, float page_height,
+    public static void init(float img_height, float img_width, float page_height,
                             float page_width) {
-//        calculator=getInstance();
-
-        calculator.rotated = rotated;
-        if (rotated) {
-            calculator.x_space = page_height - img_height;
-            calculator.y_space = page_width - img_width;
-        } else {
-            calculator.x_space = page_width - img_width;
-            calculator.y_space = page_height - img_height;
-        }
-
+        calculator.x_space = page_width - img_width;
+        calculator.y_space = page_height - img_height;
     }
 
     public Position calculate(PageAlign align) {
-        if (rotated)
-            return rotated_position_calculate(align);
-        else
-            return non_rotate_position_calculate(align);
-    }
-
-
-    private Position non_rotate_position_calculate(PageAlign align) {
 
         float position_x = 0, position_y = 0;
 
@@ -77,20 +60,7 @@ public class PositionCalculator {
         return new Position(position_x, position_y);
     }
 
-    private Position rotated_position_calculate(PageAlign align) {
-
-        Position rotated_position = non_rotate_position_calculate(align);
-
-        return new Position(y_space - rotated_position.getY(), rotated_position.getX() + 0);
-
-    }
-
-    public Position toRotatedPosition(Position raw) {
-        return new Position(y_space - raw.getY(), raw.getX() + 0);
-    }
-
     private float x_space;
     private float y_space;
-    private boolean rotated;
 
 }

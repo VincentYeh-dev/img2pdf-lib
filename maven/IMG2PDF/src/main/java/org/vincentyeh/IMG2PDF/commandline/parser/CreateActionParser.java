@@ -1,12 +1,12 @@
 package org.vincentyeh.IMG2PDF.commandline.parser;
 
 import org.apache.commons.cli.*;
+import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.commandline.action.CreateAction;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
 import org.vincentyeh.IMG2PDF.commandline.option.MultiLanguageOptionFactory;
-import org.vincentyeh.IMG2PDF.pdf.doc.DocumentAccessPermission;
 import org.vincentyeh.IMG2PDF.pdf.doc.DocumentArgument;
 import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
 import org.vincentyeh.IMG2PDF.pdf.page.PageArgument;
@@ -29,38 +29,33 @@ public class CreateActionParser extends ActionParser<CreateAction> {
     private static final String DEFAULT_PDF_FILTER = "glob:*.{PNG,JPG}";
 
     private final CommandLineParser parser;
+
     @Override
     public CreateAction parse(String[] arguments) throws ParseException, HandledException {
         CommandLine cmd = parser.parse(options, arguments);
 
-        boolean debug = cmd.hasOption("debug");
-        boolean overwrite = cmd.hasOption("overwrite");
+        CreateAction.Builder builder = new CreateAction.Builder();
+        builder.setDebug(cmd.hasOption("debug"));
+        builder.setOverwrite(cmd.hasOption("overwrite"));
+        builder.setPdfDestination(cmd.getOptionValue("pdf_destination"));
+        builder.setTasklistDestination(getTaskListDestination(cmd));
+        builder.setDocumentArgument(getDocumentArgument(cmd));
+        builder.setPageArgument(getPageArgument(cmd));
+        builder.setFileFilterHelper(getFileFilterHelper(cmd));
+        builder.setSourceFiles(getDirlistSources(cmd));
+        builder.setFileSorter(new FileSorter(getSortby(cmd), getSequence(cmd)));
 
-        String pdf_dst = cmd.getOptionValue("pdf_destination");
+        return builder.build();
 
+    }
 
-        File tasklist_dst = getTaskListDestination(cmd);
-
-        FileSorter.Sortby pdf_sortby = getValueOfSortby(cmd.getOptionValue("pdf_sortby", DEFAULT_PDF_SORTBY));
-        FileSorter.Sequence pdf_sequence = getValueOfSequence(cmd.getOptionValue("pdf_sequence", DEFAULT_PDF_SEQUENCE));
-        DocumentArgument documentArgument = getDocumentArgument(cmd);
-        PageArgument pageArgument = getPageArgument(cmd);
-
-        FileFilterHelper ffh = getFileFilterHelper(cmd);
-
-        String[] str_sources = cmd.getOptionValues("source");
-        if (str_sources == null) {
-            throw new HandledException(new IllegalArgumentException("source==null"), getClass());
-        }
-
-        File[] sourceFiles;
+    private File[] getDirlistSources(CommandLine cmd) throws HandledException {
         try {
-            sourceFiles = verifyFiles(str_sources);
+            return verifyFiles(cmd.getOptionValues("source"));
         } catch (IOException e) {
             System.err.println(e.getMessage());
             throw new HandledException(e, getClass());
         }
-        return new CreateAction(pdf_sortby, pdf_sequence, ffh, documentArgument, pageArgument, pdf_dst, tasklist_dst, debug, overwrite, sourceFiles);
     }
 
     private FileFilterHelper getFileFilterHelper(CommandLine cmd) throws HandledException {
@@ -79,28 +74,44 @@ public class CreateActionParser extends ActionParser<CreateAction> {
     }
 
     private DocumentArgument getDocumentArgument(CommandLine cmd) {
-        DocumentAccessPermission pdf_permission = new DocumentAccessPermission(cmd.getOptionValue("pdf_permission", "11"));
-        String pdf_owner_password = cmd.getOptionValue("pdf_owner_password");
-        String pdf_user_password = cmd.getOptionValue("pdf_user_password");
-        return new DocumentArgument(pdf_owner_password, pdf_user_password, pdf_permission);
+        DocumentArgument.Builder builder=new DocumentArgument.Builder();
+        builder.setOwnerPassword(cmd.getOptionValue("pdf_owner_password"));
+        builder.setUserPassword(cmd.getOptionValue("pdf_user_password"));
+        builder.setAccessPermission(getDocumentAccessPermission(cmd.getOptionValue("pdf_permission", "11")));
+        return builder.build();
+    }
+
+    private AccessPermission getDocumentAccessPermission(String symbol) {
+        AccessPermission ap = new AccessPermission();
+
+        if (symbol == null || symbol.isEmpty())
+            throw new IllegalArgumentException("str is null or empty");
+        if (symbol.length() != 2)
+            throw new IllegalArgumentException("str invalid");
+
+        char[] permissions = symbol.toCharArray();
+        ap.setCanPrint(permissions[0] != '0');
+        ap.setCanModify(permissions[1] != '0');
+
+        return ap;
     }
 
     private PageArgument getPageArgument(CommandLine cmd) throws HandledException {
-        PageArgument pageArgument = new PageArgument();
-        pageArgument.setAlign(getValueOfAlign(cmd.getOptionValue("pdf_align", DEFAULT_PDF_ALIGN)));
-        pageArgument.setSize(getValueOfSize(cmd.getOptionValue("pdf_size", DEFAULT_PDF_SIZE)));
-        pageArgument.setDirection(getValueOfDirection(cmd.getOptionValue("pdf_direction", DEFAULT_PDF_DIRECTION)));
+        PageArgument.Builder builder = new PageArgument.Builder();
+        builder.setAlign(getValueOfAlign(cmd.getOptionValue("pdf_align", DEFAULT_PDF_ALIGN)));
+        builder.setSize(getValueOfSize(cmd.getOptionValue("pdf_size", DEFAULT_PDF_SIZE)));
+        builder.setDirection(getValueOfDirection(cmd.getOptionValue("pdf_direction", DEFAULT_PDF_DIRECTION)));
 
-        pageArgument.setAutoRotate(cmd.hasOption("pdf_auto_rotate"));
-        return pageArgument;
+        builder.setAutoRotate(cmd.hasOption("pdf_auto_rotate"));
+        return builder.build();
     }
 
     private PageDirection getValueOfDirection(String value) throws HandledException {
-        return getValueOfEnum(PageDirection.class,value);
+        return getValueOfEnum(PageDirection.class, value);
     }
 
     private PageSize getValueOfSize(String value) throws HandledException {
-        return getValueOfEnum(PageSize.class,value);
+        return getValueOfEnum(PageSize.class, value);
     }
 
 
@@ -115,14 +126,13 @@ public class CreateActionParser extends ActionParser<CreateAction> {
     }
 
 
-    private FileSorter.Sequence getValueOfSequence(String value) throws HandledException {
-        return getValueOfEnum(FileSorter.Sequence.class,value);
+    private FileSorter.Sequence getSequence(CommandLine cmd) throws HandledException {
+        return getValueOfEnum(FileSorter.Sequence.class, cmd.getOptionValue("pdf_sequence", DEFAULT_PDF_SEQUENCE));
     }
 
-    private FileSorter.Sortby getValueOfSortby(String value) throws HandledException {
-        return getValueOfEnum(FileSorter.Sortby.class,value);
+    private FileSorter.Sortby getSortby(CommandLine cmd) throws HandledException {
+        return getValueOfEnum(FileSorter.Sortby.class, cmd.getOptionValue("pdf_sortby", DEFAULT_PDF_SORTBY));
     }
-
 
 
     public CreateActionParser() {
@@ -174,6 +184,6 @@ public class CreateActionParser extends ActionParser<CreateAction> {
         options.addOption(opt_sources);
         options.addOption(opt_list_destination);
 
-        parser=new CheckHelpParser(opt_help);
+        parser = new CheckHelpParser(opt_help);
     }
 }
