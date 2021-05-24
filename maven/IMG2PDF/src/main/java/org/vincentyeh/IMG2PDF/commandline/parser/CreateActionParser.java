@@ -74,10 +74,11 @@ public class CreateActionParser extends ActionParser<CreateAction> {
     }
 
     private DocumentArgument getDocumentArgument(CommandLine cmd) {
-        AccessPermission pdf_permission = getDocumentAccessPermission(cmd.getOptionValue("pdf_permission", "11"));
-        String pdf_owner_password = cmd.getOptionValue("pdf_owner_password");
-        String pdf_user_password = cmd.getOptionValue("pdf_user_password");
-        return new DocumentArgument(pdf_owner_password, pdf_user_password, pdf_permission);
+        DocumentArgument.Builder builder=new DocumentArgument.Builder();
+        builder.setOwnerPassword(cmd.getOptionValue("pdf_owner_password"));
+        builder.setUserPassword(cmd.getOptionValue("pdf_user_password"));
+        builder.setAccessPermission(getDocumentAccessPermission(cmd.getOptionValue("pdf_permission", "11")));
+        return builder.build();
     }
 
     private AccessPermission getDocumentAccessPermission(String symbol) {
