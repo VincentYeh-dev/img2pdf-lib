@@ -9,7 +9,6 @@ import org.vincentyeh.IMG2PDF.commandline.action.ConvertAction;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.CheckHelpParser;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
 import org.vincentyeh.IMG2PDF.util.BytesSize;
-import org.vincentyeh.IMG2PDF.util.file.FileChecker;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,15 +21,15 @@ public class ConvertActionParser extends ActionParser<ConvertAction> {
     public ConvertAction parse(String[] arguments) throws ParseException, HandledException {
         CommandLine cmd = parser.parse(options, arguments);
 
-        File tempFolder = getTempFolder(cmd);
-        try {
-            FileChecker.makeDirsIfNotExists(tempFolder);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new HandledException(e, getClass());
-        }
+        ConvertAction.Builder builder=new ConvertAction.Builder();
 
-        return new ConvertAction(tempFolder, getMaxMemoryBytes(cmd), getTaskListSources(cmd), cmd.hasOption("open_when_complete"), cmd.hasOption("overwrite"));
+        builder.setTasklistSources(getTaskListSources(cmd));
+        builder.setOverwrite(cmd.hasOption("overwrite"));
+        builder.setOpenWhenComplete(cmd.hasOption("open_when_complete"));
+        builder.setTempFolder(getTempFolder(cmd)).setMaxMainMemoryBytes(getMaxMemoryBytes(cmd));
+
+        return builder.build();
+//        return new ConvertAction(getTempFolder(cmd), getMaxMemoryBytes(cmd), getTaskListSources(cmd), cmd.hasOption("open_when_complete"), cmd.hasOption("overwrite"));
     }
 
     private File[] getTaskListSources(CommandLine cmd) throws HandledException {
@@ -79,5 +78,6 @@ public class ConvertActionParser extends ActionParser<ConvertAction> {
 
         parser=new CheckHelpParser(opt_help);
     }
+
 
 }
