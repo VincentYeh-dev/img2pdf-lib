@@ -1,7 +1,9 @@
-package org.vincentyeh.IMG2PDF.pdf.page;
+package org.vincentyeh.IMG2PDF.task;
 
-import org.jdom2.Element;
 
+import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
+import org.vincentyeh.IMG2PDF.pdf.page.PageDirection;
+import org.vincentyeh.IMG2PDF.pdf.page.PageSize;
 
 public class PageArgument {
 
@@ -35,14 +37,6 @@ public class PageArgument {
         public PageArgument build() {
             return new PageArgument(align, size, direction, auto_rotate);
         }
-
-        public PageArgument buildFrom(Element element) {
-            setAlign(new PageAlign(element.getChild("align").getValue()));
-            setSize(PageSize.valueOf(element.getChild("size").getValue()));
-            setDirection(PageDirection.valueOf(element.getChild("default-direction").getValue()));
-            setAutoRotate(Boolean.parseBoolean(element.getChild("auto-rotate").getValue()));
-            return build();
-        }
     }
 
     private final PageAlign align;
@@ -71,16 +65,6 @@ public class PageArgument {
 
     public boolean getAutoRotate() {
         return auto_rotate;
-    }
-
-    public Element toElement() {
-        Element element = new Element("PageArgument");
-        element.addContent(new Element("size").addContent(size.toString()));
-        element.addContent(new Element("align").addContent(align.toString()));
-        element.addContent(new Element("default-direction").addContent(direction.toString()));
-        element.addContent(new Element("auto-rotate").addContent(Boolean.toString(auto_rotate)));
-        return element;
-
     }
 
 }

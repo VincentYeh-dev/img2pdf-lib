@@ -1,8 +1,7 @@
-package org.vincentyeh.IMG2PDF.pdf.doc;
+package org.vincentyeh.IMG2PDF.task;
 
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
-import org.jdom2.Element;
 
 public class DocumentArgument {
 
@@ -30,19 +29,6 @@ public class DocumentArgument {
             return new DocumentArgument(owner_password, user_password, ap);
         }
 
-        public DocumentArgument buildFrom(Element element) {
-            Element permission = element.getChild("permission");
-
-            AccessPermission ap = new AccessPermission();
-            ap.setCanPrint(Boolean.parseBoolean(permission.getAttributeValue("canPrint")));
-            ap.setCanModify(Boolean.parseBoolean(permission.getAttributeValue("canModify")));
-
-            setUserPassword(permission.getChild("USER-PASSWORD").getValue());
-            setOwnerPassword(permission.getChild("OWNER-PASSWORD").getValue());
-            setAccessPermission(ap);
-
-            return build();
-        }
     }
 
     private final String owner_password;
@@ -55,18 +41,18 @@ public class DocumentArgument {
         this.ap = ap;
     }
 
-    public Element toElement() {
-        Element element = new Element("DocumentArgument");
-
-        Element permission = new Element("permission");
-        permission.setAttribute("canPrint", String.valueOf(ap.canPrint()));
-        permission.setAttribute("canModify", String.valueOf(ap.canModify()));
-        permission.addContent(new Element("OWNER-PASSWORD").addContent(owner_password));
-        permission.addContent(new Element("USER-PASSWORD").addContent(user_password));
-        element.addContent(permission);
-        return element;
-
-    }
+//    public Element toElement() {
+//        Element element = new Element("DocumentArgument");
+//
+//        Element permission = new Element("permission");
+//        permission.setAttribute("canPrint", String.valueOf(ap.canPrint()));
+//        permission.setAttribute("canModify", String.valueOf(ap.canModify()));
+//        permission.addContent(new Element("OWNER-PASSWORD").addContent(owner_password));
+//        permission.addContent(new Element("USER-PASSWORD").addContent(user_password));
+//        element.addContent(permission);
+//        return element;
+//
+//    }
 
     public StandardProtectionPolicy getSpp() {
         return createProtectionPolicy(owner_password, user_password, ap);
@@ -80,6 +66,18 @@ public class DocumentArgument {
         StandardProtectionPolicy spp = new StandardProtectionPolicy(owner_pwd, user_pwd, ap);
         spp.setEncryptionKeyLength(keyLength);
         return spp;
+    }
+
+    public String getOwner_password() {
+        return owner_password;
+    }
+
+    public String getUser_password() {
+        return user_password;
+    }
+
+    public AccessPermission getAp() {
+        return ap;
     }
 
 }
