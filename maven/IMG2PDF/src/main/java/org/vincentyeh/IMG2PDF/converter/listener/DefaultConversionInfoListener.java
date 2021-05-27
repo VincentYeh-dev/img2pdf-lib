@@ -38,7 +38,7 @@ public class DefaultConversionInfoListener implements ConversionInfoListener {
             progress -= 1;
             counter++;
         }
-        String name = task.getDestination().getName();
+        String name = task.getPdfDestination().getName();
         System.out.printf("\t" + SharedSpace.getResString("convert.listener.converting") + "\r", new String(progress_bar), getSimplifiedName(name), index + 1, total, file.getName());
     }
 

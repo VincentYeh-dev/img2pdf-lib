@@ -4,17 +4,13 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
 
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
 import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
-import org.vincentyeh.IMG2PDF.pdf.doc.DocumentArgument;
-import org.vincentyeh.IMG2PDF.pdf.page.PageArgument;
+import org.vincentyeh.IMG2PDF.task.DocumentArgument;
+import org.vincentyeh.IMG2PDF.task.PageArgument;
+import org.vincentyeh.IMG2PDF.task.TaskListConverter;
 import org.vincentyeh.IMG2PDF.util.file.FileFilterHelper;
 import org.vincentyeh.IMG2PDF.task.Task;
-import org.vincentyeh.IMG2PDF.task.TaskList;
 import org.vincentyeh.IMG2PDF.util.file.FileSorter;
 import org.vincentyeh.IMG2PDF.util.file.FileUtils;
 import org.vincentyeh.IMG2PDF.util.NameFormatter;
@@ -73,7 +69,9 @@ public class CreateAction implements Action {
 
     @Override
     public void start() throws Exception {
-        TaskList tasks = new TaskList();
+        List<Task> tasks=new ArrayList<>();
+
+//        TaskList tasks = new TaskList();
 
         for (File dirlist : sourceFiles) {
 //          In dirlist
@@ -159,7 +157,7 @@ public class CreateAction implements Action {
         FileUtils.checkIsDirectory(source_directory);
 
         NameFormatter nf = new NameFormatter(source_directory);
-        return new Task(documentArgument, pageArgument, importSortedImagesFiles(source_directory), new File(nf.format(pdf_dst)));
+        return new Task(documentArgument, pageArgument, importSortedImagesFiles(source_directory), new File(nf.format(pdf_dst)).getAbsoluteFile());
     }
 
     private File[] importSortedImagesFiles(File source_directory) {
@@ -181,19 +179,16 @@ public class CreateAction implements Action {
         return files;
     }
 
-    public void save(TaskList taskList, File destination) throws IOException {
+    public void save(List<Task> taskList, File destination) throws IOException {
         FileUtils.makeDirsIfNotExists(destination.getParentFile());
         FileUtils.checkAbsolute(destination);
         FileUtils.checkIsFile(destination);
 
-        Document doc = new Document();
-        Element root = taskList.toElement();
-        doc.setRootElement(root);
-        XMLOutputter outer = new XMLOutputter();
-        Format format = Format.getPrettyFormat();
-        outer.setFormat(format);
-
-        outer.output(doc, new OutputStreamWriter(new FileOutputStream(destination), SharedSpace.Configuration.DEFAULT_CHARSET));
+        BufferedWriter writer=new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destination),SharedSpace.Configuration.DEFAULT_CHARSET));
+        TaskListConverter converter=new TaskListConverter();
+        writer.append(converter.toXml(taskList));
+        writer.close();
+//        outer.output(doc, new OutputStreamWriter(new FileOutputStream(destination), SharedSpace.Configuration.DEFAULT_CHARSET));
     }
 
     public static class Builder{

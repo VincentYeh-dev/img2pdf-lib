@@ -1,7 +1,6 @@
 package org.vincentyeh.IMG2PDF.converter;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.ImagingOpException;
 import java.io.File;
 import java.io.IOException;
 
@@ -15,7 +14,6 @@ import org.vincentyeh.IMG2PDF.converter.listener.ConversionInfoListener;
 import org.vincentyeh.IMG2PDF.pdf.page.core.ImagePageFactory;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.util.file.FileUtils;
-//import org.vincentyeh.IMG2PDF.util.file.FileChecker;
 
 import javax.imageio.ImageIO;
 
@@ -64,9 +62,9 @@ public class PDFConverter implements ConversionInfoListener {
 
     private File savePDFAndClose() throws IOException {
         try {
-            FileUtils.makeDirsIfNotExists(task.getDestination().getParentFile());
-            document.save(task.getDestination());
-            return task.getDestination();
+            FileUtils.makeDirsIfNotExists(task.getPdfDestination().getParentFile());
+            document.save(task.getPdfDestination());
+            return task.getPdfDestination();
         } finally {
             closeDocument();
         }
@@ -103,9 +101,9 @@ public class PDFConverter implements ConversionInfoListener {
     }
 
     private void checkOverwrite() throws OverwriteDenyException {
-        if (!overwrite && task.getDestination().exists()) {
+        if (!overwrite && task.getPdfDestination().exists()) {
             closeDocument();
-            throw new OverwriteDenyException(task.getDestination());
+            throw new OverwriteDenyException(task.getPdfDestination());
         }
     }
 
