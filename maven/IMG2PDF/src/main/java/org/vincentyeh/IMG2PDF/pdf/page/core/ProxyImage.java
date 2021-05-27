@@ -2,7 +2,7 @@ package org.vincentyeh.IMG2PDF.pdf.page.core;
 
 import java.awt.image.BufferedImage;
 
-public class ProxyImage implements Resizable<BufferedImage> {
+public class ProxyImage {
     private final BufferedImage image;
     private final Size size;
 
@@ -16,12 +16,10 @@ public class ProxyImage implements Resizable<BufferedImage> {
     }
 
 
-    @Override
     public BufferedImage get() {
         return image;
     }
 
-    @Override
     public Size getSize() {
         return size;
     }

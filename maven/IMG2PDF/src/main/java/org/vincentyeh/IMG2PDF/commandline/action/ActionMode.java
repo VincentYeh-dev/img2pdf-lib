@@ -7,7 +7,7 @@ import org.vincentyeh.IMG2PDF.commandline.parser.CreateActionParser;
 public enum ActionMode {
 	create(new CreateActionParser()),convert(new ConvertActionParser());
 
-	ActionParser parser;
+	final ActionParser parser;
 
 	ActionMode(ActionParser parser) {
 		this.parser = parser;

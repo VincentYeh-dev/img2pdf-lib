@@ -44,29 +44,6 @@ public class CreateAction implements Action {
         this.sourceFiles = sourceFiles;
     }
 
-//    private void printInformation() {
-//        System.out.println();
-//        System.out.printf("### " + SharedSpace.getResString("create.tasklist_config")
-//                        + " ###\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n%s:%s\n############\n",
-////
-//                SharedSpace.getResString("create.arg.pdf_align.name"), pageArgument.getAlign(),
-////
-//                SharedSpace.getResString("create.arg.pdf_size.name"), pageArgument.getSize(),
-////
-//                SharedSpace.getResString("create.arg.pdf_direction.name"), pageArgument.getDirection(),
-////
-//                SharedSpace.getResString("create.arg.pdf_auto_rotate.name"), pageArgument.getAutoRotate(),
-////
-//                SharedSpace.getResString("create.arg.filter.name"), ffh.getOperator(),
-////
-//                SharedSpace.getResString("create.arg.list_destination.name"), tasklist_dst,
-////
-//                SharedSpace.getResString("create.arg.source.name"), listStringArray(ArrayToStringArray(sourceFiles))
-////
-//        );
-//        System.out.println();
-//    }
-
     @Override
     public void start() throws Exception {
         List<Task> tasks=new ArrayList<>();

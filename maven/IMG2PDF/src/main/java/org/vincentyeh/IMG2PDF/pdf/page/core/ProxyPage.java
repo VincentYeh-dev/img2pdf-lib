@@ -3,7 +3,7 @@ package org.vincentyeh.IMG2PDF.pdf.page.core;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
-class ProxyPage implements Resizable<PDPage> {
+class ProxyPage  {
     private final PDPage page;
     private final Size size;
 
@@ -13,12 +13,10 @@ class ProxyPage implements Resizable<PDPage> {
         this.size = size;
     }
 
-    @Override
     public PDPage get() {
         return page;
     }
 
-    @Override
     public Size getSize() {
         return size;
     }

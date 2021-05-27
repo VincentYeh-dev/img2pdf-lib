@@ -9,7 +9,6 @@ import java.nio.file.PathMatcher;
 import java.util.regex.PatternSyntaxException;
 
 public class FileFilterHelper implements FileFilter {
-	private final String operator;
 	private final PathMatcher matcher;
 
 	/**
@@ -18,7 +17,6 @@ public class FileFilterHelper implements FileFilter {
 	 */
 	public FileFilterHelper(String operator)
 			throws PatternSyntaxException, UnsupportedOperationException {
-		this.operator = operator;
 		FileSystem fs = FileSystems.getDefault();
 		matcher = fs.getPathMatcher(operator);
 
@@ -31,8 +29,5 @@ public class FileFilterHelper implements FileFilter {
 		return matcher.matches(name);
 	}
 
-	public String getOperator() {
-		return operator;
-	}
 
 }
