@@ -1,7 +1,6 @@
 package org.vincentyeh.IMG2PDF.util;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Calendar;
 import java.util.Date;
@@ -34,7 +33,7 @@ public class NameFormatter {
 
 //	private final File file;
 
-	public NameFormatter(File raw) throws IOException {
+	public NameFormatter(File raw) {
 		file=raw;
 		Path p=raw.toPath();
 		parents = new File[p.getNameCount()-1];
@@ -71,10 +70,10 @@ public class NameFormatter {
 
 	private String formatParents(String format, File[] parents)
 			throws NumberFormatException, ParentOverPointException {
-		Matcher matcher = Pattern.compile(".*?(\\$PARENT\\{[0-9]+\\}).*?").matcher(format);
+		Matcher matcher = Pattern.compile(".*?(\\$PARENT\\{[0-9]+}).*?").matcher(format);
 		while (matcher.find()) {
 			String parent = matcher.group(1);
-			Matcher matcher_num = Pattern.compile("\\$PARENT\\{([0-9]+)\\}").matcher(parent);
+			Matcher matcher_num = Pattern.compile("\\$PARENT\\{([0-9]+)}").matcher(parent);
 			if (matcher_num.find()) {
 				int index = Integer.parseInt(matcher_num.group(1));
 				if (index >= parents.length) {
@@ -86,12 +85,12 @@ public class NameFormatter {
 		return format;
 	}
 
-	public String format(String format) throws ParentOverPointException, IOException {
+	public String format(String format) throws ParentOverPointException {
         String[] buf = file.getName().split("\\.");
 
 		format = format.replace("$NAME", buf[0]);
 
-		if (format.matches(".*\\$PARENT\\{([0-9]{1,})\\}.*"))
+		if (format.matches(".*\\$PARENT\\{([0-9]+)}.*"))
 			format = formatParents(format, parents);
 
 		if (format.matches(".*\\$(CY|CM|CD|CH|CN|CS).*"))

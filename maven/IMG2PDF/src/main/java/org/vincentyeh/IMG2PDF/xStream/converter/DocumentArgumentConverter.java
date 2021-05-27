@@ -37,11 +37,13 @@ public class DocumentArgumentConverter implements Converter {
         builder.setOwnerPassword(elements.get("owner-password").toString());
         builder.setUserPassword(elements.get("user-password").toString());
 
-        final Map<String, Object> access_permission = (Map<String, Object>) elements.get("AccessPermission");
-
         AccessPermission ap = new AccessPermission();
-        ap.setCanModify(Boolean.parseBoolean(access_permission.get("canModify").toString()));
-        ap.setCanPrint(Boolean.parseBoolean(access_permission.get("canPrint").toString()));
+        Object ap_obj=elements.get("AccessPermission");
+        if(ap_obj instanceof HashMap){
+            final Map<String, Object> access_permission = (Map<String, Object>) ap_obj;
+            ap.setCanModify(Boolean.parseBoolean(access_permission.get("canModify").toString()));
+            ap.setCanPrint(Boolean.parseBoolean(access_permission.get("canPrint").toString()));
+        }
         builder.setAccessPermission(ap);
 
         return builder.build();

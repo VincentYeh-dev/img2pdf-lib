@@ -1,7 +1,6 @@
 package org.vincentyeh.IMG2PDF.converter.listener;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.vincentyeh.IMG2PDF.task.Task;
 
