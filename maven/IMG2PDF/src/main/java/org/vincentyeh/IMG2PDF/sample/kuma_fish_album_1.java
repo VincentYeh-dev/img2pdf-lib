@@ -24,7 +24,7 @@ public class kuma_fish_album_1 {
 //		Create dirlist.txt which contain path of images directory.
 		BufferedWriter writer;
 		try {
-			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(sources_list), SharedSpace.Configuration.DEFAULT_CHARSET));
+			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(sources_list), SharedSpace.Configuration.DIRLIST_READ_CHARSET));
 			writer.write(image_sources_dir.getAbsolutePath() + "\n\n");
 			writer.close();
 		} catch (IOException e) {

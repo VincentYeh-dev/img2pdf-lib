@@ -56,7 +56,7 @@ public class CreateAction implements Action {
             FileUtils.checkIsFile(dirlist);
 
             System.out.printf(SharedSpace.getResString("create.import_from_list") + "\n", dirlist.getName());
-            List<String> lines = Files.readAllLines(dirlist.toPath(), SharedSpace.Configuration.DEFAULT_CHARSET);
+            List<String> lines = Files.readAllLines(dirlist.toPath(), SharedSpace.Configuration.DIRLIST_READ_CHARSET);
 
             for (int line_index = 0; line_index < lines.size(); line_index++) {
 
@@ -161,7 +161,7 @@ public class CreateAction implements Action {
         FileUtils.checkAbsolute(destination);
         FileUtils.checkIsFile(destination);
 
-        BufferedWriter writer=new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destination),SharedSpace.Configuration.DEFAULT_CHARSET));
+        BufferedWriter writer=new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destination),SharedSpace.Configuration.TASKlIST_WRITE_CHARSET));
         TaskListConverter converter=new TaskListConverter();
         writer.append(converter.toXml(taskList));
         writer.close();

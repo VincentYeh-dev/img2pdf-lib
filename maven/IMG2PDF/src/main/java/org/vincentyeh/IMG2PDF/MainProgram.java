@@ -37,7 +37,7 @@ public class MainProgram {
         } catch (HelperException e) {
 //            e.printStackTrace();
             HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp(SharedSpace.Configuration.PROGRAM_NAME, e.getOptions());
+            formatter.printHelp(SharedSpace.Constance.PROGRAM_NAME, e.getOptions());
             throw new HandledException(e,getClass());
         } catch (MissingOptionException e) {
             System.err.printf(SharedSpace.getResString("argperser.err.missing_option") + "\n", e.getMissingOptions().stream().map(Object::toString).collect(Collectors.joining(",")));

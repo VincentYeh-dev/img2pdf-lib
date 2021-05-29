@@ -117,7 +117,7 @@ public class ConvertAction implements Action {
             throw new HandledException(e, getClass());
         }
         try {
-            String xml= String.join("\n", Files.readAllLines(file.toPath(),SharedSpace.Configuration.DEFAULT_CHARSET));
+            String xml= String.join("\n", Files.readAllLines(file.toPath(),SharedSpace.Configuration.TASKLIST_READ_CHARSET));
             return (new TaskListConverter()).parse(xml);
         } catch (IOException e) {
 //            TODO:Print error message
