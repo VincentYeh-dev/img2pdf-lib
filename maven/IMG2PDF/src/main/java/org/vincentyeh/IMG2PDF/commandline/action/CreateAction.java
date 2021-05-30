@@ -1,6 +1,8 @@
 package org.vincentyeh.IMG2PDF.commandline.action;
 
 import java.io.*;
+import java.nio.charset.MalformedInputException;
+import java.nio.charset.UnmappableCharacterException;
 import java.nio.file.Files;
 import java.util.*;
 
@@ -46,18 +48,21 @@ public class CreateAction implements Action {
 
     @Override
     public void start() throws Exception {
+
+        if (!overwrite && tasklist_dst.exists()) {
+            System.err.printf(SharedSpace.getResString("public.err.overwrite") + "\n", tasklist_dst.getAbsolutePath());
+            throw new HandledException(new RuntimeException("Overwrite deny"), getClass());
+        }
+
         List<Task> tasks=new ArrayList<>();
-
-//        TaskList tasks = new TaskList();
-
         for (File dirlist : sourceFiles) {
 //          In dirlist
             FileUtils.checkAbsolute(dirlist);
             FileUtils.checkIsFile(dirlist);
 
             System.out.printf(SharedSpace.getResString("create.import_from_list") + "\n", dirlist.getName());
-            List<String> lines = Files.readAllLines(dirlist.toPath(), SharedSpace.Configuration.DEFAULT_CHARSET);
 
+            List<String> lines= readAllLinesFromDirlist(dirlist);
             for (int line_index = 0; line_index < lines.size(); line_index++) {
 
                 String line = getFixedLine(lines.get(line_index));
@@ -79,11 +84,6 @@ public class CreateAction implements Action {
 
         }
 
-        if (!overwrite && tasklist_dst.exists()) {
-            System.err.printf(SharedSpace.getResString("public.err.overwrite") + "\n", tasklist_dst.getAbsolutePath());
-            throw new HandledException(new RuntimeException("Overwrite deny"), getClass());
-        }
-
         try {
             save(tasks, tasklist_dst);
             System.out.printf("[" + SharedSpace.getResString("public.info.exported") + "] %s\n", tasklist_dst.getAbsolutePath());
@@ -91,6 +91,21 @@ public class CreateAction implements Action {
             System.err.printf(SharedSpace.getResString("create.err.tasklist_create") + "\n", e.getMessage());
             throw new HandledException(e, getClass());
         }
+    }
+
+    private List<String> readAllLinesFromDirlist(File dirlist) throws HandledException {
+        List<String> lines;
+        try{
+            lines = Files.readAllLines(dirlist.toPath(), SharedSpace.Configuration.DIRLIST_READ_CHARSET);
+        }catch (UnmappableCharacterException| MalformedInputException e){
+//            TODO:wrong charset,print error message.
+            System.err.println("Unmappable character or Malformed input,maybe cause by wrong charset."+e.getMessage());
+            throw new HandledException(e,getClass());
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new HandledException(e,getClass());
+        }
+        return lines;
     }
 
     private void checkDirectoryInSource(File dirlist, int line, File directory) throws HandledException {
@@ -161,11 +176,8 @@ public class CreateAction implements Action {
         FileUtils.checkAbsolute(destination);
         FileUtils.checkIsFile(destination);
 
-        BufferedWriter writer=new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destination),SharedSpace.Configuration.DEFAULT_CHARSET));
         TaskListConverter converter=new TaskListConverter();
-        writer.append(converter.toXml(taskList));
-        writer.close();
-//        outer.output(doc, new OutputStreamWriter(new FileOutputStream(destination), SharedSpace.Configuration.DEFAULT_CHARSET));
+        Files.writeString(destination.toPath(),converter.toXml(taskList),SharedSpace.Configuration.TASKlIST_WRITE_CHARSET);
     }
 
     public static class Builder{

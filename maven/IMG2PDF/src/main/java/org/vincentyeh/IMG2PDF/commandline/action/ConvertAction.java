@@ -2,6 +2,8 @@ package org.vincentyeh.IMG2PDF.commandline.action;
 
 import java.awt.Desktop;
 import java.io.*;
+import java.nio.charset.MalformedInputException;
+import java.nio.charset.UnmappableCharacterException;
 import java.nio.file.Files;
 import java.util.List;
 
@@ -117,16 +119,28 @@ public class ConvertAction implements Action {
             throw new HandledException(e, getClass());
         }
         try {
-            String xml= String.join("\n", Files.readAllLines(file.toPath(),SharedSpace.Configuration.DEFAULT_CHARSET));
+            String xml = String.join("\n", readAllLinesFromTasklist(file));
             return (new TaskListConverter()).parse(xml);
-        } catch (IOException e) {
-//            TODO:Print error message
-            throw new HandledException(e, getClass());
-        }catch (com.thoughtworks.xstream.converters.ConversionException e){
+        } catch (com.thoughtworks.xstream.converters.ConversionException e) {
             System.err.println(e.getCause().getMessage());
             throw new HandledException(e, getClass());
         }
 
+    }
+
+    private List<String> readAllLinesFromTasklist(File dirlist) throws HandledException {
+        List<String> lines;
+        try {
+            lines = Files.readAllLines(dirlist.toPath(), SharedSpace.Configuration.TASKLIST_READ_CHARSET);
+        } catch (UnmappableCharacterException | MalformedInputException e) {
+//            TODO:wrong charset,print error message.
+            System.err.println("Unmappable character or Malformed input,maybe cause by wrong charset." + e.getMessage());
+            throw new HandledException(e, getClass());
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new HandledException(e, getClass());
+        }
+        return lines;
     }
 
     public static class Builder {
@@ -136,8 +150,8 @@ public class ConvertAction implements Action {
         private boolean open_when_complete;
         private boolean overwrite_output;
 
-        public ConvertAction build(){
-            return new ConvertAction(tempFolder,maxMainMemoryBytes,tasklist_sources,open_when_complete,overwrite_output);
+        public ConvertAction build() {
+            return new ConvertAction(tempFolder, maxMainMemoryBytes, tasklist_sources, open_when_complete, overwrite_output);
         }
 
         public Builder setTempFolder(File tempFolder) {

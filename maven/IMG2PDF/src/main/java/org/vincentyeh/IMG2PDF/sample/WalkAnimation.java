@@ -21,7 +21,7 @@ public class WalkAnimation {
 		File sources_list = new File(sample_root, "dirlist.txt").getAbsoluteFile();
 		BufferedWriter writer;
 		try {
-			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(sources_list), SharedSpace.Configuration.DEFAULT_CHARSET));
+			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(sources_list),SharedSpace.Configuration.DIRLIST_READ_CHARSET));
 			writer.write(image_sources_dir.getAbsolutePath() + "\n\n");
 			writer.close();
 		} catch (IOException e) {
