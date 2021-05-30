@@ -49,46 +49,31 @@ public class SharedSpace {
     }
 
     private static Charset getDirListReadCharsetFromProperties(Properties properties) {
-        String charset = properties.getProperty("dirlist-read-charset");
-        if (charset == null || charset.isEmpty()) {
-            System.err.println("Option \"dirlist-read-charset\" not found.\nUse default charset:UTF-8.");
-            return StandardCharsets.UTF_8;
-        }
-        try {
-            return Charset.forName(charset);
-        } catch (UnsupportedCharsetException e) {
-            System.err.printf("Option \"dirlist-read-charset\" not support:%s.\nUse default charset:%s\n", e.getCharsetName(), StandardCharsets.UTF_8);
-            return StandardCharsets.UTF_8;
-        }
+        return getCharsetFromProperties("dirlist-read-charset",properties);
     }
-
+    
     private static Charset getTaskListWriteCharsetFromProperties(Properties properties) {
-        String charset = properties.getProperty("tasklist-write-charset");
-        if (charset == null || charset.isEmpty()) {
-            System.err.println("Option \"tasklist-write-charset\" not found.\nUse default charset:UTF-8.");
-            return StandardCharsets.UTF_8;
-        }
-        try {
-            return Charset.forName(charset);
-        } catch (UnsupportedCharsetException e) {
-            System.err.printf("Option \"tasklist-write-charset\" not support:%s.\nUse default charset:%s\n", e.getCharsetName(), StandardCharsets.UTF_8);
-            return StandardCharsets.UTF_8;
-        }
+        return getCharsetFromProperties("tasklist-write-charset",properties);
     }
 
     private static Charset getTaskListReadCharsetFromProperties(Properties properties) {
-        String charset = properties.getProperty("tasklist-read-charset");
+        return getCharsetFromProperties("tasklist-read-charset",properties);
+    }
+
+    private static Charset getCharsetFromProperties(String option,Properties properties){
+        String charset = properties.getProperty(option);
         if (charset == null || charset.isEmpty()) {
-            System.err.println("Option \"tasklist-read-charset\" not found.\nUse default charset:UTF-8.");
+            System.err.printf("Option \"%s\" not found.\nUse default charset:UTF-8.\n",option);
             return StandardCharsets.UTF_8;
         }
         try {
             return Charset.forName(charset);
         } catch (UnsupportedCharsetException e) {
-            System.err.printf("Option \"tasklist-read-charset\" not support:%s.\nUse default charset:%s\n", e.getCharsetName(), StandardCharsets.UTF_8);
+            System.err.printf("Option \"%s\" not support:%s.\nUse default charset:UTF-8\n", option);
             return StandardCharsets.UTF_8;
         }
     }
+
 
     private static Locale getLocaleFromProperties(Properties properties) {
         String language = properties.getProperty("language");
