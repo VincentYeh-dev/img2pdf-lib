@@ -3,10 +3,7 @@ package org.vincentyeh.IMG2PDF.task;
 import org.vincentyeh.IMG2PDF.util.NameFormatter;
 import org.vincentyeh.IMG2PDF.util.file.FileUtils;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.*;
@@ -19,13 +16,13 @@ public abstract class DirlistTaskFactory {
     private static PageArgument pageArgument;
     private static String pdf_destination;
 
-    public static void setArgument(DocumentArgument documentArgument,PageArgument pageArgument,String pdf_destination) {
+    public static void setArgument(DocumentArgument documentArgument, PageArgument pageArgument, String pdf_destination) {
         DirlistTaskFactory.documentArgument = documentArgument;
         DirlistTaskFactory.pageArgument = pageArgument;
         DirlistTaskFactory.pdf_destination = pdf_destination;
     }
 
-    public static void setImageFilesRule(FileFilter imageFilter, Comparator<? super File> fileSorter){
+    public static void setImageFilesRule(FileFilter imageFilter, Comparator<? super File> fileSorter) {
         DirlistTaskFactory.imageFilter = imageFilter;
         DirlistTaskFactory.fileSorter = fileSorter;
     }
@@ -36,58 +33,54 @@ public abstract class DirlistTaskFactory {
         List<String> lines = readAllLinesFromDirlist(dirlist, charset);
 
         List<Task> tasks = new ArrayList<>();
-
-        for (String s : lines) {
-            String line = getFixedLine(s);
-            if (line == null)
-                continue;
-            File dir = getAbsoluteFileFromLine(line, dirlist);
-            checkDirectoryInSource(dir);
-            tasks.add(mergeAllIntoTask(dir));
+        for (String line : lines) {
+            tasks.add(mergeArgumentIntoTask(getCheckedFileFromLine(line, dirlist)));
         }
-
         return tasks;
     }
 
-    private static File getAbsoluteFileFromLine(String line, File directoryList) {
+    private static File getCheckedFileFromLine(String line, File directoryList) throws FileNotFoundException, FileUtils.WrongTypeException {
         File dir = new File(line);
+        File result;
         if (!dir.isAbsolute()) {
-            return new File(directoryList.getParent(), line).getAbsoluteFile();
+            result = new File(directoryList.getParent(), line).getAbsoluteFile();
         } else {
-            return dir;
+            result = dir;
         }
+        FileUtils.checkExists(result);
+        FileUtils.checkIsDirectory(result);
+
+        return result;
     }
 
-    private static void checkDirectoryInSource(File directory) throws FileNotFoundException, FileUtils.WrongTypeException {
-        FileUtils.checkExists(directory);
-        FileUtils.checkIsDirectory(directory);
-
-    }
-
-
-    private static String getFixedLine(String raw) {
-        if (raw.isEmpty() || raw.trim().isEmpty())
-            return null;
-        else
-            return removeBOMHeaderInUTF8Line(raw).trim();
-    }
-
-    private static String removeBOMHeaderInUTF8Line(String raw) {
-        return raw.replace("\uFEFF", "");
-    }
-
-    private static Task mergeAllIntoTask(File source_directory) throws IOException {
-        FileUtils.checkAbsolute(source_directory);
-        FileUtils.checkExists(source_directory);
-        FileUtils.checkIsDirectory(source_directory);
-
+    private static Task mergeArgumentIntoTask(File source_directory) {
         NameFormatter nf = new NameFormatter(source_directory);
         return createTask(documentArgument, pageArgument, importSortedImagesFiles(source_directory), new File(nf.format(pdf_destination)).getAbsoluteFile());
     }
 
     private static List<String> readAllLinesFromDirlist(File dirlist, Charset charset) throws IOException {
-        return Files.readAllLines(dirlist.toPath(),charset);
+        try (BufferedReader reader = Files.newBufferedReader(dirlist.toPath(), charset)) {
+            List<String> result = new ArrayList<>();
+            for (; ; ) {
+                String line = reader.readLine();
+                if (line == null || getFixedLine(line) == null)
+                    break;
+                result.add(getFixedLine(line));
+            }
+            return result;
+        }
     }
+
+    private static String getFixedLine(String raw) {
+        if (raw == null || raw.isEmpty() || raw.trim().isEmpty())
+            return null;
+        else {
+//            remove BOM header in UTF8 line
+            String result = raw.replace("\uFEFF", "");
+            return result.trim();
+        }
+    }
+
 
     private static File[] importSortedImagesFiles(File source_directory) {
         File[] files = source_directory.listFiles(imageFilter);
