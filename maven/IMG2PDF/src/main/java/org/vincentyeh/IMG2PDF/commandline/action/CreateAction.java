@@ -7,6 +7,9 @@ import java.util.*;
 import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
 import org.vincentyeh.IMG2PDF.task.*;
+import org.vincentyeh.IMG2PDF.task.factory.DirlistTaskFactory;
+import org.vincentyeh.IMG2PDF.task.factory.exception.DirListException;
+import org.vincentyeh.IMG2PDF.task.factory.exception.SourceFileException;
 import org.vincentyeh.IMG2PDF.util.file.FileFilterHelper;
 import org.vincentyeh.IMG2PDF.util.file.FileSorter;
 import org.vincentyeh.IMG2PDF.util.file.FileUtils;
@@ -51,11 +54,14 @@ public class CreateAction implements Action {
         DirlistTaskFactory.setImageFilesRule(ffh, fileSorter);
 
         List<Task> tasks = new ArrayList<>();
-
-        for (File dirlist : sourceFiles) {
-            tasks.addAll(DirlistTaskFactory.createFromDirlist(dirlist, SharedSpace.Configuration.DIRLIST_READ_CHARSET));
+        try {
+            for (File dirlist : sourceFiles) {
+                tasks.addAll(DirlistTaskFactory.createFromDirlist(dirlist, SharedSpace.Configuration.DIRLIST_READ_CHARSET));
+            }
+        }catch (SourceFileException | DirListException e){
+//            System.err.println(e.getMessage());
+            throw new HandledException(e,getClass());
         }
-
         save(tasks, tasklist_dst);
     }
 

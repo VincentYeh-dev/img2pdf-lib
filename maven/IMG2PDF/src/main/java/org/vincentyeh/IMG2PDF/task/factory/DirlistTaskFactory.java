@@ -1,7 +1,11 @@
-package org.vincentyeh.IMG2PDF.task;
+package org.vincentyeh.IMG2PDF.task.factory;
 
+import org.vincentyeh.IMG2PDF.task.DocumentArgument;
+import org.vincentyeh.IMG2PDF.task.PageArgument;
+import org.vincentyeh.IMG2PDF.task.Task;
+import org.vincentyeh.IMG2PDF.task.factory.exception.DirListException;
+import org.vincentyeh.IMG2PDF.task.factory.exception.SourceFileException;
 import org.vincentyeh.IMG2PDF.util.NameFormatter;
-import org.vincentyeh.IMG2PDF.util.file.FileUtils;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -27,19 +31,24 @@ public abstract class DirlistTaskFactory {
         DirlistTaskFactory.fileSorter = fileSorter;
     }
 
-    public static List<Task> createFromDirlist(File dirlist, Charset charset) throws IOException {
-        FileUtils.checkAbsolute(dirlist);
-        FileUtils.checkIsFile(dirlist);
+    public static List<Task> createFromDirlist(File dirlist, Charset charset) throws SourceFileException, DirListException {
+        if(dirlist==null)
+            throw new IllegalArgumentException("dirlist==null");
+        if(charset==null)
+            throw new IllegalArgumentException("charset==null");
+
         List<String> lines = readAllLinesFromDirlist(dirlist, charset);
 
         List<Task> tasks = new ArrayList<>();
+
         for (String line : lines) {
-            tasks.add(mergeArgumentIntoTask(getCheckedFileFromLine(line, dirlist)));
+            tasks.add(createTaskFromSource(getCheckedFileFromLine(line, dirlist)));
         }
+
         return tasks;
     }
 
-    private static File getCheckedFileFromLine(String line, File directoryList) throws FileNotFoundException, FileUtils.WrongTypeException {
+    private static File getCheckedFileFromLine(String line, File directoryList) throws SourceFileException {
         File dir = new File(line);
         File result;
         if (!dir.isAbsolute()) {
@@ -47,18 +56,34 @@ public abstract class DirlistTaskFactory {
         } else {
             result = dir;
         }
-        FileUtils.checkExists(result);
-        FileUtils.checkIsDirectory(result);
+
+        if (!result.exists()) {
+            throw new SourceFileException("Source file not found:" +result, result);
+        }
+
+        if (!result.isDirectory()) {
+            throw new SourceFileException(new IOException("Source file is not a directory:" + result), result);
+        }
 
         return result;
     }
 
-    private static Task mergeArgumentIntoTask(File source_directory) {
-        NameFormatter nf = new NameFormatter(source_directory);
-        return createTask(documentArgument, pageArgument, importSortedImagesFiles(source_directory), new File(nf.format(pdf_destination)).getAbsoluteFile());
+    private static Task createTaskFromSource(File directory) throws SourceFileException {
+        NameFormatter nf = new NameFormatter(directory);
+        return createTask(documentArgument,
+                pageArgument,
+                importSortedImagesFiles(directory),
+                new File(nf.format(pdf_destination)).getAbsoluteFile());
     }
 
-    private static List<String> readAllLinesFromDirlist(File dirlist, Charset charset) throws IOException {
+    private static List<String> readAllLinesFromDirlist(File dirlist, Charset charset) throws DirListException {
+        if (!dirlist.exists())
+            throw new DirListException("Dirlist not found:" + dirlist, dirlist);
+
+        if (!dirlist.isFile())
+            throw new DirListException("Dirlist file is not a file:" + dirlist, dirlist);
+
+
         try (BufferedReader reader = Files.newBufferedReader(dirlist.toPath(), charset)) {
             List<String> result = new ArrayList<>();
             for (; ; ) {
@@ -68,6 +93,8 @@ public abstract class DirlistTaskFactory {
                 result.add(getFixedLine(line));
             }
             return result;
+        } catch (Exception e) {
+            throw new DirListException(e, dirlist);
         }
     }
 
@@ -82,10 +109,11 @@ public abstract class DirlistTaskFactory {
     }
 
 
-    private static File[] importSortedImagesFiles(File source_directory) {
+    private static File[] importSortedImagesFiles(File source_directory) throws SourceFileException {
         File[] files = source_directory.listFiles(imageFilter);
-        if (files == null)
-            files = new File[0];
+
+        if (files == null || files.length == 0)
+            throw new SourceFileException("No image was found in:" + source_directory, source_directory);
 
         Arrays.sort(files, fileSorter);
 
@@ -95,4 +123,5 @@ public abstract class DirlistTaskFactory {
     private static Task createTask(DocumentArgument documentArgument, PageArgument pageArgument, File[] images, File pdf_destination) {
         return new Task(documentArgument, pageArgument, images, pdf_destination);
     }
+
 }
