@@ -65,11 +65,6 @@ public class CreateAction implements Action {
     public void save(List<Task> taskList, File destination) throws HandledException {
         destination.getParentFile().mkdirs();
 
-        if(!destination.isFile()){
-//          TODO:print error message
-            throw new HandledException("destination is directory:"+destination,getClass());
-        }
-
         String content= new TaskListConverter().toXml(taskList);
         try {
             writeStringToFile(destination,content,SharedSpace.Configuration.TASKlIST_WRITE_CHARSET);
