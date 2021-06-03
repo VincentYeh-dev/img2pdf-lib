@@ -1,6 +1,7 @@
 package org.vincentyeh.IMG2PDF.commandline.action;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.*;
 
@@ -72,7 +73,7 @@ public class CreateAction implements Action {
             FileUtils.checkIsFile(destination);
 
             TaskListConverter converter = new TaskListConverter();
-            Files.writeString(destination.toPath(), converter.toXml(taskList), SharedSpace.Configuration.TASKlIST_WRITE_CHARSET);
+            writeStringToFile(destination,converter.toXml(taskList),SharedSpace.Configuration.TASKlIST_WRITE_CHARSET);
             System.out.printf("[" + SharedSpace.getResString("public.info.exported") + "] %s\n", tasklist_dst.getAbsolutePath());
         } catch (IOException e) {
             System.err.printf(SharedSpace.getResString("create.err.tasklist_create") + "\n", e.getMessage());
@@ -80,6 +81,11 @@ public class CreateAction implements Action {
         }
     }
 
+    private void writeStringToFile(File file, String content, Charset charset) throws IOException {
+        List<String> contents=new ArrayList<>();
+        contents.add(content);
+        Files.write(file.toPath(),contents, charset);
+    }
     public static class Builder {
         private FileSorter fileSorter;
         protected FileFilterHelper ffh;
