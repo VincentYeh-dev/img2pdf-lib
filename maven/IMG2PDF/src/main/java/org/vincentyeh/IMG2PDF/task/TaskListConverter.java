@@ -15,6 +15,8 @@ public class TaskListConverter {
         xStream.processAnnotations(PageArgument.class);
         xStream.processAnnotations(DocumentArgument.class);
         XStream.setupDefaultSecurity(xStream);
+//        xStream.setMode(XStream.NO_REFERENCES);
+
         xStream.allowTypesByWildcard(new String[] {
                 "org.vincentyeh.IMG2PDF.**"
         });

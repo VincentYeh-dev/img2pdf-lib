@@ -1,25 +1,19 @@
 package org.vincentyeh.IMG2PDF.commandline.action;
 
 import java.io.*;
-import java.nio.charset.MalformedInputException;
-import java.nio.charset.UnmappableCharacterException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.*;
 
 import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
-import org.vincentyeh.IMG2PDF.task.DocumentArgument;
-import org.vincentyeh.IMG2PDF.task.PageArgument;
-import org.vincentyeh.IMG2PDF.task.TaskListConverter;
+import org.vincentyeh.IMG2PDF.task.*;
+import org.vincentyeh.IMG2PDF.task.factory.DirlistTaskFactory;
+import org.vincentyeh.IMG2PDF.task.factory.exception.DirListException;
+import org.vincentyeh.IMG2PDF.task.factory.exception.SourceFileException;
 import org.vincentyeh.IMG2PDF.util.file.FileFilterHelper;
-import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.util.file.FileSorter;
-import org.vincentyeh.IMG2PDF.util.file.FileUtils;
-import org.vincentyeh.IMG2PDF.util.NameFormatter;
-
 public class CreateAction implements Action {
-
-
     private final FileSorter fileSorter;
     protected final FileFilterHelper ffh;
 
@@ -53,134 +47,43 @@ public class CreateAction implements Action {
             System.err.printf(SharedSpace.getResString("public.err.overwrite") + "\n", tasklist_dst.getAbsolutePath());
             throw new HandledException(new RuntimeException("Overwrite deny"), getClass());
         }
+        DirlistTaskFactory.setArgument(documentArgument, pageArgument, pdf_dst);
+        DirlistTaskFactory.setImageFilesRule(ffh, fileSorter);
 
-        List<Task> tasks=new ArrayList<>();
-        for (File dirlist : sourceFiles) {
-//          In dirlist
-            FileUtils.checkAbsolute(dirlist);
-            FileUtils.checkIsFile(dirlist);
-
-            System.out.printf(SharedSpace.getResString("create.import_from_list") + "\n", dirlist.getName());
-
-            List<String> lines= readAllLinesFromDirlist(dirlist);
-            for (int line_index = 0; line_index < lines.size(); line_index++) {
-
-                String line = getFixedLine(lines.get(line_index));
-
-                if (line == null)
-                    continue;
-
-                File dir = getAbsoluteFileFromLine(line, dirlist);
-
-                System.out.printf("\t[" + SharedSpace.getResString("public.info.importing") + "] %s\n",
-                        dir.getAbsolutePath());
-
-                checkDirectoryInSource(dirlist, line_index, dir);
-
-                tasks.add(mergeAllIntoTask(dir));
-                System.out.printf("\t[" + SharedSpace.getResString("public.info.imported") + "] %s\n",
-                        dir.getAbsolutePath());
-            }
-
-        }
-
+        List<Task> tasks = new ArrayList<>();
         try {
-            save(tasks, tasklist_dst);
+            for (File dirlist : sourceFiles) {
+                tasks.addAll(DirlistTaskFactory.createFromDirlist(dirlist, SharedSpace.Configuration.DIRLIST_READ_CHARSET));
+            }
+        }catch (SourceFileException | DirListException e){
+//            System.err.println(e.getMessage());
+            throw new HandledException(e,getClass());
+        }
+        save(tasks, tasklist_dst);
+    }
+
+    public void save(List<Task> taskList, File destination) throws HandledException {
+        destination.getParentFile().mkdirs();
+
+        String content= new TaskListConverter().toXml(taskList);
+        try {
+            writeStringToFile(destination,content,SharedSpace.Configuration.TASKlIST_WRITE_CHARSET);
             System.out.printf("[" + SharedSpace.getResString("public.info.exported") + "] %s\n", tasklist_dst.getAbsolutePath());
         } catch (IOException e) {
             System.err.printf(SharedSpace.getResString("create.err.tasklist_create") + "\n", e.getMessage());
             throw new HandledException(e, getClass());
-        }
-    }
-
-    private List<String> readAllLinesFromDirlist(File dirlist) throws HandledException {
-        List<String> lines;
-        try{
-            lines = Files.readAllLines(dirlist.toPath(), SharedSpace.Configuration.DIRLIST_READ_CHARSET);
-        }catch (UnmappableCharacterException| MalformedInputException e){
-//            TODO:wrong charset,print error message.
-            System.err.println("Unmappable character or Malformed input,maybe cause by wrong charset."+e.getMessage());
-            throw new HandledException(e,getClass());
-        } catch (IOException e) {
+        }catch (Exception e){
             e.printStackTrace();
             throw new HandledException(e,getClass());
         }
-        return lines;
     }
 
-    private void checkDirectoryInSource(File dirlist, int line, File directory) throws HandledException {
-        try {
-            FileUtils.checkExists(directory);
-            FileUtils.checkIsDirectory(directory);
-        } catch (FileNotFoundException e) {
-            System.err.printf(SharedSpace.getResString("create.err.source_filenotfound") + "\n", dirlist.getName(),
-                    line, directory.getAbsolutePath());
-            throw new HandledException(e, getClass());
-        } catch (FileUtils.WrongTypeException e) {
-            System.err.printf(SharedSpace.getResString("create.err.source_path_is_file") + "\n", dirlist.getName(),
-                    line, directory.getAbsolutePath());
-            throw new HandledException(e, getClass());
-        }
+    private void writeStringToFile(File file, String content, Charset charset) throws IOException {
+        List<String> contents=new ArrayList<>();
+        contents.add(content);
+        Files.write(file.toPath(),contents, charset);
     }
-
-    private File getAbsoluteFileFromLine(String line, File directoryList) {
-        File dir = new File(line);
-        if (!dir.isAbsolute()) {
-            return new File(directoryList.getParent(), line).getAbsoluteFile();
-        } else {
-            return dir;
-        }
-    }
-
-    private String getFixedLine(String raw) {
-        if (raw.isEmpty() || raw.trim().isEmpty())
-            return null;
-        else
-            return removeBOMHeaderInUTF8Line(raw).trim();
-    }
-
-    private String removeBOMHeaderInUTF8Line(String raw) {
-        return raw.replace("\uFEFF", "");
-    }
-
-    private Task mergeAllIntoTask(File source_directory) throws IOException {
-        FileUtils.checkAbsolute(source_directory);
-        FileUtils.checkExists(source_directory);
-        FileUtils.checkIsDirectory(source_directory);
-
-        NameFormatter nf = new NameFormatter(source_directory);
-        return new Task(documentArgument, pageArgument, importSortedImagesFiles(source_directory), new File(nf.format(pdf_dst)).getAbsoluteFile());
-    }
-
-    private File[] importSortedImagesFiles(File source_directory) {
-        File[] files = source_directory.listFiles(ffh);
-        if (files == null)
-            files = new File[0];
-
-
-        Arrays.sort(files,fileSorter);
-        if (debug) {
-            System.out.println("@Debug");
-            System.out.println("Sort Images:");
-            for (File img : files) {
-                System.out.println("\t" + img);
-            }
-            System.out.println();
-        }
-
-        return files;
-    }
-
-    public void save(List<Task> taskList, File destination) throws IOException {
-        FileUtils.makeDirsIfNotExists(destination.getParentFile());
-        FileUtils.checkAbsolute(destination);
-        FileUtils.checkIsFile(destination);
-
-        TaskListConverter converter=new TaskListConverter();
-        Files.writeString(destination.toPath(),converter.toXml(taskList),SharedSpace.Configuration.TASKlIST_WRITE_CHARSET);
-    }
-
-    public static class Builder{
+    public static class Builder {
         private FileSorter fileSorter;
         protected FileFilterHelper ffh;
 
@@ -239,7 +142,7 @@ public class CreateAction implements Action {
             return this;
         }
 
-        public CreateAction build(){
+        public CreateAction build() {
             return new CreateAction(fileSorter, ffh, documentArgument, pageArgument, pdf_dst, tasklist_dst, debug, overwrite, sourceFiles);
         }
     }
