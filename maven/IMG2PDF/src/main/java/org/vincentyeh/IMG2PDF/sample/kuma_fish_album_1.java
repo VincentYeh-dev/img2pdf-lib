@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 
 public class kuma_fish_album_1 {
 
@@ -24,7 +25,7 @@ public class kuma_fish_album_1 {
 //		Create dirlist.txt which contain path of images directory.
 		BufferedWriter writer;
 		try {
-			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(sources_list), SharedSpace.Configuration.DIRLIST_READ_CHARSET));
+			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(sources_list), StandardCharsets.UTF_8 ));
 			writer.write(image_sources_dir.getAbsolutePath() + "\n\n");
 			writer.close();
 		} catch (IOException e) {

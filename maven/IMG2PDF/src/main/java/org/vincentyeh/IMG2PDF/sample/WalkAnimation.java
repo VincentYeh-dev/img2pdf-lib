@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 
 public class WalkAnimation {
 
@@ -21,7 +22,7 @@ public class WalkAnimation {
 		File sources_list = new File(sample_root, "dirlist.txt").getAbsoluteFile();
 		BufferedWriter writer;
 		try {
-			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(sources_list),SharedSpace.Configuration.DIRLIST_READ_CHARSET));
+			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(sources_list), StandardCharsets.UTF_8));
 			writer.write(image_sources_dir.getAbsolutePath() + "\n\n");
 			writer.close();
 		} catch (IOException e) {
