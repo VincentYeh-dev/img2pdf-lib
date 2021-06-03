@@ -13,11 +13,7 @@ import org.vincentyeh.IMG2PDF.task.factory.exception.DirListException;
 import org.vincentyeh.IMG2PDF.task.factory.exception.SourceFileException;
 import org.vincentyeh.IMG2PDF.util.file.FileFilterHelper;
 import org.vincentyeh.IMG2PDF.util.file.FileSorter;
-import org.vincentyeh.IMG2PDF.util.file.FileUtils;
-
 public class CreateAction implements Action {
-
-
     private final FileSorter fileSorter;
     protected final FileFilterHelper ffh;
 
@@ -67,17 +63,23 @@ public class CreateAction implements Action {
     }
 
     public void save(List<Task> taskList, File destination) throws HandledException {
-        try {
-            FileUtils.makeDirsIfNotExists(destination.getParentFile());
-            FileUtils.checkAbsolute(destination);
-            FileUtils.checkIsFile(destination);
+        destination.getParentFile().mkdirs();
 
-            TaskListConverter converter = new TaskListConverter();
-            writeStringToFile(destination,converter.toXml(taskList),SharedSpace.Configuration.TASKlIST_WRITE_CHARSET);
+        if(!destination.isFile()){
+//          TODO:print error message
+            throw new HandledException("destination is directory:"+destination,getClass());
+        }
+
+        String content= new TaskListConverter().toXml(taskList);
+        try {
+            writeStringToFile(destination,content,SharedSpace.Configuration.TASKlIST_WRITE_CHARSET);
             System.out.printf("[" + SharedSpace.getResString("public.info.exported") + "] %s\n", tasklist_dst.getAbsolutePath());
         } catch (IOException e) {
             System.err.printf(SharedSpace.getResString("create.err.tasklist_create") + "\n", e.getMessage());
             throw new HandledException(e, getClass());
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new HandledException(e,getClass());
         }
     }
 
