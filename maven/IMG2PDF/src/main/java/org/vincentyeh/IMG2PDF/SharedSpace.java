@@ -100,5 +100,7 @@ public class SharedSpace {
         return SharedSpace.language_resource.getString(key);
     }
 
-
+    public static ResourceBundle getLanguageResourceBundle() {
+        return language_resource;
+    }
 }

@@ -11,11 +11,11 @@ import org.vincentyeh.IMG2PDF.task.*;
 import org.vincentyeh.IMG2PDF.task.factory.DirlistTaskFactory;
 import org.vincentyeh.IMG2PDF.task.factory.exception.DirListException;
 import org.vincentyeh.IMG2PDF.task.factory.exception.SourceFileException;
-import org.vincentyeh.IMG2PDF.util.file.FileFilterHelper;
+import org.vincentyeh.IMG2PDF.util.file.GlobbingFileFilter;
 import org.vincentyeh.IMG2PDF.util.file.FileSorter;
 public class CreateAction implements Action {
     private final FileSorter fileSorter;
-    protected final FileFilterHelper ffh;
+    protected final GlobbingFileFilter ffh;
 
     //    For PDF
     private final DocumentArgument documentArgument;
@@ -28,7 +28,7 @@ public class CreateAction implements Action {
     private final boolean overwrite;
     private final File[] sourceFiles;
 
-    private CreateAction(FileSorter fileSorter, FileFilterHelper ffh, DocumentArgument documentArgument, PageArgument pageArgument, String pdf_dst, File tasklist_dst, boolean debug, boolean overwrite, File[] sourceFiles) {
+    private CreateAction(FileSorter fileSorter, GlobbingFileFilter ffh, DocumentArgument documentArgument, PageArgument pageArgument, String pdf_dst, File tasklist_dst, boolean debug, boolean overwrite, File[] sourceFiles) {
         this.fileSorter = fileSorter;
         this.ffh = ffh;
         this.documentArgument = documentArgument;
@@ -85,7 +85,7 @@ public class CreateAction implements Action {
     }
     public static class Builder {
         private FileSorter fileSorter;
-        protected FileFilterHelper ffh;
+        protected GlobbingFileFilter ffh;
 
         private DocumentArgument documentArgument;
         private PageArgument pageArgument;
@@ -101,7 +101,7 @@ public class CreateAction implements Action {
             return this;
         }
 
-        public Builder setFileFilterHelper(FileFilterHelper ffh) {
+        public Builder setFileFilterHelper(GlobbingFileFilter ffh) {
             this.ffh = ffh;
             return this;
         }

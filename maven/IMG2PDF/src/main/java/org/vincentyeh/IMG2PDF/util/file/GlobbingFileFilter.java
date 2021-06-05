@@ -8,14 +8,14 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.regex.PatternSyntaxException;
 
-public class FileFilterHelper implements FileFilter {
+public class GlobbingFileFilter implements FileFilter {
 	private final PathMatcher matcher;
 
 	/**
 	 * @param operator filter operator
 	 * @throws PatternSyntaxException when using regex
 	 */
-	public FileFilterHelper(String operator)
+	public GlobbingFileFilter(String operator)
 			throws PatternSyntaxException, UnsupportedOperationException {
 		FileSystem fs = FileSystems.getDefault();
 		matcher = fs.getPathMatcher(operator);

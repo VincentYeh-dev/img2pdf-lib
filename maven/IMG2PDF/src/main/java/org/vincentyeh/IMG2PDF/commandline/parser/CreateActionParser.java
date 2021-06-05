@@ -12,7 +12,7 @@ import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
 import org.vincentyeh.IMG2PDF.task.PageArgument;
 import org.vincentyeh.IMG2PDF.pdf.page.PageDirection;
 import org.vincentyeh.IMG2PDF.pdf.page.PageSize;
-import org.vincentyeh.IMG2PDF.util.file.FileFilterHelper;
+import org.vincentyeh.IMG2PDF.util.file.GlobbingFileFilter;
 import org.vincentyeh.IMG2PDF.util.file.FileSorter;
 
 import java.io.File;
@@ -58,9 +58,9 @@ public class CreateActionParser extends ActionParser<CreateAction> {
         }
     }
 
-    private FileFilterHelper getFileFilterHelper(CommandLine cmd) throws HandledException {
+    private GlobbingFileFilter getFileFilterHelper(CommandLine cmd) throws HandledException {
         try {
-            return new FileFilterHelper(cmd.getOptionValue("filter", DEFAULT_PDF_FILTER));
+            return new GlobbingFileFilter(cmd.getOptionValue("filter", DEFAULT_PDF_FILTER));
 
         } catch (UnsupportedOperationException e) {
             System.err.printf(SharedSpace.getResString("create.err.filter") + "\n", e.getMessage());
