@@ -29,46 +29,52 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-@CommandLine.Command(name = "create", description = "create description")
+@CommandLine.Command(name = "create", description = "create description",resourceBundle = "cmd_create")
 public class CreateCommand implements Callable<Integer> {
 
-    @CommandLine.Option(names = {"--sorter", "-sr"}, defaultValue = "NAME&INCREASE", converter = FileSorterConverter.class)
+    @CommandLine.ParentCommand
+    IMG2PDFCommand img2PDFCommand;
+
+    @CommandLine.Option(names = {"--sorter", "-sr"}, defaultValue = "NAME$INCREASE", converter = FileSorterConverter.class)
     FileSorter fileSorter;
 
-    @CommandLine.Option(names = {"--filter", "-f"}, defaultValue = "glob:*.{PNG,JPG}", converter = GlobbingFileFilterConverter.class)
+    @CommandLine.Option(names = {"--filter", "-f"}, defaultValue = "glob:*.{PNG,JPG}",converter = GlobbingFileFilterConverter.class,descriptionKey = "create.filter.description")
     GlobbingFileFilter filter;
 
-    @CommandLine.Option(names = {"--pdf_owner_password", "-popwd"})
+    @CommandLine.Option(names = {"--pdf_owner_password", "-popwd"},descriptionKey = "create.pdf_user_password.description")
     String pdf_owner_password;
-    @CommandLine.Option(names = {"--pdf_user_password", "-pupwd"})
+    @CommandLine.Option(names = {"--pdf_user_password", "-pupwd"},descriptionKey ="create.pdf_owner_password.description" )
     String pdf_user_password;
 
-    @CommandLine.Option(names = {"--pdf_permission", "-pp"}, converter = AccessPermissionConverter.class)
+    @CommandLine.Option(names = {"--pdf_permission", "-pp"},defaultValue = "255", converter = AccessPermissionConverter.class,descriptionKey = "create.pdf_permission.description")
     AccessPermission pdf_permission;
 
-    @CommandLine.Option(names = {"--pdf_align", "-pa"}, defaultValue = "CENTER-CENTER", converter = PageAlignConverter.class)
+    @CommandLine.Option(names = {"--pdf_align", "-pa"}, defaultValue = "CENTER-CENTER", converter = PageAlignConverter.class,descriptionKey = "create.pdf_align.description")
     PageAlign pdf_align;
 
-    @CommandLine.Option(names = {"--pdf_size", "-pz"})
+    @CommandLine.Option(names = {"--pdf_size", "-pz"},descriptionKey = "create.pdf_size.description")
     PageSize pdf_size;
 
-    @CommandLine.Option(names = {"--pdf_direction", "-pdi"}, defaultValue = "Portrait")
+    @CommandLine.Option(names = {"--pdf_direction", "-pdi"}, defaultValue = "Portrait",descriptionKey = "create.pdf_direction.description")
     PageDirection pdf_direction;
 
-    @CommandLine.Option(names = {"--pdf_auto_rotate", "-par"})
+    @CommandLine.Option(names = {"--pdf_auto_rotate", "-par"},descriptionKey = "create.pdf_auto_rotate.description")
     boolean pdf_auto_rotate;
 
-    @CommandLine.Option(names = {"--pdf_destination", "-pdst"})
+    @CommandLine.Option(names = {"--pdf_destination", "-pdst"},descriptionKey = "create.pdf_destination.description")
     String pdf_dst;
 
-    @CommandLine.Option(names = {"--list_destination", "-ldst"})
+    @CommandLine.Option(names = {"--list_destination", "-ldst"},descriptionKey = "create.list_destination.description")
     File tasklist_dst;
 
-    @CommandLine.Option(names = {"--overwrite", "-ow"})
+    @CommandLine.Option(names = {"--overwrite", "-ow"},descriptionKey = "create.overwrite_tasklist.description")
     boolean overwrite;
 
-    @CommandLine.Parameters
+    @CommandLine.Parameters(descriptionKey = "create.source.description" )
     List<File> sourceFiles;
+
+    @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true, description = "display this help message")
+    boolean usageHelpRequested;
 
     @Override
     public Integer call() throws Exception {
