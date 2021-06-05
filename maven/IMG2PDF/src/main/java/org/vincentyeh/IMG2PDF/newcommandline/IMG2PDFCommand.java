@@ -9,6 +9,7 @@ public class IMG2PDFCommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        return null;
+        System.out.println(getClass().getSimpleName());
+        return 16;
     }
 }
