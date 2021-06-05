@@ -38,42 +38,42 @@ public class CreateCommand implements Callable<Integer> {
     @CommandLine.Option(names = {"--sorter", "-sr"}, defaultValue = "NAME$INCREASE", converter = FileSorterConverter.class)
     FileSorter fileSorter;
 
-    @CommandLine.Option(names = {"--filter", "-f"}, defaultValue = "glob:*.{PNG,JPG}",converter = GlobbingFileFilterConverter.class,descriptionKey = "create.filter.description")
+    @CommandLine.Option(names = {"--filter", "-f"}, defaultValue = "glob:*.{PNG,JPG}",converter = GlobbingFileFilterConverter.class)
     GlobbingFileFilter filter;
 
-    @CommandLine.Option(names = {"--pdf_owner_password", "-popwd"},descriptionKey = "create.pdf_user_password.description")
+    @CommandLine.Option(names = {"--pdf_owner_password", "-popwd"})
     String pdf_owner_password;
-    @CommandLine.Option(names = {"--pdf_user_password", "-pupwd"},descriptionKey ="create.pdf_owner_password.description" )
+    @CommandLine.Option(names = {"--pdf_user_password", "-pupwd"} )
     String pdf_user_password;
 
-    @CommandLine.Option(names = {"--pdf_permission", "-pp"},defaultValue = "255", converter = AccessPermissionConverter.class,descriptionKey = "create.pdf_permission.description")
+    @CommandLine.Option(names = {"--pdf_permission", "-pp"},defaultValue = "255", converter = AccessPermissionConverter.class)
     AccessPermission pdf_permission;
 
-    @CommandLine.Option(names = {"--pdf_align", "-pa"}, defaultValue = "CENTER-CENTER", converter = PageAlignConverter.class,descriptionKey = "create.pdf_align.description")
+    @CommandLine.Option(names = {"--pdf_align", "-pa"}, defaultValue = "CENTER-CENTER", converter = PageAlignConverter.class)
     PageAlign pdf_align;
 
-    @CommandLine.Option(names = {"--pdf_size", "-pz"},descriptionKey = "create.pdf_size.description")
+    @CommandLine.Option(names = {"--pdf_size", "-pz"})
     PageSize pdf_size;
 
-    @CommandLine.Option(names = {"--pdf_direction", "-pdi"}, defaultValue = "Portrait",descriptionKey = "create.pdf_direction.description")
+    @CommandLine.Option(names = {"--pdf_direction", "-pdi"}, defaultValue = "Portrait")
     PageDirection pdf_direction;
 
-    @CommandLine.Option(names = {"--pdf_auto_rotate", "-par"},descriptionKey = "create.pdf_auto_rotate.description")
+    @CommandLine.Option(names = {"--pdf_auto_rotate", "-par"})
     boolean pdf_auto_rotate;
 
-    @CommandLine.Option(names = {"--pdf_destination", "-pdst"},descriptionKey = "create.pdf_destination.description")
+    @CommandLine.Option(names = {"--pdf_destination", "-pdst"})
     String pdf_dst;
 
-    @CommandLine.Option(names = {"--list_destination", "-ldst"},descriptionKey = "create.list_destination.description")
+    @CommandLine.Option(names = {"--list_destination", "-ldst"})
     File tasklist_dst;
 
-    @CommandLine.Option(names = {"--overwrite", "-ow"},descriptionKey = "create.overwrite_tasklist.description")
+    @CommandLine.Option(names = {"--overwrite", "-ow"})
     boolean overwrite;
 
-    @CommandLine.Parameters(descriptionKey = "create.source.description" )
+    @CommandLine.Parameters
     List<File> sourceFiles;
 
-    @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true, description = "display this help message")
+    @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true)
     boolean usageHelpRequested;
 
     @Override
