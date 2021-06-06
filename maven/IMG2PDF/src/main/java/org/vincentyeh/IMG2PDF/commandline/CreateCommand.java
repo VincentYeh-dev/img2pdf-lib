@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
 @CommandLine.Command(name = "create")
 public class CreateCommand implements Callable<Integer> {
@@ -37,15 +38,15 @@ public class CreateCommand implements Callable<Integer> {
     @CommandLine.Option(names = {"--sorter", "-sr"}, defaultValue = "NAME$INCREASE", converter = FileSorterConverter.class)
     FileSorter fileSorter;
 
-    @CommandLine.Option(names = {"--filter", "-f"}, defaultValue = "glob:*.{PNG,JPG}",converter = GlobbingFileFilterConverter.class)
+    @CommandLine.Option(names = {"--filter", "-f"}, defaultValue = "glob:*.{PNG,JPG}", converter = GlobbingFileFilterConverter.class)
     GlobbingFileFilter filter;
 
     @CommandLine.Option(names = {"--pdf_owner_password", "-popwd"})
     String pdf_owner_password;
-    @CommandLine.Option(names = {"--pdf_user_password", "-pupwd"} )
+    @CommandLine.Option(names = {"--pdf_user_password", "-pupwd"})
     String pdf_user_password;
 
-    @CommandLine.Option(names = {"--pdf_permission", "-pp"},defaultValue = "255", converter = AccessPermissionConverter.class)
+    @CommandLine.Option(names = {"--pdf_permission", "-pp"}, defaultValue = "255", converter = AccessPermissionConverter.class)
     AccessPermission pdf_permission;
 
     @CommandLine.Option(names = {"--pdf_align", "-pa"}, defaultValue = "CENTER-CENTER", converter = PageAlignConverter.class)
@@ -69,7 +70,7 @@ public class CreateCommand implements Callable<Integer> {
     @CommandLine.Option(names = {"--overwrite", "-ow"})
     boolean overwrite;
 
-    @CommandLine.Parameters
+    @CommandLine.Parameters(arity = "1..*")
     List<File> sourceFiles;
 
     @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true)
@@ -77,6 +78,12 @@ public class CreateCommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
+        try {
+            checkParameters();
+        }catch (IllegalArgumentException e){
+            throw new ExecutionException(e.getMessage(),e);
+        }
+
         if (!overwrite && tasklist_dst.exists()) {
             System.err.printf(SharedSpace.getResString("public.err.overwrite") + "\n", tasklist_dst.getAbsolutePath());
             throw new HandledException(new RuntimeException("Overwrite deny"), getClass());
@@ -95,6 +102,30 @@ public class CreateCommand implements Callable<Integer> {
         }
         save(tasks, tasklist_dst);
         return 1;
+    }
+
+    private void checkParameters() {
+        if (fileSorter == null)
+            throw new IllegalArgumentException("fileSorter == null");
+
+        if (filter == null)
+            throw new IllegalArgumentException("filter == null");
+
+        if (pdf_align == null)
+            throw new IllegalArgumentException("pdf_align == null");
+
+        if (pdf_size == null)
+            throw new IllegalArgumentException("pdf_size == null");
+
+        if (pdf_direction == null)
+            throw new IllegalArgumentException("pdf_direction == null");
+
+        if (pdf_dst == null)
+            throw new IllegalArgumentException("pdf_dst == null");
+
+        if (tasklist_dst == null)
+            throw new IllegalArgumentException("tasklist_dst==null");
+
     }
 
     private PageArgument getPageArgument() {
