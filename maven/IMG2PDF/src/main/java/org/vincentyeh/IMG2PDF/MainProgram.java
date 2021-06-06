@@ -11,7 +11,7 @@ public class MainProgram {
 
     public static void main(String[] args) {
         SharedSpace.initialize();
-        Locale locale=Locale.TAIWAN;
+        Locale locale=SharedSpace.Configuration.locale;
         CommandLine cmd= new CommandLine(new IMG2PDFCommand());
         cmd.setParameterExceptionHandler(new ResourceBundleParameterHandler(ResourceBundle.getBundle("cmd_err",locale)));
         cmd.setResourceBundle(ResourceBundle.getBundle("cmd",locale));

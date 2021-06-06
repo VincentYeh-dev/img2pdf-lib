@@ -21,7 +21,7 @@ public class SharedSpace {
     }
 
     public static class Configuration {
-        static Locale locale;
+        public static Locale locale;
         public static Charset TASKLIST_READ_CHARSET;
         public static Charset TASKlIST_WRITE_CHARSET;
         public static Charset DIRLIST_READ_CHARSET;
@@ -37,7 +37,7 @@ public class SharedSpace {
             Configuration.TASKLIST_READ_CHARSET=getTaskListReadCharsetFromProperties(properties);
             Configuration.TASKlIST_WRITE_CHARSET=getTaskListWriteCharsetFromProperties(properties);
             Configuration.DIRLIST_READ_CHARSET=getDirListReadCharsetFromProperties(properties);
-            Configuration.locale=getLocaleFromProperties(properties);
+            Configuration.locale=getLanguageSupport(getLocaleFromProperties(properties));
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(0);
@@ -80,11 +80,17 @@ public class SharedSpace {
             System.err.println("Option \"language\" not found.\nUse default language.");
             return Locale.ROOT;
         }
-        return Locale.forLanguageTag(language);
+        if(!Locale.forLanguageTag(language).toString().isEmpty())
+            return Locale.forLanguageTag(language);
+        else
+            return Locale.ROOT;
     }
 
 
     private static Locale getLanguageSupport(Locale target) {
+        if(target.equals(Locale.ROOT))
+            return target;
+
         for (Locale locale : supportedLocales) {
             if (target.equals(locale)) {
                 return locale;
@@ -99,7 +105,4 @@ public class SharedSpace {
         return SharedSpace.language_resource.getString(key);
     }
 
-    public static ResourceBundle getLanguageResourceBundle() {
-        return language_resource;
-    }
 }
