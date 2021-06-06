@@ -32,14 +32,17 @@ public class ConvertCommand implements Callable<Integer> {
     @CommandLine.Option(names = {"--memory_max_usage","-mx"},defaultValue = "50MB",converter = ByteSizeConverter.class)
     BytesSize maxMainMemoryBytes;
 
-    @CommandLine.Option(names = {"--open_when_complete","-o"},defaultValue = "50MB")
+    @CommandLine.Option(names = {"--open_when_complete","-o"})
     boolean open_when_complete;
 
-    @CommandLine.Option(names = {"--overwrite","-ow"},defaultValue = "50MB")
+    @CommandLine.Option(names = {"--overwrite","-ow"})
     boolean overwrite_output;
 
     @CommandLine.Parameters
     List<File> tasklist_sources;
+
+    @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true)
+    boolean usageHelpRequested;
 
     @Override
     public Integer call() throws Exception {
@@ -104,6 +107,7 @@ public class ConvertCommand implements Callable<Integer> {
             System.err.printf("\n\t\t" + SharedSpace.getResString("convert.listener.err.image") + "\n", e.getMessage());
             throw new HandledException(e, getClass());
         } catch (ConversionException e) {
+            e.printStackTrace();
             System.err.printf("\n\t\t" + SharedSpace.getResString("convert.listener.err.conversion") + "\n", e.getMessage());
             throw new HandledException(e, getClass());
         }

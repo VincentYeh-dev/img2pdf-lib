@@ -104,7 +104,7 @@ public class CreateCommand implements Callable<Integer> {
         builder.setDirection(pdf_direction);
         builder.setSize(pdf_size);
         builder.setAutoRotate(pdf_auto_rotate);
-        return null;
+        return builder.build();
     }
 
     private DocumentArgument getDocumentArgument() {

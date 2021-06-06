@@ -87,6 +87,7 @@ public class PDFConverter implements ConversionInfoListener {
         try {
             document.addPage(getImagePage(image));
         } catch (Exception e) {
+            e.printStackTrace();
             throw new ConversionException(file, e);
         }
 
