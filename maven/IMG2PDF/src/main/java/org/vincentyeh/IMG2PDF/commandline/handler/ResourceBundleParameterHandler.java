@@ -31,9 +31,17 @@ public class ResourceBundleParameterHandler implements CommandLine.IParameterExc
             handleMissingParameter(cmd,ex);
         }else if(ex.getCause()!=null&&ex.getCause() instanceof CommandLine.TypeConversionException){
             handleInternalTypeConversion(cmd,ex);
+        }else if(ex instanceof CommandLine.UnmatchedArgumentException){
+            handleUnmatchedArgument(cmd,ex);
         }else {
             printErrorText(cmd,ex.getMessage());
         }
+    }
+
+    private void handleUnmatchedArgument(CommandLine cmd, CommandLine.ParameterException ex) {
+        CommandLine.UnmatchedArgumentException exception=(CommandLine.UnmatchedArgumentException) ex;
+        printErrorText(cmd,exception.getMessage());
+//        TODO:handle error
     }
 
     private void handleInternalTypeConversion(CommandLine cmd, CommandLine.ParameterException ex) {
