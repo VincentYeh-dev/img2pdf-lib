@@ -11,7 +11,7 @@ import java.util.concurrent.Callable;
         "JVM: ${java.version} (${java.vendor} ${java.vm.name} ${java.vm.version})",
         "OS: ${os.name} ${os.version} ${os.arch}"},
         subcommands = {CreateCommand.class,ConvertCommand.class}
-        , resourceBundle = "cmd")
+        )
 
 public class IMG2PDFCommand implements Callable<Integer> {
     @CommandLine.Option(names = {"--debug", "-d"})
