@@ -55,6 +55,7 @@ public class ConvertCommand implements Callable<Integer> {
                 System.out.println(SharedSpace.getResString("convert.start_conversion"));
                 convertAllToFile(tasks);
             } catch (HandledException ignored) {
+                ignored.printStackTrace();
             }
 
         }
