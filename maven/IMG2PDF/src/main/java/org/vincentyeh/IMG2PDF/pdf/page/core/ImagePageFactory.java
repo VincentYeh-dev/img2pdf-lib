@@ -25,6 +25,15 @@ import static org.vincentyeh.IMG2PDF.pdf.page.PageDirection.Portrait;
 public class ImagePageFactory {
 
     public static PDPage getImagePage(PDDocument document, PageArgument argument, BufferedImage rawImage) throws Exception {
+        if(document==null)
+            throw new IllegalArgumentException("document==null");
+
+        if(argument==null)
+            throw new IllegalArgumentException("argument==null");
+
+        if(rawImage==null)
+            throw new IllegalArgumentException("rawImage==null");
+
         ProxyImage proxyImage = new ProxyImage(rawImage);
 
         ProxyPage page=new ProxyPage(new PDPage(), getPageSize(getPageDirection(argument.getSize(), proxyImage.getSize(), argument.getDirection(), argument.getAutoRotate()), argument.getSize(), proxyImage.getSize()));

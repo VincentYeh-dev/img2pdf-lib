@@ -28,10 +28,8 @@ public class SharedSpace {
 
     }
 
-    private final static ResourceBundle language_resource;
-
-    static {
-
+    private static ResourceBundle language_resource;
+    public static void initialize(){
         Properties properties = new Properties();
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("config.properties"), StandardCharsets.UTF_8));
@@ -47,6 +45,7 @@ public class SharedSpace {
 
         language_resource = ResourceBundle.getBundle("language_package", getLanguageSupport(Configuration.locale));
     }
+
 
     private static Charset getDirListReadCharsetFromProperties(Properties properties) {
         return getCharsetFromProperties("dirlist-read-charset",properties);
@@ -100,5 +99,7 @@ public class SharedSpace {
         return SharedSpace.language_resource.getString(key);
     }
 
-
+    public static ResourceBundle getLanguageResourceBundle() {
+        return language_resource;
+    }
 }

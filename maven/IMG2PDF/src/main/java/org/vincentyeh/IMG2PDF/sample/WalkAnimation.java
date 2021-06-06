@@ -29,39 +29,35 @@ public class WalkAnimation {
 			e.printStackTrace();
 		}
 
-		String create_command = "-m create "
-//
-				+"-d "
+		String create_command = "create "
 //
 				+"-ow "
 //				
 				+ "-pz A4 "
 //				
-				+ "-ps NUMERIC "
+				+ "-sr NUMERIC$INCREASE "
 //				
 				+ "-pa CENTER-CENTER "
 //				
 				+ "-pdi Portrait "
 //				
-				+ "-par YES "
-//				
-				+ "-pseq INCREASE "
+				+ "-par "
 //				
 				+ "-pupwd 1234AAA "
 //				
 				+ "-popwd 1234AAA "
 //				
-				+ "-pp 11 "
+				+ "-pp 255 "
 //				
 				+ "-f \"glob:*.{PNG,JPG}\" "
 //				
 				+ "-pdst \"" + sample_root.getAbsolutePath() + "\\output\\$PARENT{0} $CY-$CM-$CD $CH-$CN-$CS.pdf\" "
 //				
-				+ "-ldst \"" + taskslist_destination.getAbsolutePath() + "\" -src \""
+				+ "-ldst \"" + taskslist_destination.getAbsolutePath() + "\" \""
 //				
 				+ sources_list.getAbsolutePath() + "\"";
 
-		String convert_command = "-m convert -o -lsrc \"" + taskslist_destination.getAbsolutePath()+"\"";
+		String convert_command = "convert -o \"" + taskslist_destination.getAbsolutePath()+"\"";
 		System.out.println("create command:");
 		System.out.println(create_command);
 		
