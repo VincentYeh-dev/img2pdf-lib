@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-@CommandLine.Command(name = "create", description = "create description")
+@CommandLine.Command(name = "create")
 public class CreateCommand implements Callable<Integer> {
 
     @CommandLine.ParentCommand

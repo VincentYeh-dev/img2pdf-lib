@@ -10,7 +10,8 @@ import java.util.concurrent.Callable;
         "Picocli " + picocli.CommandLine.VERSION,
         "JVM: ${java.version} (${java.vendor} ${java.vm.name} ${java.vm.version})",
         "OS: ${os.name} ${os.version} ${os.arch}"},
-        subcommands = CreateCommand.class, resourceBundle = "cmd")
+        subcommands = {CreateCommand.class,ConvertCommand.class}
+        , resourceBundle = "cmd")
 
 public class IMG2PDFCommand implements Callable<Integer> {
     @CommandLine.Option(names = {"--debug", "-d"})
