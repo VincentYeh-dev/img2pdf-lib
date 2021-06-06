@@ -107,9 +107,8 @@ public class ConvertCommand implements Callable<Integer> {
             System.err.printf("\n\t\t" + SharedSpace.getResString("convert.listener.err.image") + "\n", e.getMessage());
             throw new HandledException(e, getClass());
         } catch (ConversionException e) {
-            e.printStackTrace();
-            System.err.printf("\n\t\t" + SharedSpace.getResString("convert.listener.err.conversion") + "\n", e.getMessage());
-            throw new HandledException(e, getClass());
+            System.err.printf("\n\t\t" + SharedSpace.getResString("convert.listener.err.conversion") + "\n", e.getCause().getMessage());
+            throw new HandledException(e.getCause().getMessage(), getClass());
         }
 
     }
