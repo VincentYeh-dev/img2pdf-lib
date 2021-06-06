@@ -1,12 +1,11 @@
-package org.vincentyeh.IMG2PDF.newcommandline;
+package org.vincentyeh.IMG2PDF.commandline;
 
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 import org.vincentyeh.IMG2PDF.SharedSpace;
-import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
-import org.vincentyeh.IMG2PDF.newcommandline.converter.AccessPermissionConverter;
-import org.vincentyeh.IMG2PDF.newcommandline.converter.FileSorterConverter;
-import org.vincentyeh.IMG2PDF.newcommandline.converter.GlobbingFileFilterConverter;
-import org.vincentyeh.IMG2PDF.newcommandline.converter.PageAlignConverter;
+import org.vincentyeh.IMG2PDF.commandline.converter.AccessPermissionConverter;
+import org.vincentyeh.IMG2PDF.commandline.converter.FileSorterConverter;
+import org.vincentyeh.IMG2PDF.commandline.converter.GlobbingFileFilterConverter;
+import org.vincentyeh.IMG2PDF.commandline.converter.PageAlignConverter;
 import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
 import org.vincentyeh.IMG2PDF.pdf.page.PageDirection;
 import org.vincentyeh.IMG2PDF.pdf.page.PageSize;

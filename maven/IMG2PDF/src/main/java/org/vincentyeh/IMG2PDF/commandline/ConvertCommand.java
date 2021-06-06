@@ -1,41 +1,50 @@
-package org.vincentyeh.IMG2PDF.commandline.action;
+package org.vincentyeh.IMG2PDF.commandline;
 
-import java.awt.Desktop;
-import java.io.*;
-import java.nio.charset.MalformedInputException;
-import java.nio.charset.UnmappableCharacterException;
-import java.nio.file.Files;
-import java.util.List;
-
+import org.vincentyeh.IMG2PDF.SharedSpace;
+import org.vincentyeh.IMG2PDF.converter.PDFConverter;
 import org.vincentyeh.IMG2PDF.converter.exception.ConversionException;
 import org.vincentyeh.IMG2PDF.converter.exception.OverwriteDenyException;
 import org.vincentyeh.IMG2PDF.converter.exception.ReadImageException;
 import org.vincentyeh.IMG2PDF.converter.listener.DefaultConversionInfoListener;
-import org.vincentyeh.IMG2PDF.SharedSpace;
-import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
-import org.vincentyeh.IMG2PDF.converter.PDFConverter;
+import org.vincentyeh.IMG2PDF.commandline.converter.ByteSizeConverter;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskListConverter;
+import org.vincentyeh.IMG2PDF.util.BytesSize;
 import org.vincentyeh.IMG2PDF.util.file.FileUtils;
+import picocli.CommandLine;
 
-public class ConvertAction implements Action {
+import java.awt.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.charset.MalformedInputException;
+import java.nio.charset.UnmappableCharacterException;
+import java.nio.file.Files;
+import java.util.List;
+import java.util.concurrent.Callable;
 
-    private final File tempFolder;
-    private final long maxMainMemoryBytes;
-    private final File[] tasklist_sources;
-    private final boolean open_when_complete;
-    private final boolean overwrite_output;
+@CommandLine.Command(name = "convert")
+public class ConvertCommand implements Callable<Integer> {
+    @CommandLine.Option(names = {"--temp_folder","-tmp"},defaultValue = ".org.vincentyeh.IMG2PDF.tmp")
+    File tempFolder;
 
-    private ConvertAction(File tempFolder, long maxMainMemoryBytes, File[] tasklist_sources, boolean open_when_complete, boolean overwrite_output) {
-        this.tempFolder = tempFolder;
-        this.maxMainMemoryBytes = maxMainMemoryBytes;
-        this.tasklist_sources = tasklist_sources;
-        this.open_when_complete = open_when_complete;
-        this.overwrite_output = overwrite_output;
-    }
+    @CommandLine.Option(names = {"--memory_max_usage","-mx"},defaultValue = "50MB",converter = ByteSizeConverter.class)
+    BytesSize maxMainMemoryBytes;
+
+    @CommandLine.Option(names = {"--open_when_complete","-o"})
+    boolean open_when_complete;
+
+    @CommandLine.Option(names = {"--overwrite","-ow"})
+    boolean overwrite_output;
+
+    @CommandLine.Parameters
+    List<File> tasklist_sources;
+
+    @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true)
+    boolean usageHelpRequested;
 
     @Override
-    public void start() throws Exception {
+    public Integer call() throws Exception {
         System.out.println(SharedSpace.getResString("convert.import_tasklists"));
         for (File src : tasklist_sources) {
             System.out.print(
@@ -50,6 +59,7 @@ public class ConvertAction implements Action {
 
         }
 
+        return 0;
     }
 
     private void convertAllToFile(List<Task> tasks) throws Exception {
@@ -79,7 +89,7 @@ public class ConvertAction implements Action {
     private File convertToFile(Task task) throws IOException, HandledException {
         PDFConverter converter;
         try {
-            converter = new PDFConverter(task, maxMainMemoryBytes, tempFolder, overwrite_output);
+            converter = new PDFConverter(task, maxMainMemoryBytes.getBytes(), tempFolder, overwrite_output);
             converter.setInfoListener(new DefaultConversionInfoListener());
         } catch (IOException e) {
 //            TODO:print error message
@@ -96,8 +106,8 @@ public class ConvertAction implements Action {
             System.err.printf("\n\t\t" + SharedSpace.getResString("convert.listener.err.image") + "\n", e.getMessage());
             throw new HandledException(e, getClass());
         } catch (ConversionException e) {
-            System.err.printf("\n\t\t" + SharedSpace.getResString("convert.listener.err.conversion") + "\n", e.getMessage());
-            throw new HandledException(e, getClass());
+            System.err.printf("\n\t\t" + SharedSpace.getResString("convert.listener.err.conversion") + "\n", e.getCause().getMessage());
+            throw new HandledException(e.getCause().getMessage(), getClass());
         }
 
     }
@@ -141,45 +151,6 @@ public class ConvertAction implements Action {
             throw new HandledException(e, getClass());
         }
         return lines;
-    }
-
-    public static class Builder {
-        private File tempFolder;
-        private long maxMainMemoryBytes;
-        private File[] tasklist_sources;
-        private boolean open_when_complete;
-        private boolean overwrite_output;
-
-        public ConvertAction build() {
-            return new ConvertAction(tempFolder, maxMainMemoryBytes, tasklist_sources, open_when_complete, overwrite_output);
-        }
-
-        public Builder setTempFolder(File tempFolder) {
-            this.tempFolder = tempFolder;
-            return this;
-        }
-
-        public Builder setMaxMainMemoryBytes(long maxMainMemoryBytes) {
-            this.maxMainMemoryBytes = maxMainMemoryBytes;
-
-            return this;
-        }
-
-        public Builder setTasklistSources(File[] tasklist_sources) {
-            this.tasklist_sources = tasklist_sources;
-
-            return this;
-        }
-
-        public Builder setOpenWhenComplete(boolean open_when_complete) {
-            this.open_when_complete = open_when_complete;
-            return this;
-        }
-
-        public Builder setOverwrite(boolean overwrite_output) {
-            this.overwrite_output = overwrite_output;
-            return this;
-        }
     }
 
 }

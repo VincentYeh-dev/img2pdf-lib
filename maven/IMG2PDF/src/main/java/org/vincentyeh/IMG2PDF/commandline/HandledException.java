@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.commandline.parser.core;
+package org.vincentyeh.IMG2PDF.commandline;
 
 public class HandledException extends Exception{
     private final Class<?> where;
@@ -9,7 +9,7 @@ public class HandledException extends Exception{
         setStackTrace(e.getStackTrace());
     }
 
-    public HandledException(String message,Class<?> where) {
+    public HandledException(String message, Class<?> where) {
         super(String.format("Handled in %s:%s",where.getSimpleName(),message));
         this.where = where;
     }

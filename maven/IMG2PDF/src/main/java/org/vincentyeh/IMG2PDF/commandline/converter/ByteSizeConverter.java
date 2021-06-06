@@ -1,6 +1,5 @@
-package org.vincentyeh.IMG2PDF.newcommandline.converter;
+package org.vincentyeh.IMG2PDF.commandline.converter;
 
-import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
 import org.vincentyeh.IMG2PDF.util.BytesSize;
 import picocli.CommandLine;
 
