@@ -15,37 +15,52 @@ public class ResourceBundleParameterHandler implements CommandLine.IParameterExc
     @Override
     public int handleParseException(CommandLine.ParameterException ex, String[] strings) throws Exception {
         CommandLine cmd = ex.getCommandLine();
-        PrintWriter err = cmd.getErr();
-
-        handleSpecifiedException(ex, err);
-
-//        CommandLine.UnmatchedArgumentException.printSuggestions(ex, err);
-        err.print(cmd.getHelp().fullSynopsis());
-
+        handleSpecifiedException(cmd,ex);
+        printText(cmd,cmd.getHelp().fullSynopsis());
         CommandLine.Model.CommandSpec spec = cmd.getCommandSpec();
-        err.printf(getLocaleResource("try_help"), spec.qualifiedName());
+        printText(cmd,String.format(getLocaleResource("try_help"), spec.qualifiedName()));
 
         return cmd.getExitCodeExceptionMapper() != null
                 ? cmd.getExitCodeExceptionMapper().getExitCode(ex)
                 : spec.exitCodeOnInvalidInput();
     }
 
-    private void handleSpecifiedException(CommandLine.ParameterException ex, PrintWriter err) {
+    private void handleSpecifiedException(CommandLine cmd, CommandLine.ParameterException ex) {
+
         if (ex instanceof CommandLine.MissingParameterException) {
-            handleMissingParameter(ex, err);
+            handleMissingParameter(cmd,ex);
+        }else if(ex.getCause()!=null&&ex.getCause() instanceof CommandLine.TypeConversionException){
+            handleInternalTypeConversion(cmd,ex);
+        }else {
+            printErrorText(cmd,ex.getMessage());
         }
     }
 
-    private void handleMissingParameter(CommandLine.ParameterException ex, PrintWriter err) {
+    private void handleInternalTypeConversion(CommandLine cmd, CommandLine.ParameterException ex) {
+        printErrorText(cmd,ex.getMessage());
+    }
+
+    private void handleMissingParameter(CommandLine cmd, CommandLine.ParameterException ex) {
+
         CommandLine.MissingParameterException missingEx = (CommandLine.MissingParameterException) ex;
         for (CommandLine.Model.ArgSpec argSpec : missingEx.getMissing()) {
             String type = getArgStringType(argSpec);
             if (argSpec.isPositional()) {
-                err.printf(getLocaleResource("missing_required") + "\n", getPublicResource(type), getPositionalParamSpec(argSpec).paramLabel());
+                printErrorText(cmd,String.format(getLocaleResource("missing_required") + "\n", getPublicResource(type), getPositionalParamSpec(argSpec).paramLabel()));
             } else if (argSpec.isOption()) {
-                err.printf(getLocaleResource("missing_required") + "\n", getPublicResource(type), getOptionSpec(argSpec).longestName());
+                printErrorText(cmd,String.format(getLocaleResource("missing_required") + "\n", getPublicResource(type), getOptionSpec(argSpec).longestName()));
             }
         }
+    }
+
+    private void printErrorText(CommandLine cmd,String message){
+        PrintWriter printer=cmd.getErr();
+        printer.println(cmd.getColorScheme().errorText(message)); // bold red
+    }
+
+    private void printText(CommandLine cmd,String message){
+        PrintWriter printer=cmd.getErr();
+        printer.println(message); // bold red
     }
 
     private CommandLine.Model.OptionSpec getOptionSpec(CommandLine.Model.ArgSpec argSpec) {
