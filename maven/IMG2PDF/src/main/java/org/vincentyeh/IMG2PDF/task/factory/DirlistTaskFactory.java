@@ -3,8 +3,6 @@ package org.vincentyeh.IMG2PDF.task.factory;
 import org.vincentyeh.IMG2PDF.task.DocumentArgument;
 import org.vincentyeh.IMG2PDF.task.PageArgument;
 import org.vincentyeh.IMG2PDF.task.Task;
-import org.vincentyeh.IMG2PDF.task.factory.exception.DirListException;
-import org.vincentyeh.IMG2PDF.task.factory.exception.SourceFileException;
 import org.vincentyeh.IMG2PDF.util.NameFormatter;
 
 import java.io.*;
@@ -32,9 +30,9 @@ public abstract class DirlistTaskFactory {
     }
 
     public static List<Task> createFromDirlist(File dirlist, Charset charset) throws SourceFileException, DirListException {
-        if(dirlist==null)
+        if (dirlist == null)
             throw new IllegalArgumentException("dirlist==null");
-        if(charset==null)
+        if (charset == null)
             throw new IllegalArgumentException("charset==null");
 
         List<String> lines = readAllLinesFromDirlist(dirlist, charset);
@@ -58,7 +56,7 @@ public abstract class DirlistTaskFactory {
         }
 
         if (!result.exists()) {
-            throw new SourceFileException("Source file not found:" +result, result);
+            throw new SourceFileException(new FileNotFoundException("File not found: " + result.getAbsolutePath()), result);
         }
 
         if (!result.isDirectory()) {
@@ -78,11 +76,10 @@ public abstract class DirlistTaskFactory {
 
     private static List<String> readAllLinesFromDirlist(File dirlist, Charset charset) throws DirListException {
         if (!dirlist.exists())
-            throw new DirListException("Dirlist not found:" + dirlist, dirlist);
+            throw new DirListException(new FileNotFoundException("File not found: " + dirlist), dirlist);
 
         if (!dirlist.isFile())
-            throw new DirListException("Dirlist file is not a file:" + dirlist, dirlist);
-
+            throw new DirListException(new WrongFileTypeException(WrongFileTypeException.Type.FILE, WrongFileTypeException.Type.FOLDER), dirlist);
 
         try (BufferedReader reader = Files.newBufferedReader(dirlist.toPath(), charset)) {
             List<String> result = new ArrayList<>();
@@ -113,7 +110,7 @@ public abstract class DirlistTaskFactory {
         File[] files = source_directory.listFiles(imageFilter);
 
         if (files == null || files.length == 0)
-            throw new SourceFileException("No image was found in:" + source_directory, source_directory);
+            throw new SourceFileException(new EmptyImagesException("No image was found in: "+source_directory), source_directory);
 
         Arrays.sort(files, fileSorter);
 
@@ -122,6 +119,62 @@ public abstract class DirlistTaskFactory {
 
     private static Task createTask(DocumentArgument documentArgument, PageArgument pageArgument, File[] images, File pdf_destination) {
         return new Task(documentArgument, pageArgument, images, pdf_destination);
+    }
+
+    public static class SourceFileException extends Exception{
+
+        private final File source;
+
+        public SourceFileException(Throwable cause, File source) {
+            super(cause);
+            this.source = source;
+        }
+
+        public File getSource() {
+            return source;
+        }
+    }
+
+    public static class DirListException extends Exception{
+
+        private final File dirlist;
+
+        public DirListException(Throwable cause, File dirlist) {
+            super(cause);
+            this.dirlist = dirlist;
+        }
+
+        public File getDirlist() {
+            return dirlist;
+        }
+    }
+
+    public static class EmptyImagesException extends RuntimeException{
+        public EmptyImagesException(String message) {
+            super(message);
+        }
+    }
+
+    public static class WrongFileTypeException extends RuntimeException{
+        public enum Type{
+            FOLDER,FILE
+        }
+        private Type expected;
+        private Type value;
+
+        public Type getExpected() {
+            return expected;
+        }
+
+        public Type getValue() {
+            return value;
+        }
+
+        public WrongFileTypeException(Type expected, Type value) {
+            super(value+"!="+expected+"(expected)");
+            this.expected = expected;
+            this.value = value;
+        }
     }
 
 }
