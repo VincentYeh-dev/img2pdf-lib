@@ -60,7 +60,7 @@ public abstract class DirlistTaskFactory {
         }
 
         if (!result.isDirectory()) {
-            throw new SourceFileException(new IOException("Source file is not a directory:" + result), result);
+            throw new SourceFileException(new WrongFileTypeException(WrongFileTypeException.Type.FOLDER, WrongFileTypeException.Type.FILE), result);
         }
 
         return result;

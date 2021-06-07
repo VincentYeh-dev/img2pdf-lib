@@ -147,7 +147,7 @@ public class CreateCommand implements Callable<Integer> {
             writeStringToFile(destination, content, SharedSpace.Configuration.TASKlIST_WRITE_CHARSET);
             System.out.printf("[" + SharedSpace.getResString("public.info.exported") + "] %s\n", tasklist_dst.getAbsolutePath());
         } catch (IOException e) {
-            throw new SaveException(e);
+            throw new SaveException(e,destination);
         }
 
     }
@@ -172,9 +172,14 @@ public class CreateCommand implements Callable<Integer> {
     }
 
     public static class SaveException extends Exception {
-
-        public SaveException(Throwable cause) {
+        private File file;
+        public SaveException(Throwable cause, File file) {
             super(cause);
+            this.file = file;
+        }
+
+        public File getFile() {
+            return file;
         }
     }
 }

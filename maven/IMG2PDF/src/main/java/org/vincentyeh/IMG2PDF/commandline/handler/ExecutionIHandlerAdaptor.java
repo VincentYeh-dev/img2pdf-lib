@@ -1,12 +1,12 @@
 package org.vincentyeh.IMG2PDF.commandline.handler;
 
 import org.vincentyeh.IMG2PDF.commandline.handler.core.ClassHandler;
-import org.vincentyeh.IMG2PDF.commandline.handler.core.ListHandlerRegister;
+import org.vincentyeh.IMG2PDF.commandline.handler.core.ListIHandlerRegister;
 import picocli.CommandLine;
 
 import java.io.PrintWriter;
 
-public class ExecutionHandlerAdaptor extends ListHandlerRegister<ClassHandler> implements CommandLine.IExecutionExceptionHandler {
+public class ExecutionIHandlerAdaptor extends ListIHandlerRegister<ClassHandler> implements CommandLine.IExecutionExceptionHandler {
     @Override
     public int handleExecutionException(Exception e, CommandLine commandLine, CommandLine.ParseResult parseResult) throws Exception {
         for (ClassHandler handler : handlers) {
