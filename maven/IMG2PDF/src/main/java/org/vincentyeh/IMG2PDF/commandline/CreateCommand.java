@@ -49,7 +49,7 @@ public class CreateCommand implements Callable<Integer> {
     @CommandLine.Option(names = {"--pdf_align", "-pa"}, defaultValue = "CENTER-CENTER", converter = PageAlignConverter.class)
     PageAlign pdf_align;
 
-    @CommandLine.Option(names = {"--pdf_size", "-pz"})
+    @CommandLine.Option(names = {"--pdf_size", "-pz"},required = true)
     PageSize pdf_size;
 
     @CommandLine.Option(names = {"--pdf_direction", "-pdi"}, defaultValue = "Portrait")
@@ -58,10 +58,10 @@ public class CreateCommand implements Callable<Integer> {
     @CommandLine.Option(names = {"--pdf_auto_rotate", "-par"})
     boolean pdf_auto_rotate;
 
-    @CommandLine.Option(names = {"--pdf_destination", "-pdst"})
+    @CommandLine.Option(names = {"--pdf_destination", "-pdst"},required = true)
     String pdf_dst;
 
-    @CommandLine.Option(names = {"--list_destination", "-ldst"})
+    @CommandLine.Option(names = {"--list_destination", "-ldst"},required = true)
     File tasklist_dst;
 
     @CommandLine.Option(names = {"--overwrite", "-ow"})
