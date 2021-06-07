@@ -10,7 +10,7 @@ public class ExecutionIHandlerAdaptor extends ListIHandlerRegister<ClassHandler>
     @Override
     public int handleExecutionException(Exception e, CommandLine commandLine, CommandLine.ParseResult parseResult) throws Exception {
         for (ClassHandler handler : handlers) {
-            if (handler.canHandle(e,commandLine.getCommand().getClass())) {
+            if (handler.canHandle(commandLine.getCommand().getClass())) {
                 handler.parse(e);
             }
             printErrorText(commandLine, handler.getErrorMessage());

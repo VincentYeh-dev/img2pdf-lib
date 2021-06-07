@@ -5,5 +5,5 @@ public interface IHandler<T>{
     void parse(Exception e);
     String getErrorMessage();
     int getExitCode();
-    boolean canHandle(Exception exception,T condition);
+    boolean canHandle(T condition);
 }

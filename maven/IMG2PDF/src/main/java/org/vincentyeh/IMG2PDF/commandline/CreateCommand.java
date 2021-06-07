@@ -78,8 +78,6 @@ public class CreateCommand implements Callable<Integer> {
 
         checkParameters();
 
-        if(1==1)throw new OverwriteTaskListException(tasklist_dst);
-
         if (!overwrite && tasklist_dst.exists()) {
             System.err.printf(SharedSpace.getResString("public.err.overwrite") + "\n", tasklist_dst.getAbsolutePath());
             throw new OverwriteTaskListException(tasklist_dst);

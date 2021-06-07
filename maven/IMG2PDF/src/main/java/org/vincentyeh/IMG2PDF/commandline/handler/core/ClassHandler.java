@@ -9,7 +9,7 @@ public abstract class ClassHandler implements IHandler<Class<?>> {
     }
 
     @Override
-    public boolean canHandle(Exception exception, Class<?> condition) {
+    public boolean canHandle(Class<?> condition) {
         return condition.equals(clazz);
     }
 }
