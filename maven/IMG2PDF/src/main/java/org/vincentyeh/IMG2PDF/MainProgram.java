@@ -1,9 +1,8 @@
 package org.vincentyeh.IMG2PDF;
 import org.vincentyeh.IMG2PDF.commandline.IMG2PDFCommand;
-import org.vincentyeh.IMG2PDF.commandline.handler.execution.ConvertHandler;
-import org.vincentyeh.IMG2PDF.commandline.handler.execution.CreateHandler;
-import org.vincentyeh.IMG2PDF.commandline.handler.ExecutionIHandlerAdaptor;
+import org.vincentyeh.IMG2PDF.commandline.handler.ExecutionHandler;
 import org.vincentyeh.IMG2PDF.commandline.handler.ResourceBundleParameterHandler;
+import org.vincentyeh.IMG2PDF.commandline.handler.execution.ResourceBundleHandler;
 import picocli.CommandLine;
 
 import java.util.Locale;
@@ -16,9 +15,10 @@ public class MainProgram {
         SharedSpace.initialize();
         Locale locale=SharedSpace.Configuration.locale;
         CommandLine cmd= new CommandLine(new IMG2PDFCommand());
-        ExecutionIHandlerAdaptor adaptor=new ExecutionIHandlerAdaptor();
-        adaptor.registerHandler(new CreateHandler(ResourceBundle.getBundle("cmd_err",locale)));
-        adaptor.registerHandler(new ConvertHandler(ResourceBundle.getBundle("cmd_err",locale)));
+        ResourceBundleHandler.setResourceBundle(ResourceBundle.getBundle("cmd_err",locale));
+
+        ExecutionHandler adaptor=new ExecutionHandler();
+
         cmd.setExecutionExceptionHandler(adaptor);
 
         cmd.setParameterExceptionHandler(new ResourceBundleParameterHandler(ResourceBundle.getBundle("cmd_err",locale)));

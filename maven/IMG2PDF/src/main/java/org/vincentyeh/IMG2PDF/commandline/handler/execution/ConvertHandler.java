@@ -1,44 +1,22 @@
 package org.vincentyeh.IMG2PDF.commandline.handler.execution;
 
 import org.vincentyeh.IMG2PDF.commandline.ConvertCommand;
-import org.vincentyeh.IMG2PDF.commandline.handler.core.ClassHandler;
+import org.vincentyeh.IMG2PDF.commandline.handler.ExecutionHandler;
 import org.vincentyeh.IMG2PDF.converter.exception.ConversionException;
 import org.vincentyeh.IMG2PDF.converter.exception.OverwriteDenyException;
 import org.vincentyeh.IMG2PDF.converter.exception.ReadImageException;
 import org.vincentyeh.IMG2PDF.pattern.Handler;
 
 import java.io.FileNotFoundException;
-import java.util.ResourceBundle;
 
-public class ConvertHandler extends ClassHandler {
-    private final ResourceBundle resourceBundle;
+public class ConvertHandler extends ResourceBundleHandler<String, ExecutionHandler.HandleCondition>{
 
-    private String message;
-    private int exitCode;
-
-    public ConvertHandler(ResourceBundle resourceBundle) {
-        super(ConvertCommand.class);
-        this.resourceBundle = resourceBundle;
-    }
-
-    @Override
-    public void parse(Exception e) {
-        Handler<String, Exception> handler=new PDFConversionExceptionHandler(new TaskListExceptionHandler(null));
-        message=handler.handle(e);
-    }
-
-    @Override
-    public String getErrorMessage() {
-        return message;
-    }
-
-    @Override
-    public int getExitCode() {
-        return exitCode;
+    public ConvertHandler(Handler<String, ExecutionHandler.HandleCondition> handler) {
+        super(handler);
     }
 
     private String getLocaleResource(String key) {
-        return resourceBundle.getString("err.execution.convert.handler." + key);
+        return getResourceBundle().getString("err.execution.convert.handler." + key);
     }
 
     private String getFileTypeResource(ConvertCommand.WrongFileTypeException.Type type) {
@@ -46,7 +24,16 @@ public class ConvertHandler extends ClassHandler {
     }
 
     private String getPublicResource(String key) {
-        return resourceBundle.getString("public." + key);
+        return getResourceBundle().getString("public." + key);
+    }
+
+    @Override
+    public String handle(ExecutionHandler.HandleCondition data) {
+        Handler<String,Exception> handler=new TaskListExceptionHandler(new PDFConversionExceptionHandler(null)) ;
+        if(data.getClazz().equals(ConvertCommand.class))
+            return handler.handle(data.getException());
+        else
+            return doNext(data,data.getException().getMessage());
     }
 
     private class TaskListExceptionHandler extends Handler<String, Exception> {
