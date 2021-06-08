@@ -38,7 +38,7 @@ public class ConvertCommand implements Callable<Integer> {
     boolean usageHelpRequested;
 
     @Override
-    public Integer call() throws Exception {
+    public Integer call() throws TaskListException, PDFConversionException {
         System.out.println(SharedSpace.getResString("convert.import_tasklists"));
         for (File src : tasklist_sources) {
             try {
@@ -48,7 +48,7 @@ public class ConvertCommand implements Callable<Integer> {
                 System.out.print("\t[" + SharedSpace.getResString("public.info.imported") + "] " + src.getAbsolutePath() + "\r\n\n");
                 System.out.println(SharedSpace.getResString("convert.start_conversion"));
                 convertAllToFile(tasks);
-            }finally {
+            } finally {
                 System.out.print("\n");
             }
         }
@@ -134,7 +134,7 @@ public class ConvertCommand implements Callable<Integer> {
             this.file = file;
         }
 
-        public File getFile() {
+        public File getTasklist() {
             return file;
         }
     }
