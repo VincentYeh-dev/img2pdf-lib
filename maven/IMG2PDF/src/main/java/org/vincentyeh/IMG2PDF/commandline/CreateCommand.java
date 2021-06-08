@@ -14,8 +14,6 @@ import org.vincentyeh.IMG2PDF.task.PageArgument;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskListConverter;
 import org.vincentyeh.IMG2PDF.task.factory.DirlistTaskFactory;
-import org.vincentyeh.IMG2PDF.task.factory.exception.DirListException;
-import org.vincentyeh.IMG2PDF.task.factory.exception.SourceFileException;
 import org.vincentyeh.IMG2PDF.util.file.GlobbingFileFilter;
 import org.vincentyeh.IMG2PDF.util.file.FileSorter;
 import picocli.CommandLine;
@@ -27,7 +25,6 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 
 @CommandLine.Command(name = "create")
 public class CreateCommand implements Callable<Integer> {
@@ -52,7 +49,7 @@ public class CreateCommand implements Callable<Integer> {
     @CommandLine.Option(names = {"--pdf_align", "-pa"}, defaultValue = "CENTER-CENTER", converter = PageAlignConverter.class)
     PageAlign pdf_align;
 
-    @CommandLine.Option(names = {"--pdf_size", "-pz"})
+    @CommandLine.Option(names = {"--pdf_size", "-pz"},required = true)
     PageSize pdf_size;
 
     @CommandLine.Option(names = {"--pdf_direction", "-pdi"}, defaultValue = "Portrait")
@@ -61,10 +58,10 @@ public class CreateCommand implements Callable<Integer> {
     @CommandLine.Option(names = {"--pdf_auto_rotate", "-par"})
     boolean pdf_auto_rotate;
 
-    @CommandLine.Option(names = {"--pdf_destination", "-pdst"})
+    @CommandLine.Option(names = {"--pdf_destination", "-pdst"},required = true)
     String pdf_dst;
 
-    @CommandLine.Option(names = {"--list_destination", "-ldst"})
+    @CommandLine.Option(names = {"--list_destination", "-ldst"},required = true)
     File tasklist_dst;
 
     @CommandLine.Option(names = {"--overwrite", "-ow"})
@@ -78,28 +75,23 @@ public class CreateCommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        try {
-            checkParameters();
-        }catch (IllegalArgumentException e){
-            throw new ExecutionException(e.getMessage(),e);
-        }
+
+        checkParameters();
 
         if (!overwrite && tasklist_dst.exists()) {
             System.err.printf(SharedSpace.getResString("public.err.overwrite") + "\n", tasklist_dst.getAbsolutePath());
-            throw new HandledException(new RuntimeException("Overwrite deny"), getClass());
+            throw new OverwriteTaskListException(tasklist_dst);
         }
+
         DirlistTaskFactory.setArgument(getDocumentArgument(), getPageArgument(), pdf_dst);
         DirlistTaskFactory.setImageFilesRule(filter, fileSorter);
 
         List<Task> tasks = new ArrayList<>();
-        try {
-            for (File dirlist : sourceFiles) {
-                tasks.addAll(DirlistTaskFactory.createFromDirlist(dirlist, SharedSpace.Configuration.DIRLIST_READ_CHARSET));
-            }
-        } catch (SourceFileException | DirListException e) {
-//            System.err.println(e.getMessage());
-            throw new HandledException(e, getClass());
+
+        for (File dirlist : sourceFiles) {
+            tasks.addAll(DirlistTaskFactory.createFromDirlist(dirlist, SharedSpace.Configuration.DIRLIST_READ_CHARSET));
         }
+
         save(tasks, tasklist_dst);
         return 1;
     }
@@ -145,7 +137,7 @@ public class CreateCommand implements Callable<Integer> {
         return builder.build();
     }
 
-    public void save(List<Task> taskList, File destination) throws HandledException {
+    public void save(List<Task> taskList, File destination) throws SaveException {
         destination.getParentFile().mkdirs();
 
         String content = new TaskListConverter().toXml(taskList);
@@ -153,17 +145,39 @@ public class CreateCommand implements Callable<Integer> {
             writeStringToFile(destination, content, SharedSpace.Configuration.TASKlIST_WRITE_CHARSET);
             System.out.printf("[" + SharedSpace.getResString("public.info.exported") + "] %s\n", tasklist_dst.getAbsolutePath());
         } catch (IOException e) {
-            System.err.printf(SharedSpace.getResString("create.err.tasklist_create") + "\n", e.getMessage());
-            throw new HandledException(e, getClass());
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new HandledException(e, getClass());
+            throw new SaveException(e,destination);
         }
+
     }
 
     private void writeStringToFile(File file, String content, Charset charset) throws IOException {
         List<String> contents = new ArrayList<>();
         contents.add(content);
         Files.write(file.toPath(), contents, charset);
+    }
+
+    public static class OverwriteTaskListException extends Exception {
+        private final File file;
+
+        public OverwriteTaskListException(File file) {
+            super("Overwrite deny: " + file.getAbsolutePath());
+            this.file = file;
+        }
+
+        public File getFile() {
+            return file;
+        }
+    }
+
+    public static class SaveException extends Exception {
+        private File file;
+        public SaveException(Throwable cause, File file) {
+            super(cause);
+            this.file = file;
+        }
+
+        public File getFile() {
+            return file;
+        }
     }
 }

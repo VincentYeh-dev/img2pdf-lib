@@ -6,6 +6,11 @@
   <name>IMG2PDF</name>
   <version>0.0.1-SNAPSHOT</version>
   <url>http://maven.apache.org</url>
+  <developers>
+    <developer>
+      <name>VincentYeh-dev</name>
+    </developer>
+  </developers>
   <build>
     <plugins>
       <plugin>

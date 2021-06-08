@@ -2,39 +2,33 @@ package org.vincentyeh.IMG2PDF.commandline;
 
 import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.converter.PDFConverter;
-import org.vincentyeh.IMG2PDF.converter.exception.ConversionException;
-import org.vincentyeh.IMG2PDF.converter.exception.OverwriteDenyException;
-import org.vincentyeh.IMG2PDF.converter.exception.ReadImageException;
 import org.vincentyeh.IMG2PDF.converter.listener.DefaultConversionInfoListener;
 import org.vincentyeh.IMG2PDF.commandline.converter.ByteSizeConverter;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskListConverter;
 import org.vincentyeh.IMG2PDF.util.BytesSize;
-import org.vincentyeh.IMG2PDF.util.file.FileUtils;
 import picocli.CommandLine;
 
 import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.MalformedInputException;
-import java.nio.charset.UnmappableCharacterException;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.concurrent.Callable;
 
 @CommandLine.Command(name = "convert")
 public class ConvertCommand implements Callable<Integer> {
-    @CommandLine.Option(names = {"--temp_folder","-tmp"},defaultValue = ".org.vincentyeh.IMG2PDF.tmp")
+    @CommandLine.Option(names = {"--temp_folder", "-tmp"}, defaultValue = ".org.vincentyeh.IMG2PDF.tmp")
     File tempFolder;
 
-    @CommandLine.Option(names = {"--memory_max_usage","-mx"},defaultValue = "50MB",converter = ByteSizeConverter.class)
+    @CommandLine.Option(names = {"--memory_max_usage", "-mx"}, defaultValue = "50MB", converter = ByteSizeConverter.class)
     BytesSize maxMainMemoryBytes;
 
-    @CommandLine.Option(names = {"--open_when_complete","-o"})
+    @CommandLine.Option(names = {"--open_when_complete", "-o"})
     boolean open_when_complete;
 
-    @CommandLine.Option(names = {"--overwrite","-ow"})
+    @CommandLine.Option(names = {"--overwrite", "-ow"})
     boolean overwrite_output;
 
     @CommandLine.Parameters
@@ -44,33 +38,35 @@ public class ConvertCommand implements Callable<Integer> {
     boolean usageHelpRequested;
 
     @Override
-    public Integer call() throws Exception {
+    public Integer call() throws TaskListException, PDFConversionException {
         System.out.println(SharedSpace.getResString("convert.import_tasklists"));
         for (File src : tasklist_sources) {
-            System.out.print(
-                    "\t[" + SharedSpace.getResString("public.info.importing") + "] " + src.getAbsolutePath() + "\r");
             try {
+                System.out.print(
+                        "\t[" + SharedSpace.getResString("public.info.importing") + "] " + src.getAbsolutePath() + "\r");
                 List<Task> tasks = getTaskListFromFile(src);
                 System.out.print("\t[" + SharedSpace.getResString("public.info.imported") + "] " + src.getAbsolutePath() + "\r\n\n");
                 System.out.println(SharedSpace.getResString("convert.start_conversion"));
                 convertAllToFile(tasks);
-            } catch (HandledException ignored) {
-                ignored.printStackTrace();
+            } finally {
+                System.out.print("\n");
             }
-
         }
 
         return 0;
     }
 
-    private void convertAllToFile(List<Task> tasks) throws Exception {
-//                TODO:No exception is thrown when task.getArray() is empty.Warning to the user when it happen.
+    private void convertAllToFile(List<Task> tasks) throws PDFConversionException {
+
         for (Task task : tasks) {
             try {
                 File result = convertToFile(task);
                 if (open_when_complete)
                     openPDF(result);
-            } catch (HandledException ignored) {
+            } catch (PDFConversionException e) {
+                boolean ignore = false;
+                if (ignore == false)
+                    throw e;
             }
         }
     }
@@ -87,71 +83,97 @@ public class ConvertCommand implements Callable<Integer> {
 
     }
 
-    private File convertToFile(Task task) throws IOException, HandledException {
-        PDFConverter converter;
+    private File convertToFile(Task task) throws PDFConversionException {
         try {
-            converter = new PDFConverter(task, maxMainMemoryBytes.getBytes(), tempFolder, overwrite_output);
+            PDFConverter converter = new PDFConverter(task, maxMainMemoryBytes.getBytes(), tempFolder, overwrite_output);
             converter.setInfoListener(new DefaultConversionInfoListener());
-        } catch (IOException e) {
-//            TODO:print error message
-            throw new HandledException(e, getClass());
-        }
 
-        try {
             return converter.start();
-
-        } catch (OverwriteDenyException e) {
-            System.err.printf("\t" + SharedSpace.getResString("convert.listener.err.overwrite") + "\n", e.getFile().getAbsolutePath());
-            throw new HandledException(e, getClass());
-        } catch (ReadImageException e) {
-            System.err.printf("\n\t\t" + SharedSpace.getResString("convert.listener.err.image") + "\n", e.getMessage());
-            throw new HandledException(e, getClass());
-        } catch (ConversionException e) {
-            System.err.printf("\n\t\t" + SharedSpace.getResString("convert.listener.err.conversion") + "\n", e.getCause().getMessage());
-            throw new HandledException(e.getCause().getMessage(), getClass());
+        } catch (Exception e) {
+            throw new PDFConversionException(e, task);
         }
 
     }
 
     private List<Task> getTaskListFromFile(final File file)
-            throws HandledException {
-        try {
-            FileUtils.checkAbsolute(file);
-            FileUtils.checkExists(file);
-            FileUtils.checkIsFile(file);
-        } catch (FileUtils.WrongTypeException e) {
-//            TODO:Print error message
-            throw new HandledException(e, getClass());
-        } catch (FileUtils.PathNotAbsoluteException e) {
-//            TODO:Print error message
-            throw new HandledException(e, getClass());
-        } catch (FileNotFoundException e) {
-//            TODO:Print error message
-            throw new HandledException(e, getClass());
-        }
+            throws TaskListException {
+
+        if (!file.exists())
+            throw new TaskListException(new FileNotFoundException("File not found: " + file.getPath()), file);
+        if (!file.isFile())
+            throw new TaskListException(new WrongFileTypeException(WrongFileTypeException.Type.FILE, WrongFileTypeException.Type.FOLDER), file);
+
         try {
             String xml = String.join("\n", readAllLinesFromTasklist(file));
-            return (new TaskListConverter()).parse(xml);
-        } catch (com.thoughtworks.xstream.converters.ConversionException e) {
-            System.err.println(e.getCause().getMessage());
-            throw new HandledException(e, getClass());
+            List<Task> tasks = (new TaskListConverter()).parse(xml);
+            if (tasks.isEmpty())
+                throw new TaskListException(new NoTaskException("No task was found: " + file), file);
+            return tasks;
+        } catch (Exception e) {
+            throw new TaskListException(e, file);
         }
 
     }
 
-    private List<String> readAllLinesFromTasklist(File dirlist) throws HandledException {
-        List<String> lines;
-        try {
-            lines = Files.readAllLines(dirlist.toPath(), SharedSpace.Configuration.TASKLIST_READ_CHARSET);
-        } catch (UnmappableCharacterException | MalformedInputException e) {
-//            TODO:wrong charset,print error message.
-            System.err.println("Unmappable character or Malformed input,maybe cause by wrong charset." + e.getMessage());
-            throw new HandledException(e, getClass());
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new HandledException(e, getClass());
+    private List<String> readAllLinesFromTasklist(File tasklist) throws IOException {
+        return Files.readAllLines(tasklist.toPath(), SharedSpace.Configuration.TASKLIST_READ_CHARSET);
+    }
+
+    public static class NoTaskException extends RuntimeException {
+        public NoTaskException(String message) {
+            super(message);
         }
-        return lines;
+    }
+
+    public static class TaskListException extends Exception {
+
+        private final File file;
+
+        public TaskListException(Throwable cause, File file) {
+            super(cause);
+            this.file = file;
+        }
+
+        public File getTasklist() {
+            return file;
+        }
+    }
+
+    public static class PDFConversionException extends Exception {
+        private final Task task;
+
+        public PDFConversionException(Throwable cause, Task task) {
+            super(cause);
+            this.task = task;
+        }
+
+        public Task getTask() {
+            return task;
+        }
+    }
+
+    public static class WrongFileTypeException extends RuntimeException {
+
+        public enum Type {
+            FOLDER, FILE
+        }
+
+        private final Type expected;
+        private final Type value;
+
+        public Type getExpected() {
+            return expected;
+        }
+
+        public Type getValue() {
+            return value;
+        }
+
+        public WrongFileTypeException(Type expected, Type value) {
+            super(value + "!=" + expected + "(expected)");
+            this.expected = expected;
+            this.value = value;
+        }
     }
 
 }
