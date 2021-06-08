@@ -3,9 +3,7 @@ package org.vincentyeh.IMG2PDF.commandline.handler.execution;
 import org.vincentyeh.IMG2PDF.commandline.CreateCommand;
 import org.vincentyeh.IMG2PDF.commandline.handler.core.ClassHandler;
 import org.vincentyeh.IMG2PDF.task.factory.DirlistTaskFactory;
-
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ResourceBundle;
 
 public class CreateHandler extends ClassHandler {
@@ -42,12 +40,10 @@ public class CreateHandler extends ClassHandler {
         } else if (ex instanceof DirlistTaskFactory.DirListException) {
             DirlistTaskFactory.DirListException ex1 = (DirlistTaskFactory.DirListException) ex;
             if (ex1.getCause() instanceof FileNotFoundException) {
-//                TODO:declare message value
+                message = String.format(getLocaleResource("dirlist.not_found"), ex1.getDirlist());
             } else if (ex1.getCause() instanceof DirlistTaskFactory.WrongFileTypeException) {
                 DirlistTaskFactory.WrongFileTypeException ex2 = (DirlistTaskFactory.WrongFileTypeException) ex1.getCause();
-//                TODO:declare message value
-            } else if (ex1.getCause() instanceof IOException) {
-//                TODO:declare message value
+                message = String.format(getLocaleResource("dirlist.wrong_type"), getFileTypeResource(ex2.getExpected()), getFileTypeResource(ex2.getValue()), ex1.getDirlist());
             }
         }
     }
