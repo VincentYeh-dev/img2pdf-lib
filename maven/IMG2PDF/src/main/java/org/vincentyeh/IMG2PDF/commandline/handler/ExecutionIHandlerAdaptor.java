@@ -12,13 +12,16 @@ public class ExecutionIHandlerAdaptor extends ListIHandlerRegister<ClassHandler>
         for (ClassHandler handler : handlers) {
             if (handler.canHandle(commandLine.getCommand().getClass())) {
                 handler.parse(e);
+                printErrorText(commandLine, handler.getErrorMessage());
+                printErrorText(commandLine, "AAA");
+                return handler.getExitCode();
             }
-            printErrorText(commandLine, handler.getErrorMessage());
-            printErrorText(commandLine, "AAA");
-
-            return handler.getExitCode();
         }
-        return 0;
+
+        printErrorText(commandLine, e.getMessage());
+        printErrorText(commandLine, "BBB");
+
+        return -9;
     }
 
 
