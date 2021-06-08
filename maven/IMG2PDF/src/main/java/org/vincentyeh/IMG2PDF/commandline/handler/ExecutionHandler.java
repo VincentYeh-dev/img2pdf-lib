@@ -3,6 +3,7 @@ package org.vincentyeh.IMG2PDF.commandline.handler;
 import org.vincentyeh.IMG2PDF.commandline.handler.execution.ConvertHandler;
 import org.vincentyeh.IMG2PDF.commandline.handler.execution.CreateHandler;
 import org.vincentyeh.IMG2PDF.pattern.Handler;
+import org.vincentyeh.IMG2PDF.pattern.HandlerRegister;
 import picocli.CommandLine;
 
 import java.io.PrintWriter;
@@ -11,7 +12,11 @@ public class ExecutionHandler implements CommandLine.IExecutionExceptionHandler 
     @Override
     public int handleExecutionException(Exception e, CommandLine commandLine, CommandLine.ParseResult parseResult) throws Exception {
         HandleCondition condition = new HandleCondition(commandLine.getCommand().getClass(), e);
-        Handler<String, HandleCondition> handler = new CreateHandler(new ConvertHandler(null));
+        HandlerRegister<String,HandleCondition> register=new HandlerRegister<>();
+        register.registerHandler(CreateHandler.class);
+        register.registerHandler(ConvertHandler.class);
+
+        Handler<String, HandleCondition> handler = register.getHandler();
 
         printErrorText(commandLine,handler.handle(condition));
         printErrorText(commandLine, "BBB");
