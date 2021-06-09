@@ -19,7 +19,7 @@ public class CreateHandler extends ResourceBundleHandler<String, ResourceBundleE
         if (data.getClazz().equals(CreateCommand.class)) {
             return handler.handle(data.getException());
         } else {
-            return doNext(data, data.getException().getMessage());
+            return doNext(data);
         }
     }
 
@@ -55,7 +55,7 @@ public class CreateHandler extends ResourceBundleHandler<String, ResourceBundleE
                 }
             }
 
-            return doNext(data,data.getMessage());
+            return doNext(data);
         }
     }
 
@@ -77,7 +77,7 @@ public class CreateHandler extends ResourceBundleHandler<String, ResourceBundleE
                 }
             }
 
-            return doNext(data, data.getMessage());
+            return doNext(data);
         }
     }
 
@@ -93,7 +93,7 @@ public class CreateHandler extends ResourceBundleHandler<String, ResourceBundleE
                 String dd = getLocaleResource("overwrite");
                 return String.format(dd, exception.getFile());
             } else {
-                return doNext(data, data.getMessage());
+                return doNext(data);
             }
         }
     }
@@ -110,7 +110,7 @@ public class CreateHandler extends ResourceBundleHandler<String, ResourceBundleE
                 CreateCommand.SaveException exception = (CreateCommand.SaveException) data;
                 return String.format(getLocaleResource("save"), exception.getFile());
             } else {
-                return doNext(data, data.getMessage());
+                return doNext(data);
             }
         }
     }

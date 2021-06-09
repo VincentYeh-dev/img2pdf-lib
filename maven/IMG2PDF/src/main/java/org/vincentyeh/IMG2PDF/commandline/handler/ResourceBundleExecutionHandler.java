@@ -17,15 +17,20 @@ public class ResourceBundleExecutionHandler implements CommandLine.IExecutionExc
     }
 
     @Override
-    public int handleExecutionException(Exception e, CommandLine commandLine, CommandLine.ParseResult parseResult) throws Exception {
+    public int handleExecutionException(Exception e, CommandLine cmd, CommandLine.ParseResult parseResult) {
         HandlerRegister<ResourceBundleHandler<String, HandleCondition>> register = new HandlerRegister<>();
         register.registerHandler(ConvertHandler.class);
         register.registerHandler(CreateHandler.class);
+        String msg;
+        try {
+            msg = register.getHandler().handle(new HandleCondition(cmd.getCommand().getClass(), e));
+        }catch (Handler.CantHandleException ex){
+            msg=e.getMessage();
+            printErrorText(cmd,"Can't handle");
+        }
 
-        String msg = register.getHandler().handle(new HandleCondition(commandLine.getCommand().getClass(), e));
-        printErrorText(commandLine, msg);
-        printErrorText(commandLine, "BBB");
-
+        printErrorText(cmd, msg);
+        printErrorText(cmd, "BBB");
         return -9;
     }
 

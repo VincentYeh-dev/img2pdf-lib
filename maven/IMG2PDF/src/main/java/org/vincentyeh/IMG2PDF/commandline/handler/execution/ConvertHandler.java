@@ -33,7 +33,7 @@ public class ConvertHandler extends ResourceBundleHandler<String, ResourceBundle
         if(data.getClazz().equals(ConvertCommand.class))
             return handler.handle(data.getException());
         else
-            return doNext(data,data.getException().getMessage());
+            return doNext(data);
     }
 
     private class TaskListExceptionHandler extends Handler<String, Exception> {
@@ -55,7 +55,7 @@ public class ConvertHandler extends ResourceBundleHandler<String, ResourceBundle
                     return String.format(getLocaleResource("tasklist.no_task"), ex1.getTasklist());
                 }
             }
-            return doNext(data,data.getMessage());
+            return doNext(data);
         }
     }
 
@@ -78,7 +78,7 @@ public class ConvertHandler extends ResourceBundleHandler<String, ResourceBundle
                     return String.format(getLocaleResource("conversion.conversion"), ex1.getCause().getCause().getMessage());
                 }
             }
-            return doNext(data, data.getMessage());
+            return doNext(data);
         }
     }
 }
