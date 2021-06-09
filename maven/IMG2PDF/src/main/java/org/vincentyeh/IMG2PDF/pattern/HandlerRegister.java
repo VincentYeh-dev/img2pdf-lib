@@ -13,7 +13,7 @@ public class HandlerRegister<H extends Handler<?,?>> {
         handlerClasses.add(clazz);
     }
 
-    public H getHandler() throws InvocationTargetException, InstantiationException, IllegalAccessException {
+    public H getHandler() {
         List<Constructor<? extends H>> constructors = handlerClasses.stream()
                 .map(c -> {
                     try {
@@ -26,7 +26,11 @@ public class HandlerRegister<H extends Handler<?,?>> {
 
         H last = null;
         for (Constructor<? extends H> constructor : constructors) {
-            last = constructor.newInstance(last);
+            try {
+                last = constructor.newInstance(last);
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
         }
 
         return last;
