@@ -2,9 +2,7 @@ package org.vincentyeh.IMG2PDF.commandline.handler.execution;
 
 import org.vincentyeh.IMG2PDF.commandline.ConvertCommand;
 import org.vincentyeh.IMG2PDF.commandline.handler.ResourceBundleExecutionHandler;
-import org.vincentyeh.IMG2PDF.converter.exception.ConversionException;
-import org.vincentyeh.IMG2PDF.converter.exception.OverwriteDenyException;
-import org.vincentyeh.IMG2PDF.converter.exception.ReadImageException;
+import org.vincentyeh.IMG2PDF.converter.PDFConverter;
 import org.vincentyeh.IMG2PDF.pattern.Handler;
 
 import java.io.FileNotFoundException;
@@ -69,12 +67,12 @@ public class ConvertHandler extends ResourceBundleHandler<String, ResourceBundle
         public String handle(Exception data) {
             if (data instanceof ConvertCommand.PDFConversionException) {
                 ConvertCommand.PDFConversionException ex1 = (ConvertCommand.PDFConversionException) data;
-                if (ex1.getCause() instanceof ReadImageException) {
-                    ReadImageException ex2 = (ReadImageException) data.getCause();
+                if (ex1.getCause() instanceof PDFConverter.ReadImageException) {
+                    PDFConverter.ReadImageException ex2 = (PDFConverter.ReadImageException) data.getCause();
                     return String.format(getLocaleResource("conversion.read_image"), ex2.getFile());
-                } else if (ex1.getCause() instanceof OverwriteDenyException) {
+                } else if (ex1.getCause() instanceof PDFConverter.OverwriteDenyException) {
                     return String.format(getLocaleResource("conversion.overwrite"), ex1.getTask().getPdfDestination());
-                } else if (ex1.getCause() instanceof ConversionException) {
+                } else if (ex1.getCause() instanceof PDFConverter.ConversionException) {
                     return String.format(getLocaleResource("conversion.conversion"), ex1.getCause().getCause().getMessage());
                 }
             }

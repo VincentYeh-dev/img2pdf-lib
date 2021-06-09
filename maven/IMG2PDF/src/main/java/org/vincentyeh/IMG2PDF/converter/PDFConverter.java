@@ -7,9 +7,6 @@ import java.io.IOException;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.vincentyeh.IMG2PDF.converter.exception.ConversionException;
-import org.vincentyeh.IMG2PDF.converter.exception.OverwriteDenyException;
-import org.vincentyeh.IMG2PDF.converter.exception.ReadImageException;
 import org.vincentyeh.IMG2PDF.converter.listener.ConversionInfoListener;
 import org.vincentyeh.IMG2PDF.pdf.page.core.ImagePageFactory;
 import org.vincentyeh.IMG2PDF.task.Task;
@@ -139,4 +136,59 @@ public class PDFConverter implements ConversionInfoListener {
         if (info_listener != null)
             info_listener.onConversionComplete(dst);
     }
+
+
+    public static class ConversionException extends RuntimeException {
+        private final File file;
+        private final Throwable cause;
+
+        public ConversionException(File file, Throwable cause) {
+            super(String.format("Error occur during conversion:%s", cause.getMessage()));
+            this.file = file;
+            this.cause = cause;
+        }
+
+        public File getFile() {
+            return file;
+        }
+
+        @Override
+        public Throwable getCause() {
+            return cause;
+        }
+    }
+
+    public static class OverwriteDenyException extends RuntimeException {
+        private final File file;
+
+        public OverwriteDenyException(File file) {
+            super(String.format("Overwrite DENY:%s", file.getPath()));
+            this.file = file;
+        }
+
+        public File getFile() {
+            return file;
+        }
+    }
+
+    public static class ReadImageException extends RuntimeException {
+        private final File file;
+        private final Throwable cause;
+
+        public ReadImageException(File file, Throwable cause) {
+            super(String.format("Unable to import image:%s", cause.getMessage()));
+            this.file = file;
+            this.cause = cause;
+        }
+
+        public File getFile() {
+            return file;
+        }
+
+        @Override
+        public Throwable getCause() {
+            return cause;
+        }
+    }
+
 }
