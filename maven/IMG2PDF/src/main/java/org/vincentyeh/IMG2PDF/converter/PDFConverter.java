@@ -10,7 +10,6 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.vincentyeh.IMG2PDF.converter.listener.ConversionInfoListener;
 import org.vincentyeh.IMG2PDF.pdf.page.core.ImagePageFactory;
 import org.vincentyeh.IMG2PDF.task.Task;
-import org.vincentyeh.IMG2PDF.util.file.FileUtils;
 
 import javax.imageio.ImageIO;
 
@@ -38,7 +37,7 @@ public class PDFConverter implements ConversionInfoListener {
         if (tempFolder == null)
             throw new IllegalArgumentException("tempFolder is null");
 
-        FileUtils.makeDirsIfNotExists(tempFolder);
+        tempFolder.mkdirs();
 
         document = new PDDocument(MemoryUsageSetting.setupMixed(maxMainMemoryBytes).setTempDir(tempFolder));
         document.protect(task.getDocumentArgument().getSpp());
@@ -59,7 +58,8 @@ public class PDFConverter implements ConversionInfoListener {
 
     private File savePDFAndClose() throws IOException {
         try {
-            FileUtils.makeDirsIfNotExists(task.getPdfDestination().getParentFile());
+            task.getPdfDestination().getParentFile().mkdirs();
+
             document.save(task.getPdfDestination());
             return task.getPdfDestination();
         } finally {
