@@ -92,7 +92,8 @@ public class CreateCommand implements Callable<Integer> {
         }
 
         save(tasks, tasklist_dst);
-        return 1;
+
+        return CommandLine.ExitCode.OK;
     }
 
     private void checkParameters() {

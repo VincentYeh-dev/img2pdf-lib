@@ -27,9 +27,7 @@ public class ResourceBundleParameterHandler implements CommandLine.IParameterExc
         CommandLine.Model.CommandSpec spec = cmd.getCommandSpec();
         printText(cmd, String.format(getLocaleResource("try_help"), spec.qualifiedName()));
 
-        return cmd.getExitCodeExceptionMapper() != null
-                ? cmd.getExitCodeExceptionMapper().getExitCode(ex)
-                : spec.exitCodeOnInvalidInput();
+        return CommandLine.ExitCode.USAGE;
     }
 
     private void printErrorText(CommandLine cmd, String message) {

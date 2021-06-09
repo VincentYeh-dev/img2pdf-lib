@@ -28,7 +28,7 @@ public class ResourceBundleExecutionHandler implements CommandLine.IExecutionExc
         }
 
         printErrorText(cmd, msg);
-        return -9;
+        return CommandLine.ExitCode.SOFTWARE;
     }
 
 

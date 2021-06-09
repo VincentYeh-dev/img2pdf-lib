@@ -53,7 +53,7 @@ public class ConvertCommand implements Callable<Integer> {
             }
         }
 
-        return 0;
+        return CommandLine.ExitCode.OK;
     }
 
     private void convertAllToFile(List<Task> tasks) throws PDFConversionException {
