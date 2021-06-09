@@ -6,15 +6,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class HandlerRegister<T, R> {
-    private final List<Class<? extends Handler<T, R>>> handlerClasses = new ArrayList<>();
+public class HandlerRegister<H extends Handler<?,?>> {
+    private final List<Class<? extends H>> handlerClasses = new ArrayList<>();
 
-    public void registerHandler(Class<? extends Handler<T, R>> clazz) {
+    public void registerHandler(Class<? extends H> clazz) {
         handlerClasses.add(clazz);
     }
 
-    public Handler<T, R> getHandler() throws InvocationTargetException, InstantiationException, IllegalAccessException {
-        List<Constructor<? extends Handler<T, R>>> constructors = handlerClasses.stream()
+    public H getHandler() throws InvocationTargetException, InstantiationException, IllegalAccessException {
+        List<Constructor<? extends H>> constructors = handlerClasses.stream()
                 .map(c -> {
                     try {
                         return c.getConstructor(Handler.class);
@@ -24,8 +24,8 @@ public class HandlerRegister<T, R> {
                     }
                 }).collect(Collectors.toList());
 
-        Handler<T, R> last = null;
-        for (Constructor<? extends Handler<T, R>> constructor : constructors) {
+        H last = null;
+        for (Constructor<? extends H> constructor : constructors) {
             last = constructor.newInstance(last);
         }
 

@@ -11,13 +11,12 @@ import java.io.PrintWriter;
 public class ExecutionHandler implements CommandLine.IExecutionExceptionHandler {
     @Override
     public int handleExecutionException(Exception e, CommandLine commandLine, CommandLine.ParseResult parseResult) throws Exception {
-        HandleCondition condition = new HandleCondition(commandLine.getCommand().getClass(), e);
-        HandlerRegister<String,HandleCondition> register=new HandlerRegister<>();
+        HandlerRegister<Handler<String,HandleCondition>> register=new HandlerRegister<>();
         register.registerHandler(CreateHandler.class);
         register.registerHandler(ConvertHandler.class);
-
         Handler<String, HandleCondition> handler = register.getHandler();
 
+        HandleCondition condition = new HandleCondition(commandLine.getCommand().getClass(), e);
         printErrorText(commandLine,handler.handle(condition));
         printErrorText(commandLine, "BBB");
 
