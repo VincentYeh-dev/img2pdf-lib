@@ -13,7 +13,7 @@ public abstract class Handler<T,R>{
         this.next = next;
     }
 
-    public T doNext(R data) {
+    protected T doNext(R data) {
         if (next != null) {
             return next.handle(data);
         }
