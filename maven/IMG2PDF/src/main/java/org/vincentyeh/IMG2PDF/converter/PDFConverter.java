@@ -22,12 +22,13 @@ import javax.imageio.ImageIO;
  */
 public class PDFConverter implements ConversionInfoListener {
 
-    private final PDDocument document;
     private final Task task;
     private final boolean overwrite;
     private ConversionInfoListener info_listener;
 
-    public PDFConverter(Task task, long maxMainMemoryBytes, File tempFolder, boolean overwrite) throws IOException {
+    private final MemoryUsageSetting memoryUsageSetting;
+
+    public PDFConverter(Task task, long maxMainMemoryBytes, File tempFolder, boolean overwrite) {
         this.overwrite = overwrite;
 
         if (task == null)
@@ -38,51 +39,44 @@ public class PDFConverter implements ConversionInfoListener {
             throw new IllegalArgumentException("tempFolder is null");
 
         tempFolder.mkdirs();
-
-        document = new PDDocument(MemoryUsageSetting.setupMixed(maxMainMemoryBytes).setTempDir(tempFolder));
-        document.protect(task.getDocumentArgument().getSpp());
-
+        memoryUsageSetting = MemoryUsageSetting.setupMixed(maxMainMemoryBytes).setTempDir(tempFolder);
     }
 
     public File start() throws OverwriteDenyException, IOException {
-        onConversionPreparing(task);
-        checkOverwrite();
+        try (PDDocument document = new PDDocument(memoryUsageSetting)) {
 
-        File[] images = task.getImages();
-        appendAllPageToDocument(images);
+            document.protect(task.getDocumentArgument().getSpp());
 
-        File pdf = savePDFAndClose();
-        onConversionComplete(pdf);
-        return pdf;
-    }
+            onConversionPreparing(task);
+            checkOverwrite();
 
-    private File savePDFAndClose() throws IOException {
-        try {
-            task.getPdfDestination().getParentFile().mkdirs();
+            File[] images = task.getImages();
+            appendAllPageToDocument(images, document);
 
-            document.save(task.getPdfDestination());
-            return task.getPdfDestination();
-        } finally {
-            closeDocument();
+            File pdf = savePDF(document);
+            onConversionComplete(pdf);
+            return pdf;
         }
     }
 
-    private void appendAllPageToDocument(File[] images) throws ConversionException, ReadImageException {
-        try {
-            for (int i = 0; i < images.length; i++) {
-                onConverting(i, images[i]);
-                appendPageToDocument(images[i]);
-            }
-        } catch (Exception e) {
-            closeDocument();
-            throw e;
+    private File savePDF(PDDocument document) throws IOException {
+        task.getPdfDestination().getParentFile().mkdirs();
+
+        document.save(task.getPdfDestination());
+        return task.getPdfDestination();
+    }
+
+    private void appendAllPageToDocument(File[] images, PDDocument document) throws ConversionException, ReadImageException {
+        for (int i = 0; i < images.length; i++) {
+            onConverting(i, images[i]);
+            appendPageToDocument(images[i],document);
         }
     }
 
-    private void appendPageToDocument(File file) throws ConversionException, ReadImageException {
+    private void appendPageToDocument(File file, PDDocument document) throws ConversionException, ReadImageException {
         BufferedImage image = readImage(file);
         try {
-            document.addPage(getImagePage(image));
+            document.addPage(getImagePage(image,document));
         } catch (Exception e) {
             throw new ConversionException(file, e);
         }
@@ -99,20 +93,12 @@ public class PDFConverter implements ConversionInfoListener {
 
     private void checkOverwrite() throws OverwriteDenyException {
         if (!overwrite && task.getPdfDestination().exists()) {
-            closeDocument();
             throw new OverwriteDenyException(task.getPdfDestination());
         }
     }
 
-    private PDPage getImagePage(BufferedImage img) throws Exception {
+    private PDPage getImagePage(BufferedImage img, PDDocument document) throws Exception {
         return ImagePageFactory.getImagePage(document, task.getPageArgument(), img);
-    }
-
-    private void closeDocument() {
-        try {
-            document.close();
-        } catch (Exception ignored) {
-        }
     }
 
     public void setInfoListener(ConversionInfoListener listener) {
