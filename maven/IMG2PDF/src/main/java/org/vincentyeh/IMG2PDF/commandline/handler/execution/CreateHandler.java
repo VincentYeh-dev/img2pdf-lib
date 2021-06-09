@@ -1,20 +1,20 @@
 package org.vincentyeh.IMG2PDF.commandline.handler.execution;
 
 import org.vincentyeh.IMG2PDF.commandline.CreateCommand;
-import org.vincentyeh.IMG2PDF.commandline.handler.ExecutionHandler;
+import org.vincentyeh.IMG2PDF.commandline.handler.ResourceBundleExecutionHandler;
 import org.vincentyeh.IMG2PDF.pattern.Handler;
 import org.vincentyeh.IMG2PDF.task.factory.DirlistTaskFactory;
 
 import java.io.FileNotFoundException;
 
-public class CreateHandler extends ResourceBundleHandler<String, ExecutionHandler.HandleCondition> {
+public class CreateHandler extends ResourceBundleHandler<String, ResourceBundleExecutionHandler.HandleCondition> {
 
-    public CreateHandler(Handler<String, ExecutionHandler.HandleCondition> handler) {
+    public CreateHandler(Handler<String, ResourceBundleExecutionHandler.HandleCondition> handler) {
         super(handler);
     }
 
     @Override
-    public String handle(ExecutionHandler.HandleCondition data) {
+    public String handle(ResourceBundleExecutionHandler.HandleCondition data) {
         if (data.getClazz().equals(CreateCommand.class)) {
             Exception ex= data.getException();
             String message = ex.getMessage();

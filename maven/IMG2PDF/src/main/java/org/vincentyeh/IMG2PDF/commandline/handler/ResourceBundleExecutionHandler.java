@@ -2,16 +2,23 @@ package org.vincentyeh.IMG2PDF.commandline.handler;
 
 import org.vincentyeh.IMG2PDF.commandline.handler.execution.ConvertHandler;
 import org.vincentyeh.IMG2PDF.commandline.handler.execution.CreateHandler;
+import org.vincentyeh.IMG2PDF.commandline.handler.execution.ResourceBundleHandler;
 import org.vincentyeh.IMG2PDF.pattern.Handler;
 import org.vincentyeh.IMG2PDF.pattern.HandlerRegister;
 import picocli.CommandLine;
 
 import java.io.PrintWriter;
+import java.util.ResourceBundle;
 
-public class ExecutionHandler implements CommandLine.IExecutionExceptionHandler {
+public class ResourceBundleExecutionHandler implements CommandLine.IExecutionExceptionHandler {
+
+    public ResourceBundleExecutionHandler(ResourceBundle resourceBundle) {
+        ResourceBundleHandler.setResourceBundle(resourceBundle);
+    }
+
     @Override
     public int handleExecutionException(Exception e, CommandLine commandLine, CommandLine.ParseResult parseResult) throws Exception {
-        HandlerRegister<Handler<String,HandleCondition>> register=new HandlerRegister<>();
+        HandlerRegister<ResourceBundleHandler<String,HandleCondition>> register=new HandlerRegister<>();
         register.registerHandler(CreateHandler.class);
         register.registerHandler(ConvertHandler.class);
         Handler<String, HandleCondition> handler = register.getHandler();

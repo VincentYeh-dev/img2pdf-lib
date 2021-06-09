@@ -1,7 +1,7 @@
 package org.vincentyeh.IMG2PDF.commandline.handler.execution;
 
 import org.vincentyeh.IMG2PDF.commandline.ConvertCommand;
-import org.vincentyeh.IMG2PDF.commandline.handler.ExecutionHandler;
+import org.vincentyeh.IMG2PDF.commandline.handler.ResourceBundleExecutionHandler;
 import org.vincentyeh.IMG2PDF.converter.exception.ConversionException;
 import org.vincentyeh.IMG2PDF.converter.exception.OverwriteDenyException;
 import org.vincentyeh.IMG2PDF.converter.exception.ReadImageException;
@@ -9,9 +9,9 @@ import org.vincentyeh.IMG2PDF.pattern.Handler;
 
 import java.io.FileNotFoundException;
 
-public class ConvertHandler extends ResourceBundleHandler<String, ExecutionHandler.HandleCondition>{
+public class ConvertHandler extends ResourceBundleHandler<String, ResourceBundleExecutionHandler.HandleCondition>{
 
-    public ConvertHandler(Handler<String, ExecutionHandler.HandleCondition> handler) {
+    public ConvertHandler(Handler<String, ResourceBundleExecutionHandler.HandleCondition> handler) {
         super(handler);
     }
 
@@ -28,7 +28,7 @@ public class ConvertHandler extends ResourceBundleHandler<String, ExecutionHandl
     }
 
     @Override
-    public String handle(ExecutionHandler.HandleCondition data) {
+    public String handle(ResourceBundleExecutionHandler.HandleCondition data) {
         Handler<String,Exception> handler=new TaskListExceptionHandler(new PDFConversionExceptionHandler(null)) ;
         if(data.getClazz().equals(ConvertCommand.class))
             return handler.handle(data.getException());
