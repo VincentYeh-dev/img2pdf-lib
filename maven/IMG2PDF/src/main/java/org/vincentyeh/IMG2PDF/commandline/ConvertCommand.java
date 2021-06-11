@@ -1,12 +1,14 @@
 package org.vincentyeh.IMG2PDF.commandline;
 
 import org.vincentyeh.IMG2PDF.SharedSpace;
+import org.vincentyeh.IMG2PDF.commandline.converter.AbsoluteFileConverter;
 import org.vincentyeh.IMG2PDF.converter.PDFConverter;
 import org.vincentyeh.IMG2PDF.converter.listener.DefaultConversionInfoListener;
 import org.vincentyeh.IMG2PDF.commandline.converter.ByteSizeConverter;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskListConverter;
 import org.vincentyeh.IMG2PDF.util.BytesSize;
+import org.vincentyeh.IMG2PDF.util.file.FileUtils;
 import picocli.CommandLine;
 
 import java.awt.*;
@@ -19,7 +21,7 @@ import java.util.concurrent.Callable;
 
 @CommandLine.Command(name = "convert")
 public class ConvertCommand implements Callable<Integer> {
-    @CommandLine.Option(names = {"--temp_folder", "-tmp"}, defaultValue = ".org.vincentyeh.IMG2PDF.tmp")
+    @CommandLine.Option(names = {"--temp_folder", "-tmp"},converter = AbsoluteFileConverter.class, defaultValue = ".org.vincentyeh.IMG2PDF.tmp")
     File tempFolder;
 
     @CommandLine.Option(names = {"--memory_max_usage", "-mx"}, defaultValue = "50MB", converter = ByteSizeConverter.class)
@@ -31,7 +33,7 @@ public class ConvertCommand implements Callable<Integer> {
     @CommandLine.Option(names = {"--overwrite", "-ow"})
     boolean overwrite_output;
 
-    @CommandLine.Parameters
+    @CommandLine.Parameters(arity = "1..*",converter = AbsoluteFileConverter.class)
     List<File> tasklist_sources;
 
     @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true)
@@ -39,6 +41,7 @@ public class ConvertCommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws TaskListException, PDFConversionException {
+        checkParameters();
         System.out.println(SharedSpace.getResString("convert.import_tasklists"));
         for (File src : tasklist_sources) {
             try {
@@ -117,6 +120,28 @@ public class ConvertCommand implements Callable<Integer> {
 
     private List<String> readAllLinesFromTasklist(File tasklist) throws IOException {
         return Files.readAllLines(tasklist.toPath(), SharedSpace.Configuration.TASKLIST_READ_CHARSET);
+    }
+
+    private void checkParameters() {
+        if (tempFolder == null)
+            throw new IllegalArgumentException("tempFolder==null");
+        if (!tempFolder.isAbsolute())
+            throw new IllegalArgumentException("tempFolder is not absolute: " + tempFolder);
+        if (FileUtils.isRoot(tempFolder))
+            throw new IllegalArgumentException("tempFolder is root: " + tempFolder);
+
+        if (maxMainMemoryBytes == null)
+            throw new IllegalArgumentException("maxMainMemoryBytes==null");
+
+        if (tasklist_sources == null || tasklist_sources.isEmpty())
+            throw new IllegalArgumentException("sourceFiles==null");
+
+        for (File source : tasklist_sources) {
+            if (!source.isAbsolute())
+                throw new IllegalArgumentException("source is not absolute: " + source);
+            if (FileUtils.isRoot(source))
+                throw new IllegalArgumentException("source is root: " + source);
+        }
     }
 
     public static class NoTaskException extends RuntimeException {
