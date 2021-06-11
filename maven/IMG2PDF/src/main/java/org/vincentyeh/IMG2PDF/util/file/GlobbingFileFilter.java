@@ -10,6 +10,7 @@ import java.util.regex.PatternSyntaxException;
 
 public class GlobbingFileFilter implements FileFilter {
 	private final PathMatcher matcher;
+	private final String operator;
 
 	/**
 	 * @param operator filter operator
@@ -17,6 +18,7 @@ public class GlobbingFileFilter implements FileFilter {
 	 */
 	public GlobbingFileFilter(String operator)
 			throws PatternSyntaxException, UnsupportedOperationException {
+		this.operator = operator;
 		FileSystem fs = FileSystems.getDefault();
 		matcher = fs.getPathMatcher(operator);
 
@@ -30,4 +32,7 @@ public class GlobbingFileFilter implements FileFilter {
 	}
 
 
+	public String getOperator() {
+		return operator;
+	}
 }

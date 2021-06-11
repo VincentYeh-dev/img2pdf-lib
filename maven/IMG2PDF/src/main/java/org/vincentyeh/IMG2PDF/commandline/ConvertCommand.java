@@ -21,7 +21,11 @@ import java.util.concurrent.Callable;
 
 @CommandLine.Command(name = "convert")
 public class ConvertCommand implements Callable<Integer> {
-    @CommandLine.Option(names = {"--temp_folder", "-tmp"},converter = AbsoluteFileConverter.class, defaultValue = ".org.vincentyeh.IMG2PDF.tmp")
+
+    @CommandLine.ParentCommand
+    IMG2PDFCommand img2PDFCommand;
+
+    @CommandLine.Option(names = {"--temp_folder", "-tmp"}, converter = AbsoluteFileConverter.class, defaultValue = ".org.vincentyeh.IMG2PDF.tmp")
     File tempFolder;
 
     @CommandLine.Option(names = {"--memory_max_usage", "-mx"}, defaultValue = "50MB", converter = ByteSizeConverter.class)
@@ -33,7 +37,7 @@ public class ConvertCommand implements Callable<Integer> {
     @CommandLine.Option(names = {"--overwrite", "-ow"})
     boolean overwrite_output;
 
-    @CommandLine.Parameters(arity = "1..*",converter = AbsoluteFileConverter.class)
+    @CommandLine.Parameters(arity = "1..*", converter = AbsoluteFileConverter.class)
     List<File> tasklist_sources;
 
     @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true)
@@ -123,6 +127,7 @@ public class ConvertCommand implements Callable<Integer> {
     }
 
     private void checkParameters() {
+        printDebugLog("tempFolder=%s",true,tempFolder);
         if (tempFolder == null)
             throw new IllegalArgumentException("tempFolder==null");
         if (!tempFolder.isAbsolute())
@@ -130,17 +135,29 @@ public class ConvertCommand implements Callable<Integer> {
         if (FileUtils.isRoot(tempFolder))
             throw new IllegalArgumentException("tempFolder is root: " + tempFolder);
 
+        printDebugLog("maxMainMemoryBytes=%s",true,maxMainMemoryBytes.getBytes());
         if (maxMainMemoryBytes == null)
             throw new IllegalArgumentException("maxMainMemoryBytes==null");
 
         if (tasklist_sources == null || tasklist_sources.isEmpty())
             throw new IllegalArgumentException("sourceFiles==null");
 
+        printDebugLog("sources:",true);
         for (File source : tasklist_sources) {
+            printDebugLog("\t- %s",true,source);
             if (!source.isAbsolute())
                 throw new IllegalArgumentException("source is not absolute: " + source);
             if (FileUtils.isRoot(source))
                 throw new IllegalArgumentException("source is root: " + source);
+        }
+        printDebugLog("-----------------------",true);
+    }
+
+    private void printDebugLog(String msg, boolean nextLine, Object... objects) {
+        if (img2PDFCommand.isDebug()) {
+            System.out.printf(msg, objects);
+            if (nextLine)
+                System.out.println();
         }
     }
 

@@ -74,6 +74,7 @@ public class CreateCommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
+
         checkParameters();
 
         if (!overwrite && tasklist_dst.exists()) {
@@ -95,42 +96,53 @@ public class CreateCommand implements Callable<Integer> {
     }
 
     private void checkParameters() {
+        printDebugLog("fileSorter=%s",true,fileSorter);
         if (fileSorter == null)
             throw new IllegalArgumentException("fileSorter == null");
 
+
+        printDebugLog("filter=%s",true,filter.getOperator());
         if (filter == null)
             throw new IllegalArgumentException("filter == null");
 
+        printDebugLog("pdf_align=%s",true,pdf_align);
         if (pdf_align == null)
             throw new IllegalArgumentException("pdf_align == null");
 
+        printDebugLog("pdf_size=%s",true,pdf_size);
         if (pdf_size == null)
             throw new IllegalArgumentException("pdf_size == null");
 
+        printDebugLog("pdf_direction=%s",true,pdf_direction);
         if (pdf_direction == null)
             throw new IllegalArgumentException("pdf_direction == null");
 
+        printDebugLog("pdf_dst=%s",true,pdf_dst);
         if (pdf_dst == null)
             throw new IllegalArgumentException("pdf_dst == null");
 
+        printDebugLog("tasklist_dst=%s",true,tasklist_dst);
         if (tasklist_dst == null)
             throw new IllegalArgumentException("tasklist_dst==null");
 
         if (!tasklist_dst.isAbsolute())
             throw new IllegalArgumentException("tasklist is not absolute: " + tasklist_dst);
 
-        if(FileUtils.isRoot(tasklist_dst))
+        if (FileUtils.isRoot(tasklist_dst))
             throw new IllegalArgumentException("tasklist is root: " + tasklist_dst);
 
         if (sourceFiles == null || sourceFiles.isEmpty())
             throw new IllegalArgumentException("sourceFiles==null");
 
+        printDebugLog("sources:",true);
         for (File source : sourceFiles) {
+            printDebugLog("\t- %s",true,source);
             if (!source.isAbsolute())
                 throw new IllegalArgumentException("source is not absolute: " + source);
             if (FileUtils.isRoot(source))
                 throw new IllegalArgumentException("source is root: " + source);
         }
+        printDebugLog("-----------------------",true);
     }
 
     private PageArgument getPageArgument() {
@@ -193,6 +205,14 @@ public class CreateCommand implements Callable<Integer> {
 
         public File getFile() {
             return file;
+        }
+    }
+
+    private void printDebugLog(String msg, boolean nextLine,Object... objects) {
+        if (img2PDFCommand.isDebug()) {
+            System.out.printf(msg,objects);
+            if (nextLine)
+                System.out.println();
         }
     }
 }

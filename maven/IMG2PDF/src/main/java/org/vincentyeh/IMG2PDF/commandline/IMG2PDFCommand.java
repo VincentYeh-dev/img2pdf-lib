@@ -13,13 +13,11 @@ import java.util.concurrent.Callable;
         subcommands = {CreateCommand.class,ConvertCommand.class}
         )
 
-public class IMG2PDFCommand implements Callable<Integer> {
-    @CommandLine.Option(names = {"--debug", "-d"})
-    boolean debug;
+public class IMG2PDFCommand {
+    @CommandLine.Option(names = {"--debug","-d"})
+    private boolean debug;
 
-
-    @Override
-    public Integer call() throws Exception {
-        return null;
+    public boolean isDebug() {
+        return debug;
     }
 }

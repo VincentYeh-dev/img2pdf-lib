@@ -23,8 +23,8 @@ public class ResourceBundleExecutionHandler implements CommandLine.IExecutionExc
         try {
             msg = handler.handle(new HandleCondition(cmd.getCommand().getClass(), e));
         }catch (Handler.CantHandleException ex){
-            msg=e.getMessage();
             printErrorText(cmd,"Can't handle");
+            msg=e.getMessage();
         }
 
         printErrorText(cmd, msg);
