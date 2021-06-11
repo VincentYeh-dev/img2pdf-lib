@@ -17,7 +17,7 @@ public class ResourceBundleExecutionHandler implements CommandLine.IExecutionExc
 
     @Override
     public int handleExecutionException(Exception ex, CommandLine cmd, CommandLine.ParseResult parseResult) {
-        Handler<String,HandleCondition> handler=new CreateHandler(new ConvertHandler(null));
+        Handler<String,HandleCondition> handler=getHandler();
 
         String msg;
         try {
@@ -30,6 +30,10 @@ public class ResourceBundleExecutionHandler implements CommandLine.IExecutionExc
 
         printErrorText(cmd, msg);
         return CommandLine.ExitCode.SOFTWARE;
+    }
+
+    private Handler<String, HandleCondition> getHandler() {
+        return new CreateHandler(new ConvertHandler(null));
     }
 
 

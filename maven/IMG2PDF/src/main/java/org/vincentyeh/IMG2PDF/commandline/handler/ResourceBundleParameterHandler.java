@@ -19,13 +19,13 @@ public class ResourceBundleParameterHandler implements CommandLine.IParameterExc
     @Override
     public int handleParseException(CommandLine.ParameterException ex, String[] strings) {
         CommandLine cmd = ex.getCommandLine();
-        Handler<String,Exception> handler=new MissingParameterExceptionHandler(new TypeConversionExceptionHandler(new UnmatchedArgumentExceptionHandler(null)));
+        Handler<String, Exception> handler = getHandler();
         String msg;
         try {
             msg = handler.handle(ex);
-        }catch (Handler.CantHandleException e){
-            printErrorText(cmd,"Can't handle");
-            msg=ex.getMessage();
+        } catch (Handler.CantHandleException e) {
+            printErrorText(cmd, "Can't handle");
+            msg = ex.getMessage();
             ex.printStackTrace();
         }
 
@@ -36,6 +36,21 @@ public class ResourceBundleParameterHandler implements CommandLine.IParameterExc
         printText(cmd, String.format(getLocaleResource("try_help"), spec.qualifiedName()));
 
         return CommandLine.ExitCode.USAGE;
+    }
+
+    private Handler<String, Exception> getHandler() {
+        return new MissingParameterExceptionHandler(
+                new TypeConversionExceptionHandler(
+                        new UnmatchedArgumentExceptionHandler(new Handler<String, Exception>(null) {
+                            @Override
+                            public String handle(Exception data) {
+                                if(data instanceof CommandLine.ParameterException){
+                                    return data.getMessage();
+                                }else {
+                                    return doNext(data);
+                                }
+                            }
+                        })));
     }
 
     private void printErrorText(CommandLine cmd, String message) {
