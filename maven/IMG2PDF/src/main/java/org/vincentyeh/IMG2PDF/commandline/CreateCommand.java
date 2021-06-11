@@ -2,10 +2,7 @@ package org.vincentyeh.IMG2PDF.commandline;
 
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 import org.vincentyeh.IMG2PDF.SharedSpace;
-import org.vincentyeh.IMG2PDF.commandline.converter.AccessPermissionConverter;
-import org.vincentyeh.IMG2PDF.commandline.converter.FileSorterConverter;
-import org.vincentyeh.IMG2PDF.commandline.converter.GlobbingFileFilterConverter;
-import org.vincentyeh.IMG2PDF.commandline.converter.PageAlignConverter;
+import org.vincentyeh.IMG2PDF.commandline.converter.*;
 import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
 import org.vincentyeh.IMG2PDF.pdf.page.PageDirection;
 import org.vincentyeh.IMG2PDF.pdf.page.PageSize;
@@ -14,6 +11,7 @@ import org.vincentyeh.IMG2PDF.task.PageArgument;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskListConverter;
 import org.vincentyeh.IMG2PDF.task.factory.DirlistTaskFactory;
+import org.vincentyeh.IMG2PDF.util.file.FileUtils;
 import org.vincentyeh.IMG2PDF.util.file.GlobbingFileFilter;
 import org.vincentyeh.IMG2PDF.util.file.FileSorter;
 import picocli.CommandLine;
@@ -40,6 +38,7 @@ public class CreateCommand implements Callable<Integer> {
 
     @CommandLine.Option(names = {"--pdf_owner_password", "-popwd"})
     String pdf_owner_password;
+
     @CommandLine.Option(names = {"--pdf_user_password", "-pupwd"})
     String pdf_user_password;
 
@@ -49,7 +48,7 @@ public class CreateCommand implements Callable<Integer> {
     @CommandLine.Option(names = {"--pdf_align", "-pa"}, defaultValue = "CENTER-CENTER", converter = PageAlignConverter.class)
     PageAlign pdf_align;
 
-    @CommandLine.Option(names = {"--pdf_size", "-pz"},required = true)
+    @CommandLine.Option(names = {"--pdf_size", "-pz"}, required = true)
     PageSize pdf_size;
 
     @CommandLine.Option(names = {"--pdf_direction", "-pdi"}, defaultValue = "Portrait")
@@ -58,16 +57,16 @@ public class CreateCommand implements Callable<Integer> {
     @CommandLine.Option(names = {"--pdf_auto_rotate", "-par"})
     boolean pdf_auto_rotate;
 
-    @CommandLine.Option(names = {"--pdf_destination", "-pdst"},required = true)
+    @CommandLine.Option(names = {"--pdf_destination", "-pdst"}, required = true)
     String pdf_dst;
 
-    @CommandLine.Option(names = {"--list_destination", "-ldst"},required = true)
+    @CommandLine.Option(names = {"--list_destination", "-ldst"}, converter = AbsoluteFileConverter.class, required = true)
     File tasklist_dst;
 
     @CommandLine.Option(names = {"--overwrite", "-ow"})
     boolean overwrite;
 
-    @CommandLine.Parameters(arity = "1..*")
+    @CommandLine.Parameters(arity = "1..*", converter = AbsoluteFileConverter.class)
     List<File> sourceFiles;
 
     @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true)
@@ -75,7 +74,6 @@ public class CreateCommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-
         checkParameters();
 
         if (!overwrite && tasklist_dst.exists()) {
@@ -118,6 +116,21 @@ public class CreateCommand implements Callable<Integer> {
         if (tasklist_dst == null)
             throw new IllegalArgumentException("tasklist_dst==null");
 
+        if (!tasklist_dst.isAbsolute())
+            throw new IllegalArgumentException("tasklist is not absolute: " + tasklist_dst);
+
+        if(FileUtils.isRoot(tasklist_dst))
+            throw new IllegalArgumentException("tasklist is root: " + tasklist_dst);
+
+        if (sourceFiles == null || sourceFiles.isEmpty())
+            throw new IllegalArgumentException("sourceFiles==null");
+
+        for (File source : sourceFiles) {
+            if (!source.isAbsolute())
+                throw new IllegalArgumentException("source is not absolute: " + source);
+            if (FileUtils.isRoot(source))
+                throw new IllegalArgumentException("source is root: " + source);
+        }
     }
 
     private PageArgument getPageArgument() {
@@ -138,14 +151,15 @@ public class CreateCommand implements Callable<Integer> {
     }
 
     public void save(List<Task> taskList, File destination) throws SaveException {
-        destination.getParentFile().mkdirs();
 
         String content = new TaskListConverter().toXml(taskList);
         try {
+            FileUtils.getParentFile(destination).mkdirs();
+
             writeStringToFile(destination, content, SharedSpace.Configuration.TASKlIST_WRITE_CHARSET);
             System.out.printf("[" + SharedSpace.getResString("public.info.exported") + "] %s\n", tasklist_dst.getAbsolutePath());
-        } catch (IOException e) {
-            throw new SaveException(e,destination);
+        } catch (IOException | FileUtils.NoParentException e) {
+            throw new SaveException(e, destination);
         }
 
     }
@@ -170,7 +184,8 @@ public class CreateCommand implements Callable<Integer> {
     }
 
     public static class SaveException extends Exception {
-        private File file;
+        private final File file;
+
         public SaveException(Throwable cause, File file) {
             super(cause);
             this.file = file;
