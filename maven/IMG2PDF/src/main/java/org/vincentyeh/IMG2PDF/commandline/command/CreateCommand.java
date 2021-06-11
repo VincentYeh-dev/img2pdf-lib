@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.commandline;
+package org.vincentyeh.IMG2PDF.commandline.command;
 
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 import org.vincentyeh.IMG2PDF.SharedSpace;

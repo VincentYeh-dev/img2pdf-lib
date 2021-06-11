@@ -1,6 +1,6 @@
 package org.vincentyeh.IMG2PDF.commandline.handler.execution;
 
-import org.vincentyeh.IMG2PDF.commandline.ConvertCommand;
+import org.vincentyeh.IMG2PDF.commandline.command.ConvertCommand;
 import org.vincentyeh.IMG2PDF.commandline.handler.ResourceBundleExecutionHandler;
 import org.vincentyeh.IMG2PDF.converter.PDFConverter;
 import org.vincentyeh.IMG2PDF.pattern.Handler;

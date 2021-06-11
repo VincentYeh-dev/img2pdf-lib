@@ -1,8 +1,8 @@
-package org.vincentyeh.IMG2PDF.commandline;
+package org.vincentyeh.IMG2PDF.commandline.command;
 
+import org.vincentyeh.IMG2PDF.commandline.command.ConvertCommand;
+import org.vincentyeh.IMG2PDF.commandline.command.CreateCommand;
 import picocli.CommandLine;
-
-import java.util.concurrent.Callable;
 
 @CommandLine.Command(name = "img2pdf", mixinStandardHelpOptions = true,
         version = {
@@ -10,7 +10,7 @@ import java.util.concurrent.Callable;
         "Picocli " + picocli.CommandLine.VERSION,
         "JVM: ${java.version} (${java.vendor} ${java.vm.name} ${java.vm.version})",
         "OS: ${os.name} ${os.version} ${os.arch}"},
-        subcommands = {CreateCommand.class,ConvertCommand.class}
+        subcommands = {CreateCommand.class, ConvertCommand.class}
         )
 
 public class IMG2PDFCommand {

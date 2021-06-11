@@ -1,9 +1,8 @@
 package org.vincentyeh.IMG2PDF;
 
-import org.vincentyeh.IMG2PDF.commandline.IMG2PDFCommand;
+import org.vincentyeh.IMG2PDF.commandline.command.IMG2PDFCommand;
 import org.vincentyeh.IMG2PDF.commandline.handler.ResourceBundleExecutionHandler;
 import org.vincentyeh.IMG2PDF.commandline.handler.ResourceBundleParameterHandler;
-import org.vincentyeh.IMG2PDF.commandline.handler.execution.ResourceBundleHandler;
 import picocli.CommandLine;
 
 import java.util.Locale;
