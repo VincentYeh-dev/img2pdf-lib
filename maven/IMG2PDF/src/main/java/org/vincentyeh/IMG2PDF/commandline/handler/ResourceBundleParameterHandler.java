@@ -26,6 +26,7 @@ public class ResourceBundleParameterHandler implements CommandLine.IParameterExc
         }catch (Handler.CantHandleException e){
             printErrorText(cmd,"Can't handle");
             msg=ex.getMessage();
+            ex.printStackTrace();
         }
 
         printErrorText(cmd, msg);
