@@ -48,7 +48,7 @@ public class MainProgram {
         properties.setProperty("dirlist-read-charset","UTF-8");
         properties.setProperty("tasklist-write-charset","UTF-8");
         properties.setProperty("tasklist-read-charset","UTF-8");
-        properties.setProperty("language","en");
+        properties.setProperty("language",Locale.ROOT.toLanguageTag());
 
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("config.properties"), StandardCharsets.UTF_8));
