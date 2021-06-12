@@ -27,19 +27,19 @@ public class ConvertCommand implements Callable<Integer> {
     public static class Configurations {
         private final Locale locale;
         private final Charset TASKLIST_READ_CHARSET;
+        private final ResourceBundle resourceBundle;
 
-        public Configurations(Locale locale, Charset tasklist_read_charset) {
+        public Configurations(Locale locale, Charset tasklist_read_charset, ResourceBundle resourceBundle) {
             this.locale = locale;
             TASKLIST_READ_CHARSET = tasklist_read_charset;
+            this.resourceBundle = resourceBundle;
         }
     }
 
-    public ConvertCommand(ResourceBundle resourceBundle, Configurations configurations) {
-        this.resourceBundle = resourceBundle;
+    public ConvertCommand(Configurations configurations) {
         this.configurations = configurations;
     }
 
-    private final ResourceBundle resourceBundle;
     private final Configurations configurations;
 
     @CommandLine.ParentCommand
@@ -66,14 +66,14 @@ public class ConvertCommand implements Callable<Integer> {
     @Override
     public Integer call() throws TaskListException, PDFConversionException {
         checkParameters();
-        System.out.println(resourceBundle.getString("execution.convert.start.import_tasklists"));
+        System.out.println(configurations.resourceBundle.getString("execution.convert.start.import_tasklists"));
         for (File src : tasklist_sources) {
             try {
                 System.out.print(
-                        "\t[" + resourceBundle.getString("public.importing") + "] " + src.getAbsolutePath() + "\r");
+                        "\t[" + configurations.resourceBundle.getString("public.importing") + "] " + src.getAbsolutePath() + "\r");
                 List<Task> tasks = getTaskListFromFile(src);
-                System.out.print("\t[" + resourceBundle.getString("public.imported") + "] " + src.getAbsolutePath() + "\r\n\n");
-                System.out.println(resourceBundle.getString("execution.convert.start.start_conversion"));
+                System.out.print("\t[" + configurations.resourceBundle.getString("public.imported") + "] " + src.getAbsolutePath() + "\r\n\n");
+                System.out.println(configurations.resourceBundle.getString("execution.convert.start.start_conversion"));
                 convertAllToFile(tasks);
             } finally {
                 System.out.print("\n");

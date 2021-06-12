@@ -8,119 +8,21 @@ import org.vincentyeh.IMG2PDF.commandline.handler.ResourceBundleParameterHandler
 import picocli.CommandLine;
 
 import java.io.*;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.ResourceBundle;
 
 
 public class MainProgram {
 
-    private static final Locale[] supportedLocales = {
-            Locale.TRADITIONAL_CHINESE
-    };
-
     public static void main(String[] args) {
-        Properties properties=getProperties();
-        Locale locale=getLanguageSupport(getLocaleFromProperties(properties));
-//        locale=Locale.TAIWAN;
+        ConfigurationAgent.loadOrCreateProperties(new File("config.properties"));
 
-        ResourceBundle resourceBundle=ResourceBundle.getBundle("cmd",locale);
         CommandLine cmd = new CommandLine(new IMG2PDFCommand());
-        cmd.addSubcommand(new CreateCommand(resourceBundle,getCreateConfig(locale,properties)));
-        cmd.addSubcommand(new ConvertCommand(resourceBundle,getConvertConfig(locale,properties)));
+        cmd.addSubcommand(new CreateCommand(ConfigurationAgent.getCreateConfig()));
+        cmd.addSubcommand(new ConvertCommand(ConfigurationAgent.getConvertConfig()));
 
-        cmd.setExecutionExceptionHandler(new ResourceBundleExecutionHandler(resourceBundle));
-        cmd.setParameterExceptionHandler(new ResourceBundleParameterHandler(resourceBundle));
-        cmd.setResourceBundle(resourceBundle);
+        cmd.setExecutionExceptionHandler(new ResourceBundleExecutionHandler(ConfigurationAgent.getHandlerResourceBundle()));
+        cmd.setParameterExceptionHandler(new ResourceBundleParameterHandler(ConfigurationAgent.getHandlerResourceBundle()));
+        cmd.setResourceBundle(ConfigurationAgent.getCommandResourceBundle());
 
         System.exit(cmd.execute(args));
-    }
-
-    private static ConvertCommand.Configurations getConvertConfig(Locale locale, Properties properties) {
-        return new ConvertCommand.Configurations(locale, getTaskListReadCharsetFromProperties(properties));
-    }
-
-    private static Properties getProperties() {
-        Properties properties = new Properties();
-        properties.setProperty("dirlist-read-charset","UTF-8");
-        properties.setProperty("tasklist-write-charset","UTF-8");
-        properties.setProperty("tasklist-read-charset","UTF-8");
-        properties.setProperty("language",getLanguageSupport(Locale.getDefault()).toLanguageTag());
-
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("config.properties"), StandardCharsets.UTF_8));
-            properties.load(reader);
-        }catch (FileNotFoundException e){
-            try {
-                properties.store(new BufferedWriter(new OutputStreamWriter(new FileOutputStream("config.properties"))),"This config file is for img2pdf.");
-            } catch (IOException ioException) {
-                ioException.printStackTrace();
-            }
-        }catch (Exception e) {
-            System.err.println(e.getMessage());
-        }
-
-        return properties;
-    }
-
-
-    private static CreateCommand.Configurations getCreateConfig(Locale locale, Properties properties) {
-        return new CreateCommand.Configurations(locale,getTaskListWriteCharsetFromProperties(properties),getDirListReadCharsetFromProperties(properties));
-    }
-
-    private static Charset getDirListReadCharsetFromProperties(Properties properties) {
-        return getCharsetFromProperties("dirlist-read-charset",properties);
-    }
-
-    private static Charset getTaskListWriteCharsetFromProperties(Properties properties) {
-        return getCharsetFromProperties("tasklist-write-charset",properties);
-    }
-
-    private static Charset getTaskListReadCharsetFromProperties(Properties properties) {
-        return getCharsetFromProperties("tasklist-read-charset",properties);
-    }
-
-    private static Charset getCharsetFromProperties(String option,Properties properties){
-        String charset = properties.getProperty(option);
-        if (charset == null || charset.isEmpty()) {
-            System.err.printf("Option \"%s\" not found.\nUse default charset:UTF-8.\n",option);
-            return StandardCharsets.UTF_8;
-        }
-        try {
-            return Charset.forName(charset);
-        } catch (UnsupportedCharsetException e) {
-            System.err.printf("Option \"%s\" not support:%s.\nUse default charset:UTF-8\n", option);
-            return StandardCharsets.UTF_8;
-        }
-    }
-
-
-    private static Locale getLocaleFromProperties(Properties properties) {
-        String language = properties.getProperty("language");
-        if (language == null || language.isEmpty()) {
-            System.err.println("Option \"language\" not found.\nUse default language.");
-            return Locale.ROOT;
-        }
-        if(!Locale.forLanguageTag(language).toString().isEmpty())
-            return Locale.forLanguageTag(language);
-        else
-            return Locale.ROOT;
-    }
-
-
-    private static Locale getLanguageSupport(Locale target) {
-        if(target.equals(Locale.ROOT))
-            return target;
-
-        for (Locale locale : supportedLocales) {
-            if (target.equals(locale)) {
-                return locale;
-            }
-        }
-        System.err.printf("Option \"language\" locale not support:%s.\nUse default language.\n", target.toLanguageTag());
-        return Locale.ROOT;
     }
 }

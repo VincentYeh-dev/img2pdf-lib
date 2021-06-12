@@ -31,19 +31,19 @@ public class CreateCommand implements Callable<Integer> {
         private final Charset TASKlIST_WRITE_CHARSET;
         private final Charset DIRLIST_READ_CHARSET;
         private final Locale locale;
-        public Configurations(Locale locale, Charset TaskListWriteCharset, Charset DirlistReadCharset) {
+        private final ResourceBundle resourceBundle;
+        public Configurations(Locale locale, Charset TaskListWriteCharset, Charset DirlistReadCharset, ResourceBundle resourceBundle) {
             this.locale=locale;
             TASKlIST_WRITE_CHARSET = TaskListWriteCharset;
             DIRLIST_READ_CHARSET = DirlistReadCharset;
+            this.resourceBundle = resourceBundle;
         }
     }
 
-    public CreateCommand(ResourceBundle resourceBundle, Configurations configurations) {
-        this.resourceBundle = resourceBundle;
+    public CreateCommand(Configurations configurations) {
         this.configurations=configurations;
     }
 
-    private final ResourceBundle resourceBundle;
     private final Configurations configurations;
 
 
@@ -190,7 +190,7 @@ public class CreateCommand implements Callable<Integer> {
 
             writeStringToFile(destination, content, configurations.TASKlIST_WRITE_CHARSET);
 
-            System.out.printf("[" + resourceBundle.getString("public.exported") + "] %s\n", tasklist_dst.getAbsolutePath());
+            System.out.printf("[" + configurations.resourceBundle.getString("public.exported") + "] %s\n", tasklist_dst.getAbsolutePath());
         } catch (IOException | FileUtils.NoParentException e) {
             throw new SaveException(e, destination);
         }
