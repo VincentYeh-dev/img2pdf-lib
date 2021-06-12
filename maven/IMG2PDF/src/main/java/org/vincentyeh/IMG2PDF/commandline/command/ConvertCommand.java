@@ -2,7 +2,7 @@ package org.vincentyeh.IMG2PDF.commandline.command;
 
 import org.vincentyeh.IMG2PDF.commandline.converter.AbsoluteFileConverter;
 import org.vincentyeh.IMG2PDF.converter.PDFConverter;
-import org.vincentyeh.IMG2PDF.converter.listener.DefaultConversionInfoListener;
+import org.vincentyeh.IMG2PDF.converter.listener.DefaultConversionListener;
 import org.vincentyeh.IMG2PDF.commandline.converter.ByteSizeConverter;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskListConverter;
@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.concurrent.Callable;
 
@@ -24,9 +25,11 @@ import java.util.concurrent.Callable;
 public class ConvertCommand implements Callable<Integer> {
 
     public static class Configurations {
+        private final Locale locale;
         private final Charset TASKLIST_READ_CHARSET;
 
-        public Configurations(Charset tasklist_read_charset) {
+        public Configurations(Locale locale, Charset tasklist_read_charset) {
+            this.locale = locale;
             TASKLIST_READ_CHARSET = tasklist_read_charset;
         }
     }
@@ -63,14 +66,14 @@ public class ConvertCommand implements Callable<Integer> {
     @Override
     public Integer call() throws TaskListException, PDFConversionException {
         checkParameters();
-        System.out.println(resourceBundle.getString("convert.import_tasklists"));
+        System.out.println(resourceBundle.getString("execution.convert.start.import_tasklists"));
         for (File src : tasklist_sources) {
             try {
                 System.out.print(
                         "\t[" + resourceBundle.getString("public.importing") + "] " + src.getAbsolutePath() + "\r");
                 List<Task> tasks = getTaskListFromFile(src);
                 System.out.print("\t[" + resourceBundle.getString("public.imported") + "] " + src.getAbsolutePath() + "\r\n\n");
-                System.out.println(resourceBundle.getString("convert.start_conversion"));
+                System.out.println(resourceBundle.getString("execution.convert.start.start_conversion"));
                 convertAllToFile(tasks);
             } finally {
                 System.out.print("\n");
@@ -110,7 +113,7 @@ public class ConvertCommand implements Callable<Integer> {
     private File convertToFile(Task task) throws PDFConversionException {
         try {
             PDFConverter converter = new PDFConverter(task, maxMainMemoryBytes.getBytes(), tempFolder, overwrite_output);
-            converter.setInfoListener(new DefaultConversionInfoListener(resourceBundle));
+            converter.setInfoListener(new DefaultConversionListener(configurations.locale));
 
             return converter.start();
         } catch (Exception e) {

@@ -28,12 +28,12 @@ public class MainProgram {
     public static void main(String[] args) {
         Properties properties=getProperties();
         Locale locale=getLanguageSupport(getLocaleFromProperties(properties));
-        locale=Locale.TAIWAN;
+//        locale=Locale.TAIWAN;
 
         ResourceBundle resourceBundle=ResourceBundle.getBundle("cmd",locale);
         CommandLine cmd = new CommandLine(new IMG2PDFCommand());
-        cmd.addSubcommand(new CreateCommand(resourceBundle,getCreateConfig(properties)));
-        cmd.addSubcommand(new ConvertCommand(resourceBundle,getConvertConfig(properties)));
+        cmd.addSubcommand(new CreateCommand(resourceBundle,getCreateConfig(locale,properties)));
+        cmd.addSubcommand(new ConvertCommand(resourceBundle,getConvertConfig(locale,properties)));
 
         cmd.setExecutionExceptionHandler(new ResourceBundleExecutionHandler(resourceBundle));
         cmd.setParameterExceptionHandler(new ResourceBundleParameterHandler(resourceBundle));
@@ -42,8 +42,8 @@ public class MainProgram {
         System.exit(cmd.execute(args));
     }
 
-    private static ConvertCommand.Configurations getConvertConfig(Properties properties) {
-        return new ConvertCommand.Configurations(getTaskListReadCharsetFromProperties(properties));
+    private static ConvertCommand.Configurations getConvertConfig(Locale locale, Properties properties) {
+        return new ConvertCommand.Configurations(locale, getTaskListReadCharsetFromProperties(properties));
     }
 
     private static Properties getProperties(){
@@ -63,8 +63,8 @@ public class MainProgram {
     }
 
 
-    private static CreateCommand.Configurations getCreateConfig(Properties properties) {
-        return new CreateCommand.Configurations(getTaskListWriteCharsetFromProperties(properties),getDirListReadCharsetFromProperties(properties));
+    private static CreateCommand.Configurations getCreateConfig(Locale locale, Properties properties) {
+        return new CreateCommand.Configurations(locale,getTaskListWriteCharsetFromProperties(properties),getDirListReadCharsetFromProperties(properties));
     }
 
     private static Charset getDirListReadCharsetFromProperties(Properties properties) {

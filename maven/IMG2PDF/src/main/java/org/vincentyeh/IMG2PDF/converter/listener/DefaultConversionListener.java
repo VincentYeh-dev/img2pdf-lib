@@ -4,16 +4,17 @@ import org.vincentyeh.IMG2PDF.task.Task;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
-public class DefaultConversionInfoListener implements ConversionInfoListener {
+public class DefaultConversionListener implements ConversionInfoListener {
     private final char[] progress_bar;
     private final ResourceBundle resourceBundle;
     private Task task;
     private long startSeconds;
 
-    public DefaultConversionInfoListener(ResourceBundle resourceBundle) {
-        this.resourceBundle = resourceBundle;
+    public DefaultConversionListener(Locale locale) {
+        this.resourceBundle = ResourceBundle.getBundle("pdf_converter_listener",locale);
         progress_bar = new char[10];
         Arrays.fill(progress_bar, ' ');
     }

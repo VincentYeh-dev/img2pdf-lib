@@ -21,6 +21,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.concurrent.Callable;
 
@@ -29,8 +30,9 @@ public class CreateCommand implements Callable<Integer> {
     public static class Configurations {
         private final Charset TASKlIST_WRITE_CHARSET;
         private final Charset DIRLIST_READ_CHARSET;
-
-        public Configurations(Charset TaskListWriteCharset, Charset DirlistReadCharset) {
+        private final Locale locale;
+        public Configurations(Locale locale, Charset TaskListWriteCharset, Charset DirlistReadCharset) {
+            this.locale=locale;
             TASKlIST_WRITE_CHARSET = TaskListWriteCharset;
             DIRLIST_READ_CHARSET = DirlistReadCharset;
         }
