@@ -7,9 +7,7 @@ import org.vincentyeh.IMG2PDF.commandline.handler.ResourceBundleExecutionHandler
 import org.vincentyeh.IMG2PDF.commandline.handler.ResourceBundleParameterHandler;
 import picocli.CommandLine;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
@@ -21,8 +19,7 @@ import java.util.ResourceBundle;
 public class MainProgram {
 
     private static final Locale[] supportedLocales = {
-            Locale.TRADITIONAL_CHINESE,
-            Locale.ENGLISH
+            Locale.TRADITIONAL_CHINESE
     };
 
     public static void main(String[] args) {
@@ -46,17 +43,24 @@ public class MainProgram {
         return new ConvertCommand.Configurations(locale, getTaskListReadCharsetFromProperties(properties));
     }
 
-    private static Properties getProperties(){
+    private static Properties getProperties() {
         Properties properties = new Properties();
+        properties.setProperty("dirlist-read-charset","UTF-8");
+        properties.setProperty("tasklist-write-charset","UTF-8");
+        properties.setProperty("tasklist-read-charset","UTF-8");
+        properties.setProperty("language","en");
+
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("config.properties"), StandardCharsets.UTF_8));
             properties.load(reader);
-        } catch (Exception e) {
+        }catch (FileNotFoundException e){
+            try {
+                properties.store(new BufferedWriter(new OutputStreamWriter(new FileOutputStream("config.properties"))),"This config file is for img2pdf.");
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+        }catch (Exception e) {
             System.err.println(e.getMessage());
-            properties.setProperty("dirlist-read-charset","UTF-8");
-            properties.setProperty("tasklist-write-charset","UTF-8");
-            properties.setProperty("tasklist-read-charset","UTF-8");
-            properties.setProperty("language","en-US");
         }
 
         return properties;
