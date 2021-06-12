@@ -1,7 +1,6 @@
 package org.vincentyeh.IMG2PDF.commandline.command;
 
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
-import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.commandline.converter.*;
 import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
 import org.vincentyeh.IMG2PDF.pdf.page.PageDirection;
@@ -22,10 +21,29 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.concurrent.Callable;
 
 @CommandLine.Command(name = "create")
 public class CreateCommand implements Callable<Integer> {
+    public static class Configurations {
+        private final Charset TASKlIST_WRITE_CHARSET;
+        private final Charset DIRLIST_READ_CHARSET;
+
+        public Configurations(Charset TaskListWriteCharset, Charset DirlistReadCharset) {
+            TASKlIST_WRITE_CHARSET = TaskListWriteCharset;
+            DIRLIST_READ_CHARSET = DirlistReadCharset;
+        }
+    }
+
+    public CreateCommand(ResourceBundle resourceBundle, Configurations configurations) {
+        this.resourceBundle = resourceBundle;
+        this.configurations=configurations;
+    }
+
+    private final ResourceBundle resourceBundle;
+    private final Configurations configurations;
+
 
     @CommandLine.ParentCommand
     IMG2PDFCommand img2PDFCommand;
@@ -87,7 +105,7 @@ public class CreateCommand implements Callable<Integer> {
         List<Task> tasks = new ArrayList<>();
 
         for (File dirlist : sourceFiles) {
-            tasks.addAll(DirlistTaskFactory.createFromDirlist(dirlist, SharedSpace.Configuration.DIRLIST_READ_CHARSET));
+            tasks.addAll(DirlistTaskFactory.createFromDirlist(dirlist,configurations.DIRLIST_READ_CHARSET));
         }
 
         save(tasks, tasklist_dst);
@@ -168,8 +186,9 @@ public class CreateCommand implements Callable<Integer> {
         try {
             FileUtils.getParentFile(destination).mkdirs();
 
-            writeStringToFile(destination, content, SharedSpace.Configuration.TASKlIST_WRITE_CHARSET);
-            System.out.printf("[" + SharedSpace.getResString("public.info.exported") + "] %s\n", tasklist_dst.getAbsolutePath());
+            writeStringToFile(destination, content, configurations.TASKlIST_WRITE_CHARSET);
+
+            System.out.printf("[" + resourceBundle.getString("public.exported") + "] %s\n", tasklist_dst.getAbsolutePath());
         } catch (IOException | FileUtils.NoParentException e) {
             throw new SaveException(e, destination);
         }

@@ -1,17 +1,19 @@
 package org.vincentyeh.IMG2PDF.converter.listener;
 
-import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.task.Task;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.ResourceBundle;
 
 public class DefaultConversionInfoListener implements ConversionInfoListener {
     private final char[] progress_bar;
+    private final ResourceBundle resourceBundle;
     private Task task;
     private long startSeconds;
 
-    public DefaultConversionInfoListener() {
+    public DefaultConversionInfoListener(ResourceBundle resourceBundle) {
+        this.resourceBundle = resourceBundle;
         progress_bar = new char[10];
         Arrays.fill(progress_bar, ' ');
     }
@@ -39,13 +41,13 @@ public class DefaultConversionInfoListener implements ConversionInfoListener {
             counter++;
         }
         String name = task.getPdfDestination().getName();
-        System.out.printf("\t" + SharedSpace.getResString("convert.listener.converting") + "\r", new String(progress_bar), getSimplifiedName(name), index + 1, total, file.getName());
+        System.out.printf("\t" + resourceBundle.getString("convert.listener.converting") + "\r", new String(progress_bar), getSimplifiedName(name), index + 1, total, file.getName());
     }
 
     @Override
     public void onConversionComplete(File dst) {
         long completeSeconds = System.currentTimeMillis()/1000;
-        System.out.printf("\t" + SharedSpace.getResString("convert.listener.done") + "\r\n", (completeSeconds - startSeconds),dst.getAbsolutePath());
+        System.out.printf("\t" + resourceBundle.getString("convert.listener.done") + "\r\n", (completeSeconds - startSeconds),dst.getAbsolutePath());
     }
 
     private String getSimplifiedName(String raw){

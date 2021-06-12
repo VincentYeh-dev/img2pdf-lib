@@ -1,6 +1,5 @@
 package org.vincentyeh.IMG2PDF.commandline.command;
 
-import org.vincentyeh.IMG2PDF.SharedSpace;
 import org.vincentyeh.IMG2PDF.commandline.converter.AbsoluteFileConverter;
 import org.vincentyeh.IMG2PDF.converter.PDFConverter;
 import org.vincentyeh.IMG2PDF.converter.listener.DefaultConversionInfoListener;
@@ -15,12 +14,30 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.concurrent.Callable;
 
 @CommandLine.Command(name = "convert")
 public class ConvertCommand implements Callable<Integer> {
+
+    public static class Configurations {
+        private final Charset TASKLIST_READ_CHARSET;
+
+        public Configurations(Charset tasklist_read_charset) {
+            TASKLIST_READ_CHARSET = tasklist_read_charset;
+        }
+    }
+
+    public ConvertCommand(ResourceBundle resourceBundle, Configurations configurations) {
+        this.resourceBundle = resourceBundle;
+        this.configurations = configurations;
+    }
+
+    private final ResourceBundle resourceBundle;
+    private final Configurations configurations;
 
     @CommandLine.ParentCommand
     IMG2PDFCommand img2PDFCommand;
@@ -46,14 +63,14 @@ public class ConvertCommand implements Callable<Integer> {
     @Override
     public Integer call() throws TaskListException, PDFConversionException {
         checkParameters();
-        System.out.println(SharedSpace.getResString("convert.import_tasklists"));
+        System.out.println(resourceBundle.getString("convert.import_tasklists"));
         for (File src : tasklist_sources) {
             try {
                 System.out.print(
-                        "\t[" + SharedSpace.getResString("public.info.importing") + "] " + src.getAbsolutePath() + "\r");
+                        "\t[" + resourceBundle.getString("public.importing") + "] " + src.getAbsolutePath() + "\r");
                 List<Task> tasks = getTaskListFromFile(src);
-                System.out.print("\t[" + SharedSpace.getResString("public.info.imported") + "] " + src.getAbsolutePath() + "\r\n\n");
-                System.out.println(SharedSpace.getResString("convert.start_conversion"));
+                System.out.print("\t[" + resourceBundle.getString("public.imported") + "] " + src.getAbsolutePath() + "\r\n\n");
+                System.out.println(resourceBundle.getString("convert.start_conversion"));
                 convertAllToFile(tasks);
             } finally {
                 System.out.print("\n");
@@ -93,7 +110,7 @@ public class ConvertCommand implements Callable<Integer> {
     private File convertToFile(Task task) throws PDFConversionException {
         try {
             PDFConverter converter = new PDFConverter(task, maxMainMemoryBytes.getBytes(), tempFolder, overwrite_output);
-            converter.setInfoListener(new DefaultConversionInfoListener());
+            converter.setInfoListener(new DefaultConversionInfoListener(resourceBundle));
 
             return converter.start();
         } catch (Exception e) {
@@ -123,7 +140,7 @@ public class ConvertCommand implements Callable<Integer> {
     }
 
     private List<String> readAllLinesFromTasklist(File tasklist) throws IOException {
-        return Files.readAllLines(tasklist.toPath(), SharedSpace.Configuration.TASKLIST_READ_CHARSET);
+        return Files.readAllLines(tasklist.toPath(), configurations.TASKLIST_READ_CHARSET);
     }
 
     private void checkParameters() {
