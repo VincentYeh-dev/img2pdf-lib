@@ -79,7 +79,7 @@ public class ResourceBundleParameterHandler implements CommandLine.IParameterExc
     }
 
     private String getLocaleResource(String key) {
-        return resourceBundle.getString("err.parameter.handler." + key);
+        return resourceBundle.getString("parameter.handler." + key);
     }
 
     private String getPublicResource(String key) {

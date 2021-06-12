@@ -14,7 +14,7 @@ public class ConvertHandler extends ResourceBundleHandler<String, ResourceBundle
     }
 
     private String getLocaleResource(String key) {
-        return getResourceBundle().getString("err.execution.convert.handler." + key);
+        return getResourceBundle().getString("execution.convert.handler." + key);
     }
 
     private String getFileTypeResource(ConvertCommand.WrongFileTypeException.Type type) {

@@ -25,7 +25,7 @@ public class CreateHandler extends ResourceBundleHandler<String, ResourceBundleE
     }
 
     private String getLocaleResource(String key) {
-        return getResourceBundle().getString("err.execution.create.handler." + key);
+        return getResourceBundle().getString("execution.create.handler." + key);
     }
 
     private String getFileTypeResource(DirlistTaskFactory.WrongFileTypeException.Type type) {
