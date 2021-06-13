@@ -69,14 +69,14 @@ public class PDFConverter implements ConversionInfoListener {
     private void appendAllPageToDocument(File[] images, PDDocument document) throws ConversionException, ReadImageException {
         for (int i = 0; i < images.length; i++) {
             onConverting(i, images[i]);
-            appendPageToDocument(images[i],document);
+            appendPageToDocument(images[i], document);
         }
     }
 
     private void appendPageToDocument(File file, PDDocument document) throws ConversionException, ReadImageException {
         BufferedImage image = readImage(file);
         try {
-            document.addPage(getImagePage(image,document));
+            document.addPage(getImagePage(image, document));
         } catch (Exception e) {
             throw new ConversionException(file, e);
         }
@@ -97,8 +97,14 @@ public class PDFConverter implements ConversionInfoListener {
         }
     }
 
-    private PDPage getImagePage(BufferedImage img, PDDocument document) throws Exception {
-        return ImagePageFactory.getImagePage(document, task.getPageArgument(), img);
+    private PDPage getImagePage(BufferedImage image, PDDocument document) throws Exception {
+        ImagePageFactory.Builder builder = new ImagePageFactory.Builder();
+        builder.setAutoRotate(task.getPageArgument().getAutoRotate());
+        builder.setDirection(task.getPageArgument().getDirection());
+        builder.setSize(task.getPageArgument().getSize());
+        builder.setAlign(task.getPageArgument().getAlign());
+
+        return builder.build().getImagePage(document, image);
     }
 
     public void setInfoListener(ConversionInfoListener listener) {

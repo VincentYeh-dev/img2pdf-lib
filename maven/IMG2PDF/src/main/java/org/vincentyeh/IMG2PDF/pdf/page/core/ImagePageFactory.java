@@ -10,7 +10,6 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
-import org.vincentyeh.IMG2PDF.task.PageArgument;
 import org.vincentyeh.IMG2PDF.pdf.page.PageDirection;
 import org.vincentyeh.IMG2PDF.pdf.page.PageSize;
 
@@ -23,26 +22,69 @@ import static org.vincentyeh.IMG2PDF.pdf.page.PageDirection.Portrait;
  * @author VincentYeh
  */
 public class ImagePageFactory {
-    public static PDPage getImagePage(PDDocument document, PageArgument argument, BufferedImage raw_image) throws Exception {
+
+    public static class Builder{
+        private PageAlign align;
+        private PageSize size;
+        private PageDirection direction;
+        private boolean auto_rotate;
+
+        public void setAlign(PageAlign align) {
+            if(align==null)
+                throw new IllegalArgumentException("align==null");
+            this.align = align;
+        }
+
+        public void setSize(PageSize size) {
+            if(size==null)
+                throw new IllegalArgumentException("size==null");
+            this.size = size;
+        }
+
+        public void setDirection(PageDirection direction) {
+            if(direction==null)
+                throw new IllegalArgumentException("direction==null");
+            this.direction = direction;
+        }
+
+        public void setAutoRotate(boolean auto_rotate) {
+            this.auto_rotate = auto_rotate;
+        }
+
+        public ImagePageFactory build(){
+            return new ImagePageFactory(align,size,direction,auto_rotate);
+        }
+    }
+
+    private final PageAlign align;
+    private final PageSize size;
+    private final PageDirection direction;
+    private final boolean auto_rotate;
+
+    private ImagePageFactory(PageAlign align, PageSize size, PageDirection direction, boolean auto_rotate) {
+        this.align = align;
+        this.size = size;
+        this.direction = direction;
+        this.auto_rotate = auto_rotate;
+    }
+
+    public PDPage getImagePage(PDDocument document, BufferedImage raw_image) throws Exception {
         if (document == null)
             throw new IllegalArgumentException("document==null");
-
-        if (argument == null)
-            throw new IllegalArgumentException("argument==null");
 
         if (raw_image == null)
             throw new IllegalArgumentException("rawImage==null");
 
-        PageDirection direction= getSuitableDirection(raw_image,argument);
-        Size new_page_size = getSuitablePageSize(direction, argument.getSize(), raw_image);
+        PageDirection direction= getSuitableDirection(raw_image);
+        Size new_page_size = getSuitablePageSize(direction,size, raw_image);
         Size new_image_size = getMaxScaleImageSize(raw_image, new_page_size);
-        final Position new_position = calculateImagePosition(new_image_size, new_page_size, argument.getAlign());
+        final Position new_position = calculateImagePosition(new_image_size, new_page_size,align);
 
         return createPDPage(document,raw_image,new_image_size,new_position,new_page_size);
     }
 
 
-    private static PDPage createPDPage(PDDocument document, BufferedImage image, Size image_size, Position position, Size page_size) throws IOException {
+    private PDPage createPDPage(PDDocument document, BufferedImage image, Size image_size, Position position, Size page_size) throws IOException {
         PDImageXObject pdImageXObject = LosslessFactory.createFromImage(document, image);
 
         PDPage pdPage = new PDPage(new PDRectangle(page_size.getWidth(), page_size.getHeight()));
@@ -54,28 +96,28 @@ public class ImagePageFactory {
         return pdPage;
     }
 
-    private static Size getMaxScaleImageSize(BufferedImage rawImage, Size page_size) {
+    private Size getMaxScaleImageSize(BufferedImage rawImage, Size page_size) {
         return SizeCalculator.getInstance().scaleUpToMax(new Size(rawImage.getHeight(), rawImage.getWidth()), page_size);
     }
 
-    private static Position calculateImagePosition(Size img_size, Size page_size, PageAlign align) {
+    private Position calculateImagePosition(Size img_size, Size page_size, PageAlign align) {
         PositionCalculator positionCalculator = PositionCalculator.getInstance();
         PositionCalculator.init(img_size.getHeight(), img_size.getWidth(), page_size.getHeight(), page_size.getWidth());
         return positionCalculator.calculate(align);
     }
 
-    private static PageDirection getSuitableDirection(BufferedImage image,PageArgument argument) {
-        if (argument.getSize() == PageSize.DEPEND_ON_IMG) {
+    private PageDirection getSuitableDirection(BufferedImage image) {
+        if (size == PageSize.DEPEND_ON_IMG) {
             return Portrait;
         }
-        if (argument.getAutoRotate()) {
+        if (auto_rotate) {
             return detectDirection(image.getHeight(),image.getWidth());
         } else {
-            return argument.getDirection();
+            return direction;
         }
     }
 
-    private static Size getSuitablePageSize(PageDirection direction, PageSize pageSize, BufferedImage image) {
+    private Size getSuitablePageSize(PageDirection direction, PageSize pageSize, BufferedImage image) {
         if (pageSize == PageSize.DEPEND_ON_IMG) {
             return new Size(image.getHeight(), image.getWidth());
         } else {
@@ -87,7 +129,7 @@ public class ImagePageFactory {
         }
     }
 
-    private static PageDirection detectDirection(float height,float width) {
+    private PageDirection detectDirection(float height,float width) {
         return PageDirection.detectDirection(height,width);
     }
 
