@@ -39,6 +39,7 @@
               <goal>shade</goal>
             </goals>
             <configuration>
+              <finalName>${jar-name}</finalName>
               <filters>
                 <filter>
                   <artifact>*:*</artifact>
@@ -57,9 +58,37 @@
               </artifactSet>
               <transformers>
                 <transformer>
-                  <mainClass>org.vincentyeh.IMG2PDF.MainProgram</mainClass>
+                  <mainClass>${main-class}</mainClass>
                 </transformer>
               </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>com.akathist.maven.plugins.launch4j</groupId>
+        <artifactId>launch4j-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>l4j-clui</id>
+            <phase>package</phase>
+            <goals>
+              <goal>launch4j</goal>
+            </goals>
+            <configuration>
+              <headerType>console</headerType>
+              <jar>target/${jar-name}.jar</jar>
+              <outfile>target/bin/${exe-name}.exe</outfile>
+              <downloadUrl>http://www.java.com</downloadUrl>
+              <classPath>
+                <mainClass>${main-class}</mainClass>
+              </classPath>
+              <jre>
+                <bundledJre64Bit>false</bundledJre64Bit>
+                <bundledJreAsFallback>false</bundledJreAsFallback>
+                <minVersion>${maven.compiler.source}</minVersion>
+                <jdkPreference>preferJre</jdkPreference>
+              </jre>
             </configuration>
           </execution>
         </executions>
@@ -87,8 +116,11 @@
     </site>
   </distributionManagement>
   <properties>
+    <exe-name>img2pdf</exe-name>
+    <main-class>org.vincentyeh.IMG2PDF.MainProgram</main-class>
     <maven.compiler.source>1.8</maven.compiler.source>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <jar-name>${project.name}-${project.version}</jar-name>
   </properties>
 </project>
