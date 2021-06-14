@@ -2,7 +2,7 @@ package org.vincentyeh.IMG2PDF.commandline.handler.core;
 
 
 import org.vincentyeh.IMG2PDF.commandline.exception.PDFConversionException;
-import org.vincentyeh.IMG2PDF.converter.PDFConverter;
+import org.vincentyeh.IMG2PDF.pdf.converter.PDFConverter;
 import org.vincentyeh.IMG2PDF.pattern.Handler;
 
 public class PDFConversionExceptionHandler extends ExceptionHandler{
