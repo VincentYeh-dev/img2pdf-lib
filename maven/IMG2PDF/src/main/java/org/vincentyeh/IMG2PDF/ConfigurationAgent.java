@@ -1,6 +1,6 @@
 package org.vincentyeh.IMG2PDF;
 
-import org.vincentyeh.IMG2PDF.commandline.command.NewConvertCommand;
+import org.vincentyeh.IMG2PDF.commandline.command.ConvertCommand;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -61,8 +61,8 @@ public class ConfigurationAgent {
         return ResourceBundle.getBundle("cmd",locale);
     }
 
-    public static NewConvertCommand.Configurations getConvertConfig() {
-        return new NewConvertCommand.Configurations(locale,getDirListReadCharsetFromProperties(properties), ResourceBundle.getBundle("cmd",locale));
+    public static ConvertCommand.Configurations getConvertConfig() {
+        return new ConvertCommand.Configurations(locale,getDirListReadCharsetFromProperties(properties), ResourceBundle.getBundle("cmd",locale));
     }
 
 

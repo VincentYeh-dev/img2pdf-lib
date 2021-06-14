@@ -28,8 +28,8 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.concurrent.Callable;
 
-@CommandLine.Command(name = "new")
-public class NewConvertCommand implements Callable<Integer> {
+@CommandLine.Command(name = "convert")
+public class ConvertCommand implements Callable<Integer> {
 
     @CommandLine.ParentCommand
     IMG2PDFCommand img2PDFCommand;
@@ -97,7 +97,7 @@ public class NewConvertCommand implements Callable<Integer> {
         }
     }
 
-    public NewConvertCommand(Configurations create_config) {
+    public ConvertCommand(Configurations create_config) {
         this.configurations = create_config;
     }
 

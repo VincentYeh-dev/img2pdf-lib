@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.exception;
+package org.vincentyeh.IMG2PDF.util.file.exception;
 
 
 public class WrongFileTypeException extends RuntimeException {
@@ -7,14 +7,14 @@ public class WrongFileTypeException extends RuntimeException {
         FOLDER, FILE
     }
 
-    private final WrongFileTypeException.Type expected;
-    private final WrongFileTypeException.Type value;
+    private final Type expected;
+    private final Type value;
 
-    public WrongFileTypeException.Type getExpected() {
+    public Type getExpected() {
         return expected;
     }
 
-    public WrongFileTypeException.Type getValue() {
+    public Type getValue() {
         return value;
     }
 

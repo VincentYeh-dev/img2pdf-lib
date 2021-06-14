@@ -2,7 +2,7 @@ package org.vincentyeh.IMG2PDF.commandline.handler;
 
 import org.vincentyeh.IMG2PDF.commandline.exception.*;
 import org.vincentyeh.IMG2PDF.converter.PDFConverter;
-import org.vincentyeh.IMG2PDF.exception.WrongFileTypeException;
+import org.vincentyeh.IMG2PDF.util.file.exception.WrongFileTypeException;
 import org.vincentyeh.IMG2PDF.pattern.Handler;
 import org.vincentyeh.IMG2PDF.task.factory.DirlistTaskFactory;
 import picocli.CommandLine;
@@ -46,7 +46,7 @@ public class ResourceBundleExecutionHandler implements CommandLine.IExecutionExc
     }
 
     private String getLocaleResource(String key) {
-        return resourceBundle.getString("execution.create.handler." + key);
+        return resourceBundle.getString("execution.convert.handler." + key);
     }
 
     private String getFileTypeResource(WrongFileTypeException.Type type) {

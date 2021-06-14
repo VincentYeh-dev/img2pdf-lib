@@ -1,6 +1,6 @@
 package org.vincentyeh.IMG2PDF.task.factory;
 
-import org.vincentyeh.IMG2PDF.exception.WrongFileTypeException;
+import org.vincentyeh.IMG2PDF.util.file.exception.WrongFileTypeException;
 import org.vincentyeh.IMG2PDF.task.DocumentArgument;
 import org.vincentyeh.IMG2PDF.task.PageArgument;
 import org.vincentyeh.IMG2PDF.task.Task;
@@ -60,7 +60,7 @@ public abstract class DirlistTaskFactory {
             throw new SourceFileException(new FileNotFoundException("File not found: " + result.getAbsolutePath()), result);
         }
 
-        if (result.isDirectory()) {
+        if (!result.isDirectory()) {
             throw new SourceFileException(new WrongFileTypeException(WrongFileTypeException.Type.FOLDER, WrongFileTypeException.Type.FILE), result);
         }
 
