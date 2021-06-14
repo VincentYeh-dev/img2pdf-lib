@@ -1,5 +1,6 @@
 package org.vincentyeh.IMG2PDF.task.factory;
 
+import org.vincentyeh.IMG2PDF.exception.WrongFileTypeException;
 import org.vincentyeh.IMG2PDF.task.DocumentArgument;
 import org.vincentyeh.IMG2PDF.task.PageArgument;
 import org.vincentyeh.IMG2PDF.task.Task;
@@ -59,7 +60,7 @@ public abstract class DirlistTaskFactory {
             throw new SourceFileException(new FileNotFoundException("File not found: " + result.getAbsolutePath()), result);
         }
 
-        if (!result.isDirectory()) {
+        if (result.isDirectory()) {
             throw new SourceFileException(new WrongFileTypeException(WrongFileTypeException.Type.FOLDER, WrongFileTypeException.Type.FILE), result);
         }
 
@@ -152,28 +153,6 @@ public abstract class DirlistTaskFactory {
     public static class EmptyImagesException extends RuntimeException{
         public EmptyImagesException(String message) {
             super(message);
-        }
-    }
-
-    public static class WrongFileTypeException extends RuntimeException{
-        public enum Type{
-            FOLDER,FILE
-        }
-        private final Type expected;
-        private final Type value;
-
-        public Type getExpected() {
-            return expected;
-        }
-
-        public Type getValue() {
-            return value;
-        }
-
-        public WrongFileTypeException(Type expected, Type value) {
-            super(value+"!="+expected+"(expected)");
-            this.expected = expected;
-            this.value = value;
         }
     }
 
