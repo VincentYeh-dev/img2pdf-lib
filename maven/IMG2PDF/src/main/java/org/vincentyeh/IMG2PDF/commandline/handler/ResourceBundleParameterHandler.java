@@ -1,5 +1,6 @@
 package org.vincentyeh.IMG2PDF.commandline.handler;
 
+import org.vincentyeh.IMG2PDF.pattern.Handler;
 import picocli.CommandLine;
 
 import java.io.PrintWriter;
@@ -16,74 +17,40 @@ public class ResourceBundleParameterHandler implements CommandLine.IParameterExc
     }
 
     @Override
-    public int handleParseException(CommandLine.ParameterException ex, String[] strings) throws Exception {
+    public int handleParseException(CommandLine.ParameterException ex, String[] strings) {
         CommandLine cmd = ex.getCommandLine();
-        handleSpecifiedException(cmd, ex);
+        Handler<String, Exception> handler = getHandler();
+        String msg;
+        try {
+            msg = handler.handle(ex);
+        } catch (Handler.CantHandleException e) {
+            printErrorText(cmd, "Can't handle");
+            msg = ex.getMessage();
+            ex.printStackTrace();
+        }
+
+        printErrorText(cmd, msg);
+
         printText(cmd, cmd.getHelp().fullSynopsis());
         CommandLine.Model.CommandSpec spec = cmd.getCommandSpec();
         printText(cmd, String.format(getLocaleResource("try_help"), spec.qualifiedName()));
 
-        return cmd.getExitCodeExceptionMapper() != null
-                ? cmd.getExitCodeExceptionMapper().getExitCode(ex)
-                : spec.exitCodeOnInvalidInput();
+        return CommandLine.ExitCode.USAGE;
     }
 
-    private void handleSpecifiedException(CommandLine cmd, CommandLine.ParameterException ex) {
-        if (ex instanceof CommandLine.MissingParameterException) {
-            handleMissingParameter(cmd, ex);
-        } else if (ex.getCause() != null && ex.getCause() instanceof CommandLine.TypeConversionException) {
-            handleInternalTypeConversion(cmd, ex);
-        } else if (ex instanceof CommandLine.UnmatchedArgumentException) {
-            handleUnmatchedArgument(cmd, ex);
-        } else {
-            printErrorText(cmd, ex.getMessage());
-        }
-    }
-
-    private void handleUnmatchedArgument(CommandLine cmd, CommandLine.ParameterException ex) {
-        CommandLine.UnmatchedArgumentException exception = (CommandLine.UnmatchedArgumentException) ex;
-        String list = exception.getUnmatched().stream().map(str -> '\'' + str + '\'').collect(Collectors.joining(", "));
-        printErrorText(cmd, String.format(getLocaleResource("unmatched_argument.unknown_option"), list));
-    }
-
-    private void handleInternalTypeConversion(CommandLine cmd, CommandLine.ParameterException ex) {
-        CommandLine.Model.ArgSpec argSpec = ex.getArgSpec();
-        Class<?> clazz = argSpec.type();
-
-        CommandLine.Model.OptionSpec optionSpec = (CommandLine.Model.OptionSpec) argSpec;
-        if (clazz.isEnum())
-            printErrorText(cmd, String.format(getLocaleResource("type_convert.enum"), getResourceArgSpecType(argSpec), optionSpec.longestName(), getEnumConstants(clazz), ex.getValue()));
-        else
-            printErrorText(cmd, String.format(getLocaleResource("type_convert.normal"), getResourceArgSpecType(argSpec), optionSpec.longestName(), ex.getValue()));
-
-    }
-
-    private void handleMissingParameter(CommandLine cmd, CommandLine.ParameterException ex) {
-        CommandLine.MissingParameterException exception = (CommandLine.MissingParameterException) ex;
-
-        List<String> param_list = exception.getMissing().stream()
-                .filter(CommandLine.Model.ArgSpec::isPositional)
-                .map(argSpec -> {
-                    CommandLine.Model.PositionalParamSpec positionalParamSpec = (CommandLine.Model.PositionalParamSpec) argSpec;
-                    return positionalParamSpec.paramLabel();
-                })
-                .collect(Collectors.toList());
-
-
-        List<String> option_list = exception.getMissing().stream()
-                .filter(CommandLine.Model.ArgSpec::isOption)
-                .map(argSpec -> {
-                    CommandLine.Model.OptionSpec optionSpec = (CommandLine.Model.OptionSpec) argSpec;
-                    return optionSpec.longestName();
-                })
-                .collect(Collectors.toList());
-
-        if (!param_list.isEmpty())
-            printErrorText(cmd, String.format(getLocaleResource("missing_required.parameter"), String.join(", ", param_list)));
-
-        if (!option_list.isEmpty())
-            printErrorText(cmd, String.format(getLocaleResource("missing_required.option"), String.join(", ", option_list)));
-
+    private Handler<String, Exception> getHandler() {
+        return new MissingParameterExceptionHandler(
+                new TypeConversionExceptionHandler(
+                        new UnmatchedArgumentExceptionHandler(new Handler<String, Exception>(null) {
+                            @Override
+                            public String handle(Exception data) {
+                                if(data instanceof CommandLine.ParameterException){
+                                    return data.getMessage();
+                                }else {
+                                    return doNext(data);
+                                }
+                            }
+                        })));
     }
 
     private void printErrorText(CommandLine cmd, String message) {
@@ -97,7 +64,7 @@ public class ResourceBundleParameterHandler implements CommandLine.IParameterExc
     }
 
     private String getEnumConstants(Class<?> clazz) {
-        if(!clazz.isEnum())
+        if (!clazz.isEnum())
             throw new IllegalArgumentException("clazz is not a enum.");
         List<String> constants = Arrays.stream(clazz.getEnumConstants()).map(Object::toString).collect(Collectors.toList());
         return String.join(", ", constants);
@@ -112,11 +79,93 @@ public class ResourceBundleParameterHandler implements CommandLine.IParameterExc
     }
 
     private String getLocaleResource(String key) {
-        return resourceBundle.getString("err.parameter.handler." + key);
+        return resourceBundle.getString("parameter.handler." + key);
     }
 
     private String getPublicResource(String key) {
         return resourceBundle.getString("public." + key);
     }
 
+    private class UnmatchedArgumentExceptionHandler extends Handler<String, Exception> {
+
+        public UnmatchedArgumentExceptionHandler(Handler<String, Exception> next) {
+            super(next);
+        }
+
+        @Override
+        public String handle(Exception data) {
+            if (data instanceof CommandLine.UnmatchedArgumentException) {
+                CommandLine.UnmatchedArgumentException exception = (CommandLine.UnmatchedArgumentException) data;
+                String list = exception.getUnmatched().stream().map(str -> '\'' + str + '\'').collect(Collectors.joining(", "));
+                return String.format(getLocaleResource("unmatched_argument.unknown_option"), list);
+            } else {
+                return doNext(data);
+            }
+        }
+    }
+
+    private class MissingParameterExceptionHandler extends Handler<String, Exception> {
+
+        public MissingParameterExceptionHandler(Handler<String, Exception> next) {
+            super(next);
+        }
+
+        @Override
+        public String handle(Exception data) {
+            if (data instanceof CommandLine.MissingParameterException) {
+                CommandLine.MissingParameterException exception = (CommandLine.MissingParameterException) data;
+                List<String> param_list = exception.getMissing().stream()
+                        .filter(CommandLine.Model.ArgSpec::isPositional)
+                        .map(argSpec -> {
+                            CommandLine.Model.PositionalParamSpec positionalParamSpec = (CommandLine.Model.PositionalParamSpec) argSpec;
+                            return positionalParamSpec.paramLabel();
+                        })
+                        .collect(Collectors.toList());
+
+
+                List<String> option_list = exception.getMissing().stream()
+                        .filter(CommandLine.Model.ArgSpec::isOption)
+                        .map(argSpec -> {
+                            CommandLine.Model.OptionSpec optionSpec = (CommandLine.Model.OptionSpec) argSpec;
+                            return optionSpec.longestName();
+                        })
+                        .collect(Collectors.toList());
+
+                StringBuilder builder = new StringBuilder();
+                if (!param_list.isEmpty())
+                    builder.append(String.format(getLocaleResource("missing_required.parameter") + '\n', String.join(", ", param_list)));
+
+                if (!option_list.isEmpty())
+                    builder.append(String.format(getLocaleResource("missing_required.option") + '\n', String.join(", ", option_list)));
+
+                return builder.toString();
+            } else {
+                return doNext(data);
+            }
+        }
+    }
+
+    private class TypeConversionExceptionHandler extends Handler<String, Exception> {
+
+        public TypeConversionExceptionHandler(Handler<String, Exception> next) {
+            super(next);
+        }
+
+        @Override
+        public String handle(Exception data) {
+            if (data.getCause() != null && data.getCause() instanceof CommandLine.TypeConversionException) {
+                CommandLine.ParameterException ex = (CommandLine.ParameterException) data;
+                CommandLine.Model.ArgSpec argSpec = ex.getArgSpec();
+                Class<?> clazz = argSpec.type();
+
+                CommandLine.Model.OptionSpec optionSpec = (CommandLine.Model.OptionSpec) argSpec;
+                if (clazz.isEnum())
+                    return String.format(getLocaleResource("type_convert.enum"), getResourceArgSpecType(argSpec), optionSpec.longestName(), getEnumConstants(clazz), ex.getValue());
+                else
+                    return String.format(getLocaleResource("type_convert.normal"), getResourceArgSpecType(argSpec), optionSpec.longestName(), ex.getValue());
+            } else {
+                return doNext(data);
+            }
+        }
+    }
 }

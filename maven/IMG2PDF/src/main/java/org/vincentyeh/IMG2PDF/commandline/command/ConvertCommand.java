@@ -1,25 +1,51 @@
-package org.vincentyeh.IMG2PDF.commandline;
+package org.vincentyeh.IMG2PDF.commandline.command;
 
-import org.vincentyeh.IMG2PDF.SharedSpace;
+import org.vincentyeh.IMG2PDF.commandline.converter.AbsoluteFileConverter;
 import org.vincentyeh.IMG2PDF.converter.PDFConverter;
-import org.vincentyeh.IMG2PDF.converter.listener.DefaultConversionInfoListener;
+import org.vincentyeh.IMG2PDF.converter.listener.DefaultConversionListener;
 import org.vincentyeh.IMG2PDF.commandline.converter.ByteSizeConverter;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.TaskListConverter;
 import org.vincentyeh.IMG2PDF.util.BytesSize;
+import org.vincentyeh.IMG2PDF.util.file.FileUtils;
 import picocli.CommandLine;
 
 import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.concurrent.Callable;
 
 @CommandLine.Command(name = "convert")
 public class ConvertCommand implements Callable<Integer> {
-    @CommandLine.Option(names = {"--temp_folder", "-tmp"}, defaultValue = ".org.vincentyeh.IMG2PDF.tmp")
+
+    public static class Configurations {
+        private final Locale locale;
+        private final Charset TASKLIST_READ_CHARSET;
+        private final ResourceBundle resourceBundle;
+
+        public Configurations(Locale locale, Charset tasklist_read_charset, ResourceBundle resourceBundle) {
+            this.locale = locale;
+            TASKLIST_READ_CHARSET = tasklist_read_charset;
+            this.resourceBundle = resourceBundle;
+        }
+    }
+
+    public ConvertCommand(Configurations configurations) {
+        this.configurations = configurations;
+    }
+
+    private final Configurations configurations;
+
+    @CommandLine.ParentCommand
+    IMG2PDFCommand img2PDFCommand;
+
+    @CommandLine.Option(names = {"--temp_folder", "-tmp"}, converter = AbsoluteFileConverter.class, defaultValue = ".org.vincentyeh.IMG2PDF.tmp")
     File tempFolder;
 
     @CommandLine.Option(names = {"--memory_max_usage", "-mx"}, defaultValue = "50MB", converter = ByteSizeConverter.class)
@@ -31,7 +57,7 @@ public class ConvertCommand implements Callable<Integer> {
     @CommandLine.Option(names = {"--overwrite", "-ow"})
     boolean overwrite_output;
 
-    @CommandLine.Parameters
+    @CommandLine.Parameters(arity = "1..*", converter = AbsoluteFileConverter.class)
     List<File> tasklist_sources;
 
     @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true)
@@ -39,21 +65,22 @@ public class ConvertCommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws TaskListException, PDFConversionException {
-        System.out.println(SharedSpace.getResString("convert.import_tasklists"));
+        checkParameters();
+        System.out.println(configurations.resourceBundle.getString("execution.convert.start.import_tasklists"));
         for (File src : tasklist_sources) {
             try {
                 System.out.print(
-                        "\t[" + SharedSpace.getResString("public.info.importing") + "] " + src.getAbsolutePath() + "\r");
+                        "\t[" + configurations.resourceBundle.getString("public.importing") + "] " + src.getAbsolutePath() + "\r");
                 List<Task> tasks = getTaskListFromFile(src);
-                System.out.print("\t[" + SharedSpace.getResString("public.info.imported") + "] " + src.getAbsolutePath() + "\r\n\n");
-                System.out.println(SharedSpace.getResString("convert.start_conversion"));
+                System.out.print("\t[" + configurations.resourceBundle.getString("public.imported") + "] " + src.getAbsolutePath() + "\r\n\n");
+                System.out.println(configurations.resourceBundle.getString("execution.convert.start.start_conversion"));
                 convertAllToFile(tasks);
             } finally {
                 System.out.print("\n");
             }
         }
 
-        return 0;
+        return CommandLine.ExitCode.OK;
     }
 
     private void convertAllToFile(List<Task> tasks) throws PDFConversionException {
@@ -86,7 +113,7 @@ public class ConvertCommand implements Callable<Integer> {
     private File convertToFile(Task task) throws PDFConversionException {
         try {
             PDFConverter converter = new PDFConverter(task, maxMainMemoryBytes.getBytes(), tempFolder, overwrite_output);
-            converter.setInfoListener(new DefaultConversionInfoListener());
+            converter.setInfoListener(new DefaultConversionListener(configurations.locale));
 
             return converter.start();
         } catch (Exception e) {
@@ -116,7 +143,42 @@ public class ConvertCommand implements Callable<Integer> {
     }
 
     private List<String> readAllLinesFromTasklist(File tasklist) throws IOException {
-        return Files.readAllLines(tasklist.toPath(), SharedSpace.Configuration.TASKLIST_READ_CHARSET);
+        return Files.readAllLines(tasklist.toPath(), configurations.TASKLIST_READ_CHARSET);
+    }
+
+    private void checkParameters() {
+        printDebugLog("tempFolder=%s",true,tempFolder);
+        if (tempFolder == null)
+            throw new IllegalArgumentException("tempFolder==null");
+        if (!tempFolder.isAbsolute())
+            throw new IllegalArgumentException("tempFolder is not absolute: " + tempFolder);
+        if (FileUtils.isRoot(tempFolder))
+            throw new IllegalArgumentException("tempFolder is root: " + tempFolder);
+
+        printDebugLog("maxMainMemoryBytes=%s",true,maxMainMemoryBytes.getBytes());
+        if (maxMainMemoryBytes == null)
+            throw new IllegalArgumentException("maxMainMemoryBytes==null");
+
+        if (tasklist_sources == null || tasklist_sources.isEmpty())
+            throw new IllegalArgumentException("sourceFiles==null");
+
+        printDebugLog("sources:",true);
+        for (File source : tasklist_sources) {
+            printDebugLog("\t- %s",true,source);
+            if (!source.isAbsolute())
+                throw new IllegalArgumentException("source is not absolute: " + source);
+            if (FileUtils.isRoot(source))
+                throw new IllegalArgumentException("source is root: " + source);
+        }
+        printDebugLog("-----------------------",true);
+    }
+
+    private void printDebugLog(String msg, boolean nextLine, Object... objects) {
+        if (img2PDFCommand.isDebug()) {
+            System.out.printf(msg, objects);
+            if (nextLine)
+                System.out.println();
+        }
     }
 
     public static class NoTaskException extends RuntimeException {

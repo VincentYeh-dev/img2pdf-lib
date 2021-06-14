@@ -1,29 +1,28 @@
 package org.vincentyeh.IMG2PDF;
-import org.vincentyeh.IMG2PDF.commandline.IMG2PDFCommand;
-import org.vincentyeh.IMG2PDF.commandline.handler.execution.ConvertHandler;
-import org.vincentyeh.IMG2PDF.commandline.handler.execution.CreateHandler;
-import org.vincentyeh.IMG2PDF.commandline.handler.ExecutionIHandlerAdaptor;
+
+import org.vincentyeh.IMG2PDF.commandline.command.ConvertCommand;
+import org.vincentyeh.IMG2PDF.commandline.command.CreateCommand;
+import org.vincentyeh.IMG2PDF.commandline.command.IMG2PDFCommand;
+import org.vincentyeh.IMG2PDF.commandline.handler.ResourceBundleExecutionHandler;
 import org.vincentyeh.IMG2PDF.commandline.handler.ResourceBundleParameterHandler;
 import picocli.CommandLine;
 
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.io.*;
 
 
 public class MainProgram {
 
     public static void main(String[] args) {
-        SharedSpace.initialize();
-        Locale locale=SharedSpace.Configuration.locale;
-        CommandLine cmd= new CommandLine(new IMG2PDFCommand());
-        ExecutionIHandlerAdaptor adaptor=new ExecutionIHandlerAdaptor();
-        adaptor.registerHandler(new CreateHandler(ResourceBundle.getBundle("cmd_err",locale)));
-        adaptor.registerHandler(new ConvertHandler(ResourceBundle.getBundle("cmd_err",locale)));
-        cmd.setExecutionExceptionHandler(adaptor);
+        ConfigurationAgent.loadOrCreateProperties(new File("config.properties"));
 
-        cmd.setParameterExceptionHandler(new ResourceBundleParameterHandler(ResourceBundle.getBundle("cmd_err",locale)));
-        cmd.setResourceBundle(ResourceBundle.getBundle("cmd",locale));
-        int exitCode =cmd.execute(args);
-        System.exit(exitCode);
+        CommandLine cmd = new CommandLine(new IMG2PDFCommand());
+        cmd.addSubcommand(new CreateCommand(ConfigurationAgent.getCreateConfig()));
+        cmd.addSubcommand(new ConvertCommand(ConfigurationAgent.getConvertConfig()));
+
+        cmd.setExecutionExceptionHandler(new ResourceBundleExecutionHandler(ConfigurationAgent.getHandlerResourceBundle()));
+        cmd.setParameterExceptionHandler(new ResourceBundleParameterHandler(ConfigurationAgent.getHandlerResourceBundle()));
+        cmd.setResourceBundle(ConfigurationAgent.getCommandResourceBundle());
+
+        System.exit(cmd.execute(args));
     }
 }
