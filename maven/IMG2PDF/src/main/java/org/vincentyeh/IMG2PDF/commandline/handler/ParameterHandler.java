@@ -11,7 +11,11 @@ import java.io.PrintWriter;
 import java.util.ResourceBundle;
 
 public class ParameterHandler implements CommandLine.IParameterExceptionHandler {
+
+    private final ResourceBundle resourceBundle;
+
     public ParameterHandler(ResourceBundle resourceBundle) {
+        this.resourceBundle = resourceBundle;
         ResourceBundleHandler.setResourceBundle(resourceBundle);
     }
 
@@ -31,6 +35,7 @@ public class ParameterHandler implements CommandLine.IParameterExceptionHandler 
 
         printText(cmd, cmd.getHelp().fullSynopsis());
         CommandLine.Model.CommandSpec spec = cmd.getCommandSpec();
+        printText(cmd, String.format((resourceBundle.getString("public.try_help")), spec.qualifiedName()));
 
         return CommandLine.ExitCode.USAGE;
     }
