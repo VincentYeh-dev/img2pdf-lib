@@ -2,7 +2,7 @@ package org.vincentyeh.IMG2PDF;
 
 import org.vincentyeh.IMG2PDF.commandline.command.IMG2PDFCommand;
 import org.vincentyeh.IMG2PDF.commandline.command.ConvertCommand;
-import org.vincentyeh.IMG2PDF.commandline.handler.ResourceBundleExecutionHandler;
+import org.vincentyeh.IMG2PDF.commandline.handler.ExecutionHandler;
 import org.vincentyeh.IMG2PDF.commandline.handler.ResourceBundleParameterHandler;
 import picocli.CommandLine;
 
@@ -17,7 +17,7 @@ public class MainProgram {
         CommandLine cmd = new CommandLine(new IMG2PDFCommand());
         cmd.addSubcommand(new ConvertCommand(ConfigurationAgent.getConvertConfig()));
 
-        cmd.setExecutionExceptionHandler(new ResourceBundleExecutionHandler(ConfigurationAgent.getHandlerResourceBundle()));
+        cmd.setExecutionExceptionHandler(new ExecutionHandler(ConfigurationAgent.getHandlerResourceBundle()));
         cmd.setParameterExceptionHandler(new ResourceBundleParameterHandler(ConfigurationAgent.getHandlerResourceBundle()));
         cmd.setResourceBundle(ConfigurationAgent.getCommandResourceBundle());
 
