@@ -5,11 +5,11 @@ import org.vincentyeh.IMG2PDF.util.file.exception.WrongFileTypeException;
 
 import java.util.ResourceBundle;
 
-public abstract class ResourceBundleHandler<T, R> extends Handler<T, R> {
+public abstract class ResourceBundleHandler<R> extends Handler<String, R> {
     private static ResourceBundle resourceBundle;
 
     private final String tag;
-    public ResourceBundleHandler(Handler<T, R> next, String tag) {
+    public ResourceBundleHandler(Handler<String, R> next, String tag) {
         super(next);
         this.tag = tag;
     }

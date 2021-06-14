@@ -43,7 +43,7 @@ public class ResourceBundleParameterHandler implements CommandLine.IParameterExc
                 new TypeConversionExceptionHandler(
                         new UnmatchedArgumentExceptionHandler(new Handler<String, Exception>(null) {
                             @Override
-                            public String handle(Exception data) {
+                            public String handle(Exception data) throws CantHandleException {
                                 if(data instanceof CommandLine.ParameterException){
                                     return data.getMessage();
                                 }else {
@@ -93,7 +93,7 @@ public class ResourceBundleParameterHandler implements CommandLine.IParameterExc
         }
 
         @Override
-        public String handle(Exception data) {
+        public String handle(Exception data) throws CantHandleException {
             if (data instanceof CommandLine.UnmatchedArgumentException) {
                 CommandLine.UnmatchedArgumentException exception = (CommandLine.UnmatchedArgumentException) data;
                 String list = exception.getUnmatched().stream().map(str -> '\'' + str + '\'').collect(Collectors.joining(", "));
@@ -111,7 +111,7 @@ public class ResourceBundleParameterHandler implements CommandLine.IParameterExc
         }
 
         @Override
-        public String handle(Exception data) {
+        public String handle(Exception data) throws CantHandleException {
             if (data instanceof CommandLine.MissingParameterException) {
                 CommandLine.MissingParameterException exception = (CommandLine.MissingParameterException) data;
                 List<String> param_list = exception.getMissing().stream()
@@ -152,7 +152,7 @@ public class ResourceBundleParameterHandler implements CommandLine.IParameterExc
         }
 
         @Override
-        public String handle(Exception data) {
+        public String handle(Exception data) throws CantHandleException {
             if (data.getCause() != null && data.getCause() instanceof CommandLine.TypeConversionException) {
                 CommandLine.ParameterException ex = (CommandLine.ParameterException) data;
                 CommandLine.Model.ArgSpec argSpec = ex.getArgSpec();

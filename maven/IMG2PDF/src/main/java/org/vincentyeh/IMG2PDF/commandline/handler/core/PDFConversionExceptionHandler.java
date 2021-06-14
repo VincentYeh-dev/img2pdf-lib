@@ -5,14 +5,14 @@ import org.vincentyeh.IMG2PDF.commandline.exception.PDFConversionException;
 import org.vincentyeh.IMG2PDF.converter.PDFConverter;
 import org.vincentyeh.IMG2PDF.pattern.Handler;
 
-public class PDFConversionExceptionHandler extends ResourceBundleHandler<String,Exception>{
+public class PDFConversionExceptionHandler extends ExceptionHandler{
 
     public PDFConversionExceptionHandler(Handler<String, Exception> next) {
         super(next, "conversion");
     }
 
     @Override
-    public String handle(Exception data) {
+    public String handle(Exception data) throws CantHandleException {
         if (data instanceof PDFConversionException) {
             PDFConversionException ex1 = (PDFConversionException) data;
             if (ex1.getCause() instanceof PDFConverter.ReadImageException) {

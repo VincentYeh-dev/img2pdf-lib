@@ -8,14 +8,14 @@ import org.vincentyeh.IMG2PDF.util.file.exception.WrongFileTypeException;
 import java.io.FileNotFoundException;
 
 
-public class DirlistExceptionHandler extends ResourceBundleHandler<String,Exception> {
+public class DirlistExceptionHandler extends ExceptionHandler{
 
     public DirlistExceptionHandler(Handler<String, Exception> next) {
         super(next,"dirlist");
     }
 
     @Override
-    public String handle(Exception data) {
+    public String handle(Exception data) throws CantHandleException {
         if (data instanceof DirlistTaskFactory.DirListException) {
             DirlistTaskFactory.DirListException ex1 = (DirlistTaskFactory.DirListException) data;
             if (ex1.getCause() instanceof FileNotFoundException) {

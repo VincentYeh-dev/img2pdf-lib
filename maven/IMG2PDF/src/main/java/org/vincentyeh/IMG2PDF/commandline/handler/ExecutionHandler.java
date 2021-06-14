@@ -1,9 +1,6 @@
 package org.vincentyeh.IMG2PDF.commandline.handler;
 
-import org.vincentyeh.IMG2PDF.commandline.handler.core.DirlistExceptionHandler;
-import org.vincentyeh.IMG2PDF.commandline.handler.core.PDFConversionExceptionHandler;
-import org.vincentyeh.IMG2PDF.commandline.handler.core.ResourceBundleHandler;
-import org.vincentyeh.IMG2PDF.commandline.handler.core.SourceFileExceptionHandler;
+import org.vincentyeh.IMG2PDF.commandline.handler.core.*;
 import org.vincentyeh.IMG2PDF.pattern.Handler;
 import picocli.CommandLine;
 import java.io.PrintWriter;
@@ -17,7 +14,7 @@ public class ExecutionHandler implements CommandLine.IExecutionExceptionHandler 
 
     @Override
     public int handleExecutionException(Exception ex, CommandLine cmd, CommandLine.ParseResult parseResult) {
-        Handler<String, Exception> handler = new DirlistExceptionHandler(new PDFConversionExceptionHandler(new SourceFileExceptionHandler(null)));
+        ExceptionHandler handler = new DirlistExceptionHandler(new PDFConversionExceptionHandler(new SourceFileExceptionHandler(null)));
         String msg;
         try {
             msg = handler.handle(ex);
