@@ -13,16 +13,16 @@ public abstract class Handler<T,R>{
         this.next = next;
     }
 
-    protected T doNext(R data) {
+    protected T doNext(R data) throws CantHandleException {
         if (next != null) {
             return next.handle(data);
         }
         throw new CantHandleException("Can't handle.");
     }
 
-    public abstract T handle(R data);
+    public abstract T handle(R data) throws CantHandleException;
 
-    public static class CantHandleException extends RuntimeException{
+    public static class CantHandleException extends Exception{
         public CantHandleException(String message) {
             super(message);
         }

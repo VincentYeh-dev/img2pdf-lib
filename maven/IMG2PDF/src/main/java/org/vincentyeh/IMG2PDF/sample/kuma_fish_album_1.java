@@ -13,8 +13,6 @@ public class kuma_fish_album_1 {
 
 		File project_root = new File("").getAbsoluteFile().getParentFile().getParentFile();
 		File sample_root = new File(project_root, "sample\\kuma_fish_album_1");
-		File taskslist_destination = new File(sample_root, "taskslist\\test.xml");
-		taskslist_destination.delete();
 
 		File image_sources_dir = new File(sample_root, "image-sources").getAbsoluteFile();
 
@@ -30,7 +28,7 @@ public class kuma_fish_album_1 {
 			e.printStackTrace();
 		}
 
-		String create_command = "create "
+		String convert_command = "convert "
 //
 				+"-ow "
 //				
@@ -54,14 +52,7 @@ public class kuma_fish_album_1 {
 //
 				+ "-pdst \"" + sample_root.getAbsolutePath() + "\\output\\$PARENT{0} $CY-$CM-$CD $CH-$CN-$CS.pdf\" "
 //				
-				+ "-ldst \"" + taskslist_destination.getAbsolutePath() + "\" \""
-//				
 				+ sources_list.getAbsolutePath() + "\"";
-
-		String convert_command = "convert -o \"" + taskslist_destination.getAbsolutePath()+"\"";
-
-		System.out.println("create command:");
-		System.out.println(create_command);
 
 		System.out.println("convert command:");
 		System.out.println(convert_command);

@@ -1,7 +1,6 @@
 package org.vincentyeh.IMG2PDF;
 
 import org.vincentyeh.IMG2PDF.commandline.command.ConvertCommand;
-import org.vincentyeh.IMG2PDF.commandline.command.CreateCommand;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -62,26 +61,21 @@ public class ConfigurationAgent {
         return ResourceBundle.getBundle("cmd",locale);
     }
 
-    public static CreateCommand.Configurations getCreateConfig() {
-        return new CreateCommand.Configurations(locale, getTaskListWriteCharsetFromProperties(properties), getDirListReadCharsetFromProperties(properties), ResourceBundle.getBundle("cmd",locale));
-    }
-
     public static ConvertCommand.Configurations getConvertConfig() {
-        return new ConvertCommand.Configurations(locale, getTaskListReadCharsetFromProperties(properties), ResourceBundle.getBundle("cmd",locale));
+        return new ConvertCommand.Configurations(locale,getDirListReadCharsetFromProperties(properties), ResourceBundle.getBundle("cmd",locale));
     }
 
 
     private static Charset getDirListReadCharsetFromProperties(Properties properties) {
         return getCharsetFromProperties("dirlist-read-charset", properties);
     }
-
-    private static Charset getTaskListWriteCharsetFromProperties(Properties properties) {
-        return getCharsetFromProperties("tasklist-write-charset", properties);
-    }
-
-    private static Charset getTaskListReadCharsetFromProperties(Properties properties) {
-        return getCharsetFromProperties("tasklist-read-charset", properties);
-    }
+//
+//    private static Charset getTaskListWriteCharsetFromProperties(Properties properties) {
+//        return getCharsetFromProperties("tasklist-write-charset", properties);
+//    }
+//    private static Charset getTaskListReadCharsetFromProperties(Properties properties) {
+//        return getCharsetFromProperties("tasklist-read-charset", properties);
+//    }
 
     private static Charset getCharsetFromProperties(String option, Properties properties) {
         String charset = properties.getProperty(option);

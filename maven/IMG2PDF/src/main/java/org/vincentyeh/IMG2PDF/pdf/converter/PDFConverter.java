@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.converter;
+package org.vincentyeh.IMG2PDF.pdf.converter;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -7,7 +7,7 @@ import java.io.IOException;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.vincentyeh.IMG2PDF.converter.listener.ConversionInfoListener;
+import org.vincentyeh.IMG2PDF.pdf.converter.listener.ConversionInfoListener;
 import org.vincentyeh.IMG2PDF.pdf.page.core.ImagePageFactory;
 import org.vincentyeh.IMG2PDF.task.Task;
 
