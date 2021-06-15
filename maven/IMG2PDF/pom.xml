@@ -15,6 +15,14 @@
     <name>IMG2PDF</name>
     <url>http://maven.apache.org</url>
 
+    <repositories>
+        <repository>
+            <id>dsol-xml</id>
+            <name>Simulation @ TU Delft</name>
+            <url>http://simulation.tudelft.nl/maven/</url>
+        </repository>
+    </repositories>
+
     <distributionManagement>
         <site>
             <id>www.yourcompany.com</id>
