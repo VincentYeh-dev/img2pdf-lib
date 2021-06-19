@@ -1,11 +1,14 @@
 package org.vincentyeh.IMG2PDF.pdf.converter.listener;
 
+import org.fusesource.jansi.Ansi;
 import org.vincentyeh.IMG2PDF.task.Task;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.ResourceBundle;
+
+import static org.fusesource.jansi.Ansi.ansi;
 
 public class DefaultConversionListener implements ConversionInfoListener {
     private final char[] progress_bar;
@@ -41,14 +44,16 @@ public class DefaultConversionListener implements ConversionInfoListener {
             progress -= 1;
             counter++;
         }
-        String name = task.getPdfDestination().getName();
-        System.out.printf("\t" + resourceBundle.getString("convert.listener.converting") + "\r", new String(progress_bar), getSimplifiedName(name), index + 1, total, file.getName());
+        String name = getSimplifiedName(task.getPdfDestination().getAbsolutePath());
+        System.out.print(ansi().render(String.format(resourceBundle.getString("convert.listener.converting") , new String(progress_bar), name, index + 1, total, file.getName())));
+        System.out.print("\r");
     }
 
     @Override
     public void onConversionComplete(File dst) {
         long completeSeconds = System.currentTimeMillis()/1000;
-        System.out.printf("\t" + resourceBundle.getString("convert.listener.done") + "\r\n", (completeSeconds - startSeconds),dst.getAbsolutePath());
+        System.out.print(ansi().render(String.format(resourceBundle.getString("convert.listener.done"), (completeSeconds - startSeconds),dst.getAbsolutePath())));
+        System.out.print("\r\n");
     }
 
     private String getSimplifiedName(String raw){
