@@ -2,21 +2,15 @@ package org.vincentyeh.IMG2PDF.task;
 
 import java.io.File;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-@XStreamAlias("task")
 public class Task {
 
-    @XStreamAlias("DocumentArgument")
     private final DocumentArgument documentArgument;
 
-    @XStreamAlias("PageArgument")
     private final PageArgument pageArgument;
 
-    @XStreamAlias("images")
     private final File[] images;
 
-    @XStreamAlias("destination")
     private final File pdf_destination;
 
 
