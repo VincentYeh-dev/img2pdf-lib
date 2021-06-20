@@ -11,7 +11,7 @@ import org.vincentyeh.IMG2PDF.pdf.converter.exception.PDFConversionException;
 import org.vincentyeh.IMG2PDF.pdf.converter.exception.PDFConverterException;
 import org.vincentyeh.IMG2PDF.pdf.converter.exception.ReadImageException;
 import org.vincentyeh.IMG2PDF.pdf.converter.listener.ConversionInfoListener;
-import org.vincentyeh.IMG2PDF.pdf.page.core.ImagePageFactory;
+import org.vincentyeh.IMG2PDF.pdf.converter.core.ImagePageFactory;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.util.file.FileUtils;
 import org.vincentyeh.IMG2PDF.util.file.exception.OverwriteException;

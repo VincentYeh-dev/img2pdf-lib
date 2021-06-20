@@ -1,9 +1,9 @@
 package org.vincentyeh.IMG2PDF.task;
 
 
-import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
-import org.vincentyeh.IMG2PDF.pdf.page.PageDirection;
-import org.vincentyeh.IMG2PDF.pdf.page.PageSize;
+import org.vincentyeh.IMG2PDF.pdf.parameter.PageAlign;
+import org.vincentyeh.IMG2PDF.pdf.parameter.PageDirection;
+import org.vincentyeh.IMG2PDF.pdf.parameter.PageSize;
 
 public class PageArgument {
     public static class Builder {

@@ -1,6 +1,6 @@
 package org.vincentyeh.IMG2PDF.commandline.converter;
 
-import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
+import org.vincentyeh.IMG2PDF.pdf.parameter.PageAlign;
 import picocli.CommandLine;
 
 public class PageAlignConverter implements CommandLine.ITypeConverter<PageAlign> {

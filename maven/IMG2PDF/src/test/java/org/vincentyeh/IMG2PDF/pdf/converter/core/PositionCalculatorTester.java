@@ -1,8 +1,8 @@
-package org.vincentyeh.IMG2PDF.pdf.page.core;
+package org.vincentyeh.IMG2PDF.pdf.converter.core;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
+import org.vincentyeh.IMG2PDF.pdf.parameter.PageAlign;
 
 public class PositionCalculatorTester {
 

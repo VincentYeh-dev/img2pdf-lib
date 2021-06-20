@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.pdf.page.core;
+package org.vincentyeh.IMG2PDF.pdf.converter.core;
 
 class Position {
     private final float x;

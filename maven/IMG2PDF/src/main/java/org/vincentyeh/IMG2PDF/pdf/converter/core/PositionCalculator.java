@@ -1,6 +1,6 @@
-package org.vincentyeh.IMG2PDF.pdf.page.core;
+package org.vincentyeh.IMG2PDF.pdf.converter.core;
 
-import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
+import org.vincentyeh.IMG2PDF.pdf.parameter.PageAlign;
 
 public class PositionCalculator {
     private static PositionCalculator calculator = null;

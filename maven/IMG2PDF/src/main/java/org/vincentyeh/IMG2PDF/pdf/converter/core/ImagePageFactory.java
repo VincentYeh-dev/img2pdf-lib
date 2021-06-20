@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.pdf.page.core;
+package org.vincentyeh.IMG2PDF.pdf.converter.core;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -9,12 +9,12 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
-import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
-import org.vincentyeh.IMG2PDF.pdf.page.PageDirection;
-import org.vincentyeh.IMG2PDF.pdf.page.PageSize;
+import org.vincentyeh.IMG2PDF.pdf.parameter.PageAlign;
+import org.vincentyeh.IMG2PDF.pdf.parameter.PageDirection;
+import org.vincentyeh.IMG2PDF.pdf.parameter.PageSize;
 
-import static org.vincentyeh.IMG2PDF.pdf.page.PageDirection.Landscape;
-import static org.vincentyeh.IMG2PDF.pdf.page.PageDirection.Portrait;
+import static org.vincentyeh.IMG2PDF.pdf.parameter.PageDirection.Landscape;
+import static org.vincentyeh.IMG2PDF.pdf.parameter.PageDirection.Portrait;
 
 /**
  * Page that contain image in PDF File.

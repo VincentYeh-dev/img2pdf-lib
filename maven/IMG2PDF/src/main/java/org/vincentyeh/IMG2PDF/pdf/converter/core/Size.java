@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.pdf.page.core;
+package org.vincentyeh.IMG2PDF.pdf.converter.core;
 
 class Size {
     private final float height;
