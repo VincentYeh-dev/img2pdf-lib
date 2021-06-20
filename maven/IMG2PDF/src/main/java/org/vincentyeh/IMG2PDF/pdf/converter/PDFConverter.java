@@ -10,6 +10,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.vincentyeh.IMG2PDF.pdf.converter.listener.ConversionInfoListener;
 import org.vincentyeh.IMG2PDF.pdf.page.core.ImagePageFactory;
 import org.vincentyeh.IMG2PDF.task.Task;
+import org.vincentyeh.IMG2PDF.util.file.FileUtils;
 
 import javax.imageio.ImageIO;
 
@@ -42,7 +43,7 @@ public class PDFConverter implements ConversionInfoListener {
         memoryUsageSetting = MemoryUsageSetting.setupMixed(maxMainMemoryBytes).setTempDir(tempFolder);
     }
 
-    public File start() throws OverwriteDenyException, IOException {
+    public File start() throws OverwriteDenyException, IOException, FileUtils.NoParentException {
         try (PDDocument document = new PDDocument(memoryUsageSetting)) {
 
             document.protect(task.getDocumentArgument().getSpp());
@@ -59,9 +60,8 @@ public class PDFConverter implements ConversionInfoListener {
         }
     }
 
-    private File savePDF(PDDocument document) throws IOException {
-        task.getPdfDestination().getParentFile().mkdirs();
-
+    private File savePDF(PDDocument document) throws IOException{
+        FileUtils.getParentFile(task.getPdfDestination()).mkdirs();
         document.save(task.getPdfDestination());
         return task.getPdfDestination();
     }

@@ -1,5 +1,6 @@
 package org.vincentyeh.IMG2PDF.task.factory;
 
+import org.vincentyeh.IMG2PDF.util.file.FileUtils;
 import org.vincentyeh.IMG2PDF.util.file.exception.WrongFileTypeException;
 import org.vincentyeh.IMG2PDF.task.DocumentArgument;
 import org.vincentyeh.IMG2PDF.task.PageArgument;
@@ -51,17 +52,16 @@ public abstract class DirlistTaskFactory {
         File dir = new File(line);
         File result;
         if (!dir.isAbsolute()) {
-            result = new File(directoryList.getParent(), line).getAbsoluteFile();
+            result = new File(FileUtils.getParentFile(directoryList), line).getAbsoluteFile();
         } else {
             result = dir;
         }
 
-        if (!result.exists()) {
-            throw new SourceFileException(new FileNotFoundException("File not found: " + result.getAbsolutePath()), result);
-        }
-
-        if (!result.isDirectory()) {
-            throw new SourceFileException(new WrongFileTypeException(WrongFileTypeException.Type.FOLDER, WrongFileTypeException.Type.FILE), result);
+        try {
+            FileUtils.checkExists(result);
+            FileUtils.checkType(result, WrongFileTypeException.Type.FOLDER);
+        } catch (Exception e) {
+            throw new SourceFileException(e, result);
         }
 
         return result;
@@ -76,11 +76,12 @@ public abstract class DirlistTaskFactory {
     }
 
     private static List<String> readAllLinesFromDirlist(File dirlist, Charset charset) throws DirListException {
-        if (!dirlist.exists())
-            throw new DirListException(new FileNotFoundException("File not found: " + dirlist), dirlist);
-
-        if (!dirlist.isFile())
-            throw new DirListException(new WrongFileTypeException(WrongFileTypeException.Type.FILE, WrongFileTypeException.Type.FOLDER), dirlist);
+        try{
+            FileUtils.checkExists(dirlist);
+            FileUtils.checkType(dirlist, WrongFileTypeException.Type.FILE);
+        }catch (Exception e){
+            throw new DirListException(e, dirlist);
+        }
 
         try (BufferedReader reader = Files.newBufferedReader(dirlist.toPath(), charset)) {
             List<String> result = new ArrayList<>();
@@ -111,7 +112,7 @@ public abstract class DirlistTaskFactory {
         File[] files = source_directory.listFiles(imageFilter);
 
         if (files == null || files.length == 0)
-            throw new SourceFileException(new EmptyImagesException("No image was found in: "+source_directory), source_directory);
+            throw new SourceFileException(new EmptyImagesException("No image was found in: " + source_directory), source_directory);
 
         Arrays.sort(files, fileSorter);
 
@@ -122,7 +123,7 @@ public abstract class DirlistTaskFactory {
         return new Task(documentArgument, pageArgument, images, pdf_destination);
     }
 
-    public static class SourceFileException extends Exception{
+    public static class SourceFileException extends Exception {
 
         private final File source;
 
@@ -136,7 +137,7 @@ public abstract class DirlistTaskFactory {
         }
     }
 
-    public static class DirListException extends Exception{
+    public static class DirListException extends Exception {
 
         private final File dirlist;
 
@@ -150,7 +151,7 @@ public abstract class DirlistTaskFactory {
         }
     }
 
-    public static class EmptyImagesException extends RuntimeException{
+    public static class EmptyImagesException extends RuntimeException {
         public EmptyImagesException(String message) {
             super(message);
         }
