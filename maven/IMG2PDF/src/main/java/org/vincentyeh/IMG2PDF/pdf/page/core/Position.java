@@ -4,10 +4,6 @@ class Position {
     private final float x;
     private final float y;
 
-    public Position() {
-        this.x = 0;
-        this.y = 0;
-    }
     public Position(float x, float y) {
         this.x = x;
         this.y = y;

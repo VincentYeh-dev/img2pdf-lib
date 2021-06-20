@@ -1,53 +1,30 @@
 package org.vincentyeh.IMG2PDF;
 
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.MissingArgumentException;
-import org.apache.commons.cli.MissingOptionException;
-import org.apache.commons.cli.UnrecognizedOptionException;
-import org.vincentyeh.IMG2PDF.commandline.action.MainAction;
-import org.vincentyeh.IMG2PDF.commandline.parser.MainActionParser;
-import org.vincentyeh.IMG2PDF.commandline.parser.core.HandledException;
-import org.vincentyeh.IMG2PDF.commandline.parser.exception.HelperException;
+import org.fusesource.jansi.AnsiConsole;
+import org.vincentyeh.IMG2PDF.commandline.command.IMG2PDFCommand;
+import org.vincentyeh.IMG2PDF.commandline.command.ConvertCommand;
+import org.vincentyeh.IMG2PDF.commandline.handler.ExecutionHandler;
+import org.vincentyeh.IMG2PDF.commandline.handler.ParameterHandler;
+import picocli.CommandLine;
 
-import java.util.stream.Collectors;
+import java.io.*;
+
 
 public class MainProgram {
-    private final String[] args;
-
-    private MainProgram(String[] args){
-        this.args = args;
-    }
 
     public static void main(String[] args) {
-        MainProgram main=new MainProgram(args);
-        try {
-            main.start();
-        }catch (HandledException e){
-           System.err.println(e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+        AnsiConsole.systemInstall();
+        ConfigurationAgent.loadOrCreateProperties(new File("config.properties"));
 
-    private void start() throws Exception {
-        MainActionParser parser = new MainActionParser();
-        try {
-            MainAction action = parser.parse(args);
-            action.start();
-        } catch (HelperException e) {
-//            e.printStackTrace();
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp(SharedSpace.Configuration.PROGRAM_NAME, e.getOptions());
-            throw new HandledException(e,getClass());
-        } catch (MissingOptionException e) {
-            System.err.printf(SharedSpace.getResString("argperser.err.missing_option") + "\n", e.getMissingOptions().stream().map(Object::toString).collect(Collectors.joining(",")));
-            throw new HandledException(e,getClass());
-        } catch (MissingArgumentException e) {
-            System.err.printf(SharedSpace.getResString("argperser.err.missing_argument_option") + "\n", e.getOption().getOpt());
-            throw new HandledException(e,getClass());
-        } catch (UnrecognizedOptionException e) {
-            System.err.printf(SharedSpace.getResString("public.err.unrecognized_argument_option") + "\n", e.getOption());
-            throw new HandledException(e,getClass());
-        }
+        CommandLine cmd = new CommandLine(new IMG2PDFCommand());
+        cmd.addSubcommand(new ConvertCommand(ConfigurationAgent.getConvertConfig()));
+
+        cmd.setExecutionExceptionHandler(new ExecutionHandler(ConfigurationAgent.getHandlerResourceBundle()));
+        cmd.setParameterExceptionHandler(new ParameterHandler(ConfigurationAgent.getHandlerResourceBundle()));
+        cmd.setResourceBundle(ConfigurationAgent.getCommandResourceBundle());
+
+        int exitCode=cmd.execute(args);
+        AnsiConsole.systemUninstall();
+        System.exit(exitCode);
     }
 }

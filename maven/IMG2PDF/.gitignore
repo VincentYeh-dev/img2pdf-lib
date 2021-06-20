@@ -1,1 +1,7 @@
-/target/
+*.iml
+target
+.org.vincentyeh.IMG2PDF.tmp
+.gradle
+.idea
+.run
+/config.properties

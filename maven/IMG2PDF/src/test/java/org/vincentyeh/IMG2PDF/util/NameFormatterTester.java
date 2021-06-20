@@ -4,14 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.FileSystem;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Date;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -24,7 +16,7 @@ import org.vincentyeh.IMG2PDF.util.NameFormatter.ParentOverPointException;
  */
 public class NameFormatterTester {
     @Test
-    public void testName() throws IOException {
+    public void testName() {
         File file = new File("src\\test\\resources\\TestFile.txt").getAbsoluteFile();
         assertTrue(file.exists());
 
@@ -33,7 +25,7 @@ public class NameFormatterTester {
     }
 
     @Test
-    public void testCurrentDate() throws IOException {
+    public void testCurrentDate() {
         File file = new File("src\\test\\resources\\TestFile.txt").getAbsoluteFile();
         assertTrue(file.exists());
         NameFormatter formatter = new NameFormatter(file);
@@ -42,7 +34,7 @@ public class NameFormatterTester {
     }
 
     @Test
-    public void testModifyDate() throws IOException {
+    public void testModifyDate() {
         File file = new File("src\\test\\resources\\TestFile.txt").getAbsoluteFile();
         assertTrue(file.exists());
         NameFormatter formatter = new NameFormatter(file);
@@ -50,7 +42,7 @@ public class NameFormatterTester {
     }
 
     @Test
-    public void testNoSense() throws IOException {
+    public void testNoSense() {
         File file = new File("src\\test\\resources\\TestFile.txt").getAbsoluteFile();
         assertTrue(file.exists());
 
@@ -60,7 +52,7 @@ public class NameFormatterTester {
     }
 
     @Test
-    public void testParent() throws IOException {
+    public void testParent() {
         File file = new File("src\\test\\resources\\TestFile.txt").getAbsoluteFile();
         assertTrue(file.exists());
         NameFormatter formatter = new NameFormatter(file);
@@ -70,7 +62,7 @@ public class NameFormatterTester {
     }
 
     @Test(expected = ParentOverPointException.class)
-    public void testParentOverPoint() throws IOException {
+    public void testParentOverPoint() {
         File file = new File("src\\test\\resources\\TestFile.txt").getAbsoluteFile();
         assertTrue(file.exists());
         int i = 0;
