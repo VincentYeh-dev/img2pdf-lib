@@ -15,7 +15,7 @@ public class ExecutionHandler implements CommandLine.IExecutionExceptionHandler 
 
     @Override
     public int handleExecutionException(Exception ex, CommandLine cmd, CommandLine.ParseResult parseResult) {
-        ExceptionHandler handler = new DirlistTaskFactoryExceptionHandler(null);
+        ExceptionHandler handler = new PDFConverterExceptionHandler(new DirlistTaskFactoryExceptionHandler(null));
         try {
             printErrorText(cmd, handler.handle(ex));
         } catch (Handler.CantHandleException e) {
