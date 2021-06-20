@@ -2,7 +2,7 @@ package org.vincentyeh.IMG2PDF.task.factory.exception;
 
 import java.io.File;
 
-public class DirListException extends Exception {
+public class DirListException extends DirlistTaskFactoryException{
 
     private final File dirlist;
 

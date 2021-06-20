@@ -2,6 +2,7 @@ package org.vincentyeh.IMG2PDF.task.factory;
 
 import org.vincentyeh.IMG2PDF.task.factory.exception.DirListException;
 import org.vincentyeh.IMG2PDF.task.factory.exception.EmptyImagesException;
+import org.vincentyeh.IMG2PDF.task.factory.exception.SourceFileException;
 import org.vincentyeh.IMG2PDF.util.file.FileUtils;
 import org.vincentyeh.IMG2PDF.util.file.exception.WrongFileTypeException;
 import org.vincentyeh.IMG2PDF.task.DocumentArgument;
@@ -14,7 +15,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.*;
 
-public abstract class DirlistTaskFactory {
+public class DirlistTaskFactory {
 
     private static FileFilter imageFilter;
     private static Comparator<? super File> fileSorter;
@@ -123,20 +124,6 @@ public abstract class DirlistTaskFactory {
 
     private static Task createTask(DocumentArgument documentArgument, PageArgument pageArgument, File[] images, File pdf_destination) {
         return new Task(documentArgument, pageArgument, images, pdf_destination);
-    }
-
-    public static class SourceFileException extends Exception {
-
-        private final File source;
-
-        public SourceFileException(Throwable cause, File source) {
-            super(cause);
-            this.source = source;
-        }
-
-        public File getSource() {
-            return source;
-        }
     }
 
 }
