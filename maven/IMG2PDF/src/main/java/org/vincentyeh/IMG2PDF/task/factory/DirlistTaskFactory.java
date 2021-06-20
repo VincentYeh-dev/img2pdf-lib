@@ -1,5 +1,7 @@
 package org.vincentyeh.IMG2PDF.task.factory;
 
+import org.vincentyeh.IMG2PDF.task.factory.exception.DirListException;
+import org.vincentyeh.IMG2PDF.task.factory.exception.EmptyImagesException;
 import org.vincentyeh.IMG2PDF.util.file.FileUtils;
 import org.vincentyeh.IMG2PDF.util.file.exception.WrongFileTypeException;
 import org.vincentyeh.IMG2PDF.task.DocumentArgument;
@@ -134,26 +136,6 @@ public abstract class DirlistTaskFactory {
 
         public File getSource() {
             return source;
-        }
-    }
-
-    public static class DirListException extends Exception {
-
-        private final File dirlist;
-
-        public DirListException(Throwable cause, File dirlist) {
-            super(cause);
-            this.dirlist = dirlist;
-        }
-
-        public File getDirlist() {
-            return dirlist;
-        }
-    }
-
-    public static class EmptyImagesException extends RuntimeException {
-        public EmptyImagesException(String message) {
-            super(message);
         }
     }
 
