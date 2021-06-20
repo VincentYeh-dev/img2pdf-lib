@@ -1,9 +1,11 @@
 package org.vincentyeh.IMG2PDF.util.file;
 
+import org.vincentyeh.IMG2PDF.util.file.exception.OverwriteException;
 import org.vincentyeh.IMG2PDF.util.file.exception.WrongFileTypeException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class FileUtils {
     public static File getParentFile(File file) throws NoParentException {
@@ -32,6 +34,10 @@ public class FileUtils {
         }
 
     }
+    public static void checkOverwrite(File file,String reason) throws OverwriteException {
+        if (file.exists())
+            throw new OverwriteException(reason,file);
+    }
 
     public static boolean isRoot(File file) {
         return file.toPath().getNameCount() == 0;
@@ -41,7 +47,7 @@ public class FileUtils {
         return o == null;
     }
 
-    public static class NoParentException extends RuntimeException {
+    public static class NoParentException extends IOException {
         public NoParentException(String message) {
             super(message);
         }
