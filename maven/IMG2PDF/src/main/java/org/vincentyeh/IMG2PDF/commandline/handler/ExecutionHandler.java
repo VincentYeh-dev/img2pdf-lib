@@ -4,6 +4,7 @@ import org.vincentyeh.IMG2PDF.commandline.handler.core.*;
 import org.vincentyeh.IMG2PDF.pattern.Handler;
 import picocli.CommandLine;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ResourceBundle;
 
 public class ExecutionHandler implements CommandLine.IExecutionExceptionHandler {
@@ -31,7 +32,9 @@ public class ExecutionHandler implements CommandLine.IExecutionExceptionHandler 
     }
     private void printStackTrance(CommandLine cmd,Exception e){
         PrintWriter printer = cmd.getErr();
-        printer.println(cmd.getColorScheme().stackTraceText(e)); // bold red
+        StringWriter sw = new StringWriter();
+        e.printStackTrace(new PrintWriter(sw));
+        printer.println(cmd.getColorScheme().errorText(sw.toString()));
     }
 
     private void printText(CommandLine cmd, String message) {
