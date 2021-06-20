@@ -6,22 +6,27 @@
   <name>IMG2PDF</name>
   <version>0.0.1-SNAPSHOT</version>
   <url>http://maven.apache.org</url>
+  <developers>
+    <developer>
+      <name>VincentYeh-dev</name>
+    </developer>
+  </developers>
   <build>
     <plugins>
       <plugin>
-        <artifactId>maven-site-plugin</artifactId>
-        <version>3.7.1</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>3.0.0</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.2.0</version>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.1</version>
         <configuration>
-          <show>private</show>
-          <nohelp>true</nohelp>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>info.picocli</groupId>
+              <artifactId>picocli-codegen</artifactId>
+              <version>4.6.1</version>
+            </path>
+          </annotationProcessorPaths>
+          <compilerArgs>
+            <arg>-Aproject=${project.groupId}/${project.artifactId}</arg>
+          </compilerArgs>
         </configuration>
       </plugin>
       <plugin>
@@ -34,6 +39,7 @@
               <goal>shade</goal>
             </goals>
             <configuration>
+              <finalName>${jar-name}</finalName>
               <filters>
                 <filter>
                   <artifact>*:*</artifact>
@@ -52,7 +58,7 @@
               </artifactSet>
               <transformers>
                 <transformer>
-                  <mainClass>org.vincentyeh.IMG2PDF.MainProgram</mainClass>
+                  <mainClass>${main-class}</mainClass>
                 </transformer>
               </transformers>
             </configuration>
@@ -60,14 +66,42 @@
         </executions>
       </plugin>
       <plugin>
-        <artifactId>maven-release-plugin</artifactId>
-        <configuration>
-          <useReleaseProfile>false</useReleaseProfile>
-          <tagNameFormat>v@{version}</tagNameFormat>
-        </configuration>
+        <groupId>com.akathist.maven.plugins.launch4j</groupId>
+        <artifactId>launch4j-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>l4j-clui</id>
+            <phase>package</phase>
+            <goals>
+              <goal>launch4j</goal>
+            </goals>
+            <configuration>
+              <headerType>console</headerType>
+              <jar>target/${jar-name}.jar</jar>
+              <outfile>target/bin/${exe-name}.exe</outfile>
+              <downloadUrl>http://www.java.com</downloadUrl>
+              <classPath>
+                <mainClass>${main-class}</mainClass>
+              </classPath>
+              <jre>
+                <bundledJre64Bit>false</bundledJre64Bit>
+                <bundledJreAsFallback>false</bundledJreAsFallback>
+                <minVersion>${maven.compiler.source}</minVersion>
+                <jdkPreference>preferJre</jdkPreference>
+              </jre>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
+  <repositories>
+    <repository>
+      <id>dsol-xml</id>
+      <name>Simulation @ TU Delft</name>
+      <url>http://simulation.tudelft.nl/maven/</url>
+    </repository>
+  </repositories>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -89,8 +123,11 @@
     </site>
   </distributionManagement>
   <properties>
-    <maven.compiler.target>1.8</maven.compiler.target>
+    <exe-name>img2pdf</exe-name>
+    <main-class>org.vincentyeh.IMG2PDF.MainProgram</main-class>
     <maven.compiler.source>1.8</maven.compiler.source>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <jar-name>${project.name}-${project.version}</jar-name>
   </properties>
 </project>

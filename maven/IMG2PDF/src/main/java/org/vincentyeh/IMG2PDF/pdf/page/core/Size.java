@@ -17,7 +17,4 @@ class Size {
         return width;
     }
 
-    public Size clone(){
-        return new Size(height,width);
-    }
 }

@@ -38,4 +38,9 @@ public class BytesSize {
     public long getBytes() {
         return bytes;
     }
+
+    @Override
+    public String toString() {
+        return  bytes+" bytes";
+    }
 }
