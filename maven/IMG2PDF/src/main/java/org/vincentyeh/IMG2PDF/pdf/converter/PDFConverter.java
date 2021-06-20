@@ -43,7 +43,8 @@ public class PDFConverter implements ConversionInfoListener {
         if (tempFolder == null)
             throw new IllegalArgumentException("tempFolder is null");
 
-        tempFolder.mkdirs();
+        FileUtils.makeDirectories(tempFolder);
+
         memoryUsageSetting = MemoryUsageSetting.setupMixed(maxMainMemoryBytes).setTempDir(tempFolder);
     }
 
@@ -67,7 +68,9 @@ public class PDFConverter implements ConversionInfoListener {
     }
 
     private File savePDF(PDDocument document) throws IOException {
-        FileUtils.getParentFile(task.getPdfDestination()).mkdirs();
+        File parent=FileUtils.getParentFile(task.getPdfDestination());
+        FileUtils.makeDirectories(parent);
+
         document.save(task.getPdfDestination());
         return task.getPdfDestination();
     }

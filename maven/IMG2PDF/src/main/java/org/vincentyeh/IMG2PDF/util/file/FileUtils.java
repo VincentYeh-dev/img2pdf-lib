@@ -39,6 +39,12 @@ public class FileUtils {
             throw new OverwriteException(reason,file);
     }
 
+    public static void makeDirectories(File directory){
+        if(!directory.mkdirs()){
+            System.err.println("No directory was created:"+directory);
+        }
+    }
+
     public static boolean isRoot(File file) {
         return file.toPath().getNameCount() == 0;
     }
