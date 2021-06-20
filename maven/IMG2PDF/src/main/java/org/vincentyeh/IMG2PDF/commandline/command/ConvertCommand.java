@@ -1,6 +1,7 @@
 package org.vincentyeh.IMG2PDF.commandline.command;
 
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
+import org.fusesource.jansi.Ansi;
 import org.vincentyeh.IMG2PDF.commandline.converter.*;
 import org.vincentyeh.IMG2PDF.commandline.exception.PDFConversionException;
 import org.vincentyeh.IMG2PDF.pdf.converter.PDFConverter;
@@ -21,12 +22,13 @@ import picocli.CommandLine;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.concurrent.Callable;
+
+import static org.fusesource.jansi.Ansi.ansi;
 
 @CommandLine.Command(name = "convert")
 public class ConvertCommand implements Callable<Integer> {
@@ -90,7 +92,7 @@ public class ConvertCommand implements Callable<Integer> {
         public final Charset DIRLIST_READ_CHARSET;
         public final ResourceBundle resourceBundle;
 
-        public Configurations(Locale locale,Charset dirlist_read_charset, ResourceBundle resourceBundle) {
+        public Configurations(Locale locale, Charset dirlist_read_charset, ResourceBundle resourceBundle) {
             this.locale = locale;
             DIRLIST_READ_CHARSET = dirlist_read_charset;
             this.resourceBundle = resourceBundle;
@@ -103,6 +105,7 @@ public class ConvertCommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
+        System.out.println();
 
         checkParameters();
 
@@ -125,64 +128,37 @@ public class ConvertCommand implements Callable<Integer> {
         return CommandLine.ExitCode.OK;
     }
 
-    private void printDebugLog(String msg, boolean nextLine,Object... objects) {
-        if (img2PDFCommand.isDebug()) {
-            System.out.printf(msg,objects);
-            if (nextLine)
-                System.out.println();
-        }
-    }
-    private void checkParameters() {
-        printDebugLog("fileSorter=%s", true, fileSorter);
-        if (fileSorter == null)
-            throw new IllegalArgumentException("fileSorter == null");
+    private void checkParameters() throws NoSuchFieldException, IllegalAccessException {
+        printDebugLog("-------------------------------------", true);
+        printDebugLog("@|yellow Check Parameters|@", true);
+        printDebugLog("-------------------------------------", true);
+        checkPrintNullParameter("overwrite_output");
+        checkPrintNullParameter("fileSorter");
+        checkPrintNullParameter("filter");
+        checkPrintNullParameter("pdf_align");
+        checkPrintNullParameter("pdf_size");
+        checkPrintNullParameter("pdf_direction");
+        checkPrintNullParameter("pdf_dst");
+        checkPrintNullParameter("open_when_complete");
+        checkPrintNullParameter("tempFolder");
+        checkPrintNullParameter("maxMainMemoryBytes");
+        checkPrintNullParameter("sourceFiles");
 
-        printDebugLog("filter=%s", true, filter.getOperator());
-        if (filter == null)
-            throw new IllegalArgumentException("filter == null");
-
-        printDebugLog("pdf_align=%s", true, pdf_align);
-        if (pdf_align == null)
-            throw new IllegalArgumentException("pdf_align == null");
-
-        printDebugLog("pdf_size=%s", true, pdf_size);
-        if (pdf_size == null)
-            throw new IllegalArgumentException("pdf_size == null");
-
-        printDebugLog("pdf_direction=%s", true, pdf_direction);
-        if (pdf_direction == null)
-            throw new IllegalArgumentException("pdf_direction == null");
-
-        printDebugLog("pdf_dst=%s", true, pdf_dst);
-        if (pdf_dst == null)
-            throw new IllegalArgumentException("pdf_dst == null");
-
-        if (sourceFiles == null || sourceFiles.isEmpty())
-            throw new IllegalArgumentException("sourceFiles==null");
-
-        printDebugLog("sources:", true);
         for (File source : sourceFiles) {
-            printDebugLog("\t- %s", true, source);
             if (!source.isAbsolute())
                 throw new IllegalArgumentException("source is not absolute: " + source);
             if (FileUtils.isRoot(source))
                 throw new IllegalArgumentException("source is root: " + source);
         }
-        printDebugLog("-----------------------", true);
 
-        printDebugLog("tempFolder=%s", true, tempFolder);
         if (tempFolder == null)
             throw new IllegalArgumentException("tempFolder==null");
         if (!tempFolder.isAbsolute())
             throw new IllegalArgumentException("tempFolder is not absolute: " + tempFolder);
         if (FileUtils.isRoot(tempFolder))
             throw new IllegalArgumentException("tempFolder is root: " + tempFolder);
-
-        printDebugLog("maxMainMemoryBytes=%s", true, maxMainMemoryBytes.getBytes());
-        if (maxMainMemoryBytes == null)
-            throw new IllegalArgumentException("maxMainMemoryBytes==null");
-
-        printDebugLog("-----------------------", true);
+        printDebugLog("-------------------------------------", true);
+        printDebugLog("-------------------------------------", true);
     }
 
     private PageArgument getPageArgument() {
@@ -240,5 +216,50 @@ public class ConvertCommand implements Callable<Integer> {
             throw new PDFConversionException(e, task);
         }
 
+    }
+
+
+    private void printDebugLog(String msg, boolean nextLine) {
+        if (img2PDFCommand.isDebug()) {
+            String content = String.format("[@|green DEBUG|@] %s", msg);
+            System.out.print(ansi().render(content));
+            if (nextLine)
+                System.out.println();
+        }
+    }
+
+    private void printErrorLog(String msg, boolean nextLine) {
+        if (img2PDFCommand.isDebug()) {
+            String content = String.format("[@|red ERROR|@] %s", msg);
+            System.out.print(ansi().render(content));
+            if (nextLine)
+                System.out.println();
+        }
+    }
+
+
+    private String getKeyValuePairString(String key, Object value, Ansi.Color colorOfValue) {
+        return String.format("@|yellow %s|@=@|%s %s|@", key,colorOfValue, value);
+    }
+
+    private String getKeyValuePairString(String field_name) throws NoSuchFieldException, IllegalAccessException {
+        Field field = ConvertCommand.class.getDeclaredField(field_name);
+        field.setAccessible(true);
+        return getKeyValuePairString(field.getName(), field.get(this),Ansi.Color.GREEN);
+    }
+
+    private void checkPrintNullParameter(String field_name) throws NoSuchFieldException, IllegalAccessException {
+        if(checkNullParameter(field_name)){
+            printDebugLog(getKeyValuePairString(field_name), true);
+        }else{
+            printErrorLog(getKeyValuePairString(field_name,null,Ansi.Color.RED),true);
+            throw new IllegalArgumentException(field_name+"==null");
+        }
+
+    }
+
+    private boolean checkNullParameter(String field_name) throws NoSuchFieldException, IllegalAccessException {
+        Field field = ConvertCommand.class.getDeclaredField(field_name);
+        return (field.get(this) != null) ;
     }
 }

@@ -15,22 +15,23 @@ public class ExecutionHandler implements CommandLine.IExecutionExceptionHandler 
     @Override
     public int handleExecutionException(Exception ex, CommandLine cmd, CommandLine.ParseResult parseResult) {
         ExceptionHandler handler = new DirlistExceptionHandler(new PDFConversionExceptionHandler(new SourceFileExceptionHandler(null)));
-        String msg;
         try {
-            msg = handler.handle(ex);
+            printErrorText(cmd, handler.handle(ex));
         } catch (Handler.CantHandleException e) {
             printErrorText(cmd, "Can't handle");
-            msg = ex.getMessage();
-            ex.printStackTrace();
+            printStackTrance(cmd,ex);
         }
 
-        printErrorText(cmd, msg);
         return CommandLine.ExitCode.SOFTWARE;
     }
 
     private void printErrorText(CommandLine cmd, String message) {
         PrintWriter printer = cmd.getErr();
         printer.println(cmd.getColorScheme().errorText(message)); // bold red
+    }
+    private void printStackTrance(CommandLine cmd,Exception e){
+        PrintWriter printer = cmd.getErr();
+        printer.println(cmd.getColorScheme().stackTraceText(e)); // bold red
     }
 
     private void printText(CommandLine cmd, String message) {
