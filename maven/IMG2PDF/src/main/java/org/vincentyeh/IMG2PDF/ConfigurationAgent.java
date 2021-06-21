@@ -17,13 +17,22 @@ public class ConfigurationAgent {
     private static Properties properties;
     private static Locale locale;
 
+    public static ResourceBundle getHandlerResourceBundle(){
+        return ResourceBundle.getBundle("cmd",locale);
+    }
+
+    public static ResourceBundle getCommandResourceBundle(){
+        return ResourceBundle.getBundle("cmd",locale);
+    }
+
+    public static ConvertCommand.Configurations getConvertConfig() {
+        return new ConvertCommand.Configurations(locale,getDirListReadCharsetFromProperties(properties), ResourceBundle.getBundle("cmd",locale));
+    }
     public static void loadOrCreateProperties(File file) {
+        locale = getLanguageSupport(Locale.getDefault());
         properties = new Properties();
         properties.setProperty("dirlist-read-charset", "UTF-8");
-        properties.setProperty("tasklist-write-charset", "UTF-8");
-        properties.setProperty("tasklist-read-charset", "UTF-8");
-        properties.setProperty("language", getLanguageSupport(Locale.getDefault()).toLanguageTag());
-        locale = getLanguageSupport(Locale.getDefault());
+        properties.setProperty("language", locale.toLanguageTag());
 
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
@@ -53,40 +62,16 @@ public class ConfigurationAgent {
             return Locale.ROOT;
     }
 
-    public static ResourceBundle getHandlerResourceBundle(){
-        return ResourceBundle.getBundle("cmd",locale);
-    }
-
-    public static ResourceBundle getCommandResourceBundle(){
-        return ResourceBundle.getBundle("cmd",locale);
-    }
-
-    public static ConvertCommand.Configurations getConvertConfig() {
-        return new ConvertCommand.Configurations(locale,getDirListReadCharsetFromProperties(properties), ResourceBundle.getBundle("cmd",locale));
-    }
-
-
     private static Charset getDirListReadCharsetFromProperties(Properties properties) {
-        return getCharsetFromProperties("dirlist-read-charset", properties);
-    }
-//
-//    private static Charset getTaskListWriteCharsetFromProperties(Properties properties) {
-//        return getCharsetFromProperties("tasklist-write-charset", properties);
-//    }
-//    private static Charset getTaskListReadCharsetFromProperties(Properties properties) {
-//        return getCharsetFromProperties("tasklist-read-charset", properties);
-//    }
-
-    private static Charset getCharsetFromProperties(String option, Properties properties) {
-        String charset = properties.getProperty(option);
+        String charset = properties.getProperty("dirlist-read-charset");
         if (charset == null || charset.isEmpty()) {
-            System.err.printf("Option \"%s\" not found.\nUse default charset:UTF-8.\n", option);
+            System.err.printf("Option \"%s\" not found.\nUse default charset:UTF-8.\n", "dirlist-read-charset");
             return StandardCharsets.UTF_8;
         }
         try {
             return Charset.forName(charset);
         } catch (UnsupportedCharsetException e) {
-            System.err.printf("Option \"%s\" not support:%s.\nUse default charset:UTF-8\n", option, e.getMessage());
+            System.err.printf("Option \"%s\" not support:%s.\nUse default charset:UTF-8\n", "dirlist-read-charset", e.getMessage());
             return StandardCharsets.UTF_8;
         }
     }
