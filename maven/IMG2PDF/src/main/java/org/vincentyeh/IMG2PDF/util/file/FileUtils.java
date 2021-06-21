@@ -1,9 +1,6 @@
 package org.vincentyeh.IMG2PDF.util.file;
 
-import org.vincentyeh.IMG2PDF.util.file.exception.NoParentException;
-import org.vincentyeh.IMG2PDF.util.file.exception.OverwriteException;
-import org.vincentyeh.IMG2PDF.util.file.exception.TargetRootParentException;
-import org.vincentyeh.IMG2PDF.util.file.exception.WrongFileTypeException;
+import org.vincentyeh.IMG2PDF.util.file.exception.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -40,9 +37,9 @@ public class FileUtils {
             throw new OverwriteException(reason,file);
     }
 
-    public static void makeDirectories(File directory){
-        if(!directory.mkdirs()){
-            System.err.println("No directory was created:"+directory);
+    public static void makeDirectories(File directory) throws MakeDirectoryException {
+        if(!directory.mkdirs()&&!directory.exists()){
+            throw new MakeDirectoryException("No directory was created:"+directory);
         }
     }
 

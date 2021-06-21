@@ -14,6 +14,7 @@ import org.vincentyeh.IMG2PDF.pdf.converter.listener.ConversionInfoListener;
 import org.vincentyeh.IMG2PDF.pdf.converter.core.ImagePageFactory;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.util.file.FileUtils;
+import org.vincentyeh.IMG2PDF.util.file.exception.MakeDirectoryException;
 import org.vincentyeh.IMG2PDF.util.file.exception.OverwriteException;
 
 import javax.imageio.ImageIO;
@@ -33,7 +34,7 @@ public class PDFConverter implements ConversionInfoListener {
 
     private final MemoryUsageSetting memoryUsageSetting;
 
-    public PDFConverter(Task task, long maxMainMemoryBytes, File tempFolder, boolean overwrite) {
+    public PDFConverter(Task task, long maxMainMemoryBytes, File tempFolder, boolean overwrite) throws IOException{
         this.overwrite = overwrite;
 
         if (task == null)

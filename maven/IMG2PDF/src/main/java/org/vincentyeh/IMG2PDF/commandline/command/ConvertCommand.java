@@ -179,7 +179,7 @@ public class ConvertCommand implements Callable<Integer> {
     }
 
 
-    private void convertAllToFile(List<Task> tasks) throws PDFConverterException {
+    private void convertAllToFile(List<Task> tasks) throws PDFConverterException, IOException {
 
         for (Task task : tasks) {
             try {
@@ -206,7 +206,7 @@ public class ConvertCommand implements Callable<Integer> {
 
     }
 
-    private File convertToFile(Task task) throws PDFConverterException{
+    private File convertToFile(Task task) throws PDFConverterException, IOException{
         PDFConverter converter = new PDFConverter(task, maxMainMemoryBytes.getBytes(), tempFolder, overwrite_output);
         converter.setInfoListener(new DefaultConversionListener(configurations.locale));
 
