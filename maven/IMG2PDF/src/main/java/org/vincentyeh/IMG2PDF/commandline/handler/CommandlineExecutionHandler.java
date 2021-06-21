@@ -7,9 +7,9 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ResourceBundle;
 
-public class ExecutionHandler implements CommandLine.IExecutionExceptionHandler {
+public class CommandlineExecutionHandler implements CommandLine.IExecutionExceptionHandler {
 
-    public ExecutionHandler(ResourceBundle resourceBundle) {
+    public CommandlineExecutionHandler(ResourceBundle resourceBundle) {
         ResourceBundleHandler.setResourceBundle(resourceBundle);
     }
 
