@@ -179,7 +179,7 @@ public class ConvertCommand implements Callable<Integer> {
     }
 
 
-    private void convertAllToFile(List<Task> tasks) throws PDFConverterException, IOException {
+    private void convertAllToFile(List<Task> tasks) throws IOException {
 
         for (Task task : tasks) {
             try {
@@ -187,9 +187,7 @@ public class ConvertCommand implements Callable<Integer> {
                 if (open_when_complete)
                     openPDF(result);
             } catch (PDFConverterException e) {
-                boolean ignore = false;
-                if (ignore == false)
-                    throw e;
+                System.err.println(e.getMessage());
             }
         }
     }
