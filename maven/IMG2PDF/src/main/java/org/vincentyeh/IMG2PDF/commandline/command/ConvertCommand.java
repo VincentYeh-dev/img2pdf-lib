@@ -3,12 +3,12 @@ package org.vincentyeh.IMG2PDF.commandline.command;
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 import org.fusesource.jansi.Ansi;
 import org.vincentyeh.IMG2PDF.commandline.converter.*;
-import org.vincentyeh.IMG2PDF.commandline.exception.PDFConversionException;
 import org.vincentyeh.IMG2PDF.pdf.converter.PDFConverter;
+import org.vincentyeh.IMG2PDF.pdf.converter.exception.PDFConverterException;
 import org.vincentyeh.IMG2PDF.pdf.converter.listener.DefaultConversionListener;
-import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
-import org.vincentyeh.IMG2PDF.pdf.page.PageDirection;
-import org.vincentyeh.IMG2PDF.pdf.page.PageSize;
+import org.vincentyeh.IMG2PDF.pdf.parameter.PageAlign;
+import org.vincentyeh.IMG2PDF.pdf.parameter.PageDirection;
+import org.vincentyeh.IMG2PDF.pdf.parameter.PageSize;
 import org.vincentyeh.IMG2PDF.task.DocumentArgument;
 import org.vincentyeh.IMG2PDF.task.PageArgument;
 import org.vincentyeh.IMG2PDF.task.Task;
@@ -179,17 +179,15 @@ public class ConvertCommand implements Callable<Integer> {
     }
 
 
-    private void convertAllToFile(List<Task> tasks) throws PDFConversionException {
+    private void convertAllToFile(List<Task> tasks) throws IOException {
 
         for (Task task : tasks) {
             try {
                 File result = convertToFile(task);
                 if (open_when_complete)
                     openPDF(result);
-            } catch (PDFConversionException e) {
-                boolean ignore = false;
-                if (ignore == false)
-                    throw e;
+            } catch (PDFConverterException e) {
+                System.err.println(e.getMessage());
             }
         }
     }
@@ -206,15 +204,11 @@ public class ConvertCommand implements Callable<Integer> {
 
     }
 
-    private File convertToFile(Task task) throws PDFConversionException {
-        try {
-            PDFConverter converter = new PDFConverter(task, maxMainMemoryBytes.getBytes(), tempFolder, overwrite_output);
-            converter.setInfoListener(new DefaultConversionListener(configurations.locale));
+    private File convertToFile(Task task) throws PDFConverterException, IOException{
+        PDFConverter converter = new PDFConverter(task, maxMainMemoryBytes.getBytes(), tempFolder, overwrite_output);
+        converter.setInfoListener(new DefaultConversionListener(configurations.locale));
 
-            return converter.start();
-        } catch (Exception e) {
-            throw new PDFConversionException(e, task);
-        }
+        return converter.start();
 
     }
 
@@ -239,27 +233,27 @@ public class ConvertCommand implements Callable<Integer> {
 
 
     private String getKeyValuePairString(String key, Object value, Ansi.Color colorOfValue) {
-        return String.format("@|yellow %s|@=@|%s %s|@", key,colorOfValue, value);
+        return String.format("@|yellow %s|@=@|%s %s|@", key, colorOfValue, value);
     }
 
     private String getKeyValuePairString(String field_name) throws NoSuchFieldException, IllegalAccessException {
         Field field = ConvertCommand.class.getDeclaredField(field_name);
         field.setAccessible(true);
-        return getKeyValuePairString(field.getName(), field.get(this),Ansi.Color.GREEN);
+        return getKeyValuePairString(field.getName(), field.get(this), Ansi.Color.GREEN);
     }
 
     private void checkPrintNullParameter(String field_name) throws NoSuchFieldException, IllegalAccessException {
-        if(checkNullParameter(field_name)){
+        if (checkNullParameter(field_name)) {
             printDebugLog(getKeyValuePairString(field_name), true);
-        }else{
-            printErrorLog(getKeyValuePairString(field_name,null,Ansi.Color.RED),true);
-            throw new IllegalArgumentException(field_name+"==null");
+        } else {
+            printErrorLog(getKeyValuePairString(field_name, null, Ansi.Color.RED), true);
+            throw new IllegalArgumentException(field_name + "==null");
         }
 
     }
 
     private boolean checkNullParameter(String field_name) throws NoSuchFieldException, IllegalAccessException {
         Field field = ConvertCommand.class.getDeclaredField(field_name);
-        return (field.get(this) != null) ;
+        return (field.get(this) != null);
     }
 }

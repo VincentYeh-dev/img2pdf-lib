@@ -123,11 +123,11 @@
     </site>
   </distributionManagement>
   <properties>
-    <exe-name>img2pdf</exe-name>
-    <main-class>org.vincentyeh.IMG2PDF.MainProgram</main-class>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.target>1.8</maven.compiler.target>
     <jar-name>${project.name}-${project.version}</jar-name>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <exe-name>img2pdf</exe-name>
+    <main-class>org.vincentyeh.IMG2PDF.MainProgram</main-class>
   </properties>
 </project>

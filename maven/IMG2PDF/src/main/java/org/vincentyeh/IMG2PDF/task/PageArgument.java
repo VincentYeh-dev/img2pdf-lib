@@ -1,12 +1,9 @@
 package org.vincentyeh.IMG2PDF.task;
 
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamConverter;
-import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
-import org.vincentyeh.IMG2PDF.pdf.page.PageDirection;
-import org.vincentyeh.IMG2PDF.pdf.page.PageSize;
-import org.vincentyeh.IMG2PDF.xStream.converter.PageAlignConverter;
+import org.vincentyeh.IMG2PDF.pdf.parameter.PageAlign;
+import org.vincentyeh.IMG2PDF.pdf.parameter.PageDirection;
+import org.vincentyeh.IMG2PDF.pdf.parameter.PageSize;
 
 public class PageArgument {
     public static class Builder {
@@ -40,14 +37,9 @@ public class PageArgument {
         }
     }
 
-    @XStreamAlias("align")
-    @XStreamConverter(PageAlignConverter.class)
     private final PageAlign align;
-    @XStreamAlias("size")
     private final PageSize size;
-    @XStreamAlias("direction")
     private final PageDirection direction;
-    @XStreamAlias("auto-rotate")
     private final boolean auto_rotate;
 
     private PageArgument(PageAlign align, PageSize size, PageDirection direction, boolean auto_rotate) {

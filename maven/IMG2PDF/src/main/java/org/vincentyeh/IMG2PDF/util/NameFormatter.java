@@ -4,114 +4,109 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * https://regex101.com/
- * 
+ *
  * @author VincentYeh
  */
 public class NameFormatter {
-	private static final String SYMBOL_CURRENT_Y="$CY";
-	private static final String SYMBOL_CURRENT_M="$CM";
-	private static final String SYMBOL_CURRENT_D="$CD";
-	private static final String SYMBOL_CURRENT_H="$CH";
-	private static final String SYMBOL_CURRENT_N="$CN";
-	private static final String SYMBOL_CURRENT_S="$CS";
+    private enum CurrentTime {
+        year("$CY"), month("$CM"), day("$CD"), hour("$CH"), minute("$CN"), second("$CS");
 
-	private static final String SYMBOL_MODIFY_Y="$MY";
-	private static final String SYMBOL_MODIFY_M="$MM";
-	private static final String SYMBOL_MODIFY_D="$MD";
-	private static final String SYMBOL_MODIFY_H="$MH";
-	private static final String SYMBOL_MODIFY_N="$MN";
-	private static final String SYMBOL_MODIFY_S="$MS";
-	
-//	private final ArrayList<File> parents = new ArrayList<>();
-    private final File[] parents;
+        private final String symbol;
+
+        CurrentTime(String symbol) {
+            this.symbol = symbol;
+        }
+
+        public String getSymbol() {
+            return symbol;
+        }
+    }
+
+    private enum ModifyTime {
+        year("$MY"), month("$MM"), day("$MD"), hour("$MH"), minute("$MN"), second("$MS");
+
+        private final String symbol;
+
+        ModifyTime(String symbol) {
+            this.symbol = symbol;
+        }
+
+        public String getSymbol() {
+            return symbol;
+        }
+    }
+
     private final File file;
 
-//	private final File file;
+    public NameFormatter(File raw) {
+        file = raw;
+    }
 
-	public NameFormatter(File raw) {
-		file=raw;
-		Path p=raw.toPath();
-		parents = new File[p.getNameCount()-1];
+    private void getCurrentTimeMap(Date current_date, HashMap<String, String> map) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(current_date);
+        map.put(CurrentTime.year.getSymbol(), String.format("%d", cal.get(Calendar.YEAR)));
+        map.put(CurrentTime.month.getSymbol(), String.format("%02d", cal.get(Calendar.MONTH) + 1));
+        map.put(CurrentTime.day.getSymbol(), String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)));
+        map.put(CurrentTime.hour.getSymbol(), String.format("%02d", cal.get(Calendar.HOUR)));
+        map.put(CurrentTime.minute.getSymbol(), String.format("%02d", cal.get(Calendar.MINUTE)));
+        map.put(CurrentTime.second.getSymbol(), String.format("%02d", cal.get(Calendar.SECOND)));
+    }
 
-		for(int i=2;i<=p.getNameCount();i++){
-			parents[i-2]=p.getName(p.getNameCount()-i).toFile();
-		}
+    private void getModifyTimeMap(Date current_date, HashMap<String, String> map) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(current_date);
+        map.put(ModifyTime.year.getSymbol(), String.format("%d", cal.get(Calendar.YEAR)));
+        map.put(ModifyTime.month.getSymbol(), String.format("%02d", cal.get(Calendar.MONTH) + 1));
+        map.put(ModifyTime.day.getSymbol(), String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)));
+        map.put(ModifyTime.hour.getSymbol(), String.format("%02d", cal.get(Calendar.HOUR)));
+        map.put(ModifyTime.minute.getSymbol(), String.format("%02d", cal.get(Calendar.MINUTE)));
+        map.put(ModifyTime.second.getSymbol(), String.format("%02d", cal.get(Calendar.SECOND)));
+    }
 
-	}
+    private void getParentMap(File file,HashMap<String,String> map)
+            throws NumberFormatException, ParentOverPointException {
+        Path p=file.toPath();
 
-	private String formatCurrentDateTime(String format, Date current_date) {
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(current_date);
-		format = format.replace(SYMBOL_CURRENT_Y, String.format("%d", cal.get(Calendar.YEAR)))
-				.replace(SYMBOL_CURRENT_M, String.format("%02d", cal.get(Calendar.MONTH) + 1))
-				.replace(SYMBOL_CURRENT_D, String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)))
-				.replace(SYMBOL_CURRENT_H, String.format("%02d", cal.get(Calendar.HOUR)))
-				.replace(SYMBOL_CURRENT_N, String.format("%02d", cal.get(Calendar.MINUTE)))
-				.replace(SYMBOL_CURRENT_S, String.format("%02d", cal.get(Calendar.SECOND)));
-		return format;
-	}
-	
-	private String formatModifyDateTime(String format, Date modify_date) {
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(modify_date);
-		format = format.replace(SYMBOL_MODIFY_Y, String.format("%d", cal.get(Calendar.YEAR)))
-				.replace(SYMBOL_MODIFY_M, String.format("%02d", cal.get(Calendar.MONTH) + 1))
-				.replace(SYMBOL_MODIFY_D, String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)))
-				.replace(SYMBOL_MODIFY_H, String.format("%02d", cal.get(Calendar.HOUR)))
-				.replace(SYMBOL_MODIFY_N, String.format("%02d", cal.get(Calendar.MINUTE)))
-				.replace(SYMBOL_MODIFY_S, String.format("%02d", cal.get(Calendar.SECOND)));
-		return format;
-	}
+        for (int i = 2; i <= p.getNameCount(); i++) {
+            map.put(String.format("$PARENT{%d}",i-2),p.getName(p.getNameCount() - i).toFile().getName());
+        }
+    }
 
-	private String formatParents(String format, File[] parents)
-			throws NumberFormatException, ParentOverPointException {
-		Matcher matcher = Pattern.compile(".*?(\\$PARENT\\{[0-9]+}).*?").matcher(format);
-		while (matcher.find()) {
-			String parent = matcher.group(1);
-			Matcher matcher_num = Pattern.compile("\\$PARENT\\{([0-9]+)}").matcher(parent);
-			if (matcher_num.find()) {
-				int index = Integer.parseInt(matcher_num.group(1));
-				if (index >= parents.length) {
-					throw new ParentOverPointException(index);
-				}
-				format = format.replace(parent, parents[index].toString());
-			}
-		}
-		return format;
-	}
-
-	public String format(String format) throws ParentOverPointException {
+    public String format(String format) throws ParentOverPointException {
         String[] buf = file.getName().split("\\.");
 
-		format = format.replace("$NAME", buf[0]);
+        format = format.replace("$NAME", buf[0]);
 
-		if (format.matches(".*\\$PARENT\\{([0-9]+)}.*"))
-			format = formatParents(format, parents);
+        HashMap<String, String> map = new HashMap<>();
 
-		if (format.matches(".*\\$(CY|CM|CD|CH|CN|CS).*"))
-			format = formatCurrentDateTime(format,new Date());
-		
-		if (format.matches(".*\\$(MY|MM|MD|MH|MN|MS).*")) {
-            format = formatModifyDateTime(format, new Date(file.lastModified()));
+        getParentMap(file,map);
+        getCurrentTimeMap(new Date(), map);
+        getModifyTimeMap(new Date(file.lastModified()), map);
+
+        for(String key:map.keySet()){
+            format=format.replace(key,map.get(key));
         }
-		return format;
-	}
 
-	public static class ParentOverPointException extends RuntimeException {
+        return format;
+    }
 
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 2237547036157477461L;
+    public static class ParentOverPointException extends RuntimeException {
 
-		public ParentOverPointException(int index) {
-			super(String.format("Parent in index:%d not found.", index));
-		}
+        /**
+         *
+         */
+        private static final long serialVersionUID = 2237547036157477461L;
 
-	}
+        public ParentOverPointException(int index) {
+            super(String.format("Parent in index:%d not found.", index));
+        }
+
+    }
 }

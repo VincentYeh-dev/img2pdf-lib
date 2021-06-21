@@ -1,7 +1,7 @@
 package org.vincentyeh.IMG2PDF.util.file.exception;
 
 
-public class WrongFileTypeException extends RuntimeException {
+public class WrongFileTypeException extends Exception{
 
     public enum Type {
         FOLDER, FILE
