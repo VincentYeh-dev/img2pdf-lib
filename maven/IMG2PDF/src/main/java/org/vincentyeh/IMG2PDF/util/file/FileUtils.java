@@ -1,11 +1,12 @@
 package org.vincentyeh.IMG2PDF.util.file;
 
+import org.vincentyeh.IMG2PDF.util.file.exception.NoParentException;
 import org.vincentyeh.IMG2PDF.util.file.exception.OverwriteException;
+import org.vincentyeh.IMG2PDF.util.file.exception.TargetRootParentException;
 import org.vincentyeh.IMG2PDF.util.file.exception.WrongFileTypeException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 
 public class FileUtils {
     public static File getParentFile(File file) throws NoParentException {
@@ -49,19 +50,8 @@ public class FileUtils {
         return file.toPath().getNameCount() == 0;
     }
 
-    public static boolean isNull(Object o) {
+    private static boolean isNull(Object o) {
         return o == null;
     }
 
-    public static class NoParentException extends IOException {
-        public NoParentException(String message) {
-            super(message);
-        }
-    }
-
-    public static class TargetRootParentException extends NoParentException {
-        public TargetRootParentException(String message) {
-            super(message);
-        }
-    }
 }

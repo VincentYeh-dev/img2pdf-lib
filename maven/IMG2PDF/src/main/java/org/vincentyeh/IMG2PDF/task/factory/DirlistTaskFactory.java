@@ -4,6 +4,7 @@ import org.vincentyeh.IMG2PDF.task.factory.exception.DirListException;
 import org.vincentyeh.IMG2PDF.task.factory.exception.EmptyImagesException;
 import org.vincentyeh.IMG2PDF.task.factory.exception.SourceFileException;
 import org.vincentyeh.IMG2PDF.util.file.FileUtils;
+import org.vincentyeh.IMG2PDF.util.file.exception.NoParentException;
 import org.vincentyeh.IMG2PDF.util.file.exception.WrongFileTypeException;
 import org.vincentyeh.IMG2PDF.task.DocumentArgument;
 import org.vincentyeh.IMG2PDF.task.PageArgument;
@@ -34,7 +35,7 @@ public class DirlistTaskFactory {
         DirlistTaskFactory.fileSorter = fileSorter;
     }
 
-    public static List<Task> createFromDirlist(File dirlist, Charset charset) throws SourceFileException, DirListException, FileUtils.NoParentException {
+    public static List<Task> createFromDirlist(File dirlist, Charset charset) throws SourceFileException, DirListException, NoParentException {
         if (dirlist == null)
             throw new IllegalArgumentException("dirlist==null");
         if (charset == null)
@@ -51,7 +52,7 @@ public class DirlistTaskFactory {
         return tasks;
     }
 
-    private static File getCheckedFileFromLine(String line, File directoryList) throws SourceFileException, FileUtils.NoParentException {
+    private static File getCheckedFileFromLine(String line, File directoryList) throws SourceFileException, NoParentException {
         File dir = new File(line);
         File result;
         if (!dir.isAbsolute()) {
