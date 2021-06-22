@@ -35,7 +35,7 @@ public class DirlistTaskFactory {
         DirlistTaskFactory.fileSorter = fileSorter;
     }
 
-    public static List<Task> createFromDirlist(File dirlist, Charset charset) throws SourceFileException, DirListException, NoParentException {
+    public static List<Task> createFromDirlist(File dirlist, Charset charset) throws SourceFileException, DirListException, NoParentException, FileNotFoundException {
         if (dirlist == null)
             throw new IllegalArgumentException("dirlist==null");
         if (charset == null)
@@ -52,7 +52,7 @@ public class DirlistTaskFactory {
         return tasks;
     }
 
-    private static File getCheckedFileFromLine(String line, File directoryList) throws SourceFileException, NoParentException {
+    private static File getCheckedFileFromLine(String line, File directoryList) throws SourceFileException, NoParentException, FileNotFoundException {
         File dir = new File(line);
         File result;
         if (!dir.isAbsolute()) {

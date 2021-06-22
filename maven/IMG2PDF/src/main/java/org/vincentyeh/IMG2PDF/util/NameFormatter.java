@@ -5,8 +5,6 @@ import java.nio.file.Path;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * https://regex101.com/
@@ -45,6 +43,9 @@ public class NameFormatter {
     private final File file;
 
     public NameFormatter(File raw) {
+        if (raw == null)
+            throw new IllegalArgumentException("raw==null");
+
         file = raw;
     }
 
@@ -70,43 +71,31 @@ public class NameFormatter {
         map.put(ModifyTime.second.getSymbol(), String.format("%02d", cal.get(Calendar.SECOND)));
     }
 
-    private void getParentMap(File file,HashMap<String,String> map)
-            throws NumberFormatException, ParentOverPointException {
-        Path p=file.toPath();
+    private void getFileMap(File file, HashMap<String, String> map)
+            throws NumberFormatException {
+        Path p = file.toPath();
+        map.put("$NAME", p.getFileName().toString().split("\\.")[0]);
 
-        for (int i = 2; i <= p.getNameCount(); i++) {
-            map.put(String.format("$PARENT{%d}",i-2),p.getName(p.getNameCount() - i).toFile().getName());
+        for (int i = 1; i < p.getNameCount(); i++) {
+            map.put("$PARENT{" + (i - 1) + "}", p.getName(p.getNameCount() - 1 - i).getFileName().toString());
         }
+
+        if (p.isAbsolute())
+            map.put("$ROOT", p.getRoot().toString());
     }
 
-    public String format(String format) throws ParentOverPointException {
-        String[] buf = file.getName().split("\\.");
-
-        format = format.replace("$NAME", buf[0]);
-
+    public String format(String format) {
         HashMap<String, String> map = new HashMap<>();
 
-        getParentMap(file,map);
+        getFileMap(file, map);
         getCurrentTimeMap(new Date(), map);
         getModifyTimeMap(new Date(file.lastModified()), map);
 
-        for(String key:map.keySet()){
-            format=format.replace(key,map.get(key));
+        for (String key : map.keySet()) {
+            format = format.replace(key, map.get(key));
         }
 
         return format;
     }
 
-    public static class ParentOverPointException extends RuntimeException {
-
-        /**
-         *
-         */
-        private static final long serialVersionUID = 2237547036157477461L;
-
-        public ParentOverPointException(int index) {
-            super(String.format("Parent in index:%d not found.", index));
-        }
-
-    }
 }
