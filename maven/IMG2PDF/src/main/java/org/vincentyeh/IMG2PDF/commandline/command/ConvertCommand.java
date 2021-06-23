@@ -3,7 +3,9 @@ package org.vincentyeh.IMG2PDF.commandline.command;
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 import org.fusesource.jansi.Ansi;
 import org.vincentyeh.IMG2PDF.commandline.converter.*;
+import org.vincentyeh.IMG2PDF.commandline.handler.core.ExceptionHandler;
 import org.vincentyeh.IMG2PDF.commandline.handler.core.PDFConverterExceptionHandler;
+import org.vincentyeh.IMG2PDF.pattern.Handler;
 import org.vincentyeh.IMG2PDF.pdf.converter.PDFConverter;
 import org.vincentyeh.IMG2PDF.pdf.converter.exception.PDFConverterException;
 import org.vincentyeh.IMG2PDF.pdf.converter.listener.DefaultConversionListener;
@@ -188,7 +190,12 @@ public class ConvertCommand implements Callable<Integer> {
                 if (open_when_complete)
                     openPDF(result);
             } catch (PDFConverterException e) {
-                System.err.println(e.getMessage());
+                ExceptionHandler handler=new PDFConverterExceptionHandler(null);
+                try {
+                    System.err.println(handler.handle(e));
+                } catch (Handler.CantHandleException cantHandleException) {
+                    e.printStackTrace();
+                }
             }
         }
     }
