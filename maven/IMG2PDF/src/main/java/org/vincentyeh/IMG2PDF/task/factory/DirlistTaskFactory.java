@@ -4,12 +4,12 @@ import org.vincentyeh.IMG2PDF.task.factory.exception.DirListException;
 import org.vincentyeh.IMG2PDF.task.factory.exception.EmptyImagesException;
 import org.vincentyeh.IMG2PDF.task.factory.exception.SourceFileException;
 import org.vincentyeh.IMG2PDF.util.file.FileUtils;
-import org.vincentyeh.IMG2PDF.util.file.exception.NoParentException;
-import org.vincentyeh.IMG2PDF.util.file.exception.WrongFileTypeException;
+import org.vincentyeh.IMG2PDF.util.exception.NoParentException;
+import org.vincentyeh.IMG2PDF.util.exception.WrongFileTypeException;
 import org.vincentyeh.IMG2PDF.task.DocumentArgument;
 import org.vincentyeh.IMG2PDF.task.PageArgument;
 import org.vincentyeh.IMG2PDF.task.Task;
-import org.vincentyeh.IMG2PDF.util.NameFormatter;
+import org.vincentyeh.IMG2PDF.util.FileNameFormatter;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -72,7 +72,7 @@ public class DirlistTaskFactory {
     }
 
     private static Task createTaskFromSource(File directory) throws SourceFileException {
-        NameFormatter nf = new NameFormatter(directory);
+        FileNameFormatter nf = new FileNameFormatter(directory);
         return createTask(documentArgument,
                 pageArgument,
                 importSortedImagesFiles(directory),

@@ -6,7 +6,7 @@ import org.vincentyeh.IMG2PDF.pattern.Handler;
 import org.vincentyeh.IMG2PDF.pdf.converter.exception.PDFConverterException;
 import org.vincentyeh.IMG2PDF.pdf.converter.exception.ReadImageException;
 import org.vincentyeh.IMG2PDF.task.Task;
-import org.vincentyeh.IMG2PDF.util.file.exception.OverwriteException;
+import org.vincentyeh.IMG2PDF.util.exception.OverwriteException;
 
 public class PDFConverterExceptionHandler extends ExceptionHandler {
 

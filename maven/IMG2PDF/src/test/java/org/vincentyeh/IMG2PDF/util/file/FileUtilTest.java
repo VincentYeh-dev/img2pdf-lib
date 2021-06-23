@@ -1,8 +1,7 @@
 package org.vincentyeh.IMG2PDF.util.file;
 
 import org.junit.jupiter.api.Test;
-import org.vincentyeh.IMG2PDF.util.file.exception.TargetRootParentException;
-import org.vincentyeh.IMG2PDF.util.file.exception.WrongFileTypeException;
+import org.vincentyeh.IMG2PDF.util.exception.WrongFileTypeException;
 
 
 import java.io.File;

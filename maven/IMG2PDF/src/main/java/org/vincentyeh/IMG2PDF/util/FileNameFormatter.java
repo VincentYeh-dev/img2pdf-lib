@@ -1,6 +1,10 @@
 package org.vincentyeh.IMG2PDF.util;
 
+import org.vincentyeh.IMG2PDF.util.interfaces.NameFormatter;
+
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Calendar;
 import java.util.Date;
@@ -11,7 +15,7 @@ import java.util.HashMap;
  *
  * @author VincentYeh
  */
-public class NameFormatter {
+public class FileNameFormatter extends NameFormatter<File> {
     private enum CurrentTime {
         year("$CY"), month("$CM"), day("$CD"), hour("$CH"), minute("$CN"), second("$CS");
 
@@ -40,13 +44,8 @@ public class NameFormatter {
         }
     }
 
-    private final File file;
-
-    public NameFormatter(File raw) {
-        if (raw == null)
-            throw new IllegalArgumentException("raw==null");
-
-        file = raw;
+    public FileNameFormatter(File file) {
+        super(file);
     }
 
     private void getCurrentTimeMap(Date current_date, HashMap<String, String> map) {
@@ -71,9 +70,9 @@ public class NameFormatter {
         map.put(ModifyTime.second.getSymbol(), String.format("%02d", cal.get(Calendar.SECOND)));
     }
 
-    private void getFileMap(File file, HashMap<String, String> map)
+    private void getFileMap(HashMap<String, String> map)
             throws NumberFormatException {
-        Path p = file.toPath();
+        Path p = getData().toPath();
         map.put("$NAME", p.getFileName().toString().split("\\.")[0]);
 
         for (int i = 1; i < p.getNameCount(); i++) {
@@ -83,13 +82,13 @@ public class NameFormatter {
         if (p.isAbsolute())
             map.put("$ROOT", p.getRoot().toString());
     }
-
+    @Override
     public String format(String format) {
         HashMap<String, String> map = new HashMap<>();
 
-        getFileMap(file, map);
+        getFileMap(map);
         getCurrentTimeMap(new Date(), map);
-        getModifyTimeMap(new Date(file.lastModified()), map);
+        getModifyTimeMap(new Date(getData().lastModified()), map);
 
         for (String key : map.keySet()) {
             format = format.replace(key, map.get(key));

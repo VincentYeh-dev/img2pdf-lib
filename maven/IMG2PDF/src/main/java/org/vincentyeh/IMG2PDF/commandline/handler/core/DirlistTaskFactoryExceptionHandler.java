@@ -5,7 +5,7 @@ import org.vincentyeh.IMG2PDF.task.factory.exception.DirListException;
 import org.vincentyeh.IMG2PDF.task.factory.exception.DirlistTaskFactoryException;
 import org.vincentyeh.IMG2PDF.task.factory.exception.EmptyImagesException;
 import org.vincentyeh.IMG2PDF.task.factory.exception.SourceFileException;
-import org.vincentyeh.IMG2PDF.util.file.exception.WrongFileTypeException;
+import org.vincentyeh.IMG2PDF.util.exception.WrongFileTypeException;
 
 import java.io.FileNotFoundException;
 
