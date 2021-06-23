@@ -19,25 +19,40 @@ public class FileNameFormatterTest {
     @Test
     public void testNormalInputFormat() {
         FileNameFormatter fileNameFormatter = new FileNameFormatter(normal);
-        Assertions.assertEquals(fileNameFormatter.format("$NAME"), "dd");
-        Assertions.assertEquals(fileNameFormatter.format("$PARENT{0}"), "cc");
-        Assertions.assertEquals(fileNameFormatter.format("$PARENT{1}"), "bb");
-        Assertions.assertEquals(fileNameFormatter.format("$PARENT{2}"), "aa");
-        Assertions.assertEquals(fileNameFormatter.format("$ROOT"), "E:\\");
+        try {
+            Assertions.assertEquals(fileNameFormatter.format("$NAME"), "dd");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            Assertions.assertEquals(fileNameFormatter.format("$PARENT{0}"), "cc");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            Assertions.assertEquals(fileNameFormatter.format("$PARENT{1}"), "bb");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            Assertions.assertEquals(fileNameFormatter.format("$PARENT{2}"), "aa");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            Assertions.assertEquals(fileNameFormatter.format("$ROOT"), "E:\\");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
-    public void usingNotExistedParent() {
+    public void usingNotMappedParent() {
         FileNameFormatter fileNameFormatter = new FileNameFormatter(normal);
-        Assertions.assertEquals(fileNameFormatter.format("$PARENT{3}"), "$PARENT{3}");
+        Assertions.assertThrows(FileNameFormatter.NotMappedPattern.class,
+                ()->fileNameFormatter.format("$PARENT{3}"));
+
     }
-
-//    @Test
-//    public void testIllegalFileName() {
-//        Assertions.assertThrows(Exception.class,
-//                () -> new FileNameFormatter(new File("*.aa&&")));
-//    }
-
 
 
 }

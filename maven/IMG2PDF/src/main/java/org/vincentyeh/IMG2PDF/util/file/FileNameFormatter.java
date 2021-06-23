@@ -3,12 +3,12 @@ package org.vincentyeh.IMG2PDF.util.file;
 import org.vincentyeh.IMG2PDF.util.interfaces.NameFormatter;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * https://regex101.com/
@@ -16,36 +16,23 @@ import java.util.HashMap;
  * @author VincentYeh
  */
 public class FileNameFormatter extends NameFormatter<File> {
-    private enum CurrentTime {
-        year("$CY"), month("$CM"), day("$CD"), hour("$CH"), minute("$CN"), second("$CS");
-
-        private final String symbol;
-
-        CurrentTime(String symbol) {
-            this.symbol = symbol;
-        }
-
-        public String getSymbol() {
-            return symbol;
-        }
-    }
-
-    private enum ModifyTime {
-        year("$MY"), month("$MM"), day("$MD"), hour("$MH"), minute("$MN"), second("$MS");
-
-        private final String symbol;
-
-        ModifyTime(String symbol) {
-            this.symbol = symbol;
-        }
-
-        public String getSymbol() {
-            return symbol;
-        }
-    }
-
     public FileNameFormatter(File file) {
         super(file);
+    }
+
+    @Override
+    public String format(String format) throws Exception {
+        HashMap<String, String> map = new HashMap<>();
+
+        getFileMap(map);
+        getCurrentTimeMap(new Date(), map);
+        getModifyTimeMap(new Date(getData().lastModified()), map);
+        verify(format,map);
+
+        for (String key : map.keySet()) {
+            format = format.replace(key, map.get(key));
+        }
+        return format;
     }
 
     private void getCurrentTimeMap(Date current_date, HashMap<String, String> map) {
@@ -82,19 +69,55 @@ public class FileNameFormatter extends NameFormatter<File> {
         if (p.isAbsolute())
             map.put("$ROOT", p.getRoot().toString());
     }
-    @Override
-    public String format(String format) {
-        HashMap<String, String> map = new HashMap<>();
 
-        getFileMap(map);
-        getCurrentTimeMap(new Date(), map);
-        getModifyTimeMap(new Date(getData().lastModified()), map);
 
-        for (String key : map.keySet()) {
-            format = format.replace(key, map.get(key));
+    private void verify(String format, HashMap<String, String> map) throws NotMappedPattern {
+        Matcher matcher = Pattern.compile("(\\$PARENT\\{[0-9]+})").matcher(format);
+        while (matcher.find()) {
+            if(map.get(matcher.group(1))==null)
+                throw new NotMappedPattern(matcher.group(1));
         }
 
-        return format;
+    }
+
+    public static class NotMappedPattern extends Exception{
+        private final String pattern;
+        public NotMappedPattern(String pattern) {
+            super(pattern+" not mapped.");
+            this.pattern = pattern;
+        }
+
+        public String getPattern() {
+            return pattern;
+        }
+    }
+
+    private enum CurrentTime {
+        year("$CY"), month("$CM"), day("$CD"), hour("$CH"), minute("$CN"), second("$CS");
+
+        private final String symbol;
+
+        CurrentTime(String symbol) {
+            this.symbol = symbol;
+        }
+
+        public String getSymbol() {
+            return symbol;
+        }
+    }
+
+    private enum ModifyTime {
+        year("$MY"), month("$MM"), day("$MD"), hour("$MH"), minute("$MN"), second("$MS");
+
+        private final String symbol;
+
+        ModifyTime(String symbol) {
+            this.symbol = symbol;
+        }
+
+        public String getSymbol() {
+            return symbol;
+        }
     }
 
 }

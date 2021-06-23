@@ -12,7 +12,7 @@ public abstract class NameFormatter<D> {
         this.data = data;
     }
 
-    public abstract String format(String pattern);
+    public abstract String format(String pattern) throws Exception;
 
     public D getData() {
         return data;

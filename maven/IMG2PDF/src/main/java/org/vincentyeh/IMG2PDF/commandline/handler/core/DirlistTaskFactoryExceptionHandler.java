@@ -6,6 +6,7 @@ import org.vincentyeh.IMG2PDF.task.factory.exception.DirlistTaskFactoryException
 import org.vincentyeh.IMG2PDF.task.factory.exception.EmptyImagesException;
 import org.vincentyeh.IMG2PDF.task.factory.exception.SourceFileException;
 import org.vincentyeh.IMG2PDF.util.exception.WrongFileTypeException;
+import org.vincentyeh.IMG2PDF.util.file.FileNameFormatter;
 
 import java.io.FileNotFoundException;
 
@@ -37,6 +38,8 @@ public class DirlistTaskFactoryExceptionHandler extends ExceptionHandler {
                 } else if (ex1.getCause() instanceof WrongFileTypeException) {
                     WrongFileTypeException ex2 = (WrongFileTypeException) ex1.getCause();
                     return String.format(getLocaleString("source.wrong_type"), getFileTypeString(ex2.getExpected()), getFileTypeString(ex2.getValue()), ex1.getSource());
+                }else if(ex1.getCause() instanceof FileNameFormatter.NotMappedPattern){
+                    return ex1.getCause().getMessage();
                 }
             }
 

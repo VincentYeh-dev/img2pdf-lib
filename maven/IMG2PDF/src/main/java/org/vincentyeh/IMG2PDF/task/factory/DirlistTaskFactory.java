@@ -73,10 +73,14 @@ public class DirlistTaskFactory {
 
     private static Task createTaskFromSource(File directory) throws SourceFileException {
         FileNameFormatter nf = new FileNameFormatter(directory);
-        return createTask(documentArgument,
-                pageArgument,
-                importSortedImagesFiles(directory),
-                new File(nf.format(pdf_destination)).getAbsoluteFile());
+        try {
+            return createTask(documentArgument,
+                    pageArgument,
+                    importSortedImagesFiles(directory),
+                    new File(nf.format(pdf_destination)).getAbsoluteFile());
+        } catch (Exception e) {
+            throw new SourceFileException(e,directory);
+        }
     }
 
     private static List<String> readAllLinesFromDirlist(File dirlist, Charset charset) throws DirListException {
