@@ -3,6 +3,7 @@ package org.vincentyeh.IMG2PDF.commandline.command;
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 import org.fusesource.jansi.Ansi;
 import org.vincentyeh.IMG2PDF.commandline.converter.*;
+import org.vincentyeh.IMG2PDF.commandline.handler.core.PDFConverterExceptionHandler;
 import org.vincentyeh.IMG2PDF.pdf.converter.PDFConverter;
 import org.vincentyeh.IMG2PDF.pdf.converter.exception.PDFConverterException;
 import org.vincentyeh.IMG2PDF.pdf.converter.listener.DefaultConversionListener;

@@ -4,7 +4,7 @@ import java.io.IOException;
 
 public class MakeDirectoryException extends IOException {
 
-    public MakeDirectoryException(String message) {
-        super(message);
+    public MakeDirectoryException(String message,Throwable e) {
+        super(message,e);
     }
 }

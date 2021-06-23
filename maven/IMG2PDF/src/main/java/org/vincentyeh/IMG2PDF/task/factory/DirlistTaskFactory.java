@@ -9,7 +9,7 @@ import org.vincentyeh.IMG2PDF.util.exception.WrongFileTypeException;
 import org.vincentyeh.IMG2PDF.task.DocumentArgument;
 import org.vincentyeh.IMG2PDF.task.PageArgument;
 import org.vincentyeh.IMG2PDF.task.Task;
-import org.vincentyeh.IMG2PDF.util.FileNameFormatter;
+import org.vincentyeh.IMG2PDF.util.file.FileNameFormatter;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -56,7 +56,7 @@ public class DirlistTaskFactory {
         File dir = new File(line);
         File result;
         if (!dir.isAbsolute()) {
-            result = new File(FileUtils.getParentFile(directoryList), line).getAbsoluteFile();
+            result = new File(FileUtils.getExistedParentFile(directoryList), line).getAbsoluteFile();
         } else {
             result = dir;
         }

@@ -4,11 +4,20 @@ import org.vincentyeh.IMG2PDF.util.exception.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class FileUtils {
-    public static File getParentFile(File file) throws NoParentException, FileNotFoundException {
+    public static File getExistedParentFile(File file) throws FileNotFoundException, NoParentException {
         checkNull(file);
         checkExists(file);
+        return getParentFile(file);
+    }
+
+    public static File getParentFile(File file) throws NoParentException{
+        checkNull(file);
+
         if (isRoot(file)) {
             throw new TargetRootParentException("No parent in: " + file + "(root)");
         }
@@ -24,7 +33,7 @@ public class FileUtils {
 
     public static void checkExists(File file) throws FileNotFoundException {
         checkNull(file);
-        if (!file.exists())
+        if (Files.notExists(file.toPath()))
             throw new FileNotFoundException("File not found: " + file.getAbsolutePath());
     }
 
@@ -33,7 +42,13 @@ public class FileUtils {
         checkNull(file);
         checkNull(excepted);
 
+        Path p=file.toPath();
         WrongFileTypeException.Type value = file.isFile() ? WrongFileTypeException.Type.FILE : WrongFileTypeException.Type.FOLDER;
+        if(Files.isRegularFile(p))
+            value= WrongFileTypeException.Type.FILE;
+        else if(Files.isDirectory(p))
+            value= WrongFileTypeException.Type.FOLDER;
+
         if (value != excepted) {
             throw new WrongFileTypeException(excepted,value);
         }
@@ -46,10 +61,12 @@ public class FileUtils {
             throw new OverwriteException(reason,file);
     }
 
-    public static void makeDirectories(File directory) throws MakeDirectoryException {
+    public static File makeDirectories(File directory) throws MakeDirectoryException {
         checkNull(directory);
-        if(!directory.mkdirs()&&!directory.exists()){
-            throw new MakeDirectoryException("No directory was created:"+directory);
+        try {
+            return Files.createDirectories(directory.toPath()).toFile();
+        } catch (IOException e) {
+            throw new MakeDirectoryException("Fail to create directories: "+directory,e);
         }
     }
 
@@ -63,7 +80,7 @@ public class FileUtils {
     }
 
     private static void checkNull(Object obj){
-        if(obj==null)
+        if(isNull(obj))
             throw new IllegalArgumentException();
     }
 }
