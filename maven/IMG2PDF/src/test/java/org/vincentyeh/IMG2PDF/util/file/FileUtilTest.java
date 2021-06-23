@@ -1,11 +1,15 @@
 package org.vincentyeh.IMG2PDF.util.file;
 
 import org.junit.jupiter.api.Test;
+import org.vincentyeh.IMG2PDF.util.file.exception.TargetRootParentException;
 import org.vincentyeh.IMG2PDF.util.file.exception.WrongFileTypeException;
 
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -41,6 +45,21 @@ public class FileUtilTest {
                 () -> FileUtils.checkExists(file));
         assertDoesNotThrow(() -> FileUtils.checkOverwrite(file, "No no no"));
     }
+    @Test
+    public void checkExistTest() throws IOException {
+        Path dir = Files.createTempDirectory("directory");
+        FileUtils.checkExists(dir.toFile());
+        Files.delete(dir);
 
+        Path file=Files.createTempFile("testfile",null);
+        FileUtils.checkExists(file.toFile());
+        Files.delete(file);
+
+        assertThrows(FileNotFoundException.class,
+                ()-> FileUtils.checkExists(dir.toFile()));
+
+        assertThrows(FileNotFoundException.class,
+                ()-> FileUtils.checkExists(file.toFile()));
+    }
 
 }
