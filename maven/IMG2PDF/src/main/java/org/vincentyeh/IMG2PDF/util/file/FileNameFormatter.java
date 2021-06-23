@@ -16,28 +16,28 @@ import java.util.regex.Pattern;
  * @author VincentYeh
  */
 public class FileNameFormatter extends NameFormatter<File> {
-    public FileNameFormatter(File file) {
-        super(file);
+    public FileNameFormatter(String pattern) {
+        super(pattern);
     }
 
     @Override
-    public String format(String format) throws Exception {
+    public String format(File data) throws Exception {
         HashMap<String, String> map = new HashMap<>();
-
-        getFileMap(map);
-        getCurrentTimeMap(new Date(), map);
-        getModifyTimeMap(new Date(getData().lastModified()), map);
-        verify(format,map);
-
+        getFileMap(data, map);
+        getCurrentTimeMap(map);
+        getModifyTimeMap(data, map);
+        verify(map);
+        String buf=pattern;
         for (String key : map.keySet()) {
-            format = format.replace(key, map.get(key));
+            buf = buf.replace(key, map.get(key));
         }
-        return format;
+
+        return buf;
     }
 
-    private void getCurrentTimeMap(Date current_date, HashMap<String, String> map) {
+    private void getCurrentTimeMap(HashMap<String, String> map) {
         Calendar cal = Calendar.getInstance();
-        cal.setTime(current_date);
+        cal.setTime(new Date());
         map.put(CurrentTime.year.getSymbol(), String.format("%d", cal.get(Calendar.YEAR)));
         map.put(CurrentTime.month.getSymbol(), String.format("%02d", cal.get(Calendar.MONTH) + 1));
         map.put(CurrentTime.day.getSymbol(), String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)));
@@ -46,9 +46,9 @@ public class FileNameFormatter extends NameFormatter<File> {
         map.put(CurrentTime.second.getSymbol(), String.format("%02d", cal.get(Calendar.SECOND)));
     }
 
-    private void getModifyTimeMap(Date current_date, HashMap<String, String> map) {
+    private void getModifyTimeMap(File file, HashMap<String, String> map) {
         Calendar cal = Calendar.getInstance();
-        cal.setTime(current_date);
+        cal.setTime(new Date(file.lastModified()));
         map.put(ModifyTime.year.getSymbol(), String.format("%d", cal.get(Calendar.YEAR)));
         map.put(ModifyTime.month.getSymbol(), String.format("%02d", cal.get(Calendar.MONTH) + 1));
         map.put(ModifyTime.day.getSymbol(), String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)));
@@ -57,9 +57,9 @@ public class FileNameFormatter extends NameFormatter<File> {
         map.put(ModifyTime.second.getSymbol(), String.format("%02d", cal.get(Calendar.SECOND)));
     }
 
-    private void getFileMap(HashMap<String, String> map)
+    private void getFileMap(File file, HashMap<String, String> map)
             throws NumberFormatException {
-        Path p = getData().toPath();
+        Path p = file.toPath();
         map.put("$NAME", p.getFileName().toString().split("\\.")[0]);
 
         for (int i = 1; i < p.getNameCount(); i++) {
@@ -71,19 +71,20 @@ public class FileNameFormatter extends NameFormatter<File> {
     }
 
 
-    private void verify(String format, HashMap<String, String> map) throws NotMappedPattern {
-        Matcher matcher = Pattern.compile("(\\$PARENT\\{[0-9]+})").matcher(format);
+    private void verify(HashMap<String, String> map) throws NotMappedPattern {
+        Matcher matcher = Pattern.compile("(\\$PARENT\\{[0-9]+})").matcher(pattern);
         while (matcher.find()) {
-            if(map.get(matcher.group(1))==null)
+            if (map.get(matcher.group(1)) == null)
                 throw new NotMappedPattern(matcher.group(1));
         }
 
     }
 
-    public static class NotMappedPattern extends Exception{
+    public static class NotMappedPattern extends Exception {
         private final String pattern;
+
         public NotMappedPattern(String pattern) {
-            super(pattern+" not mapped.");
+            super(pattern + " not mapped.");
             this.pattern = pattern;
         }
 

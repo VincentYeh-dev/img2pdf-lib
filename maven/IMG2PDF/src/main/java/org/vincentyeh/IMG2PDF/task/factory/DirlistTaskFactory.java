@@ -72,12 +72,12 @@ public class DirlistTaskFactory {
     }
 
     private static Task createTaskFromSource(File directory) throws SourceFileException {
-        FileNameFormatter nf = new FileNameFormatter(directory);
+        FileNameFormatter nf = new FileNameFormatter(pdf_destination);
         try {
             return createTask(documentArgument,
                     pageArgument,
                     importSortedImagesFiles(directory),
-                    new File(nf.format(pdf_destination)).getAbsoluteFile());
+                    new File(nf.format(directory)).getAbsoluteFile());
         } catch (Exception e) {
             throw new SourceFileException(e,directory);
         }

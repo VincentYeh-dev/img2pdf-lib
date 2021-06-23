@@ -4,17 +4,13 @@ package org.vincentyeh.IMG2PDF.util.interfaces;
  * @param <D> Data type
  */
 public abstract class NameFormatter<D> {
-    private final D data;
+    protected final String pattern;
 
-    public NameFormatter(D data) {
-        if (data==null)
+    public NameFormatter(String pattern) {
+        this.pattern = pattern;
+        if (pattern==null)
             throw new IllegalArgumentException("data==null");
-        this.data = data;
     }
 
-    public abstract String format(String pattern) throws Exception;
-
-    public D getData() {
-        return data;
-    }
+    public abstract String format(D data) throws Exception;
 }

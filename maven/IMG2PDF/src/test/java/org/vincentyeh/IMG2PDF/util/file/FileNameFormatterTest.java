@@ -18,29 +18,34 @@ public class FileNameFormatterTest {
 
     @Test
     public void testNormalInputFormat() {
-        FileNameFormatter fileNameFormatter = new FileNameFormatter(normal);
         try {
-            Assertions.assertEquals(fileNameFormatter.format("$NAME"), "dd");
+            FileNameFormatter fileNameFormatter = new FileNameFormatter("$NAME");
+            Assertions.assertEquals(fileNameFormatter.format(normal), "dd");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            FileNameFormatter fileNameFormatter = new FileNameFormatter("$PARENT{0}");
+            Assertions.assertEquals(fileNameFormatter.format(normal), "cc");
         } catch (Exception e) {
             e.printStackTrace();
         }
         try {
-            Assertions.assertEquals(fileNameFormatter.format("$PARENT{0}"), "cc");
+            FileNameFormatter fileNameFormatter = new FileNameFormatter("$PARENT{1}");
+            Assertions.assertEquals(fileNameFormatter.format(normal), "bb");
         } catch (Exception e) {
             e.printStackTrace();
         }
         try {
-            Assertions.assertEquals(fileNameFormatter.format("$PARENT{1}"), "bb");
+            FileNameFormatter fileNameFormatter = new FileNameFormatter("$PARENT{2}");
+            Assertions.assertEquals(fileNameFormatter.format(normal), "aa");
         } catch (Exception e) {
             e.printStackTrace();
         }
         try {
-            Assertions.assertEquals(fileNameFormatter.format("$PARENT{2}"), "aa");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            Assertions.assertEquals(fileNameFormatter.format("$ROOT"), "E:\\");
+            FileNameFormatter fileNameFormatter = new FileNameFormatter("$ROOT");
+            Assertions.assertEquals(fileNameFormatter.format(normal), "E:\\");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -48,9 +53,9 @@ public class FileNameFormatterTest {
 
     @Test
     public void usingNotMappedParent() {
-        FileNameFormatter fileNameFormatter = new FileNameFormatter(normal);
+        FileNameFormatter fileNameFormatter = new FileNameFormatter("$PARENT{3}");
         Assertions.assertThrows(FileNameFormatter.NotMappedPattern.class,
-                ()->fileNameFormatter.format("$PARENT{3}"));
+                ()->fileNameFormatter.format(normal));
 
     }
 
