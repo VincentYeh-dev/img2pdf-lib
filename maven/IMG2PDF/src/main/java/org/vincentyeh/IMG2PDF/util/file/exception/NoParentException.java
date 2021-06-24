@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.util.exception;
+package org.vincentyeh.IMG2PDF.util.file.exception;
 
 import java.io.IOException;
 

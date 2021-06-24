@@ -1,7 +1,7 @@
 package org.vincentyeh.IMG2PDF.commandline.handler.core;
 
 import org.vincentyeh.IMG2PDF.pattern.Handler;
-import org.vincentyeh.IMG2PDF.util.exception.WrongFileTypeException;
+import org.vincentyeh.IMG2PDF.util.file.exception.WrongFileTypeException;
 
 import java.util.ResourceBundle;
 

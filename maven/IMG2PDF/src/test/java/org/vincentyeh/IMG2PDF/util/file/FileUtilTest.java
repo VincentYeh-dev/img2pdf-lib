@@ -4,9 +4,9 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.vincentyeh.IMG2PDF.util.exception.MakeDirectoryException;
-import org.vincentyeh.IMG2PDF.util.exception.NoParentException;
-import org.vincentyeh.IMG2PDF.util.exception.WrongFileTypeException;
+import org.vincentyeh.IMG2PDF.util.file.exception.MakeDirectoryException;
+import org.vincentyeh.IMG2PDF.util.file.exception.NoParentException;
+import org.vincentyeh.IMG2PDF.util.file.exception.WrongFileTypeException;
 
 
 import java.io.File;
