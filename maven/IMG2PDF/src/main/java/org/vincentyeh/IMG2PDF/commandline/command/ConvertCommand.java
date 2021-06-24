@@ -17,6 +17,7 @@ import org.vincentyeh.IMG2PDF.task.PageArgument;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.factory.DirlistTaskFactory;
 import org.vincentyeh.IMG2PDF.util.BytesSize;
+import org.vincentyeh.IMG2PDF.util.file.FileNameFormatter;
 import org.vincentyeh.IMG2PDF.util.file.FileSorter;
 import org.vincentyeh.IMG2PDF.util.file.FileUtils;
 import org.vincentyeh.IMG2PDF.util.file.GlobbingFileFilter;
@@ -112,7 +113,7 @@ public class ConvertCommand implements Callable<Integer> {
 
         checkParameters();
 
-        DirlistTaskFactory.setArgument(getDocumentArgument(), getPageArgument(), pdf_dst);
+        DirlistTaskFactory.setArgument(getDocumentArgument(), getPageArgument(), new FileNameFormatter(pdf_dst));
         DirlistTaskFactory.setImageFilesRule(filter, fileSorter);
 
         List<Task> tasks = new ArrayList<>();
@@ -190,7 +191,7 @@ public class ConvertCommand implements Callable<Integer> {
                 if (open_when_complete)
                     openPDF(result);
             } catch (PDFConverterException e) {
-                ExceptionHandler handler=new PDFConverterExceptionHandler(null);
+                ExceptionHandler handler = new PDFConverterExceptionHandler(null);
                 try {
                     System.err.println(handler.handle(e));
                 } catch (Handler.CantHandleException cantHandleException) {
@@ -212,7 +213,7 @@ public class ConvertCommand implements Callable<Integer> {
 
     }
 
-    private File convertToFile(Task task) throws PDFConverterException, IOException{
+    private File convertToFile(Task task) throws PDFConverterException, IOException {
         PDFConverter converter = new PDFConverter(task, maxMainMemoryBytes.getBytes(), tempFolder, overwrite_output);
         converter.setInfoListener(new DefaultConversionListener(configurations.locale));
 

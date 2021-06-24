@@ -9,7 +9,7 @@ import org.vincentyeh.IMG2PDF.util.file.exception.WrongFileTypeException;
 import org.vincentyeh.IMG2PDF.task.DocumentArgument;
 import org.vincentyeh.IMG2PDF.task.PageArgument;
 import org.vincentyeh.IMG2PDF.task.Task;
-import org.vincentyeh.IMG2PDF.util.file.FileNameFormatter;
+import org.vincentyeh.IMG2PDF.util.interfaces.NameFormatter;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -22,12 +22,12 @@ public class DirlistTaskFactory {
     private static Comparator<? super File> fileSorter;
     private static DocumentArgument documentArgument;
     private static PageArgument pageArgument;
-    private static String pdf_destination;
+    private static NameFormatter<File> formatter;
 
-    public static void setArgument(DocumentArgument documentArgument, PageArgument pageArgument, String pdf_destination) {
+    public static void setArgument(DocumentArgument documentArgument, PageArgument pageArgument,NameFormatter<File> formatter) {
         DirlistTaskFactory.documentArgument = documentArgument;
         DirlistTaskFactory.pageArgument = pageArgument;
-        DirlistTaskFactory.pdf_destination = pdf_destination;
+        DirlistTaskFactory.formatter=formatter;
     }
 
     public static void setImageFilesRule(FileFilter imageFilter, Comparator<? super File> fileSorter) {
@@ -72,12 +72,11 @@ public class DirlistTaskFactory {
     }
 
     private static Task createTaskFromSource(File directory) throws SourceFileException {
-        FileNameFormatter nf = new FileNameFormatter(pdf_destination);
         try {
             return createTask(documentArgument,
                     pageArgument,
                     importSortedImagesFiles(directory),
-                    new File(nf.format(directory)).getAbsoluteFile());
+                    new File(formatter.format(directory)).getAbsoluteFile());
         } catch (Exception e) {
             throw new SourceFileException(e,directory);
         }
