@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 
 public class FileUtils {
@@ -15,8 +16,8 @@ public class FileUtils {
         return getParentFile(file);
     }
 
-    public static File getParentFile(File file) throws NoParentException{
-        checkNull(file);
+    public static File getParentFile(File file) throws NoParentException {
+        checkFileValidity(file);
 
         if (isRoot(file)) {
             throw new TargetRootParentException("No parent in: " + file + "(root)");
@@ -33,13 +34,14 @@ public class FileUtils {
 
     public static void checkExists(File file) throws FileNotFoundException {
         checkNull(file);
+        checkFileValidity(file);
         if (Files.notExists(file.toPath()))
             throw new FileNotFoundException("File not found: " + file.getAbsolutePath());
     }
 
     public static void checkType(File file, WrongFileTypeException.Type excepted) throws WrongFileTypeException, FileNotFoundException {
+        checkFileValidity(file);
         checkExists(file);
-        checkNull(file);
         checkNull(excepted);
 
         Path p=file.toPath();
@@ -73,6 +75,11 @@ public class FileUtils {
     public static boolean isRoot(File file) {
         checkNull(file);
         return file.toPath().getNameCount() == 0;
+    }
+
+    public static void checkFileValidity(File file) throws InvalidPathException{
+        checkNull(file);
+        file.toPath().toFile();
     }
 
     private static boolean isNull(Object o) {
