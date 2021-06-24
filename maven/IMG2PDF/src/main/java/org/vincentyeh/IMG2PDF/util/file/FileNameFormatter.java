@@ -21,7 +21,7 @@ public class FileNameFormatter extends NameFormatter<File> {
     }
 
     @Override
-    public String format(File data) throws Exception {
+    public String format(File data) throws FormatException{
         HashMap<String, String> map = new HashMap<>();
         getFileMap(data, map);
         getCurrentTimeMap(map);
@@ -80,7 +80,7 @@ public class FileNameFormatter extends NameFormatter<File> {
 
     }
 
-    public static class NotMappedPattern extends Exception {
+    public static class NotMappedPattern extends FormatException{
         private final String pattern;
 
         public NotMappedPattern(String pattern) {
@@ -92,6 +92,8 @@ public class FileNameFormatter extends NameFormatter<File> {
             return pattern;
         }
     }
+
+
 
     private enum CurrentTime {
         year("$CY"), month("$CM"), day("$CD"), hour("$CH"), minute("$CN"), second("$CS");
