@@ -56,6 +56,14 @@
             <version>5.7.2</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>5.7.2</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- ... -->
 
         <!-- https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox -->
@@ -107,7 +115,7 @@
                     <execution>
                         <configuration>
                             <ignoredDependencies>
-                                <ignoredDependency>org.junit.jupiter:junit-jupiter-engine:jar:5.7.2</ignoredDependency>
+                                <ignoredDependency>org.junit.jupiter:*</ignoredDependency>
                             </ignoredDependencies>
                         </configuration>
                     </execution>
