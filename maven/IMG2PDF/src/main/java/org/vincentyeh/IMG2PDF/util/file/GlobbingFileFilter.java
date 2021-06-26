@@ -10,34 +10,34 @@ import java.util.regex.PatternSyntaxException;
 
 public class GlobbingFileFilter implements FileFilter {
 	private final PathMatcher matcher;
-	private final String operator;
+	private final String pattern;
+	private static final String syntax="glob";
 
-	/**
-	 * @param operator filter operator
-	 * @throws PatternSyntaxException when using regex
-	 */
-	public GlobbingFileFilter(String operator)
+	public GlobbingFileFilter(String pattern)
 			throws PatternSyntaxException, UnsupportedOperationException {
-		this.operator = operator;
-		FileSystem fs = FileSystems.getDefault();
-		matcher = fs.getPathMatcher(operator);
+		checkPatternNull(pattern);
 
+		this.pattern = pattern;
+		FileSystem fs = FileSystems.getDefault();
+		matcher = fs.getPathMatcher(syntax+":"+ pattern);
 	}
 
 	@Override
 	public boolean accept(File file) {
+		FileUtils.checkFileValidity(file);
+
 //		Only the file in particular folder will be passed to this method.
 		Path name = file.toPath().getFileName();
 		return matcher.matches(name);
 	}
 
-
-	public String getOperator() {
-		return operator;
-	}
-
 	@Override
 	public String toString() {
-		return operator;
+		return syntax+":"+pattern;
+	}
+
+	private static void checkPatternNull(String obj){
+		if(obj==null)
+			throw new IllegalArgumentException("pattern" +"==null");
 	}
 }

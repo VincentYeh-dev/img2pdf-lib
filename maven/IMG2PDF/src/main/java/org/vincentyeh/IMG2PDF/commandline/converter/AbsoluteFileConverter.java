@@ -1,12 +1,16 @@
 package org.vincentyeh.IMG2PDF.commandline.converter;
 
-import picocli.CommandLine;
+import org.vincentyeh.IMG2PDF.commandline.converter.core.BasicConverter;
 
 import java.io.File;
 
-public class AbsoluteFileConverter implements CommandLine.ITypeConverter<File> {
+public class AbsoluteFileConverter extends BasicConverter<File> {
     @Override
     public File convert(String s) throws Exception {
+        checkNull(s,getClass().getName()+".s");
+        checkEmpty(s,getClass().getName()+".s");
         return new File(s).getAbsoluteFile();
     }
+
+
 }

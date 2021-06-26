@@ -43,7 +43,7 @@ public class ConvertCommand implements Callable<Integer> {
     @CommandLine.Option(names = {"--sorter", "-sr"}, defaultValue = "NAME$INCREASE", converter = FileSorterConverter.class)
     FileSorter fileSorter;
 
-    @CommandLine.Option(names = {"--filter", "-f"}, defaultValue = "glob:*.{PNG,JPG}", converter = GlobbingFileFilterConverter.class)
+    @CommandLine.Option(names = {"--filter", "-f"}, defaultValue = "*.{PNG,JPG}", converter = GlobbingFileFilterConverter.class)
     GlobbingFileFilter filter;
 
     @CommandLine.Option(names = {"--pdf_owner_password", "-popwd"})

@@ -10,7 +10,6 @@ import org.vincentyeh.IMG2PDF.util.file.exception.MakeDirectoryException;
 import org.vincentyeh.IMG2PDF.util.file.exception.NoParentException;
 import org.vincentyeh.IMG2PDF.util.file.exception.WrongFileTypeException;
 
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
