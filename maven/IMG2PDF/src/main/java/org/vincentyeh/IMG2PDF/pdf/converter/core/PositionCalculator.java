@@ -3,25 +3,45 @@ package org.vincentyeh.IMG2PDF.pdf.converter.core;
 import org.vincentyeh.IMG2PDF.pdf.parameter.PageAlign;
 
 public class PositionCalculator {
-    private static PositionCalculator calculator = null;
+    private final PageAlign align;
 
-    public static PositionCalculator getInstance() {
-        if (calculator == null) {
-            calculator = new PositionCalculator();
-        }
-        return calculator;
+    public PositionCalculator(PageAlign align) {
+        if(align==null)
+            throw new IllegalArgumentException("align==null");
+        this.align = align;
     }
 
-    public static void init(float img_height, float img_width, float page_height,
-                            float page_width) {
-        calculator.x_space = page_width - img_width;
-        calculator.y_space = page_height - img_height;
+    public Position calculate(Size object_size, Size container_size){
+        if (object_size == null)
+            throw new IllegalArgumentException("object_size==null");
+        if (container_size == null)
+            throw new IllegalArgumentException("container_size==null");
+
+        return calculate(object_size.getHeight(), object_size.getWidth(), container_size.getHeight(),container_size.getWidth());
     }
 
-    public Position calculate(PageAlign align) {
+    public Position calculate(float object_height, float object_width, float container_height,
+                              float container_width){
+        final float x_space;
+        final float y_space;
+        if (object_height < 0)
+            throw new IllegalArgumentException("object_height<0");
+        if (object_width < 0)
+            throw new IllegalArgumentException("object_width<0");
 
-        float position_x = 0, position_y = 0;
+        if (container_height < 0)
+            throw new IllegalArgumentException("container_height<0");
+        if (container_width < 0)
+            throw new IllegalArgumentException("container_width<0");
 
+        x_space = container_width - object_width;
+        if (x_space < 0)
+            throw new IllegalArgumentException("The space of x axis is negative.");
+        y_space = container_height - object_height;
+        if (y_space < 0)
+            throw new IllegalArgumentException("The space of y axis is negative.");
+
+        float position_x = 0f, position_y = 0f;
 //        水平 X
         PageAlign.HorizontalAlign hori_align = align.getHorizontal();
 
@@ -59,8 +79,5 @@ public class PositionCalculator {
 
         return new Position(position_x, position_y);
     }
-
-    private float x_space;
-    private float y_space;
 
 }
