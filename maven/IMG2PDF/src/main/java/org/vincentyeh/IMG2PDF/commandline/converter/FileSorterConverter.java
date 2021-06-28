@@ -11,7 +11,7 @@ public class FileSorterConverter extends BasicConverter<FileSorter> {
 
         checkNull(s,getClass().getName()+".s");
         checkEmpty(s,getClass().getName()+".s");
-        String[] split =s.split("\\$");
+        String[] split =s.split("-");
         try {
             return new FileSorter(FileSorter.Sortby.valueOf(split[0]),FileSorter.Sequence.valueOf(split[1]));
         }catch (Exception e){

@@ -40,7 +40,7 @@ public class ConvertCommand implements Callable<Integer> {
     @CommandLine.ParentCommand
     IMG2PDFCommand img2PDFCommand;
 
-    @CommandLine.Option(names = {"--sorter", "-sr"}, defaultValue = "NAME$INCREASE", converter = FileSorterConverter.class)
+    @CommandLine.Option(names = {"--sorter", "-sr"}, defaultValue = "NAME-INCREASE", converter = FileSorterConverter.class)
     FileSorter fileSorter;
 
     @CommandLine.Option(names = {"--filter", "-f"}, defaultValue = "*.{PNG,JPG}", converter = GlobbingFileFilterConverter.class)

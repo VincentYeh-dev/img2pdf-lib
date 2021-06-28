@@ -87,7 +87,7 @@ public class FileSorter implements Comparator<File> {
 
     @Override
     public String toString() {
-        return String.format("%s$%s", sortby, sequence);
+        return String.format("%s-%s", sortby, sequence);
     }
 
     public enum Sequence {
