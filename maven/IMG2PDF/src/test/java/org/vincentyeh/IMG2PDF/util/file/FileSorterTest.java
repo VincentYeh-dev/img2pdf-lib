@@ -45,9 +45,9 @@ public class FileSorterTest {
     @MethodSource("provider")
     public void testName(int n1, int n2, File f1, File f2) {
         FileSorter sorter = new FileSorter(FileSorter.Sortby.NAME, FileSorter.Sequence.INCREASE);
-        assertEquals(sorter.compare(f1, f2),f1.getName().compareTo(f2.getName()));
+        assertEquals(sorter.compare(f1, f2), f1.getName().compareTo(f2.getName()));
         FileSorter sorter2 = new FileSorter(FileSorter.Sortby.NAME, FileSorter.Sequence.DECREASE);
-        assertEquals(sorter2.compare(f1, f2),f2.getName().compareTo(f1.getName()));
+        assertEquals(sorter2.compare(f1, f2), f2.getName().compareTo(f1.getName()));
     }
 
     @ParameterizedTest
@@ -76,16 +76,25 @@ public class FileSorterTest {
     private static Stream<Arguments> DateFileProvider() throws IOException {
         List<Arguments> list = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
-            Date time1 = generateRandomDate();
-            File f1 = Files.createFile(tempDir.resolve(time1.getTime()+".txt")).toFile();
-            boolean a = f1.setLastModified(time1.getTime());
+            File f1;
+            long t1;
+            do {
+                t1=generateRandomDate().getTime();
+                f1 = new File(tempDir.toFile(),  t1+ ".txt");
+            } while (f1.exists());
+            Files.createFile(f1.toPath());
+            boolean a = f1.setLastModified(t1);
 
+            File f2;
+            long t2;
+            do {
+                t2=generateRandomDate().getTime();
+                f2 = new File(tempDir.toFile(),  t2+ ".txt");
+            } while (f2.exists());
+            Files.createFile(f2.toPath());
+            boolean b = f2.setLastModified(t2);
 
-            Date time2 = generateRandomDate();
-            File f2 = Files.createFile(tempDir.resolve(time2.getTime()+".txt")).toFile();
-            boolean b = f2.setLastModified(time2.getTime());
-
-            list.add(arguments(time1.getTime(), time2.getTime(), f1, f2));
+            list.add(arguments(t1,t2, f1, f2));
         }
         return list.stream();
     }
