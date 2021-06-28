@@ -6,6 +6,7 @@ import org.vincentyeh.IMG2PDF.pattern.Handler;
 import org.vincentyeh.IMG2PDF.pdf.converter.exception.PDFConverterException;
 import org.vincentyeh.IMG2PDF.pdf.converter.exception.ReadImageException;
 import org.vincentyeh.IMG2PDF.task.Task;
+import org.vincentyeh.IMG2PDF.util.file.exception.InvalidFileException;
 import org.vincentyeh.IMG2PDF.util.file.exception.OverwriteException;
 
 public class PDFConverterExceptionHandler extends ExceptionHandler {
@@ -26,6 +27,9 @@ public class PDFConverterExceptionHandler extends ExceptionHandler {
                 return String.format(getLocaleString("overwrite"), task.getPdfDestination());
             } else if (ex1.getCause() instanceof PDFConversionException) {
                 return String.format(getLocaleString("conversion"), ex1.getCause().getMessage());
+            }
+            else if (ex1.getCause() instanceof InvalidFileException) {
+                return String.format(getLocaleString("invalid_file"), ex1.getCause().getMessage());
             }
         }
         return doNext(data);

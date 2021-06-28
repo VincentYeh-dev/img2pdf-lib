@@ -24,8 +24,7 @@ import org.vincentyeh.IMG2PDF.util.file.GlobbingFileFilter;
 import picocli.CommandLine;
 
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -194,10 +193,10 @@ public class ConvertCommand implements Callable<Integer> {
                 ExceptionHandler handler = new PDFConverterExceptionHandler(null);
                 try {
                     System.err.println();
-                    System.err.println(handler.handle(e));
+                    System.err.println(ansi().render(String.format("[@|red ERROR|@] %s",handler.handle(e))));
 
                     if(img2PDFCommand.isDebug())
-                        e.printStackTrace();
+                        printStackTrance(e);
                 } catch (Handler.CantHandleException cantHandleException) {
                     System.err.println("Can't handle");
                     e.printStackTrace();
@@ -270,4 +269,12 @@ public class ConvertCommand implements Callable<Integer> {
         Field field = ConvertCommand.class.getDeclaredField(field_name);
         return (field.get(this) != null);
     }
+
+    private void printStackTrance(Exception e){
+        PrintStream printer = System.err;
+        StringWriter sw = new StringWriter();
+        e.printStackTrace(new PrintWriter(sw));
+        printer.println(ansi().fg(Ansi.Color.RED).a(sw.toString()).reset());
+    }
+
 }
