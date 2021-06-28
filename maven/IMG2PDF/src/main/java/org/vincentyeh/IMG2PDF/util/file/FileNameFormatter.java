@@ -60,19 +60,19 @@ public class FileNameFormatter extends NameFormatter<File> {
     private void getFileMap(File file, HashMap<String, String> map)
             throws NumberFormatException {
         Path p = file.toPath();
-        map.put("$NAME", p.getFileName().toString().split("\\.")[0]);
+        map.put("<NAME>", p.getFileName().toString().split("\\.")[0]);
 
         for (int i = 1; i < p.getNameCount(); i++) {
-            map.put("$PARENT{" + (i - 1) + "}", p.getName(p.getNameCount() - 1 - i).getFileName().toString());
+            map.put("<PARENT{" + (i - 1) + "}>", p.getName(p.getNameCount() - 1 - i).getFileName().toString());
         }
 
         if (p.isAbsolute())
-            map.put("$ROOT", p.getRoot().toString());
+            map.put("<ROOT>", p.getRoot().toString());
     }
 
 
     private void verify(HashMap<String, String> map) throws NotMappedPattern {
-        Matcher matcher = Pattern.compile("(\\$PARENT\\{[0-9]+})").matcher(pattern);
+        Matcher matcher = Pattern.compile("(<PARENT\\{[0-9]+}>)").matcher(pattern);
         while (matcher.find()) {
             if (map.get(matcher.group(1)) == null)
                 throw new NotMappedPattern(matcher.group(1));
@@ -96,7 +96,7 @@ public class FileNameFormatter extends NameFormatter<File> {
 
 
     private enum CurrentTime {
-        year("$CY"), month("$CM"), day("$CD"), hour("$CH"), minute("$CN"), second("$CS");
+        year("<CY>"), month("<CM>"), day("<CD>"), hour("<CH>"), minute("<CN>"), second("<CS>");
 
         private final String symbol;
 
@@ -110,7 +110,7 @@ public class FileNameFormatter extends NameFormatter<File> {
     }
 
     private enum ModifyTime {
-        year("$MY"), month("$MM"), day("$MD"), hour("$MH"), minute("$MN"), second("$MS");
+        year("<MY>"), month("<MM>"), day("<MD>"), hour("<MH>"), minute("<MN>"), second("<MS>");
 
         private final String symbol;
 
