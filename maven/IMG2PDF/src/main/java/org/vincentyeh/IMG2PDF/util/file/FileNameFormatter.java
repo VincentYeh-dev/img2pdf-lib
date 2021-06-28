@@ -72,7 +72,7 @@ public class FileNameFormatter extends NameFormatter<File> {
 
 
     private void verify(HashMap<String, String> map) throws NotMappedPattern {
-        Matcher matcher = Pattern.compile("(<PARENT\\{[0-9]+}>)").matcher(pattern);
+        Matcher matcher = Pattern.compile("(<PARENT\\{[0-9]+}>|<ROOT>)").matcher(pattern);
         while (matcher.find()) {
             if (map.get(matcher.group(1)) == null)
                 throw new NotMappedPattern(matcher.group(1));

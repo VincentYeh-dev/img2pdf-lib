@@ -39,7 +39,8 @@ public class DirlistTaskFactoryExceptionHandler extends ExceptionHandler {
                     WrongFileTypeException ex2 = (WrongFileTypeException) ex1.getCause();
                     return String.format(getLocaleString("source.wrong_type"), getFileTypeString(ex2.getExpected()), getFileTypeString(ex2.getValue()), ex1.getSource());
                 }else if(ex1.getCause() instanceof FileNameFormatter.NotMappedPattern){
-                    return ex1.getCause().getMessage();
+                    FileNameFormatter.NotMappedPattern ex2=(FileNameFormatter.NotMappedPattern) ex1.getCause();
+                    return String.format(getLocaleString("source.no_map_pattern"),ex2.getPattern());
                 }
             }
 

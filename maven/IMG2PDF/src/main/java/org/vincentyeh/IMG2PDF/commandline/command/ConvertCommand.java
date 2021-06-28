@@ -192,8 +192,8 @@ public class ConvertCommand implements Callable<Integer> {
             } catch (PDFConverterException e) {
                 ExceptionHandler handler = new PDFConverterExceptionHandler(null);
                 try {
-                    System.err.println();
-                    System.err.println(ansi().render(String.format("[@|red ERROR|@] %s",handler.handle(e))));
+                    System.out.println();
+                    System.out.println(ansi().render(String.format("[@|red ERROR|@] %s",handler.handle(e))));
 
                     if(img2PDFCommand.isDebug())
                         printStackTrance(e);
