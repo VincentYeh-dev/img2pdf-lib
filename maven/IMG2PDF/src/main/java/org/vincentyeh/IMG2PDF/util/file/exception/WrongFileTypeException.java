@@ -1,7 +1,9 @@
 package org.vincentyeh.IMG2PDF.util.file.exception;
 
 
-public class WrongFileTypeException extends Exception{
+import java.io.IOException;
+
+public class WrongFileTypeException extends IOException {
 
     public enum Type {
         FOLDER, FILE
