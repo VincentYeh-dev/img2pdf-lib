@@ -5,7 +5,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.File;
-import java.nio.file.InvalidPathException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -24,8 +23,7 @@ public class GlobbingFileFilterTest {
     })
     public void testIllegalFileName(String input){
         GlobbingFileFilter filter=new GlobbingFileFilter("*");
-        assertThrows(InvalidPathException.class,
-                ()->filter.accept(new File(input)));
+        assertFalse(filter.accept(new File(input)));
     }
     @ParameterizedTest
     @ValueSource(strings = {"Hello.txt","World.jpg","abc.png","doc.docx","data.db"})

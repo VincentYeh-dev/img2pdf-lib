@@ -1,12 +1,12 @@
 package org.vincentyeh.IMG2PDF.util.file;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.vincentyeh.IMG2PDF.util.file.exception.InvalidFileException;
 import org.vincentyeh.IMG2PDF.util.file.exception.MakeDirectoryException;
 import org.vincentyeh.IMG2PDF.util.file.exception.NoParentException;
 import org.vincentyeh.IMG2PDF.util.file.exception.WrongFileTypeException;
@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -134,7 +133,7 @@ public class FileUtilTest {
     })
     public void checkInvalidFilename(String str) {
         File invalid = new File(str);
-        assertThrows(InvalidPathException.class,
+        assertThrows(InvalidFileException.class,
                 () -> FileUtils.checkFileValidity(invalid));
     }
 

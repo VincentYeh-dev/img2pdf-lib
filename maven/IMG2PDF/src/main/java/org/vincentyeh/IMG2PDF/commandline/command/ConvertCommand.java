@@ -193,8 +193,13 @@ public class ConvertCommand implements Callable<Integer> {
             } catch (PDFConverterException e) {
                 ExceptionHandler handler = new PDFConverterExceptionHandler(null);
                 try {
+                    System.err.println();
                     System.err.println(handler.handle(e));
+
+                    if(img2PDFCommand.isDebug())
+                        e.printStackTrace();
                 } catch (Handler.CantHandleException cantHandleException) {
+                    System.err.println("Can't handle");
                     e.printStackTrace();
                 }
             }

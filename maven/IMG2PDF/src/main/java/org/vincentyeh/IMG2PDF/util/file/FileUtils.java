@@ -10,13 +10,13 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 
 public class FileUtils {
-    public static File getExistedParentFile(File file) throws FileNotFoundException, NoParentException {
+    public static File getExistedParentFile(File file) throws FileNotFoundException, NoParentException, InvalidFileException {
         checkNull(file);
         checkExists(file);
         return getParentFile(file);
     }
 
-    public static File getParentFile(File file) throws NoParentException {
+    public static File getParentFile(File file) throws NoParentException, InvalidFileException {
         checkFileValidity(file);
 
         if (isRoot(file)) {
@@ -32,14 +32,14 @@ public class FileUtils {
         return parent;
     }
 
-    public static void checkExists(File file) throws FileNotFoundException {
+    public static void checkExists(File file) throws FileNotFoundException, InvalidFileException {
         checkNull(file);
         checkFileValidity(file);
         if (Files.notExists(file.toPath()))
             throw new FileNotFoundException("File not found: " + file.getAbsolutePath());
     }
 
-    public static void checkType(File file, WrongFileTypeException.Type excepted) throws WrongFileTypeException, FileNotFoundException {
+    public static void checkType(File file, WrongFileTypeException.Type excepted) throws WrongFileTypeException, FileNotFoundException, InvalidFileException {
         checkFileValidity(file);
         checkExists(file);
         checkNull(excepted);
@@ -77,9 +77,13 @@ public class FileUtils {
         return file.toPath().getNameCount() == 0;
     }
 
-    public static void checkFileValidity(File file) throws InvalidPathException{
+    public static void checkFileValidity(File file) throws InvalidFileException{
         checkNull(file);
-        file.toPath().toFile();
+        try {
+            file.toPath().toFile();
+        }catch (InvalidPathException e){
+            throw new InvalidFileException(e.getMessage());
+        }
     }
 
     private static boolean isNull(Object o) {

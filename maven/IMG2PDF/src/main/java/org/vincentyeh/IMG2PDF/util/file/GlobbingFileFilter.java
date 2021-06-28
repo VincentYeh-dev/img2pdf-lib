@@ -1,10 +1,11 @@
 package org.vincentyeh.IMG2PDF.util.file;
 
+import org.vincentyeh.IMG2PDF.util.file.exception.InvalidFileException;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
-import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.regex.PatternSyntaxException;
 
@@ -22,13 +23,19 @@ public class GlobbingFileFilter implements FileFilter {
 		matcher = fs.getPathMatcher(syntax+":"+ pattern);
 	}
 
+	/**
+	 * @param file The file which passed to the filter.
+	 * @return Return true if file is matched for the pattern.Return false if file is invalid.
+	 */
 	@Override
 	public boolean accept(File file) {
-		FileUtils.checkFileValidity(file);
+		try {
+			FileUtils.checkFileValidity(file);
+		} catch (InvalidFileException e) {
+			return false;
+		}
 
-//		Only the file in particular folder will be passed to this method.
-		Path name = file.toPath().getFileName();
-		return matcher.matches(name);
+		return matcher.matches(file.toPath().getFileName());
 	}
 
 	@Override

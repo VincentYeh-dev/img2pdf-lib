@@ -50,9 +50,7 @@ public class PDFConverter implements ConversionInfoListener {
 
     public File start() throws PDFConverterException {
         try (PDDocument document = new PDDocument(memoryUsageSetting)) {
-
             document.protect(task.getDocumentArgument().getSpp());
-
             onConversionPreparing(task);
             checkOverwrite();
 
@@ -62,7 +60,7 @@ public class PDFConverter implements ConversionInfoListener {
             File pdf = savePDF(document);
             onConversionComplete(pdf);
             return pdf;
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new PDFConverterException(e, task);
         }
     }
