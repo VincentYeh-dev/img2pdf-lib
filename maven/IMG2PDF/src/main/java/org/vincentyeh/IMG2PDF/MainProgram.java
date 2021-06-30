@@ -17,8 +17,6 @@ public class MainProgram {
 
         CommandLine cmd = new CommandLine(new IMG2PDFCommand());
         cmd.addSubcommand(new ConvertCommand(ConfigurationAgent.getConvertConfig()));
-
-//        cmd.setExecutionExceptionHandler(new CommandlineExecutionHandler(ConfigurationAgent.getHandlerResourceBundle()));
         cmd.setParameterExceptionHandler(new CommandlineParameterHandler(ConfigurationAgent.getHandlerResourceBundle()));
         cmd.setResourceBundle(ConfigurationAgent.getCommandResourceBundle());
 

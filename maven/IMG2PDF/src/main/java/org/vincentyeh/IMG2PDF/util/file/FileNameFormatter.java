@@ -16,8 +16,11 @@ import java.util.regex.Pattern;
  * @author VincentYeh
  */
 public class FileNameFormatter extends NameFormatter<File> {
+    private final Date currentDate;
+
     public FileNameFormatter(String pattern) {
         super(pattern);
+        currentDate = new Date();
     }
 
     @Override
@@ -37,7 +40,7 @@ public class FileNameFormatter extends NameFormatter<File> {
 
     private void getCurrentTimeMap(HashMap<String, String> map) {
         Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date());
+        cal.setTime(currentDate);
         map.put(CurrentTime.year.getSymbol(), String.format("%d", cal.get(Calendar.YEAR)));
         map.put(CurrentTime.month.getSymbol(), String.format("%02d", cal.get(Calendar.MONTH) + 1));
         map.put(CurrentTime.day.getSymbol(), String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)));

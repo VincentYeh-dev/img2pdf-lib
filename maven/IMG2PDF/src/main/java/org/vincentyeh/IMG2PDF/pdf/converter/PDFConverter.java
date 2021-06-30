@@ -49,8 +49,8 @@ public class PDFConverter implements ConversionInfoListener {
     }
 
     public File start() throws PDFConverterException {
-        checkOverwrite();
         try (PDDocument document = new PDDocument(memoryUsageSetting)) {
+            checkOverwrite();
             document.protect(task.getDocumentArgument().getSpp());
             onConversionPreparing(task);
 
@@ -66,6 +66,7 @@ public class PDFConverter implements ConversionInfoListener {
 
     private File savePDF(PDDocument document) throws SaveException {
         try {
+            FileUtils.checkFileValidity(task.getPdfDestination());
             File parent = FileUtils.getParentFile(task.getPdfDestination());
             FileUtils.makeDirectories(parent);
             document.save(task.getPdfDestination());

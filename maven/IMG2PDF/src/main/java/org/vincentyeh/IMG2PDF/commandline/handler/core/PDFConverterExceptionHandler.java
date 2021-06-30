@@ -23,15 +23,15 @@ public class PDFConverterExceptionHandler extends ExceptionHandler {
             Throwable cause = ex1.getCause();
             Task task = ex1.getTask();
             if (cause instanceof ReadImageException) {
-                return String.format(getLocaleString("read_image"), ((ReadImageException) cause).getErrorImageFile(), cause.getCause().getMessage());
+                return String.format(getLocaleString("read_image"),task.getPdfDestination().getPath(),((ReadImageException) cause).getErrorImageFile(), cause.getCause().getMessage());
             } else if (cause instanceof PDFConversionException) {
-                return String.format(getLocaleString("conversion"), cause.getCause().getMessage());
+                return String.format(getLocaleString("conversion"),task.getPdfDestination().getPath() ,cause.getCause().getMessage());
             } else if (cause instanceof SaveException) {
                 SaveException ex2=(SaveException) cause;
                 if (ex2.getCause() instanceof OverwriteException) {
-                    return String.format(getLocaleString("overwrite"), task.getPdfDestination());
+                    return String.format(getLocaleString("overwrite"), task.getPdfDestination().getPath(),task.getPdfDestination());
                 } else if (ex2.getCause() instanceof InvalidFileException) {
-                    return String.format(getLocaleString("invalid_file"), ex2.getCause().getMessage());
+                    return String.format(getLocaleString("invalid_file"),task.getPdfDestination().getPath(), ex2.getCause().getMessage());
                 }
             }
         }
