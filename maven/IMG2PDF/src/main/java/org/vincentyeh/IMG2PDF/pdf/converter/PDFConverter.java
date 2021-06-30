@@ -1,22 +1,22 @@
 package org.vincentyeh.IMG2PDF.pdf.converter;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.vincentyeh.IMG2PDF.pdf.converter.core.ImagePageFactory;
 import org.vincentyeh.IMG2PDF.pdf.converter.exception.PDFConversionException;
 import org.vincentyeh.IMG2PDF.pdf.converter.exception.PDFConverterException;
 import org.vincentyeh.IMG2PDF.pdf.converter.exception.ReadImageException;
+import org.vincentyeh.IMG2PDF.pdf.converter.exception.SaveException;
 import org.vincentyeh.IMG2PDF.pdf.converter.listener.ConversionInfoListener;
-import org.vincentyeh.IMG2PDF.pdf.converter.core.ImagePageFactory;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.util.file.FileUtils;
 import org.vincentyeh.IMG2PDF.util.file.exception.OverwriteException;
 
 import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * The core of this program. At first,this class will be initialized by task.
@@ -33,7 +33,7 @@ public class PDFConverter implements ConversionInfoListener {
 
     private final MemoryUsageSetting memoryUsageSetting;
 
-    public PDFConverter(Task task, long maxMainMemoryBytes, File tempFolder, boolean overwrite) throws IOException{
+    public PDFConverter(Task task, long maxMainMemoryBytes, File tempFolder, boolean overwrite) throws IOException {
         this.overwrite = overwrite;
 
         if (task == null)
@@ -49,14 +49,13 @@ public class PDFConverter implements ConversionInfoListener {
     }
 
     public File start() throws PDFConverterException {
+        checkOverwrite();
         try (PDDocument document = new PDDocument(memoryUsageSetting)) {
             document.protect(task.getDocumentArgument().getSpp());
             onConversionPreparing(task);
-            checkOverwrite();
 
             File[] images = task.getImages();
             appendAllPageToDocument(images, document);
-
             File pdf = savePDF(document);
             onConversionComplete(pdf);
             return pdf;
@@ -65,12 +64,15 @@ public class PDFConverter implements ConversionInfoListener {
         }
     }
 
-    private File savePDF(PDDocument document) throws IOException {
-        File parent=FileUtils.getParentFile(task.getPdfDestination());
-        FileUtils.makeDirectories(parent);
-
-        document.save(task.getPdfDestination());
-        return task.getPdfDestination();
+    private File savePDF(PDDocument document) throws SaveException {
+        try {
+            File parent = FileUtils.getParentFile(task.getPdfDestination());
+            FileUtils.makeDirectories(parent);
+            document.save(task.getPdfDestination());
+            return task.getPdfDestination();
+        } catch (Exception e) {
+            throw new SaveException(e);
+        }
     }
 
     private void appendAllPageToDocument(File[] images, PDDocument document) throws PDFConversionException, ReadImageException {
@@ -85,7 +87,7 @@ public class PDFConverter implements ConversionInfoListener {
         try {
             document.addPage(getImagePage(image, document));
         } catch (Exception e) {
-            throw new PDFConversionException(task, e);
+            throw new PDFConversionException(e);
         }
 
     }
@@ -94,13 +96,18 @@ public class PDFConverter implements ConversionInfoListener {
         try {
             return ImageIO.read(image);
         } catch (Exception e) {
-            throw new ReadImageException(image, e, task);
+            throw new ReadImageException(e, image);
         }
     }
 
-    private void checkOverwrite() throws OverwriteException {
-        if (!overwrite)
-            FileUtils.checkOverwrite(task.getPdfDestination(), "PDF overwrite deny,File is already exists:" + task.getPdfDestination().getAbsoluteFile());
+    private void checkOverwrite() throws SaveException {
+        if (!overwrite) {
+            try {
+                FileUtils.checkOverwrite(task.getPdfDestination(), "PDF overwrite deny,File is already exists:" + task.getPdfDestination().getAbsoluteFile());
+            } catch (OverwriteException e) {
+                throw new SaveException(e);
+            }
+        }
     }
 
     private PDPage getImagePage(BufferedImage image, PDDocument document) throws Exception {

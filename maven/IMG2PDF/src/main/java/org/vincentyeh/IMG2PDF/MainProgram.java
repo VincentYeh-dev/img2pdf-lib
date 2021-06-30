@@ -1,13 +1,12 @@
 package org.vincentyeh.IMG2PDF;
 
 import org.fusesource.jansi.AnsiConsole;
-import org.vincentyeh.IMG2PDF.commandline.command.IMG2PDFCommand;
 import org.vincentyeh.IMG2PDF.commandline.command.ConvertCommand;
-import org.vincentyeh.IMG2PDF.commandline.handler.CommandlineExecutionHandler;
+import org.vincentyeh.IMG2PDF.commandline.command.IMG2PDFCommand;
 import org.vincentyeh.IMG2PDF.commandline.handler.CommandlineParameterHandler;
 import picocli.CommandLine;
 
-import java.io.*;
+import java.io.File;
 
 
 public class MainProgram {
@@ -19,7 +18,7 @@ public class MainProgram {
         CommandLine cmd = new CommandLine(new IMG2PDFCommand());
         cmd.addSubcommand(new ConvertCommand(ConfigurationAgent.getConvertConfig()));
 
-        cmd.setExecutionExceptionHandler(new CommandlineExecutionHandler(ConfigurationAgent.getHandlerResourceBundle()));
+//        cmd.setExecutionExceptionHandler(new CommandlineExecutionHandler(ConfigurationAgent.getHandlerResourceBundle()));
         cmd.setParameterExceptionHandler(new CommandlineParameterHandler(ConfigurationAgent.getHandlerResourceBundle()));
         cmd.setResourceBundle(ConfigurationAgent.getCommandResourceBundle());
 
