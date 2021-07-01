@@ -1,20 +1,14 @@
 package org.vincentyeh.IMG2PDF.util.file.exception;
 
-import java.io.IOException;
+import java.io.File;
+import java.nio.file.InvalidPathException;
 
-public class InvalidFileException extends IOException {
-    public InvalidFileException() {
+public class InvalidFileException extends FileException{
+    public InvalidFileException(File file) {
+        super("Invalid file:"+file,file);
     }
 
-    public InvalidFileException(String message) {
-        super(message);
-    }
-
-    public InvalidFileException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public InvalidFileException(Throwable cause) {
-        super(cause);
+    public InvalidFileException(InvalidPathException cause, File file) {
+        super(cause.getMessage(), file);
     }
 }

@@ -1,10 +1,10 @@
 package org.vincentyeh.IMG2PDF.util.file.exception;
 
-import java.io.IOException;
+import java.io.File;
 
-public class MakeDirectoryException extends IOException {
+public class MakeDirectoryException extends FileException{
 
-    public MakeDirectoryException(String message,Throwable e) {
-        super(message,e);
+    public MakeDirectoryException(Throwable cause, File file) {
+        super("Fail to create directories:"+file,cause, file);
     }
 }
