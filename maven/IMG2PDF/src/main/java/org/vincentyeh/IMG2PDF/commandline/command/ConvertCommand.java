@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.*;
 import java.util.concurrent.Callable;
 
+import static java.lang.String.format;
 import static java.lang.System.out;
 import static org.fusesource.jansi.Ansi.ansi;
 
@@ -134,9 +135,9 @@ public class ConvertCommand implements Callable<Integer> {
         List<Task> tasks = new ArrayList<>();
         for (File dirlist : sourceFiles) {
             try {
-                out.println(getColorLine(String.format(configurations.resourceBundle.getString("execution.convert.start.parsing"), dirlist.getPath()), Ansi.Color.BLUE));
+                out.println(getColorLine(format(configurations.resourceBundle.getString("execution.convert.start.parsing"), dirlist.getPath()), Ansi.Color.BLUE));
                 List<Task> found = DirlistTaskFactory.createFromDirlist(dirlist, configurations.DIRLIST_READ_CHARSET);
-                out.println(getColorLine(String.format(configurations.resourceBundle.getString("execution.convert.start.parsed"), found.size(), dirlist.getPath()), Ansi.Color.BLUE));
+                out.println(getColorLine(format(configurations.resourceBundle.getString("execution.convert.start.parsed"), found.size(), dirlist.getPath()), Ansi.Color.BLUE));
                 tasks.addAll(found);
             } catch (Exception e) {
                 handleException(e, new DirlistTaskFactoryExceptionHandler(null),"\t","");
@@ -245,7 +246,7 @@ public class ConvertCommand implements Callable<Integer> {
 
     private void handleException(Exception e, ExceptionHandler handler,String prefix,String suffix) {
         try {
-            out.println(ansi().render(String.format(prefix+"[@|red ERROR|@] %s"+suffix, handler.handle(e))));
+            out.println(ansi().render(format(prefix+"[@|red ERROR|@] %s"+suffix, handler.handle(e))));
             if (img2PDFCommand.isDebug())
                 out.println(getStackTranceString(e));
         } catch (Handler.CantHandleException cantHandleException) {
@@ -257,14 +258,14 @@ public class ConvertCommand implements Callable<Integer> {
 
     private void printDebugLog(Object msg) {
         if (img2PDFCommand.isDebug()) {
-            String content = String.format("[@|blue DEBUG|@] %s", msg);
+            String content = format("[@|blue DEBUG|@] %s", msg);
             out.println(ansi().render(content));
         }
     }
 
     private void printErrorLog(Object msg) {
         if (img2PDFCommand.isDebug()) {
-            String content = String.format("[@|red ERROR|@] %s", msg);
+            String content = format("[@|red ERROR|@] %s", msg);
             out.println(ansi().render(content));
         }
     }
@@ -281,7 +282,7 @@ public class ConvertCommand implements Callable<Integer> {
 
 
     private String getKeyValuePairString(String key, Object value, Ansi.Color colorOfValue) {
-        return String.format("@|yellow %s|@=@|%s %s|@", key, colorOfValue, value);
+        return format("@|yellow %s|@=@|%s %s|@", key, colorOfValue, value);
     }
 
     private String getKeyValuePairString(String field_name) throws NoSuchFieldException, IllegalAccessException {

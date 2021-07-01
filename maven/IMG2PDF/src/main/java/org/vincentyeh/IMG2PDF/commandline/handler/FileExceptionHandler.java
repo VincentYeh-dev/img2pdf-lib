@@ -22,9 +22,9 @@ public class FileExceptionHandler extends ExceptionHandler {
                 return format(getLocaleString("InvalidFileException"),getExceptionFile(data));
             }else if(data instanceof WrongFileTypeException){
                 WrongFileTypeException ex1=(WrongFileTypeException) data;
-                return String.format(getLocaleString("WrongFileTypeException"),getFileTypeString(ex1.getExpected()), getFileTypeString(ex1.getValue()),getExceptionFile(ex1));
+                return format(getLocaleString("WrongFileTypeException"),getFileTypeString(ex1.getExpected()), getFileTypeString(ex1.getValue()),getExceptionFile(ex1));
             }else if(data instanceof NoParentException){
-                return String.format(getLocaleString("NoParentException"),getExceptionFile(data));
+                return format(getLocaleString("NoParentException"),getExceptionFile(data));
             }
         }
         return doNext(data);

@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
+
 public class ParameterExceptionHandler extends ExceptionHandler {
 
     public ParameterExceptionHandler(Handler<String, Exception> next) {
@@ -22,13 +24,13 @@ public class ParameterExceptionHandler extends ExceptionHandler {
 
             CommandLine.Model.OptionSpec optionSpec = (CommandLine.Model.OptionSpec) argSpec;
             if (clazz.isEnum())
-                return String.format(getLocaleString("type_convert.enum"), getResourceArgSpecType(argSpec), optionSpec.longestName(), getEnumConstants(clazz), ex.getValue());
+                return format(getLocaleString("type_convert.enum"), getResourceArgSpecType(argSpec), optionSpec.longestName(), getEnumConstants(clazz), ex.getValue());
             else
-                return String.format(getLocaleString("type_convert.normal"), getResourceArgSpecType(argSpec), optionSpec.longestName(), ex.getValue());
+                return format(getLocaleString("type_convert.normal"), getResourceArgSpecType(argSpec), optionSpec.longestName(), ex.getValue());
         } else if (data instanceof CommandLine.UnmatchedArgumentException) {
             CommandLine.UnmatchedArgumentException exception = (CommandLine.UnmatchedArgumentException) data;
             String list = exception.getUnmatched().stream().map(str -> '\'' + str + '\'').collect(Collectors.joining(", "));
-            return String.format(getLocaleString("unmatched_argument.unknown_option"), list);
+            return format(getLocaleString("unmatched_argument.unknown_option"), list);
         } else if (data instanceof CommandLine.MissingParameterException) {
             CommandLine.MissingParameterException exception = (CommandLine.MissingParameterException) data;
             List<String> param_list = exception.getMissing().stream()
@@ -50,10 +52,10 @@ public class ParameterExceptionHandler extends ExceptionHandler {
 
             StringBuilder builder = new StringBuilder();
             if (!param_list.isEmpty())
-                builder.append(String.format(getLocaleString("missing_required.parameter") + '\n', String.join(", ", param_list)));
+                builder.append(format(getLocaleString("missing_required.parameter") + '\n', String.join(", ", param_list)));
 
             if (!option_list.isEmpty())
-                builder.append(String.format(getLocaleString("missing_required.option") + '\n', String.join(", ", option_list)));
+                builder.append(format(getLocaleString("missing_required.option") + '\n', String.join(", ", option_list)));
 
             return builder.toString();
         } else {

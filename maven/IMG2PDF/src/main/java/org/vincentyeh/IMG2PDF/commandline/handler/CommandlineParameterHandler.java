@@ -8,6 +8,8 @@ import picocli.CommandLine;
 import java.io.PrintWriter;
 import java.util.ResourceBundle;
 
+import static java.lang.String.format;
+
 public class CommandlineParameterHandler implements CommandLine.IParameterExceptionHandler {
 
     private final ResourceBundle resourceBundle;
@@ -33,7 +35,7 @@ public class CommandlineParameterHandler implements CommandLine.IParameterExcept
 
         printErrorText(cmd, cmd.getHelp().fullSynopsis());
         CommandLine.Model.CommandSpec spec = cmd.getCommandSpec();
-        printErrorText(cmd, String.format((resourceBundle.getString("public.try_help")), spec.qualifiedName()));
+        printErrorText(cmd, format((resourceBundle.getString("public.try_help")), spec.qualifiedName()));
 
         return CommandLine.ExitCode.USAGE;
     }
