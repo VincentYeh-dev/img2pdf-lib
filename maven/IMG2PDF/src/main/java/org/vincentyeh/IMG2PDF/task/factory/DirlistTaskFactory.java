@@ -4,9 +4,7 @@ import org.vincentyeh.IMG2PDF.task.factory.exception.DirListException;
 import org.vincentyeh.IMG2PDF.task.factory.exception.EmptyImagesException;
 import org.vincentyeh.IMG2PDF.task.factory.exception.SourceFileException;
 import org.vincentyeh.IMG2PDF.util.file.FileUtils;
-import org.vincentyeh.IMG2PDF.util.file.exception.InvalidFileException;
-import org.vincentyeh.IMG2PDF.util.file.exception.NoParentException;
-import org.vincentyeh.IMG2PDF.util.file.exception.WrongFileTypeException;
+import org.vincentyeh.IMG2PDF.util.file.exception.*;
 import org.vincentyeh.IMG2PDF.task.DocumentArgument;
 import org.vincentyeh.IMG2PDF.task.PageArgument;
 import org.vincentyeh.IMG2PDF.task.Task;
@@ -25,10 +23,10 @@ public class DirlistTaskFactory {
     private static PageArgument pageArgument;
     private static NameFormatter<File> formatter;
 
-    public static void setArgument(DocumentArgument documentArgument, PageArgument pageArgument,NameFormatter<File> formatter) {
+    public static void setArgument(DocumentArgument documentArgument, PageArgument pageArgument, NameFormatter<File> formatter) {
         DirlistTaskFactory.documentArgument = documentArgument;
         DirlistTaskFactory.pageArgument = pageArgument;
-        DirlistTaskFactory.formatter=formatter;
+        DirlistTaskFactory.formatter = formatter;
     }
 
     public static void setImageFilesRule(FileFilter imageFilter, Comparator<? super File> fileSorter) {
@@ -36,7 +34,7 @@ public class DirlistTaskFactory {
         DirlistTaskFactory.fileSorter = fileSorter;
     }
 
-    public static List<Task> createFromDirlist(File dirlist, Charset charset) throws SourceFileException, DirListException,IOException {
+    public static List<Task> createFromDirlist(File dirlist, Charset charset) throws SourceFileException, DirListException {
         if (dirlist == null)
             throw new IllegalArgumentException("dirlist==null");
         if (charset == null)
@@ -46,48 +44,48 @@ public class DirlistTaskFactory {
 
         List<Task> tasks = new ArrayList<>();
 
-        for (String line : lines) {
-            tasks.add(createTaskFromSource(getCheckedFileFromLine(line, dirlist)));
+        for (int i = 0; i < lines.size(); i++) {
+            tasks.add(createTaskFromSource(getCheckedFileFromLine(lines.get(i), dirlist, i + 1), i + 1));
         }
 
         return tasks;
     }
 
-    private static File getCheckedFileFromLine(String line, File directoryList) throws SourceFileException, NoParentException, FileNotFoundException, InvalidFileException {
-        File dir = new File(line);
-        File result;
-        if (!dir.isAbsolute()) {
-            result = new File(FileUtils.getExistedParentFile(directoryList), line).getAbsoluteFile();
-        } else {
-            result = dir;
-        }
-
+    private static File getCheckedFileFromLine(String lineString, File directoryList, int line) throws SourceFileException {
+        File dir = new File(lineString);
         try {
+            File result;
+            if (!dir.isAbsolute()) {
+                result = new File(FileUtils.getExistedParentFile(directoryList), lineString).getAbsoluteFile();
+            } else {
+                result = dir;
+            }
+
             FileUtils.checkExists(result);
             FileUtils.checkType(result, WrongFileTypeException.Type.FOLDER);
-        } catch (Exception e) {
-            throw new SourceFileException(e, result);
-        }
+            return result;
 
-        return result;
+        } catch (Exception e) {
+            throw new SourceFileException(e, dir, line);
+        }
     }
 
-    private static Task createTaskFromSource(File directory) throws SourceFileException {
+    private static Task createTaskFromSource(File directory, int line) throws SourceFileException {
         try {
             return createTask(documentArgument,
                     pageArgument,
                     importSortedImagesFiles(directory),
                     new File(formatter.format(directory)).getAbsoluteFile());
         } catch (Exception e) {
-            throw new SourceFileException(e,directory);
+            throw new SourceFileException(e, directory, line);
         }
     }
 
     private static List<String> readAllLinesFromDirlist(File dirlist, Charset charset) throws DirListException {
-        try{
+        try {
             FileUtils.checkExists(dirlist);
             FileUtils.checkType(dirlist, WrongFileTypeException.Type.FILE);
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new DirListException(e, dirlist);
         }
 

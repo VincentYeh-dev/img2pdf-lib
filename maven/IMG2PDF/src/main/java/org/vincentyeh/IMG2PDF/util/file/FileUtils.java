@@ -3,14 +3,13 @@ package org.vincentyeh.IMG2PDF.util.file;
 import org.vincentyeh.IMG2PDF.util.file.exception.*;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 
 public class FileUtils {
-    public static File getExistedParentFile(File file) throws FileNotFoundException, NoParentException, InvalidFileException {
+    public static File getExistedParentFile(File file) throws NoParentException, InvalidFileException, FileNotExistsException {
         checkNull(file);
         checkExists(file);
         return getParentFile(file);
@@ -32,14 +31,14 @@ public class FileUtils {
         return parent;
     }
 
-    public static void checkExists(File file) throws FileNotFoundException, InvalidFileException {
+    public static void checkExists(File file) throws FileNotExistsException, InvalidFileException {
         checkNull(file);
         checkFileValidity(file);
         if (Files.notExists(file.toPath()))
-            throw new FileNotFoundException("File not found: " + file.getAbsolutePath());
+            throw new FileNotExistsException(file);
     }
 
-    public static void checkType(File file, WrongFileTypeException.Type excepted) throws WrongFileTypeException, FileNotFoundException, InvalidFileException {
+    public static void checkType(File file, WrongFileTypeException.Type excepted) throws WrongFileTypeException, InvalidFileException, FileNotExistsException {
         checkFileValidity(file);
         checkExists(file);
         checkNull(excepted);

@@ -132,17 +132,14 @@ public class ConvertCommand implements Callable<Integer> {
         DirlistTaskFactory.setArgument(getDocumentArgument(), getPageArgument(), new FileNameFormatter(pdf_dst));
         DirlistTaskFactory.setImageFilesRule(filter, fileSorter);
         List<Task> tasks = new ArrayList<>();
-        printDebugLog("Import dirlist");
-        printDebugLog("Files");
         for (File dirlist : sourceFiles) {
-            printDebugLog(getColorLine("\t|- " + dirlist.getPath(), Ansi.Color.CYAN));
             try {
-                out.println(getColorLine(String.format("Parsing folder list: %s", dirlist.getPath()), Ansi.Color.BLUE));
+                out.println(getColorLine(String.format(configurations.resourceBundle.getString("execution.convert.start.parsing"), dirlist.getPath()), Ansi.Color.BLUE));
                 List<Task> found = DirlistTaskFactory.createFromDirlist(dirlist, configurations.DIRLIST_READ_CHARSET);
-                out.println(getColorLine(String.format("Found %d folders in %s", found.size(), dirlist.getPath()), Ansi.Color.BLUE));
+                out.println(getColorLine(String.format(configurations.resourceBundle.getString("execution.convert.start.parsed"), found.size(), dirlist.getPath()), Ansi.Color.BLUE));
                 tasks.addAll(found);
             } catch (Exception e) {
-                handleException(e, new DirlistTaskFactoryExceptionHandler(null));
+                handleException(e, new DirlistTaskFactoryExceptionHandler(null),"\t","");
             }
         }
         return tasks;
@@ -239,16 +236,16 @@ public class ConvertCommand implements Callable<Integer> {
 
             return converter.start();
         } catch (PDFConverterException e) {
-            handleException(e, new PDFConverterExceptionHandler(null));
+            handleException(e, new PDFConverterExceptionHandler(null),"","");
         } catch (Exception e) {
             out.println(getStackTranceString(e));
         }
         return null;
     }
 
-    private void handleException(Exception e, ExceptionHandler handler) {
+    private void handleException(Exception e, ExceptionHandler handler,String prefix,String suffix) {
         try {
-            out.println(ansi().render(String.format("[@|red ERROR|@] %s", handler.handle(e))));
+            out.println(ansi().render(String.format(prefix+"[@|red ERROR|@] %s"+suffix, handler.handle(e))));
             if (img2PDFCommand.isDebug())
                 out.println(getStackTranceString(e));
         } catch (Handler.CantHandleException cantHandleException) {

@@ -6,18 +6,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.vincentyeh.IMG2PDF.util.file.exception.InvalidFileException;
-import org.vincentyeh.IMG2PDF.util.file.exception.MakeDirectoryException;
-import org.vincentyeh.IMG2PDF.util.file.exception.NoParentException;
-import org.vincentyeh.IMG2PDF.util.file.exception.WrongFileTypeException;
+import org.vincentyeh.IMG2PDF.util.file.exception.*;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class FileUtilTest {
     private static File normal_file, normal_folder;
@@ -56,10 +53,10 @@ public class FileUtilTest {
 
     @Test
     public void TestNotExistsFile() {
-        assertThrows(FileNotFoundException.class,
+        assertThrows(FileNotExistsException.class,
                 () -> FileUtils.checkType(not_exists_file, WrongFileTypeException.Type.FILE));
 
-        assertThrows(FileNotFoundException.class,
+        assertThrows(FileNotExistsException.class,
                 () -> FileUtils.checkExists(not_exists_file));
 
         assertDoesNotThrow(() -> FileUtils.checkOverwrite(not_exists_file, "No no no"));
@@ -109,7 +106,7 @@ public class FileUtilTest {
         Assertions.assertDoesNotThrow(
                 () -> FileUtils.getParentFile(file));
         Assertions.assertEquals(file.getParentFile().getName(), FileUtils.getParentFile(file).getName());
-        Assertions.assertThrows(FileNotFoundException.class,
+        Assertions.assertThrows(FileNotExistsException.class,
                 () -> FileUtils.getExistedParentFile(file));
 
         Files.createFile(file.toPath());

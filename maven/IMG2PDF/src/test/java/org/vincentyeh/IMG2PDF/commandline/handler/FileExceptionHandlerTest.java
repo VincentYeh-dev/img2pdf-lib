@@ -21,7 +21,7 @@ public class FileExceptionHandlerTest {
     }
 
     @Test
-    public void testFileNotFound() throws Handler.CantHandleException {
+    public void testFileExistsException() throws Handler.CantHandleException {
         String result=handler.handle(new FileNotExistsException(new File("AAAA")));
         System.out.println(result);
         assertEquals("File not found : AAAA",result);
@@ -37,7 +37,7 @@ public class FileExceptionHandlerTest {
     public void testWrongFileTypeException() throws Handler.CantHandleException {
         String result=handler.handle(new WrongFileTypeException(WrongFileTypeException.Type.FILE, WrongFileTypeException.Type.FOLDER,new File("AAAA")));
         System.out.println(result);
-        assertEquals("Path should be a file,but was 'folder': AAAA",result);
+        assertEquals("Path should be a file,but was folder: AAAA",result);
     }
 
     @Test
