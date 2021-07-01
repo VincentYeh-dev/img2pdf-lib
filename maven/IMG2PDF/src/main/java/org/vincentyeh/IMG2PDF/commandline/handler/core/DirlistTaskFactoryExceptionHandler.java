@@ -5,8 +5,8 @@ import org.vincentyeh.IMG2PDF.task.factory.exception.DirListException;
 import org.vincentyeh.IMG2PDF.task.factory.exception.DirlistTaskFactoryException;
 import org.vincentyeh.IMG2PDF.task.factory.exception.EmptyImagesException;
 import org.vincentyeh.IMG2PDF.task.factory.exception.SourceFileException;
-import org.vincentyeh.IMG2PDF.util.file.exception.WrongFileTypeException;
 import org.vincentyeh.IMG2PDF.util.file.FileNameFormatter;
+import org.vincentyeh.IMG2PDF.util.file.exception.WrongFileTypeException;
 
 import java.io.FileNotFoundException;
 
@@ -37,10 +37,10 @@ public class DirlistTaskFactoryExceptionHandler extends ExceptionHandler {
                     return String.format(getLocaleString("source.empty_image"), ex1.getSource());
                 } else if (ex1.getCause() instanceof WrongFileTypeException) {
                     WrongFileTypeException ex2 = (WrongFileTypeException) ex1.getCause();
-                    return String.format(getLocaleString("source.wrong_type"), getFileTypeString(ex2.getExpected()), getFileTypeString(ex2.getValue()), ex1.getSource());
-                }else if(ex1.getCause() instanceof FileNameFormatter.NotMappedPattern){
-                    FileNameFormatter.NotMappedPattern ex2=(FileNameFormatter.NotMappedPattern) ex1.getCause();
-                    return String.format(getLocaleString("source.no_map_pattern"),ex2.getPattern());
+                    return String.format(getLocaleString("source.wrong_type"), ex1.getSource(),getFileTypeString(ex2.getExpected()), getFileTypeString(ex2.getValue()));
+                }else if(ex1.getCause() instanceof FileNameFormatter.NotMappedPattern) {
+                    FileNameFormatter.NotMappedPattern ex2 = (FileNameFormatter.NotMappedPattern) ex1.getCause();
+                    return String.format(getLocaleString("source.no_map_pattern"), ex1.getSource(), ex2.getPattern());
                 }
             }
 

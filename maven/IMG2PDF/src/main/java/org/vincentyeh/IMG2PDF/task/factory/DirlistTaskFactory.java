@@ -116,11 +116,11 @@ public class DirlistTaskFactory {
     }
 
 
-    private static File[] importSortedImagesFiles(File source_directory) throws SourceFileException {
+    private static File[] importSortedImagesFiles(File source_directory) throws EmptyImagesException {
         File[] files = source_directory.listFiles(imageFilter);
 
         if (files == null || files.length == 0)
-            throw new SourceFileException(new EmptyImagesException("No image was found in: " + source_directory), source_directory);
+            throw new EmptyImagesException("No image was found in: " + source_directory);
 
         Arrays.sort(files, fileSorter);
 

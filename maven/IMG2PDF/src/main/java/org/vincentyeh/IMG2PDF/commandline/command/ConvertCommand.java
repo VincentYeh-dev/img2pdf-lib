@@ -26,7 +26,6 @@ import picocli.CommandLine;
 
 import java.awt.*;
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
@@ -117,34 +116,36 @@ public class ConvertCommand implements Callable<Integer> {
             checkParameters();
         } catch (NoSuchFieldException | IllegalAccessException e) {
             out.println(getStackTranceString(e));
+            return CommandLine.ExitCode.SOFTWARE;
         }
 
-        DirlistTaskFactory.setArgument(getDocumentArgument(), getPageArgument(), new FileNameFormatter(pdf_dst));
-        DirlistTaskFactory.setImageFilesRule(filter, fileSorter);
+        List<Task> tasks = importAllTaskFromDirlists();
 
-        List<Task> tasks = new ArrayList<>();
+        out.println(configurations.resourceBundle.getString("execution.convert.start.start_conversion"));
 
-        printDebugLog("import:");
-        for (File dirlist : sourceFiles) {
-            printDebugLog(getColorLine("\t|- "+ dirlist.getPath(), Ansi.Color.CYAN));
-            try {
-                tasks.addAll(DirlistTaskFactory.createFromDirlist(dirlist, configurations.DIRLIST_READ_CHARSET));
-            } catch (Exception e) {
-                handleException(e, new DirlistTaskFactoryExceptionHandler(null));
-                return CommandLine.ExitCode.SOFTWARE;
-            }
-        }
-
-        try {
-            out.println(configurations.resourceBundle.getString("execution.convert.start.start_conversion"));
-            convertAllToFile(tasks);
-        } catch (IOException e) {
-            out.println(getStackTranceString(e));
-        } finally {
-            out.print("\n");
-        }
+        convertAllToFile(tasks);
 
         return CommandLine.ExitCode.OK;
+    }
+
+    private List<Task> importAllTaskFromDirlists() {
+        DirlistTaskFactory.setArgument(getDocumentArgument(), getPageArgument(), new FileNameFormatter(pdf_dst));
+        DirlistTaskFactory.setImageFilesRule(filter, fileSorter);
+        List<Task> tasks = new ArrayList<>();
+        printDebugLog("Import dirlist");
+        printDebugLog("Files");
+        for (File dirlist : sourceFiles) {
+            printDebugLog(getColorLine("\t|- " + dirlist.getPath(), Ansi.Color.CYAN));
+            try {
+                out.println(getColorLine(String.format("Parsing folder list: %s", dirlist.getPath()), Ansi.Color.BLUE));
+                List<Task> found = DirlistTaskFactory.createFromDirlist(dirlist, configurations.DIRLIST_READ_CHARSET);
+                out.println(getColorLine(String.format("Found %d folders in %s", found.size(), dirlist.getPath()), Ansi.Color.BLUE));
+                tasks.addAll(found);
+            } catch (Exception e) {
+                handleException(e, new DirlistTaskFactoryExceptionHandler(null));
+            }
+        }
+        return tasks;
     }
 
     private void checkParameters() throws NoSuchFieldException, IllegalAccessException {
@@ -198,13 +199,13 @@ public class ConvertCommand implements Callable<Integer> {
     }
 
 
-    private void convertAllToFile(List<Task> tasks) throws IOException {
+    private void convertAllToFile(List<Task> tasks) {
         for (Task task : tasks) {
             printDebugLog("Name: " + task.getPdfDestination());
             printDebugLog("Images");
             Arrays.stream(task.getImages()).forEach(img -> printDebugLog(getColorLine("\t|- " + img, Ansi.Color.CYAN)));
             File result = convertToFile(task);
-            if (open_when_complete&&result!=null)
+            if (open_when_complete && result != null)
                 openPDF(result);
         }
     }
