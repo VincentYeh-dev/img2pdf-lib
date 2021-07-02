@@ -16,7 +16,9 @@ import org.vincentyeh.IMG2PDF.util.file.exception.OverwriteException;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * The core of this program. At first,this class will be initialized by task.
@@ -93,11 +95,18 @@ public class PDFConverter implements ConversionInfoListener {
 
     }
 
-    private BufferedImage readImage(File image) throws ReadImageException {
+    private BufferedImage readImage(File file) throws ReadImageException {
         try {
-            return ImageIO.read(image);
+            FileUtils.checkExists(file);
+            InputStream is = new FileInputStream(file);
+
+            BufferedImage image = ImageIO.read(is);
+            if (image == null)
+                throw new RuntimeException("image==null");
+
+            return image;
         } catch (Exception e) {
-            throw new ReadImageException(e, image);
+            throw new ReadImageException(e, file);
         }
     }
 

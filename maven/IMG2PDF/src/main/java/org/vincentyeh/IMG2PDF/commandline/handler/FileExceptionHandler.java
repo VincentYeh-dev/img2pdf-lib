@@ -25,6 +25,8 @@ public class FileExceptionHandler extends ExceptionHandler {
                 return format(getLocaleString("WrongFileTypeException"),getFileTypeString(ex1.getExpected()), getFileTypeString(ex1.getValue()),getExceptionFile(ex1));
             }else if(data instanceof NoParentException){
                 return format(getLocaleString("NoParentException"),getExceptionFile(data));
+            }else if(data instanceof OverwriteException){
+                return format(getLocaleString("OverwriteException"),getExceptionFile(data));
             }
         }
         return doNext(data);
