@@ -46,8 +46,8 @@ public class PDFConverterExceptionHandler extends ExceptionHandler {
         Exception innerCause = (Exception) e.getCause();
 
         if (innerCause instanceof FileException)
-            return format(getLocaleString("read_image"), task.getPdfDestination().getPath(), e.getErrorImageFile(), handleFileException((FileException) innerCause));
+            return format(getLocaleString("read_image"), task.getPdfDestination().getName(), e.getErrorImageFile(), handleFileException((FileException) innerCause));
         else
-            return format(getLocaleString("read_image"), task.getPdfDestination().getPath(), e.getErrorImageFile(), innerCause.getMessage());
+            return format(getLocaleString("read_image"), task.getPdfDestination().getName(), e.getErrorImageFile(), innerCause.getMessage());
     }
 }

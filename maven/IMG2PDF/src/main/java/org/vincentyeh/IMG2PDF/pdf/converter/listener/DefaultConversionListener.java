@@ -10,7 +10,7 @@ import java.util.ResourceBundle;
 import static java.lang.String.format;
 import static org.fusesource.jansi.Ansi.ansi;
 
-public class DefaultConversionListener implements ConversionInfoListener {
+public class DefaultConversionListener implements ConversionListener {
     private final char[] progress_bar;
     private final ResourceBundle resourceBundle;
     private Task task;
@@ -53,6 +53,10 @@ public class DefaultConversionListener implements ConversionInfoListener {
     public void onConversionComplete(File dst) {
         long completeSeconds = System.currentTimeMillis()/1000;
         System.out.print(ansi().render(format(resourceBundle.getString("convert.listener.done"), (completeSeconds - startSeconds),dst.getAbsolutePath())));
+    }
+
+    @Override
+    public void onFinally(){
         System.out.print("\r\n");
     }
 

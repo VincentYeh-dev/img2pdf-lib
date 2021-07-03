@@ -8,7 +8,7 @@ import org.vincentyeh.IMG2PDF.pdf.converter.exception.PDFConversionException;
 import org.vincentyeh.IMG2PDF.pdf.converter.exception.PDFConverterException;
 import org.vincentyeh.IMG2PDF.pdf.converter.exception.ReadImageException;
 import org.vincentyeh.IMG2PDF.pdf.converter.exception.SaveException;
-import org.vincentyeh.IMG2PDF.pdf.converter.listener.ConversionInfoListener;
+import org.vincentyeh.IMG2PDF.pdf.converter.listener.ConversionListener;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.util.file.FileUtils;
 import org.vincentyeh.IMG2PDF.util.file.exception.OverwriteException;
@@ -27,20 +27,15 @@ import java.io.InputStream;
  *
  * @author VincentYeh
  */
-public class PDFConverter implements ConversionInfoListener {
+public class PDFConverter implements ConversionListener {
 
-    private final Task task;
     private final boolean overwrite;
-    private ConversionInfoListener info_listener;
+    private ConversionListener listener;
 
     private final MemoryUsageSetting memoryUsageSetting;
 
-    public PDFConverter(Task task, long maxMainMemoryBytes, File tempFolder, boolean overwrite) throws IOException {
+    public PDFConverter(long maxMainMemoryBytes, File tempFolder, boolean overwrite) throws IOException {
         this.overwrite = overwrite;
-
-        if (task == null)
-            throw new IllegalArgumentException("task is null.");
-        this.task = task;
 
         if (tempFolder == null)
             throw new IllegalArgumentException("tempFolder is null");
@@ -50,45 +45,49 @@ public class PDFConverter implements ConversionInfoListener {
         memoryUsageSetting = MemoryUsageSetting.setupMixed(maxMainMemoryBytes).setTempDir(tempFolder);
     }
 
-    public File start() throws PDFConverterException {
+    public File start(Task task) throws PDFConverterException {
+        if (task == null)
+            throw new IllegalArgumentException("task is null.");
         try (PDDocument document = new PDDocument(memoryUsageSetting)) {
-            checkOverwrite();
+            checkOverwrite(task.getPdfDestination());
+
             document.protect(task.getDocumentArgument().getSpp());
             onConversionPreparing(task);
 
             File[] images = task.getImages();
-            appendAllPageToDocument(images, document);
-            File pdf = savePDF(document);
+            appendAllPageToDocument(task,images, document);
+            File pdf = savePDF(document, task.getPdfDestination());
             onConversionComplete(pdf);
             return pdf;
         } catch (Exception e) {
             throw new PDFConverterException(e, task);
+        } finally {
+            onFinally();
         }
     }
 
-    private File savePDF(PDDocument document) throws SaveException {
+    private File savePDF(PDDocument document, File file) throws SaveException {
         try {
-            FileUtils.checkFileValidity(task.getPdfDestination());
-            File parent = FileUtils.getParentFile(task.getPdfDestination());
-            FileUtils.makeDirectories(parent);
-            document.save(task.getPdfDestination());
-            return task.getPdfDestination();
+            FileUtils.checkFileValidity(file);
+            FileUtils.makeDirectories(FileUtils.getParentFile(file));
+            document.save(file);
+            return file;
         } catch (Exception e) {
             throw new SaveException(e);
         }
     }
 
-    private void appendAllPageToDocument(File[] images, PDDocument document) throws PDFConversionException, ReadImageException {
+    private void appendAllPageToDocument(Task task,File[] images, PDDocument document) throws PDFConversionException, ReadImageException {
         for (int i = 0; i < images.length; i++) {
             onConverting(i, images[i]);
-            appendPageToDocument(images[i], document);
+            appendPageToDocument(task,images[i], document);
         }
     }
 
-    private void appendPageToDocument(File file, PDDocument document) throws PDFConversionException, ReadImageException {
+    private void appendPageToDocument(Task task,File file, PDDocument document) throws PDFConversionException, ReadImageException {
         BufferedImage image = readImage(file);
         try {
-            document.addPage(getImagePage(image, document));
+            document.addPage(getImagePage(task,image, document));
         } catch (Exception e) {
             throw new PDFConversionException(e);
         }
@@ -110,17 +109,17 @@ public class PDFConverter implements ConversionInfoListener {
         }
     }
 
-    private void checkOverwrite() throws SaveException {
+    private void checkOverwrite(File file) throws SaveException {
         if (!overwrite) {
             try {
-                FileUtils.checkOverwrite(task.getPdfDestination(), "PDF overwrite deny,File is already exists:" + task.getPdfDestination().getAbsoluteFile());
+                FileUtils.checkOverwrite(file, "PDF overwrite deny,File is already exists:" + file.getAbsoluteFile());
             } catch (OverwriteException e) {
                 throw new SaveException(e);
             }
         }
     }
 
-    private PDPage getImagePage(BufferedImage image, PDDocument document) throws Exception {
+    private PDPage getImagePage(Task task, BufferedImage image, PDDocument document) throws Exception {
         ImagePageFactory.Builder builder = new ImagePageFactory.Builder();
         builder.setAutoRotate(task.getPageArgument().getAutoRotate());
         builder.setDirection(task.getPageArgument().getDirection());
@@ -130,26 +129,32 @@ public class PDFConverter implements ConversionInfoListener {
         return builder.build().getImagePage(document, image);
     }
 
-    public void setInfoListener(ConversionInfoListener listener) {
-        this.info_listener = listener;
+    public void setInfoListener(ConversionListener listener) {
+        this.listener = listener;
     }
 
     @Override
     public void onConversionPreparing(Task task) {
-        if (info_listener != null)
-            info_listener.onConversionPreparing(task);
+        if (listener != null)
+            listener.onConversionPreparing(task);
     }
 
     @Override
     public void onConverting(int index, File file) {
-        if (info_listener != null)
-            info_listener.onConverting(index, file);
+        if (listener != null)
+            listener.onConverting(index, file);
     }
 
     @Override
     public void onConversionComplete(File dst) {
-        if (info_listener != null)
-            info_listener.onConversionComplete(dst);
+        if (listener != null)
+            listener.onConversionComplete(dst);
+    }
+
+    @Override
+    public void onFinally() {
+        if (listener != null)
+            listener.onFinally();
     }
 
 

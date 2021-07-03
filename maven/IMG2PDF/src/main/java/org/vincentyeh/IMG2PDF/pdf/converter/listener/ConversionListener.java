@@ -1,15 +1,15 @@
 package org.vincentyeh.IMG2PDF.pdf.converter.listener;
 
-import java.io.File;
-
 import org.vincentyeh.IMG2PDF.task.Task;
+
+import java.io.File;
 
 
 /**
  * This interface can listen the event when conversion started.
  * @author vincent
  */
-public interface ConversionInfoListener {
+public interface ConversionListener {
 	
 	/**
 	 * When the task is just loaded to the converter.
@@ -28,4 +28,5 @@ public interface ConversionInfoListener {
 	 */
 	void onConversionComplete(File dst);
 
+	void onFinally();
 }

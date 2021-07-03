@@ -115,18 +115,15 @@ public class ConvertCommand implements Callable<Integer> {
     public Integer call() {
         try {
             checkParameters();
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+            List<Task> tasks = importAllTaskFromDirlists();
+            out.println(configurations.resourceBundle.getString("execution.convert.start.start_conversion"));
+            convertAllToFile(tasks);
+
+            return CommandLine.ExitCode.OK;
+        } catch (Exception e) {
             out.println(getStackTranceString(e));
             return CommandLine.ExitCode.SOFTWARE;
         }
-
-        List<Task> tasks = importAllTaskFromDirlists();
-
-        out.println(configurations.resourceBundle.getString("execution.convert.start.start_conversion"));
-
-        convertAllToFile(tasks);
-
-        return CommandLine.ExitCode.OK;
     }
 
     private List<Task> importAllTaskFromDirlists() {
@@ -140,7 +137,7 @@ public class ConvertCommand implements Callable<Integer> {
                 out.println(getColorLine(format(configurations.resourceBundle.getString("execution.convert.start.parsed"), found.size(), dirlist.getPath()), Ansi.Color.BLUE));
                 tasks.addAll(found);
             } catch (Exception e) {
-                handleException(e, new DirlistTaskFactoryExceptionHandler(null),"\t","");
+                handleException(e, new DirlistTaskFactoryExceptionHandler(null), "\t", "");
             }
         }
         return tasks;
@@ -197,12 +194,16 @@ public class ConvertCommand implements Callable<Integer> {
     }
 
 
-    private void convertAllToFile(List<Task> tasks) {
+    private void convertAllToFile(List<Task> tasks) throws Exception {
+        printDebugLog("Converter Configuration");
+        printDebugLog(getColorLine("\t|- max main memory usage:" + maxMainMemoryBytes.getBytes(), Ansi.Color.CYAN));
+        printDebugLog(getColorLine("\t|- temporary folder:" + tempFolder.getAbsolutePath(), Ansi.Color.CYAN));
+        printDebugLog(getColorLine("\t|- Overwrite:" + overwrite_output, Ansi.Color.CYAN));
+        PDFConverter converter = new PDFConverter(maxMainMemoryBytes.getBytes(), tempFolder, overwrite_output);
+        converter.setInfoListener(new DefaultConversionListener(configurations.locale));
+
         for (Task task : tasks) {
-            printDebugLog("Name: " + task.getPdfDestination());
-            printDebugLog("Images");
-            Arrays.stream(task.getImages()).forEach(img -> printDebugLog(getColorLine("\t|- " + img, Ansi.Color.CYAN)));
-            File result = convertToFile(task);
+            File result = convertToFile(converter, task);
             if (open_when_complete && result != null)
                 openPDF(result);
         }
@@ -226,27 +227,24 @@ public class ConvertCommand implements Callable<Integer> {
         }
     }
 
-    private File convertToFile(Task task) {
+    private File convertToFile(PDFConverter converter, Task task) {
         printDebugLog("Converting");
-        printDebugLog(getColorLine("\t|- max main memory usage:" + maxMainMemoryBytes.getBytes(), Ansi.Color.CYAN));
-        printDebugLog(getColorLine("\t|- temporary folder:" + tempFolder.getAbsolutePath(), Ansi.Color.CYAN));
-        printDebugLog(getColorLine("\t|- Overwrite:" + overwrite_output, Ansi.Color.CYAN));
+        printDebugLog("Name: " + task.getPdfDestination());
+        printDebugLog("Images");
+        Arrays.stream(task.getImages()).forEach(img -> printDebugLog(getColorLine("\t|- " + img, Ansi.Color.CYAN)));
         try {
-            PDFConverter converter = new PDFConverter(task, maxMainMemoryBytes.getBytes(), tempFolder, overwrite_output);
-            converter.setInfoListener(new DefaultConversionListener(configurations.locale));
-
-            return converter.start();
+            return converter.start(task);
         } catch (PDFConverterException e) {
-            handleException(e, new PDFConverterExceptionHandler(null),"","");
+            handleException(e, new PDFConverterExceptionHandler(null), "\t", "");
         } catch (Exception e) {
             out.println(getStackTranceString(e));
         }
         return null;
     }
 
-    private void handleException(Exception e, ExceptionHandler handler,String prefix,String suffix) {
+    private void handleException(Exception e, ExceptionHandler handler, String prefix, String suffix) {
         try {
-            out.println(ansi().render(format(prefix+"[@|red ERROR|@] %s"+suffix, handler.handle(e))));
+            out.println(ansi().render(format(prefix + "[@|red ERROR|@] %s" + suffix, handler.handle(e))));
             if (img2PDFCommand.isDebug())
                 out.println(getStackTranceString(e));
         } catch (Handler.CantHandleException cantHandleException) {
