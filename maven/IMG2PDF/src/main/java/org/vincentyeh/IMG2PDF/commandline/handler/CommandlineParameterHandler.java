@@ -1,7 +1,6 @@
 package org.vincentyeh.IMG2PDF.commandline.handler;
 
 import org.vincentyeh.IMG2PDF.commandline.handler.core.ParameterExceptionHandler;
-import org.vincentyeh.IMG2PDF.commandline.handler.core.ResourceBundleHandler;
 import org.vincentyeh.IMG2PDF.pattern.Handler;
 import picocli.CommandLine;
 
@@ -16,7 +15,6 @@ public class CommandlineParameterHandler implements CommandLine.IParameterExcept
 
     public CommandlineParameterHandler(ResourceBundle resourceBundle) {
         this.resourceBundle = resourceBundle;
-        ResourceBundleHandler.setResourceBundle(resourceBundle);
     }
 
     @Override
@@ -35,7 +33,7 @@ public class CommandlineParameterHandler implements CommandLine.IParameterExcept
 
         printErrorText(cmd, cmd.getHelp().fullSynopsis());
         CommandLine.Model.CommandSpec spec = cmd.getCommandSpec();
-        printErrorText(cmd, format((resourceBundle.getString("public.try_help")), spec.qualifiedName()));
+        printErrorText(cmd, format((resourceBundle.getString("handler.exception.parameter.try_help")), spec.qualifiedName()));
 
         return CommandLine.ExitCode.USAGE;
     }

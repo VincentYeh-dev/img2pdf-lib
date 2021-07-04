@@ -4,6 +4,7 @@ import org.fusesource.jansi.AnsiConsole;
 import org.vincentyeh.IMG2PDF.commandline.command.ConvertCommand;
 import org.vincentyeh.IMG2PDF.commandline.command.IMG2PDFCommand;
 import org.vincentyeh.IMG2PDF.commandline.handler.CommandlineParameterHandler;
+import org.vincentyeh.IMG2PDF.commandline.handler.core.ResourceBundleHandler;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -14,6 +15,7 @@ public class MainProgram {
     public static void main(String[] args) {
         AnsiConsole.systemInstall();
         ConfigurationAgent.loadOrCreateProperties(new File("config.properties"));
+        ResourceBundleHandler.setResourceBundle(ConfigurationAgent.getHandlerResourceBundle());
 
         CommandLine cmd = new CommandLine(new IMG2PDFCommand());
         cmd.addSubcommand(new ConvertCommand(ConfigurationAgent.getConvertConfig()));

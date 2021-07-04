@@ -18,7 +18,7 @@ public class ConfigurationAgent {
     private static Locale locale;
 
     public static ResourceBundle getHandlerResourceBundle(){
-        return ResourceBundle.getBundle("cmd",locale);
+        return ResourceBundle.getBundle("handler",locale);
     }
 
     public static ResourceBundle getCommandResourceBundle(){
