@@ -7,8 +7,8 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import static java.lang.String.format;
-import static org.fusesource.jansi.Ansi.ansi;
+import static org.vincentyeh.IMG2PDF.util.PrinterUtils.print;
+import static org.vincentyeh.IMG2PDF.util.PrinterUtils.printRenderFormat;
 
 public class DefaultConversionListener implements ConversionListener {
     private final char[] progress_bar;
@@ -45,19 +45,18 @@ public class DefaultConversionListener implements ConversionListener {
             counter++;
         }
         String name = getSimplifiedName(task.getPdfDestination().getAbsolutePath());
-        System.out.print(ansi().render(format(resourceBundle.getString("convert.listener.converting") , new String(progress_bar), name, index + 1, total, file.getName())));
-        System.out.print("\r");
+        printRenderFormat(resourceBundle.getString("convert.listener.converting")+"\r", new String(progress_bar), name, index + 1, total, file.getName());
     }
 
     @Override
     public void onConversionComplete(File dst) {
         long completeSeconds = System.currentTimeMillis()/1000;
-        System.out.print(ansi().render(format(resourceBundle.getString("convert.listener.done"), (completeSeconds - startSeconds),dst.getAbsolutePath())));
+        printRenderFormat(resourceBundle.getString("convert.listener.done"), (completeSeconds - startSeconds),dst.getAbsolutePath());
     }
 
     @Override
     public void onFinally(){
-        System.out.print("\r\n");
+        print("\r\n");
     }
 
     private String getSimplifiedName(String raw){

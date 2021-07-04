@@ -1,13 +1,13 @@
 package org.vincentyeh.IMG2PDF.commandline.handler;
 
+import org.fusesource.jansi.Ansi;
 import org.vincentyeh.IMG2PDF.commandline.handler.core.ParameterExceptionHandler;
 import org.vincentyeh.IMG2PDF.pattern.Handler;
 import picocli.CommandLine;
 
-import java.io.PrintWriter;
 import java.util.ResourceBundle;
 
-import static java.lang.String.format;
+import static org.vincentyeh.IMG2PDF.util.PrinterUtils.*;
 
 public class CommandlineParameterHandler implements CommandLine.IParameterExceptionHandler {
 
@@ -21,19 +21,15 @@ public class CommandlineParameterHandler implements CommandLine.IParameterExcept
     public int handleParseException(CommandLine.ParameterException ex, String[] strings) {
         CommandLine cmd = ex.getCommandLine();
         Handler<String, Exception> handler = getHandler();
-        String msg;
         try {
-            msg = handler.handle(ex);
+            printColor(handler.handle(ex)+"\n", Ansi.Color.RED);
         } catch (Handler.CantHandleException e) {
-            printErrorText(cmd, "Can't handle");
-            msg = ex.getMessage();
+            printColor("Can't handle"+"\n", Ansi.Color.RED);
+            printStackTrance(ex);
         }
 
-        printErrorText(cmd, msg);
-
-        printErrorText(cmd, cmd.getHelp().fullSynopsis());
         CommandLine.Model.CommandSpec spec = cmd.getCommandSpec();
-        printErrorText(cmd, format((resourceBundle.getString("handler.exception.parameter.try_help")), spec.qualifiedName()));
+        printColorFormat(resourceBundle.getString("handler.exception.parameter.try_help")+"\n", Ansi.Color.RED,spec.qualifiedName());
 
         return CommandLine.ExitCode.USAGE;
     }
@@ -42,13 +38,4 @@ public class CommandlineParameterHandler implements CommandLine.IParameterExcept
         return new ParameterExceptionHandler(null);
     }
 
-    private void printErrorText(CommandLine cmd, String message) {
-        PrintWriter printer = cmd.getErr();
-        printer.println(cmd.getColorScheme().errorText(message)); // bold red
-    }
-
-    private void printText(CommandLine cmd, String message) {
-        PrintWriter printer = cmd.getErr();
-        printer.println(message); // bold red
-    }
 }

@@ -26,17 +26,13 @@ import picocli.CommandLine;
 
 import java.awt.*;
 import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.Callable;
 
-import static java.lang.String.format;
-import static java.lang.System.out;
-import static org.fusesource.jansi.Ansi.ansi;
+import static org.vincentyeh.IMG2PDF.util.PrinterUtils.*;
 
 @CommandLine.Command(name = "convert")
 public class ConvertCommand implements Callable<Integer> {
@@ -116,12 +112,13 @@ public class ConvertCommand implements Callable<Integer> {
         try {
             checkParameters();
             List<Task> tasks = importAllTaskFromDirlists();
-            out.println(configurations.resourceBundle.getString("execution.convert.start.start_conversion"));
+            printLine(configurations.resourceBundle.getString("execution.convert.start.start_conversion"));
+
             convertAllToFile(tasks);
 
             return CommandLine.ExitCode.OK;
         } catch (Exception e) {
-            out.println(getStackTranceString(e));
+            printStackTrance(e);
             return CommandLine.ExitCode.SOFTWARE;
         }
     }
@@ -132,9 +129,9 @@ public class ConvertCommand implements Callable<Integer> {
         List<Task> tasks = new ArrayList<>();
         for (File dirlist : sourceFiles) {
             try {
-                out.println(getColorLine(format(configurations.resourceBundle.getString("execution.convert.start.parsing"), dirlist.getPath()), Ansi.Color.BLUE));
+                printColorFormat(configurations.resourceBundle.getString("execution.convert.start.parsing")+"\n", Ansi.Color.BLUE, dirlist.getPath());
                 List<Task> found = DirlistTaskFactory.createFromDirlist(dirlist, configurations.DIRLIST_READ_CHARSET);
-                out.println(getColorLine(format(configurations.resourceBundle.getString("execution.convert.start.parsed"), found.size(), dirlist.getPath()), Ansi.Color.BLUE));
+                printColorFormat(configurations.resourceBundle.getString("execution.convert.start.parsed")+"\n", Ansi.Color.BLUE, found.size(), dirlist.getPath());
                 tasks.addAll(found);
             } catch (Exception e) {
                 handleException(e, new DirlistTaskFactoryExceptionHandler(null), "\t", "");
@@ -145,7 +142,7 @@ public class ConvertCommand implements Callable<Integer> {
 
     private void checkParameters() throws NoSuchFieldException, IllegalAccessException {
         printDebugLog("-------------------------------------");
-        printDebugLog(getColorLine("Check Parameters", Ansi.Color.YELLOW));
+        printDebugLog(getColor("Check Parameters", Ansi.Color.YELLOW));
         printDebugLog("-------------------------------------");
         checkPrintNullParameter("overwrite_output");
         checkPrintNullParameter("fileSorter");
@@ -196,9 +193,9 @@ public class ConvertCommand implements Callable<Integer> {
 
     private void convertAllToFile(List<Task> tasks) throws Exception {
         printDebugLog("Converter Configuration");
-        printDebugLog(getColorLine("\t|- max main memory usage:" + maxMainMemoryBytes.getBytes(), Ansi.Color.CYAN));
-        printDebugLog(getColorLine("\t|- temporary folder:" + tempFolder.getAbsolutePath(), Ansi.Color.CYAN));
-        printDebugLog(getColorLine("\t|- Overwrite:" + overwrite_output, Ansi.Color.CYAN));
+        printDebugLog(getColor("\t|- max main memory usage:" + maxMainMemoryBytes.getBytes(), Ansi.Color.CYAN));
+        printDebugLog(getColor("\t|- temporary folder:" + tempFolder.getAbsolutePath(), Ansi.Color.CYAN));
+        printDebugLog(getColor("\t|- Overwrite:" + overwrite_output, Ansi.Color.CYAN));
         PDFConverter converter = new PDFConverter(maxMainMemoryBytes.getBytes(), tempFolder, overwrite_output);
         converter.setInfoListener(new DefaultConversionListener(configurations.locale));
 
@@ -220,7 +217,7 @@ public class ConvertCommand implements Callable<Integer> {
             } catch (Exception e) {
                 printErrorLog("Can't open:" + e.getMessage());
                 if (img2PDFCommand.isDebug())
-                    out.println(getStackTranceString(e));
+                    printStackTrance(e);
             }
         else {
             printErrorLog("File not exists,Can't open:" + file.getAbsolutePath());
@@ -231,69 +228,56 @@ public class ConvertCommand implements Callable<Integer> {
         printDebugLog("Converting");
         printDebugLog("Name: " + task.getPdfDestination());
         printDebugLog("Images");
-        Arrays.stream(task.getImages()).forEach(img -> printDebugLog(getColorLine("\t|- " + img, Ansi.Color.CYAN)));
+        Arrays.stream(task.getImages()).forEach(img -> printDebugLog(getColor("\t|- " + img, Ansi.Color.CYAN)));
         try {
             return converter.start(task);
         } catch (PDFConverterException e) {
             handleException(e, new PDFConverterExceptionHandler(null), "\t", "");
         } catch (Exception e) {
-            out.println(getStackTranceString(e));
+            printStackTrance(e);
         }
         return null;
     }
 
     private void handleException(Exception e, ExceptionHandler handler, String prefix, String suffix) {
         try {
-            out.println(ansi().render(format(prefix + "[@|red ERROR|@] %s" + suffix, handler.handle(e))));
+            printRenderFormat(prefix + "[@|red ERROR|@] %s\n" + suffix, handler.handle(e));
             if (img2PDFCommand.isDebug())
-                out.println(getStackTranceString(e));
+                printStackTrance(e);
         } catch (Handler.CantHandleException cantHandleException) {
-            out.println(getColorLine("Can't handle.", Ansi.Color.RED));
-            out.println(getStackTranceString(e));
+            printColor("Can't handle.\n", Ansi.Color.RED);
+            printStackTrance(e);
         }
     }
 
 
     private void printDebugLog(Object msg) {
         if (img2PDFCommand.isDebug()) {
-            String content = format("[@|blue DEBUG|@] %s", msg);
-            out.println(ansi().render(content));
+            printRenderFormat("[@|blue DEBUG|@] %s\n", msg);
         }
     }
 
     private void printErrorLog(Object msg) {
         if (img2PDFCommand.isDebug()) {
-            String content = format("[@|red ERROR|@] %s", msg);
-            out.println(ansi().render(content));
+            printRenderFormat("[@|red ERROR|@] %s\n", msg);
         }
     }
 
-    private Ansi getStackTranceString(Exception e) {
-        StringWriter sw = new StringWriter();
-        e.printStackTrace(new PrintWriter(sw));
-        return getColorLine(sw.toString(), Ansi.Color.RED);
+    private Ansi getKeyValuePair(String key, Object value, Ansi.Color color) {
+        return getRenderFormat("@|yellow %s|@=@|%s %s|@\n", key, color, value);
     }
 
-    private Ansi getColorLine(String msg, Ansi.Color color) {
-        return ansi().fg(color).a(msg).reset();
-    }
-
-
-    private String getKeyValuePairString(String key, Object value, Ansi.Color colorOfValue) {
-        return format("@|yellow %s|@=@|%s %s|@", key, colorOfValue, value);
-    }
-
-    private String getKeyValuePairString(String field_name) throws NoSuchFieldException, IllegalAccessException {
+    private Ansi getKeyValuePair(String field_name) throws NoSuchFieldException, IllegalAccessException {
         Field field = ConvertCommand.class.getDeclaredField(field_name);
         field.setAccessible(true);
-        return getKeyValuePairString(field.getName(), field.get(this), Ansi.Color.GREEN);
+        return getKeyValuePair(field.getName(), field.get(this), Ansi.Color.GREEN);
     }
 
     private void checkPrintNullParameter(String field_name) throws NoSuchFieldException, IllegalAccessException {
         if (checkNullParameter(field_name)) {
-            printDebugLog(getKeyValuePairString(field_name));
+            printDebugLog(getKeyValuePair(field_name));
         } else {
-            printErrorLog(getKeyValuePairString(field_name, null, Ansi.Color.RED));
+            printErrorLog(getKeyValuePair(field_name, null, Ansi.Color.RED));
             throw new IllegalArgumentException(field_name + "==null");
         }
 
