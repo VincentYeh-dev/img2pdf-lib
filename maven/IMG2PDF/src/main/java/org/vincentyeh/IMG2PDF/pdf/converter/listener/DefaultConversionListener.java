@@ -13,27 +13,29 @@ import static org.vincentyeh.IMG2PDF.util.PrinterUtils.printRenderFormat;
 public class DefaultConversionListener implements ConversionListener {
     private final char[] progress_bar;
     private final ResourceBundle resourceBundle;
-    private Task task;
-    private long startSeconds;
 
     public DefaultConversionListener(Locale locale) {
-        this.resourceBundle = ResourceBundle.getBundle("pdf_converter_listener",locale);
+        this.resourceBundle = ResourceBundle.getBundle("pdf_converter_listener", locale);
         progress_bar = new char[10];
         Arrays.fill(progress_bar, ' ');
     }
 
     private int total;
-    private int counter = 0;
-
+    private int counter;
+    private long startSeconds;
     private double perImg;
-    private double progress = 0;
+    private double progress;
+    private Task task;
 
     @Override
-    public void onConversionPreparing(Task task) {
+    public void initializing(Task task) {
+        Arrays.fill(progress_bar, ' ');
+        total = counter = 0;
+        perImg = progress = 0f;
         this.task = task;
         total = task.getImages().length;
         perImg = (10. / total);
-        startSeconds =(System.currentTimeMillis()/1000);
+        startSeconds = (System.currentTimeMillis() / 1000);
     }
 
     @Override
@@ -45,21 +47,21 @@ public class DefaultConversionListener implements ConversionListener {
             counter++;
         }
         String name = getSimplifiedName(task.getPdfDestination().getAbsolutePath());
-        printRenderFormat(resourceBundle.getString("convert.listener.converting")+"\r", new String(progress_bar), name, index + 1, total, file.getName());
+        printRenderFormat(resourceBundle.getString("convert.listener.converting") + "\r", new String(progress_bar), name, index + 1, total, file.getName());
     }
 
     @Override
-    public void onConversionComplete(File dst) {
-        long completeSeconds = System.currentTimeMillis()/1000;
-        printRenderFormat(resourceBundle.getString("convert.listener.done"), (completeSeconds - startSeconds),dst.getAbsolutePath());
+    public void onConversionComplete() {
+        long completeSeconds = System.currentTimeMillis() / 1000;
+        printRenderFormat(resourceBundle.getString("convert.listener.done"), (completeSeconds - startSeconds), task.getPdfDestination().getAbsolutePath());
     }
 
     @Override
-    public void onFinally(){
+    public void onFinally() {
         print("\r\n");
     }
 
-    private String getSimplifiedName(String raw){
+    private String getSimplifiedName(String raw) {
 
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < raw.length(); i++) {
@@ -67,11 +69,11 @@ public class DefaultConversionListener implements ConversionListener {
                 sb.append(raw.charAt(i));
             } else if (i > raw.length() - 30) {
                 sb.append(raw.charAt(i));
-            }else{
+            } else {
                 sb.append("#");
             }
         }
-       return sb.toString().replaceAll("#+","...");
+        return sb.toString().replaceAll("#+", "...");
     }
 
 }

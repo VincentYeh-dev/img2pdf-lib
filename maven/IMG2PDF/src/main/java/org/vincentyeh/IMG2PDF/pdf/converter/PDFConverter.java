@@ -48,16 +48,17 @@ public class PDFConverter implements ConversionListener {
     public File start(Task task) throws PDFConverterException {
         if (task == null)
             throw new IllegalArgumentException("task is null.");
+
+        initializing(task);
+
         try (PDDocument document = new PDDocument(memoryUsageSetting)) {
             checkOverwrite(task.getPdfDestination());
-
             document.protect(task.getDocumentArgument().getSpp());
-            onConversionPreparing(task);
 
             File[] images = task.getImages();
             appendAllPageToDocument(task,images, document);
             File pdf = savePDF(document, task.getPdfDestination());
-            onConversionComplete(pdf);
+            onConversionComplete();
             return pdf;
         } catch (Exception e) {
             throw new PDFConverterException(e, task);
@@ -129,14 +130,16 @@ public class PDFConverter implements ConversionListener {
         return builder.build().getImagePage(document, image);
     }
 
-    public void setInfoListener(ConversionListener listener) {
+    public void setListener(ConversionListener listener) {
         this.listener = listener;
     }
 
+
     @Override
-    public void onConversionPreparing(Task task) {
-        if (listener != null)
-            listener.onConversionPreparing(task);
+    public void initializing(Task task) {
+        if (listener != null) {
+            listener.initializing(task);
+        }
     }
 
     @Override
@@ -146,9 +149,9 @@ public class PDFConverter implements ConversionListener {
     }
 
     @Override
-    public void onConversionComplete(File dst) {
+    public void onConversionComplete() {
         if (listener != null)
-            listener.onConversionComplete(dst);
+            listener.onConversionComplete();
     }
 
     @Override

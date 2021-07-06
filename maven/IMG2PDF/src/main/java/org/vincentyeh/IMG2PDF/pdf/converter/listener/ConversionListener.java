@@ -10,13 +10,9 @@ import java.io.File;
  * @author vincent
  */
 public interface ConversionListener {
-	
-	/**
-	 * When the task is just loaded to the converter.
-	 * @param task imported Task
-	 */
-	void onConversionPreparing(Task task);
-	
+
+	void initializing(Task task);
+
 	/**
 	 * When the single image written to a page.
 	 * @param index the index of image files
@@ -26,7 +22,7 @@ public interface ConversionListener {
 	/**
 	 * When the conversion is done.
 	 */
-	void onConversionComplete(File dst);
+	void onConversionComplete();
 
 	void onFinally();
 }

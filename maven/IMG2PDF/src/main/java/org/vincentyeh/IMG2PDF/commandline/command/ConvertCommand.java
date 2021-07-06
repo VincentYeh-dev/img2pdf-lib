@@ -197,7 +197,7 @@ public class ConvertCommand implements Callable<Integer> {
         printDebugLog(getColor("\t|- temporary folder:" + tempFolder.getAbsolutePath(), Ansi.Color.CYAN));
         printDebugLog(getColor("\t|- Overwrite:" + overwrite_output, Ansi.Color.CYAN));
         PDFConverter converter = new PDFConverter(maxMainMemoryBytes.getBytes(), tempFolder, overwrite_output);
-        converter.setInfoListener(new DefaultConversionListener(configurations.locale));
+        converter.setListener(new DefaultConversionListener(configurations.locale));
 
         for (Task task : tasks) {
             File result = convertToFile(converter, task);
