@@ -264,7 +264,7 @@ public class ConvertCommand implements Callable<Integer> {
     }
 
     private Ansi getKeyValuePair(String key, Object value, Ansi.Color color) {
-        return getRenderFormat("@|yellow %s|@=@|%s %s|@\n", key, color, value);
+        return getRenderFormat("@|yellow %s|@=@|%s %s|@", key, color, value);
     }
 
     private Ansi getKeyValuePair(String field_name) throws NoSuchFieldException, IllegalAccessException {
