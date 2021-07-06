@@ -16,7 +16,7 @@ public class FileExceptionHandlerTest {
     private static FileExceptionHandler handler;
     @BeforeAll
     public static void initialize(){
-        ResourceBundleHandler.setResourceBundle(ResourceBundle.getBundle("cmd", Locale.ROOT));
+        ResourceBundleHandler.setResourceBundle(ResourceBundle.getBundle("handler", Locale.ROOT));
         handler=new FileExceptionHandler(null);
     }
 
