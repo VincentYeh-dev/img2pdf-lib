@@ -37,7 +37,7 @@ public class PrinterUtils {
     }
 
     public static void backDel(int n){
-        for(int i=0;i<50;i++){
+        for(int i=0;i<n;i++){
             print("\b \b");
         }
     }
