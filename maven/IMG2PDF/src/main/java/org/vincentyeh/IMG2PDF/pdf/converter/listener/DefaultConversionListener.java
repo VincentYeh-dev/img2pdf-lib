@@ -1,5 +1,6 @@
 package org.vincentyeh.IMG2PDF.pdf.converter.listener;
 
+import org.fusesource.jansi.Ansi;
 import org.vincentyeh.IMG2PDF.task.Task;
 
 import java.io.File;
@@ -7,8 +8,7 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import static org.vincentyeh.IMG2PDF.util.PrinterUtils.print;
-import static org.vincentyeh.IMG2PDF.util.PrinterUtils.printRenderFormat;
+import static org.vincentyeh.IMG2PDF.util.PrinterUtils.*;
 
 public class DefaultConversionListener implements ConversionListener {
     private final char[] progress_bar;
@@ -26,6 +26,7 @@ public class DefaultConversionListener implements ConversionListener {
     private double perImg;
     private double progress;
     private Task task;
+    private int previous_msg_length;
 
     @Override
     public void initializing(Task task) {
@@ -47,18 +48,21 @@ public class DefaultConversionListener implements ConversionListener {
             counter++;
         }
         String name = task.getPdfDestination().getName();
-        printRenderFormat(resourceBundle.getString("convert.listener.converting") + "\r", new String(progress_bar), name, index + 1, total, file.getName());
+        Ansi msg=getRenderFormat("\r"+resourceBundle.getString("convert.listener.converting") , new String(progress_bar), name, index + 1, total, file.getName());
+        print(msg);
+        previous_msg_length=msg.toString().length();
     }
 
     @Override
     public void onConversionComplete() {
+        backDel(previous_msg_length);
         long completeSeconds = System.currentTimeMillis() / 1000;
-        printRenderFormat(resourceBundle.getString("convert.listener.done"), (completeSeconds - startSeconds), task.getPdfDestination().getAbsolutePath());
+        printRenderFormat("\r"+resourceBundle.getString("convert.listener.done"), (completeSeconds - startSeconds), task.getPdfDestination().getAbsolutePath());
     }
 
     @Override
     public void onFinally() {
-        print("\r\n");
+        print("\n\r");
     }
 
     private String getSimplifiedName(String raw) {

@@ -36,6 +36,12 @@ public class PrinterUtils {
         System.out.print(object);
     }
 
+    public static void backDel(int n){
+        for(int i=0;i<50;i++){
+            print("\b \b");
+        }
+    }
+
     public static void printStackTrance(Exception e) {
         printLine(getColorStackTrance(e));
     }
