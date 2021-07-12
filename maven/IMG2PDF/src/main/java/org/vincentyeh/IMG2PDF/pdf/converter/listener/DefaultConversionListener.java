@@ -46,7 +46,7 @@ public class DefaultConversionListener implements ConversionListener {
             progress -= 1;
             counter++;
         }
-        String name = getSimplifiedName(task.getPdfDestination().getAbsolutePath());
+        String name = task.getPdfDestination().getName();
         printRenderFormat(resourceBundle.getString("convert.listener.converting") + "\r", new String(progress_bar), name, index + 1, total, file.getName());
     }
 
