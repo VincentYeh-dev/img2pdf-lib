@@ -4,7 +4,7 @@ import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
 import org.vincentyeh.IMG2PDF.commandline.command.ConvertCommand;
 import org.vincentyeh.IMG2PDF.commandline.command.IMG2PDFCommand;
-import org.vincentyeh.IMG2PDF.commandline.handler.CommandlineParameterHandler;
+import org.vincentyeh.IMG2PDF.commandline.handler.CommandLineParameterHandlerAdaptor;
 import org.vincentyeh.IMG2PDF.commandline.handler.core.ErrorHandler;
 import org.vincentyeh.IMG2PDF.commandline.handler.core.ResourceBundleHandler;
 import org.vincentyeh.IMG2PDF.pattern.Handler;
@@ -24,7 +24,7 @@ public class MainProgram {
 
             CommandLine cmd = new CommandLine(new IMG2PDFCommand());
             cmd.addSubcommand(new ConvertCommand(ConfigurationAgent.getConvertConfig()));
-            cmd.setParameterExceptionHandler(new CommandlineParameterHandler(ConfigurationAgent.getHandlerResourceBundle()));
+            cmd.setParameterExceptionHandler(new CommandLineParameterHandlerAdaptor());
             cmd.setResourceBundle(ConfigurationAgent.getCommandResourceBundle());
 
             int exitCode = cmd.execute(args);
