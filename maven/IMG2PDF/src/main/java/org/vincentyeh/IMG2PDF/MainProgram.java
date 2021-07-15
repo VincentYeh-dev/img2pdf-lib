@@ -22,14 +22,12 @@ public class MainProgram {
             ConfigurationAgent.loadOrCreateProperties(new File("config.properties"));
             ResourceBundleHandler.setResourceBundle(ConfigurationAgent.getHandlerResourceBundle());
 
-            CommandLine cmd = new CommandLine(new IMG2PDFCommand());
-            cmd.addSubcommand(new ConvertCommand(ConfigurationAgent.getConvertConfig()));
-            cmd.setParameterExceptionHandler(new CommandLineParameterHandlerAdaptor());
-            cmd.setResourceBundle(ConfigurationAgent.getCommandResourceBundle());
+            CommandLine cmd = IMG2PDFCommandMaker.getInstance().make();
 
             int exitCode = cmd.execute(args);
             AnsiConsole.systemUninstall();
             System.exit(exitCode);
+
         } catch (Error e) {
             ErrorHandler handler = new ErrorHandler(null);
             try {
@@ -40,5 +38,25 @@ public class MainProgram {
             System.exit(1000);
         }
 
+    }
+
+    private static class IMG2PDFCommandMaker {
+        private static IMG2PDFCommandMaker maker;
+
+        CommandLine make() {
+            CommandLine cmd;
+            cmd = new CommandLine(new IMG2PDFCommand());
+            cmd.addSubcommand(new ConvertCommand(ConfigurationAgent.getConvertConfig()));
+            cmd.setParameterExceptionHandler(new CommandLineParameterHandlerAdaptor());
+            cmd.setResourceBundle(ConfigurationAgent.getCommandResourceBundle());
+            return cmd;
+        }
+
+        static IMG2PDFCommandMaker getInstance() {
+            if (maker == null) {
+                maker = new IMG2PDFCommandMaker();
+            }
+            return maker;
+        }
     }
 }
