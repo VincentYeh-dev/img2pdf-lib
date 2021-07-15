@@ -89,22 +89,17 @@ public class ConvertCommand implements Callable<Integer> {
     List<File> sourceFiles;
 
 
-    private final Configurations configurations;
+    private final ResourceBundle resourceBundle;
+    private final Configuration configuration;
 
-    public static class Configurations {
-        public final Locale locale;
-        public final Charset DIRLIST_READ_CHARSET;
-        public final ResourceBundle resourceBundle;
-
-        public Configurations(Locale locale, Charset dirlist_read_charset, ResourceBundle resourceBundle) {
-            this.locale = locale;
-            DIRLIST_READ_CHARSET = dirlist_read_charset;
-            this.resourceBundle = resourceBundle;
-        }
+    public interface Configuration{
+        Charset getDirectoryListCharset();
+        Locale getLocale();
     }
 
-    public ConvertCommand(Configurations create_config) {
-        this.configurations = create_config;
+    public ConvertCommand(Configuration configuration, ResourceBundle resourceBundle) {
+        this.configuration = configuration;
+        this.resourceBundle = resourceBundle;
     }
 
     @Override
@@ -112,7 +107,7 @@ public class ConvertCommand implements Callable<Integer> {
         try {
             checkParameters();
             List<Task> tasks = importAllTaskFromDirlists();
-            printLine(configurations.resourceBundle.getString("execution.convert.start.start_conversion"));
+            printLine(resourceBundle.getString("execution.convert.start.start_conversion"));
 
             convertAllToFile(tasks);
 
@@ -129,9 +124,9 @@ public class ConvertCommand implements Callable<Integer> {
         List<Task> tasks = new ArrayList<>();
         for (File dirlist : sourceFiles) {
             try {
-                printColorFormat(configurations.resourceBundle.getString("execution.convert.start.parsing")+"\n", Ansi.Color.BLUE, dirlist.getPath());
-                List<Task> found = DirlistTaskFactory.createFromDirlist(dirlist, configurations.DIRLIST_READ_CHARSET);
-                printColorFormat(configurations.resourceBundle.getString("execution.convert.start.parsed")+"\n", Ansi.Color.BLUE, found.size(), dirlist.getPath());
+                printColorFormat(resourceBundle.getString("execution.convert.start.parsing")+"\n", Ansi.Color.BLUE, dirlist.getPath());
+                List<Task> found = DirlistTaskFactory.createFromDirlist(dirlist, configuration.getDirectoryListCharset());
+                printColorFormat(resourceBundle.getString("execution.convert.start.parsed")+"\n", Ansi.Color.BLUE, found.size(), dirlist.getPath());
                 tasks.addAll(found);
             } catch (Exception e) {
                 handleException(e, new DirlistTaskFactoryExceptionHandler(null), "\t", "");
@@ -197,7 +192,7 @@ public class ConvertCommand implements Callable<Integer> {
         printDebugLog(getColor("\t|- temporary folder:" + tempFolder.getAbsolutePath(), Ansi.Color.CYAN));
         printDebugLog(getColor("\t|- Overwrite:" + overwrite_output, Ansi.Color.CYAN));
         PDFConverter converter = new PDFConverter(maxMainMemoryBytes.getBytes(), tempFolder, overwrite_output);
-        converter.setListener(new DefaultConversionListener(configurations.locale));
+        converter.setListener(new DefaultConversionListener(configuration.getLocale()));
 
         for (Task task : tasks) {
             File result = convertToFile(converter, task);
