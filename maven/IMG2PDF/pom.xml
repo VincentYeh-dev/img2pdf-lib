@@ -5,7 +5,7 @@
 
     <groupId>org.vincentyeh</groupId>
     <artifactId>IMG2PDF</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
     <developers>
         <developer>
