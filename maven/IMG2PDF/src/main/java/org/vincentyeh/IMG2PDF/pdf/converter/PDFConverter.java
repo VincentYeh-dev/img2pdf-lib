@@ -1,17 +1,24 @@
 package org.vincentyeh.IMG2PDF.pdf.converter;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.vincentyeh.IMG2PDF.pdf.converter.listener.ConversionInfoListener;
-import org.vincentyeh.IMG2PDF.pdf.page.core.ImagePageFactory;
+import org.vincentyeh.IMG2PDF.pdf.converter.core.ImagePageFactory;
+import org.vincentyeh.IMG2PDF.pdf.converter.exception.PDFConversionException;
+import org.vincentyeh.IMG2PDF.pdf.converter.exception.PDFConverterException;
+import org.vincentyeh.IMG2PDF.pdf.converter.exception.ReadImageException;
+import org.vincentyeh.IMG2PDF.pdf.converter.exception.SaveException;
+import org.vincentyeh.IMG2PDF.pdf.converter.listener.ConversionListener;
 import org.vincentyeh.IMG2PDF.task.Task;
+import org.vincentyeh.IMG2PDF.util.file.FileUtils;
+import org.vincentyeh.IMG2PDF.util.file.exception.OverwriteException;
 
 import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * The core of this program. At first,this class will be initialized by task.
@@ -20,84 +27,100 @@ import javax.imageio.ImageIO;
  *
  * @author VincentYeh
  */
-public class PDFConverter implements ConversionInfoListener {
+public class PDFConverter implements ConversionListener {
 
-    private final Task task;
     private final boolean overwrite;
-    private ConversionInfoListener info_listener;
+    private ConversionListener listener;
 
     private final MemoryUsageSetting memoryUsageSetting;
 
-    public PDFConverter(Task task, long maxMainMemoryBytes, File tempFolder, boolean overwrite) {
+    public PDFConverter(long maxMainMemoryBytes, File tempFolder, boolean overwrite) throws IOException {
         this.overwrite = overwrite;
-
-        if (task == null)
-            throw new IllegalArgumentException("task is null.");
-        this.task = task;
 
         if (tempFolder == null)
             throw new IllegalArgumentException("tempFolder is null");
 
-        tempFolder.mkdirs();
+        FileUtils.makeDirectories(tempFolder);
+
         memoryUsageSetting = MemoryUsageSetting.setupMixed(maxMainMemoryBytes).setTempDir(tempFolder);
     }
 
-    public File start() throws OverwriteDenyException, IOException {
-        try (PDDocument document = new PDDocument(memoryUsageSetting)) {
+    public File start(Task task) throws PDFConverterException {
+        if (task == null)
+            throw new IllegalArgumentException("task is null.");
 
+        initializing(task);
+
+        try (PDDocument document = new PDDocument(memoryUsageSetting)) {
+            checkOverwrite(task.getPdfDestination());
             document.protect(task.getDocumentArgument().getSpp());
 
-            onConversionPreparing(task);
-            checkOverwrite();
-
             File[] images = task.getImages();
-            appendAllPageToDocument(images, document);
-
-            File pdf = savePDF(document);
-            onConversionComplete(pdf);
+            appendAllPageToDocument(task,images, document);
+            File pdf = savePDF(document, task.getPdfDestination());
+            onConversionComplete();
             return pdf;
+        } catch (Exception e) {
+            throw new PDFConverterException(e, task);
+        } finally {
+            onFinally();
         }
     }
 
-    private File savePDF(PDDocument document) throws IOException {
-        task.getPdfDestination().getParentFile().mkdirs();
-
-        document.save(task.getPdfDestination());
-        return task.getPdfDestination();
+    private File savePDF(PDDocument document, File file) throws SaveException {
+        try {
+            FileUtils.checkFileValidity(file);
+            FileUtils.makeDirectories(FileUtils.getParentFile(file));
+            document.save(file);
+            return file;
+        } catch (Exception e) {
+            throw new SaveException(e);
+        }
     }
 
-    private void appendAllPageToDocument(File[] images, PDDocument document) throws ConversionException, ReadImageException {
+    private void appendAllPageToDocument(Task task,File[] images, PDDocument document) throws PDFConversionException, ReadImageException {
         for (int i = 0; i < images.length; i++) {
             onConverting(i, images[i]);
-            appendPageToDocument(images[i], document);
+            appendPageToDocument(task,images[i], document);
         }
     }
 
-    private void appendPageToDocument(File file, PDDocument document) throws ConversionException, ReadImageException {
+    private void appendPageToDocument(Task task,File file, PDDocument document) throws PDFConversionException, ReadImageException {
         BufferedImage image = readImage(file);
         try {
-            document.addPage(getImagePage(image, document));
+            document.addPage(getImagePage(task,image, document));
         } catch (Exception e) {
-            throw new ConversionException(file, e);
+            throw new PDFConversionException(e);
         }
 
     }
 
-    private BufferedImage readImage(File image) throws ReadImageException {
+    private BufferedImage readImage(File file) throws ReadImageException {
         try {
-            return ImageIO.read(image);
+            FileUtils.checkExists(file);
+            InputStream is = new FileInputStream(file);
+
+            BufferedImage image = ImageIO.read(is);
+            if (image == null)
+                throw new RuntimeException("image==null");
+
+            return image;
         } catch (Exception e) {
-            throw new ReadImageException(image, e);
+            throw new ReadImageException(e, file);
         }
     }
 
-    private void checkOverwrite() throws OverwriteDenyException {
-        if (!overwrite && task.getPdfDestination().exists()) {
-            throw new OverwriteDenyException(task.getPdfDestination());
+    private void checkOverwrite(File file) throws SaveException {
+        if (!overwrite) {
+            try {
+                FileUtils.checkOverwrite(file, "PDF overwrite deny,File is already exists:" + file.getAbsoluteFile());
+            } catch (OverwriteException e) {
+                throw new SaveException(e);
+            }
         }
     }
 
-    private PDPage getImagePage(BufferedImage image, PDDocument document) throws Exception {
+    private PDPage getImagePage(Task task, BufferedImage image, PDDocument document) throws Exception {
         ImagePageFactory.Builder builder = new ImagePageFactory.Builder();
         builder.setAutoRotate(task.getPageArgument().getAutoRotate());
         builder.setDirection(task.getPageArgument().getDirection());
@@ -107,80 +130,35 @@ public class PDFConverter implements ConversionInfoListener {
         return builder.build().getImagePage(document, image);
     }
 
-    public void setInfoListener(ConversionInfoListener listener) {
-        this.info_listener = listener;
+    public void setListener(ConversionListener listener) {
+        this.listener = listener;
     }
 
+
     @Override
-    public void onConversionPreparing(Task task) {
-        if (info_listener != null)
-            info_listener.onConversionPreparing(task);
+    public void initializing(Task task) {
+        if (listener != null) {
+            listener.initializing(task);
+        }
     }
 
     @Override
     public void onConverting(int index, File file) {
-        if (info_listener != null)
-            info_listener.onConverting(index, file);
+        if (listener != null)
+            listener.onConverting(index, file);
     }
 
     @Override
-    public void onConversionComplete(File dst) {
-        if (info_listener != null)
-            info_listener.onConversionComplete(dst);
+    public void onConversionComplete() {
+        if (listener != null)
+            listener.onConversionComplete();
     }
 
-
-    public static class ConversionException extends RuntimeException {
-        private final File file;
-        private final Throwable cause;
-
-        public ConversionException(File file, Throwable cause) {
-            super(String.format("Error occur during conversion:%s", cause.getMessage()));
-            this.file = file;
-            this.cause = cause;
-        }
-
-        public File getFile() {
-            return file;
-        }
-
-        @Override
-        public Throwable getCause() {
-            return cause;
-        }
+    @Override
+    public void onFinally() {
+        if (listener != null)
+            listener.onFinally();
     }
 
-    public static class OverwriteDenyException extends RuntimeException {
-        private final File file;
-
-        public OverwriteDenyException(File file) {
-            super(String.format("Overwrite DENY:%s", file.getPath()));
-            this.file = file;
-        }
-
-        public File getFile() {
-            return file;
-        }
-    }
-
-    public static class ReadImageException extends RuntimeException {
-        private final File file;
-        private final Throwable cause;
-
-        public ReadImageException(File file, Throwable cause) {
-            super(String.format("Unable to import image:%s", cause.getMessage()));
-            this.file = file;
-            this.cause = cause;
-        }
-
-        public File getFile() {
-            return file;
-        }
-
-        @Override
-        public Throwable getCause() {
-            return cause;
-        }
-    }
 
 }

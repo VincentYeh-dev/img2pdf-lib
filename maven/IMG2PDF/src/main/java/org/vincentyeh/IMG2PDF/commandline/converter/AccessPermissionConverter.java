@@ -1,11 +1,14 @@
 package org.vincentyeh.IMG2PDF.commandline.converter;
 
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
+import org.vincentyeh.IMG2PDF.commandline.converter.core.BasicConverter;
 import picocli.CommandLine;
 
-public class AccessPermissionConverter implements CommandLine.ITypeConverter<AccessPermission> {
+public class AccessPermissionConverter extends BasicConverter<AccessPermission> {
     @Override
     public AccessPermission convert(String s) throws Exception {
+        checkNull(s,getClass().getName()+".s");
+        checkEmpty(s,getClass().getName()+".s");
         if(!s.matches("-?[0-9]+")){
             throw new CommandLine.TypeConversionException("AccessPermission contain no-numeric character.");
         }

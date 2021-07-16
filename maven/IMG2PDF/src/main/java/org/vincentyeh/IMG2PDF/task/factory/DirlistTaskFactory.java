@@ -1,28 +1,32 @@
 package org.vincentyeh.IMG2PDF.task.factory;
 
-import org.vincentyeh.IMG2PDF.util.file.exception.WrongFileTypeException;
+import org.vincentyeh.IMG2PDF.task.factory.exception.DirListException;
+import org.vincentyeh.IMG2PDF.task.factory.exception.EmptyImagesException;
+import org.vincentyeh.IMG2PDF.task.factory.exception.SourceFileException;
+import org.vincentyeh.IMG2PDF.util.file.FileUtils;
+import org.vincentyeh.IMG2PDF.util.file.exception.*;
 import org.vincentyeh.IMG2PDF.task.DocumentArgument;
 import org.vincentyeh.IMG2PDF.task.PageArgument;
 import org.vincentyeh.IMG2PDF.task.Task;
-import org.vincentyeh.IMG2PDF.util.NameFormatter;
+import org.vincentyeh.IMG2PDF.util.interfaces.NameFormatter;
 
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.*;
 
-public abstract class DirlistTaskFactory {
+public class DirlistTaskFactory {
 
     private static FileFilter imageFilter;
     private static Comparator<? super File> fileSorter;
     private static DocumentArgument documentArgument;
     private static PageArgument pageArgument;
-    private static String pdf_destination;
+    private static NameFormatter<File> formatter;
 
-    public static void setArgument(DocumentArgument documentArgument, PageArgument pageArgument, String pdf_destination) {
+    public static void setArgument(DocumentArgument documentArgument, PageArgument pageArgument, NameFormatter<File> formatter) {
         DirlistTaskFactory.documentArgument = documentArgument;
         DirlistTaskFactory.pageArgument = pageArgument;
-        DirlistTaskFactory.pdf_destination = pdf_destination;
+        DirlistTaskFactory.formatter = formatter;
     }
 
     public static void setImageFilesRule(FileFilter imageFilter, Comparator<? super File> fileSorter) {
@@ -40,47 +44,50 @@ public abstract class DirlistTaskFactory {
 
         List<Task> tasks = new ArrayList<>();
 
-        for (String line : lines) {
-            tasks.add(createTaskFromSource(getCheckedFileFromLine(line, dirlist)));
+        for (int i = 0; i < lines.size(); i++) {
+            tasks.add(createTaskFromSource(getCheckedFileFromLine(lines.get(i), dirlist, i + 1), i + 1));
         }
 
         return tasks;
     }
 
-    private static File getCheckedFileFromLine(String line, File directoryList) throws SourceFileException {
-        File dir = new File(line);
-        File result;
-        if (!dir.isAbsolute()) {
-            result = new File(directoryList.getParent(), line).getAbsoluteFile();
-        } else {
-            result = dir;
-        }
+    private static File getCheckedFileFromLine(String lineString, File directoryList, int line) throws SourceFileException {
+        File dir = new File(lineString);
+        try {
+            File result;
+            if (!dir.isAbsolute()) {
+                result = new File(FileUtils.getExistedParentFile(directoryList), lineString).getAbsoluteFile();
+            } else {
+                result = dir;
+            }
 
-        if (!result.exists()) {
-            throw new SourceFileException(new FileNotFoundException("File not found: " + result.getAbsolutePath()), result);
-        }
+            FileUtils.checkExists(result);
+            FileUtils.checkType(result, WrongFileTypeException.Type.FOLDER);
+            return result;
 
-        if (!result.isDirectory()) {
-            throw new SourceFileException(new WrongFileTypeException(WrongFileTypeException.Type.FOLDER, WrongFileTypeException.Type.FILE), result);
+        } catch (Exception e) {
+            throw new SourceFileException(e, dir, line);
         }
-
-        return result;
     }
 
-    private static Task createTaskFromSource(File directory) throws SourceFileException {
-        NameFormatter nf = new NameFormatter(directory);
-        return createTask(documentArgument,
-                pageArgument,
-                importSortedImagesFiles(directory),
-                new File(nf.format(pdf_destination)).getAbsoluteFile());
+    private static Task createTaskFromSource(File directory, int line) throws SourceFileException {
+        try {
+            return createTask(documentArgument,
+                    pageArgument,
+                    importSortedImagesFiles(directory),
+                    new File(formatter.format(directory)).getAbsoluteFile());
+        } catch (Exception e) {
+            throw new SourceFileException(e, directory, line);
+        }
     }
 
     private static List<String> readAllLinesFromDirlist(File dirlist, Charset charset) throws DirListException {
-        if (!dirlist.exists())
-            throw new DirListException(new FileNotFoundException("File not found: " + dirlist), dirlist);
-
-        if (!dirlist.isFile())
-            throw new DirListException(new WrongFileTypeException(WrongFileTypeException.Type.FILE, WrongFileTypeException.Type.FOLDER), dirlist);
+        try {
+            FileUtils.checkExists(dirlist);
+            FileUtils.checkType(dirlist, WrongFileTypeException.Type.FILE);
+        } catch (Exception e) {
+            throw new DirListException(e, dirlist);
+        }
 
         try (BufferedReader reader = Files.newBufferedReader(dirlist.toPath(), charset)) {
             List<String> result = new ArrayList<>();
@@ -107,11 +114,11 @@ public abstract class DirlistTaskFactory {
     }
 
 
-    private static File[] importSortedImagesFiles(File source_directory) throws SourceFileException {
+    private static File[] importSortedImagesFiles(File source_directory) throws EmptyImagesException {
         File[] files = source_directory.listFiles(imageFilter);
 
         if (files == null || files.length == 0)
-            throw new SourceFileException(new EmptyImagesException("No image was found in: "+source_directory), source_directory);
+            throw new EmptyImagesException("No image was found in: " + source_directory);
 
         Arrays.sort(files, fileSorter);
 
@@ -120,40 +127,6 @@ public abstract class DirlistTaskFactory {
 
     private static Task createTask(DocumentArgument documentArgument, PageArgument pageArgument, File[] images, File pdf_destination) {
         return new Task(documentArgument, pageArgument, images, pdf_destination);
-    }
-
-    public static class SourceFileException extends Exception{
-
-        private final File source;
-
-        public SourceFileException(Throwable cause, File source) {
-            super(cause);
-            this.source = source;
-        }
-
-        public File getSource() {
-            return source;
-        }
-    }
-
-    public static class DirListException extends Exception{
-
-        private final File dirlist;
-
-        public DirListException(Throwable cause, File dirlist) {
-            super(cause);
-            this.dirlist = dirlist;
-        }
-
-        public File getDirlist() {
-            return dirlist;
-        }
-    }
-
-    public static class EmptyImagesException extends RuntimeException{
-        public EmptyImagesException(String message) {
-            super(message);
-        }
     }
 
 }

@@ -8,32 +8,35 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import static org.fusesource.jansi.Ansi.ansi;
+import static org.vincentyeh.IMG2PDF.util.PrinterUtils.*;
 
-public class DefaultConversionListener implements ConversionInfoListener {
+public class DefaultConversionListener implements ConversionListener {
     private final char[] progress_bar;
     private final ResourceBundle resourceBundle;
-    private Task task;
-    private long startSeconds;
 
     public DefaultConversionListener(Locale locale) {
-        this.resourceBundle = ResourceBundle.getBundle("pdf_converter_listener",locale);
+        this.resourceBundle = ResourceBundle.getBundle("pdf_converter_listener", locale);
         progress_bar = new char[10];
         Arrays.fill(progress_bar, ' ');
     }
 
     private int total;
-    private int counter = 0;
-
+    private int counter;
+    private long startSeconds;
     private double perImg;
-    private double progress = 0;
+    private double progress;
+    private Task task;
+    private int previous_msg_length;
 
     @Override
-    public void onConversionPreparing(Task task) {
+    public void initializing(Task task) {
+        Arrays.fill(progress_bar, ' ');
+        total = counter = 0;
+        perImg = progress = 0f;
         this.task = task;
         total = task.getImages().length;
         perImg = (10. / total);
-        startSeconds =(System.currentTimeMillis()/1000);
+        startSeconds = (System.currentTimeMillis() / 1000);
     }
 
     @Override
@@ -44,19 +47,25 @@ public class DefaultConversionListener implements ConversionInfoListener {
             progress -= 1;
             counter++;
         }
-        String name = getSimplifiedName(task.getPdfDestination().getAbsolutePath());
-        System.out.print(ansi().render(String.format(resourceBundle.getString("convert.listener.converting") , new String(progress_bar), name, index + 1, total, file.getName())));
-        System.out.print("\r");
+        String name = task.getPdfDestination().getName();
+        Ansi msg=getRenderFormat("\r"+resourceBundle.getString("convert.listener.converting") , new String(progress_bar), name, index + 1, total, file.getName());
+        print(msg);
+        previous_msg_length=msg.toString().length();
     }
 
     @Override
-    public void onConversionComplete(File dst) {
-        long completeSeconds = System.currentTimeMillis()/1000;
-        System.out.print(ansi().render(String.format(resourceBundle.getString("convert.listener.done"), (completeSeconds - startSeconds),dst.getAbsolutePath())));
-        System.out.print("\r\n");
+    public void onConversionComplete() {
+        backDel(previous_msg_length);
+        long completeSeconds = System.currentTimeMillis() / 1000;
+        printRenderFormat("\r"+resourceBundle.getString("convert.listener.done"), (completeSeconds - startSeconds), task.getPdfDestination().getAbsolutePath());
     }
 
-    private String getSimplifiedName(String raw){
+    @Override
+    public void onFinally() {
+        print("\n\r");
+    }
+
+    private String getSimplifiedName(String raw) {
 
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < raw.length(); i++) {
@@ -64,11 +73,11 @@ public class DefaultConversionListener implements ConversionInfoListener {
                 sb.append(raw.charAt(i));
             } else if (i > raw.length() - 30) {
                 sb.append(raw.charAt(i));
-            }else{
+            } else {
                 sb.append("#");
             }
         }
-       return sb.toString().replaceAll("#+","...");
+        return sb.toString().replaceAll("#+", "...");
     }
 
 }

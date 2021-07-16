@@ -3,17 +3,22 @@ package org.vincentyeh.IMG2PDF.commandline.command;
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 import org.fusesource.jansi.Ansi;
 import org.vincentyeh.IMG2PDF.commandline.converter.*;
-import org.vincentyeh.IMG2PDF.commandline.exception.PDFConversionException;
+import org.vincentyeh.IMG2PDF.commandline.handler.core.DirlistTaskFactoryExceptionHandler;
+import org.vincentyeh.IMG2PDF.commandline.handler.core.ExceptionHandler;
+import org.vincentyeh.IMG2PDF.commandline.handler.core.PDFConverterExceptionHandler;
+import org.vincentyeh.IMG2PDF.pattern.Handler;
 import org.vincentyeh.IMG2PDF.pdf.converter.PDFConverter;
+import org.vincentyeh.IMG2PDF.pdf.converter.exception.PDFConverterException;
 import org.vincentyeh.IMG2PDF.pdf.converter.listener.DefaultConversionListener;
-import org.vincentyeh.IMG2PDF.pdf.page.PageAlign;
-import org.vincentyeh.IMG2PDF.pdf.page.PageDirection;
-import org.vincentyeh.IMG2PDF.pdf.page.PageSize;
+import org.vincentyeh.IMG2PDF.pdf.parameter.PageAlign;
+import org.vincentyeh.IMG2PDF.pdf.parameter.PageDirection;
+import org.vincentyeh.IMG2PDF.pdf.parameter.PageSize;
 import org.vincentyeh.IMG2PDF.task.DocumentArgument;
 import org.vincentyeh.IMG2PDF.task.PageArgument;
 import org.vincentyeh.IMG2PDF.task.Task;
 import org.vincentyeh.IMG2PDF.task.factory.DirlistTaskFactory;
 import org.vincentyeh.IMG2PDF.util.BytesSize;
+import org.vincentyeh.IMG2PDF.util.file.FileNameFormatter;
 import org.vincentyeh.IMG2PDF.util.file.FileSorter;
 import org.vincentyeh.IMG2PDF.util.file.FileUtils;
 import org.vincentyeh.IMG2PDF.util.file.GlobbingFileFilter;
@@ -21,14 +26,13 @@ import picocli.CommandLine;
 
 import java.awt.*;
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.concurrent.Callable;
 
-import static org.fusesource.jansi.Ansi.ansi;
+import static org.vincentyeh.IMG2PDF.util.PrinterUtils.*;
 
 @CommandLine.Command(name = "convert")
 public class ConvertCommand implements Callable<Integer> {
@@ -36,10 +40,13 @@ public class ConvertCommand implements Callable<Integer> {
     @CommandLine.ParentCommand
     IMG2PDFCommand img2PDFCommand;
 
-    @CommandLine.Option(names = {"--sorter", "-sr"}, defaultValue = "NAME$INCREASE", converter = FileSorterConverter.class)
+    @CommandLine.Spec
+    CommandLine.Model.CommandSpec spec;
+
+    @CommandLine.Option(names = {"--sorter", "-sr"}, defaultValue = "NAME-INCREASE", converter = FileSorterConverter.class)
     FileSorter fileSorter;
 
-    @CommandLine.Option(names = {"--filter", "-f"}, defaultValue = "glob:*.{PNG,JPG}", converter = GlobbingFileFilterConverter.class)
+    @CommandLine.Option(names = {"--filter", "-f"}, defaultValue = "*.{PNG,JPG}", converter = GlobbingFileFilterConverter.class)
     GlobbingFileFilter filter;
 
     @CommandLine.Option(names = {"--pdf_owner_password", "-popwd"})
@@ -85,53 +92,54 @@ public class ConvertCommand implements Callable<Integer> {
     List<File> sourceFiles;
 
 
-    private final Configurations configurations;
+    private final Configuration configuration;
 
-    public static class Configurations {
-        public final Locale locale;
-        public final Charset DIRLIST_READ_CHARSET;
-        public final ResourceBundle resourceBundle;
-
-        public Configurations(Locale locale, Charset dirlist_read_charset, ResourceBundle resourceBundle) {
-            this.locale = locale;
-            DIRLIST_READ_CHARSET = dirlist_read_charset;
-            this.resourceBundle = resourceBundle;
-        }
+    public interface Configuration{
+        Charset getDirectoryListCharset();
+        Locale getLocale();
     }
 
-    public ConvertCommand(Configurations create_config) {
-        this.configurations = create_config;
+    public ConvertCommand(Configuration configuration) {
+        this.configuration = configuration;
     }
 
     @Override
-    public Integer call() throws Exception {
-        System.out.println();
-
-        checkParameters();
-
-        DirlistTaskFactory.setArgument(getDocumentArgument(), getPageArgument(), pdf_dst);
-        DirlistTaskFactory.setImageFilesRule(filter, fileSorter);
-
-        List<Task> tasks = new ArrayList<>();
-
-        for (File dirlist : sourceFiles) {
-            tasks.addAll(DirlistTaskFactory.createFromDirlist(dirlist, configurations.DIRLIST_READ_CHARSET));
-        }
-
+    public Integer call() {
         try {
-            System.out.println(configurations.resourceBundle.getString("execution.convert.start.start_conversion"));
-            convertAllToFile(tasks);
-        } finally {
-            System.out.print("\n");
-        }
+            checkParameters();
+            List<Task> tasks = importAllTaskFromDirlists();
+            printLine(getResourceBundleString("execution.convert.start.start_conversion"));
 
-        return CommandLine.ExitCode.OK;
+            convertAllToFile(tasks);
+
+            return CommandLine.ExitCode.OK;
+        } catch (Exception e) {
+            printStackTrance(e);
+            return CommandLine.ExitCode.SOFTWARE;
+        }
+    }
+
+    private List<Task> importAllTaskFromDirlists() {
+        DirlistTaskFactory.setArgument(getDocumentArgument(), getPageArgument(), new FileNameFormatter(pdf_dst));
+        DirlistTaskFactory.setImageFilesRule(filter, fileSorter);
+        List<Task> tasks = new ArrayList<>();
+        for (File dirlist : sourceFiles) {
+            try {
+                printColorFormat(getResourceBundleString("execution.convert.start.parsing")+"\n", Ansi.Color.BLUE, dirlist.getPath());
+                List<Task> found = DirlistTaskFactory.createFromDirlist(dirlist, configuration.getDirectoryListCharset());
+                printColorFormat(getResourceBundleString("execution.convert.start.parsed")+"\n", Ansi.Color.BLUE, found.size(), dirlist.getPath());
+                tasks.addAll(found);
+            } catch (Exception e) {
+                handleException(e, new DirlistTaskFactoryExceptionHandler(null), "\t", "");
+            }
+        }
+        return tasks;
     }
 
     private void checkParameters() throws NoSuchFieldException, IllegalAccessException {
-        printDebugLog("-------------------------------------", true);
-        printDebugLog("@|yellow Check Parameters|@", true);
-        printDebugLog("-------------------------------------", true);
+        printDebugLog("-------------------------------------");
+        printDebugLog(getColor("Check Parameters", Ansi.Color.YELLOW));
+        printDebugLog("-------------------------------------");
         checkPrintNullParameter("overwrite_output");
         checkPrintNullParameter("fileSorter");
         checkPrintNullParameter("filter");
@@ -157,8 +165,8 @@ public class ConvertCommand implements Callable<Integer> {
             throw new IllegalArgumentException("tempFolder is not absolute: " + tempFolder);
         if (FileUtils.isRoot(tempFolder))
             throw new IllegalArgumentException("tempFolder is root: " + tempFolder);
-        printDebugLog("-------------------------------------", true);
-        printDebugLog("-------------------------------------", true);
+        printDebugLog("-------------------------------------");
+        printDebugLog("-------------------------------------");
     }
 
     private PageArgument getPageArgument() {
@@ -179,87 +187,104 @@ public class ConvertCommand implements Callable<Integer> {
     }
 
 
-    private void convertAllToFile(List<Task> tasks) throws PDFConversionException {
+    private void convertAllToFile(List<Task> tasks) throws Exception {
+        printDebugLog("Converter Configuration");
+        printDebugLog(getColor("\t|- max main memory usage:" + maxMainMemoryBytes.getBytes(), Ansi.Color.CYAN));
+        printDebugLog(getColor("\t|- temporary folder:" + tempFolder.getAbsolutePath(), Ansi.Color.CYAN));
+        printDebugLog(getColor("\t|- Overwrite:" + overwrite_output, Ansi.Color.CYAN));
+        PDFConverter converter = new PDFConverter(maxMainMemoryBytes.getBytes(), tempFolder, overwrite_output);
+        converter.setListener(new DefaultConversionListener(configuration.getLocale()));
 
         for (Task task : tasks) {
-            try {
-                File result = convertToFile(task);
-                if (open_when_complete)
-                    openPDF(result);
-            } catch (PDFConversionException e) {
-                boolean ignore = false;
-                if (ignore == false)
-                    throw e;
-            }
+            File result = convertToFile(converter, task);
+            if (open_when_complete && result != null)
+                openPDF(result);
         }
     }
 
 
     private void openPDF(File file) {
+        printDebugLog("Open:" + file.getAbsolutePath());
+
         Desktop desktop = Desktop.getDesktop();
         if (file.exists())
             try {
                 desktop.open(file);
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                printErrorLog("Can't open:" + e.getMessage());
+                if (img2PDFCommand.isDebug())
+                    printStackTrance(e);
             }
-
+        else {
+            printErrorLog("File not exists,Can't open:" + file.getAbsolutePath());
+        }
     }
 
-    private File convertToFile(Task task) throws PDFConversionException {
+    private File convertToFile(PDFConverter converter, Task task) {
+        printDebugLog("Converting");
+        printDebugLog("Name: " + task.getPdfDestination());
+        printDebugLog("Images");
+        Arrays.stream(task.getImages()).forEach(img -> printDebugLog(getColor("\t|- " + img, Ansi.Color.CYAN)));
         try {
-            PDFConverter converter = new PDFConverter(task, maxMainMemoryBytes.getBytes(), tempFolder, overwrite_output);
-            converter.setInfoListener(new DefaultConversionListener(configurations.locale));
-
-            return converter.start();
+            return converter.start(task);
+        } catch (PDFConverterException e) {
+            handleException(e, new PDFConverterExceptionHandler(null), "\t", "");
         } catch (Exception e) {
-            throw new PDFConversionException(e, task);
+            printStackTrance(e);
         }
+        return null;
+    }
 
+    private void handleException(Exception e, ExceptionHandler handler, String prefix, String suffix) {
+        try {
+            printRenderFormat(prefix + "[@|red ERROR|@] %s\n" + suffix, handler.handle(e));
+            if (img2PDFCommand.isDebug())
+                printStackTrance(e);
+        } catch (Handler.CantHandleException cantHandleException) {
+            printColor("Can't handle.\n", Ansi.Color.RED);
+            printStackTrance(e);
+        }
     }
 
 
-    private void printDebugLog(String msg, boolean nextLine) {
+    private void printDebugLog(Object msg) {
         if (img2PDFCommand.isDebug()) {
-            String content = String.format("[@|green DEBUG|@] %s", msg);
-            System.out.print(ansi().render(content));
-            if (nextLine)
-                System.out.println();
+            printRenderFormat("[@|blue DEBUG|@] %s\n", msg);
         }
     }
 
-    private void printErrorLog(String msg, boolean nextLine) {
+    private void printErrorLog(Object msg) {
         if (img2PDFCommand.isDebug()) {
-            String content = String.format("[@|red ERROR|@] %s", msg);
-            System.out.print(ansi().render(content));
-            if (nextLine)
-                System.out.println();
+            printRenderFormat("[@|red ERROR|@] %s\n", msg);
         }
     }
 
-
-    private String getKeyValuePairString(String key, Object value, Ansi.Color colorOfValue) {
-        return String.format("@|yellow %s|@=@|%s %s|@", key,colorOfValue, value);
+    private Ansi getKeyValuePair(String key, Object value, Ansi.Color color) {
+        return getRenderFormat("@|yellow %s|@=@|%s %s|@", key, color, value);
     }
 
-    private String getKeyValuePairString(String field_name) throws NoSuchFieldException, IllegalAccessException {
+    private Ansi getKeyValuePair(String field_name) throws NoSuchFieldException, IllegalAccessException {
         Field field = ConvertCommand.class.getDeclaredField(field_name);
         field.setAccessible(true);
-        return getKeyValuePairString(field.getName(), field.get(this),Ansi.Color.GREEN);
+        return getKeyValuePair(field.getName(), field.get(this), Ansi.Color.GREEN);
     }
 
     private void checkPrintNullParameter(String field_name) throws NoSuchFieldException, IllegalAccessException {
-        if(checkNullParameter(field_name)){
-            printDebugLog(getKeyValuePairString(field_name), true);
-        }else{
-            printErrorLog(getKeyValuePairString(field_name,null,Ansi.Color.RED),true);
-            throw new IllegalArgumentException(field_name+"==null");
+        if (checkNullParameter(field_name)) {
+            printDebugLog(getKeyValuePair(field_name));
+        } else {
+            printErrorLog(getKeyValuePair(field_name, null, Ansi.Color.RED));
+            throw new IllegalArgumentException(field_name + "==null");
         }
 
     }
 
     private boolean checkNullParameter(String field_name) throws NoSuchFieldException, IllegalAccessException {
         Field field = ConvertCommand.class.getDeclaredField(field_name);
-        return (field.get(this) != null) ;
+        return (field.get(this) != null);
+    }
+
+    private String getResourceBundleString(String key){
+        return spec.resourceBundle().getString(key);
     }
 }
