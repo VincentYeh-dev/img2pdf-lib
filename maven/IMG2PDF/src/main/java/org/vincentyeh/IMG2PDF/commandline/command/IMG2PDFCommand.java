@@ -4,7 +4,7 @@ import picocli.CommandLine;
 
 @CommandLine.Command(name = "img2pdf", mixinStandardHelpOptions = true,
         version = {
-        "IMG2PDF v1.1.0",
+        "IMG2PDF v1.0.0",
         "Picocli " + picocli.CommandLine.VERSION,
         "JVM: ${java.version} (${java.vendor} ${java.vm.name} ${java.vm.version})",
         "OS: ${os.name} ${os.version} ${os.arch}"}
