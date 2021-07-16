@@ -19,7 +19,7 @@ class MainCommandMaker {
 
         cmd.setParameterExceptionHandler(new CommandLineParameterHandlerAdaptor());
 
-        cmd.addSubcommand(new ConvertCommand(getConvertConfiguration(configuration), cmd.getResourceBundle()));
+        cmd.addSubcommand(new ConvertCommand(getConvertConfiguration(configuration)));
         return cmd;
     }
 

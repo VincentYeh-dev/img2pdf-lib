@@ -40,6 +40,9 @@ public class ConvertCommand implements Callable<Integer> {
     @CommandLine.ParentCommand
     IMG2PDFCommand img2PDFCommand;
 
+    @CommandLine.Spec
+    CommandLine.Model.CommandSpec spec;
+
     @CommandLine.Option(names = {"--sorter", "-sr"}, defaultValue = "NAME-INCREASE", converter = FileSorterConverter.class)
     FileSorter fileSorter;
 
@@ -89,7 +92,6 @@ public class ConvertCommand implements Callable<Integer> {
     List<File> sourceFiles;
 
 
-    private final ResourceBundle resourceBundle;
     private final Configuration configuration;
 
     public interface Configuration{
@@ -97,9 +99,8 @@ public class ConvertCommand implements Callable<Integer> {
         Locale getLocale();
     }
 
-    public ConvertCommand(Configuration configuration, ResourceBundle resourceBundle) {
+    public ConvertCommand(Configuration configuration) {
         this.configuration = configuration;
-        this.resourceBundle = resourceBundle;
     }
 
     @Override
@@ -107,7 +108,7 @@ public class ConvertCommand implements Callable<Integer> {
         try {
             checkParameters();
             List<Task> tasks = importAllTaskFromDirlists();
-            printLine(resourceBundle.getString("execution.convert.start.start_conversion"));
+            printLine(getResourceBundleString("execution.convert.start.start_conversion"));
 
             convertAllToFile(tasks);
 
@@ -124,9 +125,9 @@ public class ConvertCommand implements Callable<Integer> {
         List<Task> tasks = new ArrayList<>();
         for (File dirlist : sourceFiles) {
             try {
-                printColorFormat(resourceBundle.getString("execution.convert.start.parsing")+"\n", Ansi.Color.BLUE, dirlist.getPath());
+                printColorFormat(getResourceBundleString("execution.convert.start.parsing")+"\n", Ansi.Color.BLUE, dirlist.getPath());
                 List<Task> found = DirlistTaskFactory.createFromDirlist(dirlist, configuration.getDirectoryListCharset());
-                printColorFormat(resourceBundle.getString("execution.convert.start.parsed")+"\n", Ansi.Color.BLUE, found.size(), dirlist.getPath());
+                printColorFormat(getResourceBundleString("execution.convert.start.parsed")+"\n", Ansi.Color.BLUE, found.size(), dirlist.getPath());
                 tasks.addAll(found);
             } catch (Exception e) {
                 handleException(e, new DirlistTaskFactoryExceptionHandler(null), "\t", "");
@@ -281,5 +282,9 @@ public class ConvertCommand implements Callable<Integer> {
     private boolean checkNullParameter(String field_name) throws NoSuchFieldException, IllegalAccessException {
         Field field = ConvertCommand.class.getDeclaredField(field_name);
         return (field.get(this) != null);
+    }
+
+    private String getResourceBundleString(String key){
+        return spec.resourceBundle().getString(key);
     }
 }
