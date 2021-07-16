@@ -1,16 +1,13 @@
 package org.vincentyeh.IMG2PDF.pdf.converter.core;
 
 class SizeCalculator {
-    private static SizeCalculator calculator = null;
-
-    public static SizeCalculator getInstance() {
-        if (calculator == null)
-            calculator = new SizeCalculator();
-        return calculator;
-    }
-
 
     public Size scaleUpToMax(Size img_size, Size page_size) {
+        if (img_size == null)
+            throw new IllegalArgumentException("img_size==null");
+        if (page_size == null)
+            throw new IllegalArgumentException("page_size==null");
+
         float img_height = img_size.getHeight();
         float img_width = img_size.getWidth();
         float page_height = page_size.getHeight();
@@ -28,7 +25,7 @@ class SizeCalculator {
 //			out_width = (img_width / img_height) * page_height;
         }
 
-        return new Size(out_height, out_width);
+        return new Size(out_width, out_height);
     }
 
 

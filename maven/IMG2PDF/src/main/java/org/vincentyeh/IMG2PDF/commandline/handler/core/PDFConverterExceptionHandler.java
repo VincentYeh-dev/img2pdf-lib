@@ -1,12 +1,16 @@
 package org.vincentyeh.IMG2PDF.commandline.handler.core;
 
 
-import org.vincentyeh.IMG2PDF.pdf.converter.exception.PDFConversionException;
+import org.vincentyeh.IMG2PDF.commandline.handler.FileExceptionHandler;
 import org.vincentyeh.IMG2PDF.pattern.Handler;
+import org.vincentyeh.IMG2PDF.pdf.converter.exception.PDFConversionException;
 import org.vincentyeh.IMG2PDF.pdf.converter.exception.PDFConverterException;
 import org.vincentyeh.IMG2PDF.pdf.converter.exception.ReadImageException;
+import org.vincentyeh.IMG2PDF.pdf.converter.exception.SaveException;
 import org.vincentyeh.IMG2PDF.task.Task;
-import org.vincentyeh.IMG2PDF.util.file.exception.OverwriteException;
+import org.vincentyeh.IMG2PDF.util.file.exception.FileException;
+
+import static java.lang.String.format;
 
 public class PDFConverterExceptionHandler extends ExceptionHandler {
 
@@ -18,16 +22,32 @@ public class PDFConverterExceptionHandler extends ExceptionHandler {
     public String handle(Exception data) throws CantHandleException {
         if (data instanceof PDFConverterException) {
             PDFConverterException ex1 = (PDFConverterException) data;
+            Throwable cause = ex1.getCause();
             Task task = ex1.getTask();
-            if (ex1.getCause() instanceof ReadImageException) {
-                ReadImageException ex2 = (ReadImageException) ex1;
-                return String.format(getLocaleString("read_image"), ex2.getErrorImageFile());
-            } else if (ex1.getCause() instanceof OverwriteException) {
-                return String.format(getLocaleString("overwrite"), task.getPdfDestination());
-            } else if (ex1.getCause() instanceof PDFConversionException) {
-                return String.format(getLocaleString("conversion"), ex1.getCause().getMessage());
+            if (cause instanceof ReadImageException) {
+                return handleReadImageException((ReadImageException) cause, task);
+            } else if (cause instanceof PDFConversionException) {
+                return format(getLocaleString("conversion"), task.getPdfDestination().getPath(), cause.getCause().getMessage());
+            } else if (cause instanceof SaveException) {
+                Exception innerCause = (Exception) cause.getCause();
+                if (innerCause instanceof FileException)
+                    return handleFileException((FileException) innerCause);
             }
+
         }
         return doNext(data);
+    }
+
+    private String handleFileException(FileException e) throws CantHandleException {
+        return ((ExceptionHandler) new FileExceptionHandler(null)).handle(e);
+    }
+
+    private String handleReadImageException(ReadImageException e, Task task) throws CantHandleException {
+        Exception innerCause = (Exception) e.getCause();
+
+        if (innerCause instanceof FileException)
+            return format(getLocaleString("read_image"), task.getPdfDestination().getName(), e.getErrorImageFile(), handleFileException((FileException) innerCause));
+        else
+            return format(getLocaleString("read_image"), task.getPdfDestination().getName(), e.getErrorImageFile(), innerCause.getMessage());
     }
 }

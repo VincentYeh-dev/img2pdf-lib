@@ -1,14 +1,11 @@
 package org.vincentyeh.IMG2PDF.pdf.converter.exception;
 
-import org.vincentyeh.IMG2PDF.task.Task;
-
 import java.io.File;
 
-public class ReadImageException extends PDFConverterException{
+public class ReadImageException extends RuntimeException{
     private final File image_file;
-
-    public ReadImageException(File image_file, Throwable cause, Task task) {
-        super(String.format("Unable to import image:%s",image_file),cause,task);
+    public ReadImageException(Throwable cause, File image_file) {
+        super(cause);
         this.image_file = image_file;
     }
 

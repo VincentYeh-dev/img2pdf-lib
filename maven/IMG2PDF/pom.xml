@@ -5,7 +5,7 @@
 
     <groupId>org.vincentyeh</groupId>
     <artifactId>IMG2PDF</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
     <developers>
         <developer>
@@ -56,6 +56,14 @@
             <version>5.7.2</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>5.7.2</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- ... -->
 
         <!-- https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox -->
@@ -103,6 +111,15 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>3.1.1</version>
+                <executions>
+                    <execution>
+                        <configuration>
+                            <ignoredDependencies>
+                                <ignoredDependency>org.junit.jupiter:*</ignoredDependency>
+                            </ignoredDependencies>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
@@ -188,6 +205,9 @@
                                 <mainClass>${main-class}</mainClass>
                             </classPath>
                             <jre>
+                                <opts>
+                                    <opt>-Dfile.encoding=UTF-8</opt>
+                                </opts>
                                 <bundledJre64Bit>false</bundledJre64Bit>
                                 <bundledJreAsFallback>false</bundledJreAsFallback>
                                 <minVersion>${maven.compiler.source}</minVersion>

@@ -23,6 +23,10 @@ public class FileSorter implements Comparator<File> {
 
     @Override
     public int compare(File o1, File o2) {
+        if (o1 == null)
+            throw new IllegalArgumentException("o1==null");
+        if (o2 == null)
+            throw new IllegalArgumentException("o2==null");
         switch (sortby) {
             case NAME:
                 if (sequence == Sequence.INCREASE)
@@ -31,10 +35,9 @@ public class FileSorter implements Comparator<File> {
                     return o2.getName().compareTo(o1.getName());
             case DATE:
                 if (sequence == Sequence.INCREASE)
-                    return (o1.lastModified() - o2.lastModified() > 0) ? 1 : -1;
-
+                    return (int) (o1.lastModified() - o2.lastModified());
                 else if (sequence == Sequence.DECREASE)
-                    return (o1.lastModified() - o2.lastModified() > 0) ? -1 : 1;
+                    return (int) (o2.lastModified() - o1.lastModified());
             case NUMERIC:
                 if (sequence == Sequence.INCREASE)
                     return compareNumeric(o1.getName(), o2.getName());
@@ -84,7 +87,7 @@ public class FileSorter implements Comparator<File> {
 
     @Override
     public String toString() {
-        return String.format("%s$%s",sortby,sequence);
+        return String.format("%s-%s", sortby, sequence);
     }
 
     public enum Sequence {

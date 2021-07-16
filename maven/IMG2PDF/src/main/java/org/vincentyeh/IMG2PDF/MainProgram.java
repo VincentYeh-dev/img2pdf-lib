@@ -1,30 +1,53 @@
 package org.vincentyeh.IMG2PDF;
 
+import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
-import org.vincentyeh.IMG2PDF.commandline.command.IMG2PDFCommand;
-import org.vincentyeh.IMG2PDF.commandline.command.ConvertCommand;
-import org.vincentyeh.IMG2PDF.commandline.handler.CommandlineExecutionHandler;
-import org.vincentyeh.IMG2PDF.commandline.handler.CommandlineParameterHandler;
+import org.vincentyeh.IMG2PDF.commandline.handler.core.ErrorHandler;
+import org.vincentyeh.IMG2PDF.configuration.Configuration;
+import org.vincentyeh.IMG2PDF.configuration.ConfigurationFactory;
+import org.vincentyeh.IMG2PDF.pattern.Handler;
+import org.vincentyeh.IMG2PDF.util.PrinterUtils;
 import picocli.CommandLine;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 
 
 public class MainProgram {
 
     public static void main(String[] args) {
-        AnsiConsole.systemInstall();
-        ConfigurationAgent.loadOrCreateProperties(new File("config.properties"));
 
-        CommandLine cmd = new CommandLine(new IMG2PDFCommand());
-        cmd.addSubcommand(new ConvertCommand(ConfigurationAgent.getConvertConfig()));
+        Configuration configuration = loadConfiguration("config.properties");
 
-        cmd.setExecutionExceptionHandler(new CommandlineExecutionHandler(ConfigurationAgent.getHandlerResourceBundle()));
-        cmd.setParameterExceptionHandler(new CommandlineParameterHandler(ConfigurationAgent.getHandlerResourceBundle()));
-        cmd.setResourceBundle(ConfigurationAgent.getCommandResourceBundle());
+        int exitCode;
+        try {
+            AnsiConsole.systemInstall();
 
-        int exitCode=cmd.execute(args);
-        AnsiConsole.systemUninstall();
+            CommandLine cmd = MainCommandMaker.make(configuration);
+
+            exitCode = cmd.execute(args);
+
+        } catch (Error e) {
+            ErrorHandler handler = new ErrorHandler(null);
+            try {
+                PrinterUtils.printColor(handler.handle(e), Ansi.Color.RED);
+            } catch (Handler.CantHandleException cantHandleException) {
+                cantHandleException.printStackTrace();
+            }
+            exitCode = 100;
+        } finally {
+            AnsiConsole.systemUninstall();
+        }
+
         System.exit(exitCode);
+
+    }
+
+    private static Configuration loadConfiguration(String path) {
+        try {
+            return ConfigurationFactory.createValidOptionFromPropertiesFile(new File(path));
+        } catch (IOException e) {
+            return ConfigurationFactory.createDefault();
+        }
     }
 }

@@ -3,52 +3,95 @@ package org.vincentyeh.IMG2PDF.util.file;
 import org.vincentyeh.IMG2PDF.util.file.exception.*;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
 
 public class FileUtils {
-    public static File getParentFile(File file) throws NoParentException {
+    public static File getExistedParentFile(File file) throws NoParentException, InvalidFileException, FileNotExistsException {
+        checkNull(file);
+        checkExists(file);
+        return getParentFile(file);
+    }
+
+    public static File getParentFile(File file) throws NoParentException, InvalidFileException {
+        checkFileValidity(file);
+
         if (isRoot(file)) {
-            throw new TargetRootParentException("No parent in: " + file + "(root)");
+            throw new TargetRootParentException(file);
         }
 
         File parent = file.getParentFile();
 
         if (isNull(parent)) {
-            throw new NoParentException("No parent in: " + file);
+            throw new NoParentException(file);
         }
 
         return parent;
     }
 
-    public static void checkExists(File file) throws FileNotFoundException {
-        if (!file.exists())
-            throw new FileNotFoundException("File not found: " + file.getAbsolutePath());
+    public static void checkExists(File file) throws FileNotExistsException, InvalidFileException {
+        checkNull(file);
+        checkFileValidity(file);
+        if (Files.notExists(file.toPath()))
+            throw new FileNotExistsException(file);
     }
 
-    public static void checkType(File file, WrongFileTypeException.Type excepted) throws WrongFileTypeException {
+    public static void checkType(File file, WrongFileTypeException.Type excepted) throws WrongFileTypeException, InvalidFileException, FileNotExistsException {
+        checkFileValidity(file);
+        checkExists(file);
+        checkNull(excepted);
+
+        Path p = file.toPath();
         WrongFileTypeException.Type value = file.isFile() ? WrongFileTypeException.Type.FILE : WrongFileTypeException.Type.FOLDER;
+        if (Files.isRegularFile(p))
+            value = WrongFileTypeException.Type.FILE;
+        else if (Files.isDirectory(p))
+            value = WrongFileTypeException.Type.FOLDER;
+
         if (value != excepted) {
-            throw new WrongFileTypeException(excepted,value);
+            throw new WrongFileTypeException(excepted, value,file);
         }
 
     }
-    public static void checkOverwrite(File file,String reason) throws OverwriteException {
+
+    public static void checkOverwrite(File file, String reason) throws OverwriteException {
+        checkNull(file);
+        checkNull(reason);
         if (file.exists())
-            throw new OverwriteException(reason,file);
+            throw new OverwriteException(reason, file);
     }
 
-    public static void makeDirectories(File directory) throws MakeDirectoryException {
-        if(!directory.mkdirs()&&!directory.exists()){
-            throw new MakeDirectoryException("No directory was created:"+directory);
+    public static File makeDirectories(File directory) throws MakeDirectoryException {
+        checkNull(directory);
+        try {
+            return Files.createDirectories(directory.toPath()).toFile();
+        } catch (IOException e) {
+            throw new MakeDirectoryException(e, directory);
         }
     }
 
     public static boolean isRoot(File file) {
+        checkNull(file);
         return file.toPath().getNameCount() == 0;
+    }
+
+    public static void checkFileValidity(File file) throws InvalidFileException {
+        checkNull(file);
+        try {
+            file.toPath().toFile();
+        } catch (InvalidPathException e) {
+            throw new InvalidFileException(e, file);
+        }
     }
 
     private static boolean isNull(Object o) {
         return o == null;
     }
 
+    private static void checkNull(Object obj) {
+        if (isNull(obj))
+            throw new IllegalArgumentException();
+    }
 }

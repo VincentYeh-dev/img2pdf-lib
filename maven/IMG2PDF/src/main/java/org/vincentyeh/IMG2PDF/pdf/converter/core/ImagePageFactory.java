@@ -97,13 +97,12 @@ public class ImagePageFactory {
     }
 
     private Size getMaxScaleImageSize(BufferedImage rawImage, Size page_size) {
-        return SizeCalculator.getInstance().scaleUpToMax(new Size(rawImage.getHeight(), rawImage.getWidth()), page_size);
+        return new SizeCalculator().scaleUpToMax(new Size(rawImage.getWidth(), rawImage.getHeight()), page_size);
     }
 
     private Position calculateImagePosition(Size img_size, Size page_size, PageAlign align) {
-        PositionCalculator positionCalculator = PositionCalculator.getInstance();
-        PositionCalculator.init(img_size.getHeight(), img_size.getWidth(), page_size.getHeight(), page_size.getWidth());
-        return positionCalculator.calculate(align);
+        PositionCalculator calculator=new PositionCalculator(align);
+        return calculator.calculate(img_size,page_size);
     }
 
     private PageDirection getSuitableDirection(BufferedImage image) {
@@ -119,14 +118,19 @@ public class ImagePageFactory {
 
     private Size getSuitablePageSize(PageDirection direction, PageSize pageSize, BufferedImage image) {
         if (pageSize == PageSize.DEPEND_ON_IMG) {
-            return new Size(image.getHeight(), image.getWidth());
+            return getImageSize(image,false);
         } else {
             PDRectangle rect = pageSize.getPdrectangle();
-            if (direction == Landscape)
-                return new Size(rect.getWidth(), rect.getHeight());
-            else
-                return new Size(rect.getHeight(), rect.getWidth());
+            return getPageSize(rect,direction==Landscape);
         }
+    }
+
+    private Size getImageSize(BufferedImage image,boolean reverse){
+        return new Size(reverse? image.getHeight():image.getWidth(),reverse?image.getWidth():image.getHeight());
+    }
+
+    private Size getPageSize(PDRectangle rectangle,boolean reverse){
+        return new Size(reverse? rectangle.getHeight():rectangle.getWidth(),reverse?rectangle.getWidth():rectangle.getHeight());
     }
 
     private PageDirection detectDirection(float height,float width) {
