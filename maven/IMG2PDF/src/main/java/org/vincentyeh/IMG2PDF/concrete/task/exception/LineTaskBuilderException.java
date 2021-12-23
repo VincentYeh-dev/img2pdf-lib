@@ -1,15 +1,18 @@
 package org.vincentyeh.IMG2PDF.concrete.task.exception;
 
+import org.vincentyeh.IMG2PDF.framework.task.factory.exception.TaskBuilderException;
+
 import java.io.File;
 
-public class LineException extends FileTaskFactoryException {
+public class LineTaskBuilderException extends TaskBuilderException {
 
     protected final File source;
     private final int line;
-    public LineException(Throwable cause, File source, int line) {
+
+    public LineTaskBuilderException(Throwable cause, File source, int line) {
         super(cause);
         this.line = line;
-        this.source=source;
+        this.source = source;
     }
 
     public int getLine() {

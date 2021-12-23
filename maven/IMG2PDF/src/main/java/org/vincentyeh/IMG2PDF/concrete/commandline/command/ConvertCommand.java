@@ -3,6 +3,7 @@ package org.vincentyeh.IMG2PDF.concrete.commandline.command;
 import org.fusesource.jansi.Ansi;
 import org.vincentyeh.IMG2PDF.concrete.commandline.converter.*;
 import org.vincentyeh.IMG2PDF.concrete.handler.ExceptionHandlerFactory;
+import org.vincentyeh.IMG2PDF.concrete.task.factory.LineTaskBuilder;
 import org.vincentyeh.IMG2PDF.framework.configuration.ConfigurationParser;
 import org.vincentyeh.IMG2PDF.framework.handler.CantHandleException;
 import org.vincentyeh.IMG2PDF.framework.handler.ExceptionHandler;
@@ -95,7 +96,7 @@ public class ConvertCommand implements Callable<Integer> {
 
     public ConvertCommand(Map<ConfigurationParser.ConfigParam, Object> config) {
         dir_list_read_charset = (Charset) config.get(ConfigurationParser.ConfigParam.DIR_LIST_READ_CHARSET);
-        locale=(Locale) config.get(ConfigurationParser.ConfigParam.LOCALE);
+        locale = (Locale) config.get(ConfigurationParser.ConfigParam.LOCALE);
     }
 
     @Override
@@ -120,8 +121,7 @@ public class ConvertCommand implements Callable<Integer> {
         for (File dirlist : sourceFiles) {
             try {
                 printColorFormat(getResourceBundleString("execution.convert.start.parsing") + "\n", Ansi.Color.BLUE, dirlist.getPath());
-
-                TaskListFactory<?> factory = new DirectoryTaskListFactory(dirlist,dir_list_read_charset, getPageArgument(), getDocumentArgument(), filter, fileSorter, new FileNameFormatter(pdf_dst));
+                TaskListFactory<?> factory = new DirectoryTaskListFactory(dirlist, dir_list_read_charset, new LineTaskBuilder(getDocumentArgument(), getPageArgument(), filter, fileSorter, new FileNameFormatter(pdf_dst)));
 
                 List<Task> found = factory.create();
 
