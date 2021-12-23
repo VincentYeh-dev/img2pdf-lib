@@ -17,11 +17,11 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class FileTaskFactory extends TaskListFactory<LineFile> {
+public class DirectoryTaskListFactory extends TaskListFactory<LineFile> {
     private final File dirlist;
     private final Charset charset;
 
-    public FileTaskFactory(File dirlist, Charset charset, PageArgument pageArgument, DocumentArgument documentArgument, FileFilter imageFilter, Comparator<? super File> fileSorter, NameFormatter<File> formatter) {
+    public DirectoryTaskListFactory(File dirlist, Charset charset, PageArgument pageArgument, DocumentArgument documentArgument, FileFilter imageFilter, Comparator<? super File> fileSorter, NameFormatter<File> formatter) {
         super(new LineTaskFactory(pageArgument, documentArgument, imageFilter, fileSorter, formatter));
         this.dirlist = dirlist;
         this.charset = charset;
