@@ -43,7 +43,7 @@ public class ConvertCommand implements Callable<Integer> {
     @CommandLine.Option(names = {"--sorter", "-sr"}, defaultValue = "NAME-INCREASE", converter = FileSorterConverter.class)
     FileSorter fileSorter;
 
-    @CommandLine.Option(names = {"--filter", "-f"}, defaultValue = "*.{PNG,JPG}", converter = GlobbingFileFilterConverter.class)
+    @CommandLine.Option(names = {"--filter", "-f"}, defaultValue = "*.{PNG,png,JPG,jpg}", converter = GlobbingFileFilterConverter.class)
     GlobbingFileFilter filter;
 
     @CommandLine.Option(names = {"--pdf_owner_password", "-popwd"})
@@ -58,7 +58,7 @@ public class ConvertCommand implements Callable<Integer> {
     @CommandLine.Option(names = {"--pdf_align", "-pa"}, defaultValue = "CENTER-CENTER", converter = PageAlignConverter.class)
     PageAlign pdf_align;
 
-    @CommandLine.Option(names = {"--pdf_size", "-pz"}, required = true)
+    @CommandLine.Option(names = {"--pdf_size", "-pz"}, defaultValue = "DEPEND_ON_IMG")
     PageSize pdf_size;
 
     @CommandLine.Option(names = {"--pdf_direction", "-pdi"}, defaultValue = "Portrait")
@@ -67,7 +67,7 @@ public class ConvertCommand implements Callable<Integer> {
     @CommandLine.Option(names = {"--pdf_auto_rotate", "-par"})
     boolean pdf_auto_rotate;
 
-    @CommandLine.Option(names = {"--pdf_destination", "-pdst"}, required = true)
+    @CommandLine.Option(names = {"--pdf_destination", "-pdst"}, defaultValue = "<NAME>.pdf")
     String pdf_dst;
 
     @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true)
