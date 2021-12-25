@@ -79,8 +79,8 @@ public class ConvertCommand implements Callable<Integer> {
     @CommandLine.Option(names = {"--memory_max_usage", "-mx"}, defaultValue = "50MB", converter = ByteSizeConverter.class)
     BytesSize maxMainMemoryBytes;
 
-    @CommandLine.Option(names = {"--open_when_complete", "-o"})
-    boolean open_when_complete;
+//    @CommandLine.Option(names = {"--open_when_complete", "-o"})
+//    boolean open_when_complete;
 
     @CommandLine.Option(names = {"--overwrite", "-ow"})
     boolean overwrite_output;
@@ -142,24 +142,19 @@ public class ConvertCommand implements Callable<Integer> {
         checkPrintNullParameter("pdf_size");
         checkPrintNullParameter("pdf_direction");
         checkPrintNullParameter("pdf_dst");
-        checkPrintNullParameter("open_when_complete");
+//        checkPrintNullParameter("open_when_complete");
         checkPrintNullParameter("tempFolder");
         checkPrintNullParameter("maxMainMemoryBytes");
         checkPrintNullParameter("sourceFiles");
 
         for (File source : sourceFiles) {
-            if (!source.isAbsolute())
-                throw new IllegalArgumentException("source is not absolute: " + source);
-            if (FileUtils.isRoot(source))
-                throw new IllegalArgumentException("source is root: " + source);
+            if (!source.isAbsolute()) throw new IllegalArgumentException("source is not absolute: " + source);
+            if (FileUtils.isRoot(source)) throw new IllegalArgumentException("source is root: " + source);
         }
 
-        if (tempFolder == null)
-            throw new IllegalArgumentException("tempFolder==null");
-        if (!tempFolder.isAbsolute())
-            throw new IllegalArgumentException("tempFolder is not absolute: " + tempFolder);
-        if (FileUtils.isRoot(tempFolder))
-            throw new IllegalArgumentException("tempFolder is root: " + tempFolder);
+        if (tempFolder == null) throw new IllegalArgumentException("tempFolder==null");
+        if (!tempFolder.isAbsolute()) throw new IllegalArgumentException("tempFolder is not absolute: " + tempFolder);
+        if (FileUtils.isRoot(tempFolder)) throw new IllegalArgumentException("tempFolder is root: " + tempFolder);
         printDebugLog("-------------------------------------");
         printDebugLog("-------------------------------------");
     }
@@ -222,9 +217,10 @@ public class ConvertCommand implements Callable<Integer> {
         PDFConverter converter = PDFacade.createImagePDFConverter(maxMainMemoryBytes, tempFolder, overwrite_output, new DefaultConversionListener(locale));
 
         for (Task task : tasks) {
-            File result = convertToFile(converter, task);
-            if (open_when_complete && result != null)
-                openPDF(result);
+            convertToFile(converter, task);
+//            File result = convertToFile(converter, task);
+//            if (open_when_complete && result != null)
+//                openPDF(result);
         }
     }
 
@@ -233,14 +229,12 @@ public class ConvertCommand implements Callable<Integer> {
         printDebugLog("Open:" + file.getAbsolutePath());
 
         Desktop desktop = Desktop.getDesktop();
-        if (file.exists())
-            try {
-                desktop.open(file);
-            } catch (Exception e) {
-                printErrorLog("Can't open:" + e.getMessage());
-                if (img2PDFCommand.isDebug())
-                    printStackTrance(e);
-            }
+        if (file.exists()) try {
+            desktop.open(file);
+        } catch (Exception e) {
+            printErrorLog("Can't open:" + e.getMessage());
+            if (img2PDFCommand.isDebug()) printStackTrance(e);
+        }
         else {
             printErrorLog("File not exists,Can't open:" + file.getAbsolutePath());
         }
@@ -264,8 +258,7 @@ public class ConvertCommand implements Callable<Integer> {
     private void handleException(Exception e, ExceptionHandler handler, String prefix, String suffix) {
         try {
             printRenderFormat(prefix + "[@|red ERROR|@] %s\n" + suffix, handler.handle(e));
-            if (img2PDFCommand.isDebug())
-                printStackTrance(e);
+            if (img2PDFCommand.isDebug()) printStackTrance(e);
         } catch (CantHandleException cantHandleException) {
             printColor("Can't handle.\n", Ansi.Color.RED);
             printStackTrance(e);
