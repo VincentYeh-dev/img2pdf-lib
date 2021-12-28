@@ -1,16 +1,13 @@
 package org.vincentyeh.IMG2PDF.commandline.converter;
 
-import org.vincentyeh.IMG2PDF.commandline.converter.core.BasicConverter;
+import org.vincentyeh.IMG2PDF.commandline.converter.core.BasicCheckConverter;
 
 import java.io.File;
 
-public class AbsoluteFileConverter extends BasicConverter<File> {
+public class AbsoluteFileConverter extends BasicCheckConverter<File> {
     @Override
-    public File convert(String s) throws Exception {
-        checkNull(s,getClass().getName()+".s");
-        checkEmpty(s,getClass().getName()+".s");
+    protected File doConvert(String s) {
         return new File(s).getAbsoluteFile();
     }
-
 
 }

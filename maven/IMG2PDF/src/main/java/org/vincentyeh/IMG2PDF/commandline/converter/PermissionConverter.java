@@ -1,27 +1,25 @@
 package org.vincentyeh.IMG2PDF.commandline.converter;
 
-import org.vincentyeh.IMG2PDF.commandline.converter.core.BasicConverter;
+import org.vincentyeh.IMG2PDF.commandline.converter.core.BasicCheckConverter;
 import org.vincentyeh.IMG2PDF.parameter.Permission;
 import picocli.CommandLine;
 
-public class PermissionConverter extends BasicConverter<Permission> {
+public class PermissionConverter extends BasicCheckConverter<Permission> {
     @Override
-    public Permission convert(String s) throws Exception {
-        checkNull(s,getClass().getName()+".s");
-        checkEmpty(s,getClass().getName()+".s");
-        if(!s.matches("-?[0-9]+")){
+    protected Permission doConvert(String s) {
+        if (!s.matches("-?[0-9]+")) {
             throw new CommandLine.TypeConversionException("AccessPermission contain no-numeric character.");
         }
-        int integer=Integer.parseInt(s);
-        if(integer>255||integer<0)
+        int integer = Integer.parseInt(s);
+        if (integer > 255 || integer < 0)
             throw new CommandLine.TypeConversionException("AccessPermission out of range[0-255].");
 
-        byte data=(byte)integer;
-        boolean[] value=new boolean[8];
+        byte data = (byte) integer;
+        boolean[] value = new boolean[8];
 
-        for(int i=0;i<8;i++){
-            value[i]=(data&128)!=0;
-            data<<=1;
+        for (int i = 0; i < 8; i++) {
+            value[i] = (data & 128) != 0;
+            data <<= 1;
         }
 
         return new Permission() {

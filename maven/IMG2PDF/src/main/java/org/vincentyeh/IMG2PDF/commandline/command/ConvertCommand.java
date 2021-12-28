@@ -13,7 +13,6 @@ import org.vincentyeh.IMG2PDF.pdf.framework.converter.PDFConverter;
 import org.vincentyeh.IMG2PDF.pdf.concrete.listener.DefaultConversionListener;
 import org.vincentyeh.IMG2PDF.task.framework.Task;
 import org.vincentyeh.IMG2PDF.task.framework.factory.TaskListFactory;
-import org.vincentyeh.IMG2PDF.util.BytesSize;
 import org.vincentyeh.IMG2PDF.util.file.FileSorter;
 import org.vincentyeh.IMG2PDF.util.file.FileUtils;
 import org.vincentyeh.IMG2PDF.util.file.GlobbingFileFilter;
@@ -77,7 +76,7 @@ public class ConvertCommand implements Callable<Integer> {
     File tempFolder;
 
     @CommandLine.Option(names = {"--memory_max_usage", "-mx"}, defaultValue = "50MB", converter = ByteSizeConverter.class)
-    BytesSize maxMainMemoryBytes;
+    long maxMainMemoryBytes;
 
 //    @CommandLine.Option(names = {"--open_when_complete", "-o"})
 //    boolean open_when_complete;
@@ -211,7 +210,7 @@ public class ConvertCommand implements Callable<Integer> {
 
     private void convertAllToFile(List<Task> tasks) throws MakeDirectoryException {
         printDebugLog("Converter Configuration");
-        printDebugLog(getColor("\t|- max main memory usage:" + maxMainMemoryBytes.getBytes(), Ansi.Color.CYAN));
+        printDebugLog(getColor("\t|- max main memory usage:" + maxMainMemoryBytes, Ansi.Color.CYAN));
         printDebugLog(getColor("\t|- temporary folder:" + tempFolder.getAbsolutePath(), Ansi.Color.CYAN));
         printDebugLog(getColor("\t|- Overwrite:" + overwrite_output, Ansi.Color.CYAN));
         PDFConverter converter = PDFacade.createImagePDFConverter(maxMainMemoryBytes, tempFolder, overwrite_output, new DefaultConversionListener(locale));
