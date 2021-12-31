@@ -19,7 +19,6 @@ import org.vincentyeh.IMG2PDF.util.file.exception.MakeDirectoryException;
 import org.vincentyeh.IMG2PDF.parameter.*;
 import picocli.CommandLine;
 
-import java.awt.*;
 import java.io.File;
 import java.io.FileFilter;
 import java.lang.reflect.Field;
@@ -100,7 +99,7 @@ public class ConvertCommand implements Callable<Integer> {
     public Integer call() {
         try {
             checkParameters();
-            List<Task> tasks = importAllTaskFromDirlists();
+            List<Task> tasks = importAllTaskFromDirectoryLists();
 
             printLine(getResourceBundleString("execution.convert.start.start_conversion"));
 
@@ -113,7 +112,7 @@ public class ConvertCommand implements Callable<Integer> {
         }
     }
 
-    private List<Task> importAllTaskFromDirlists() {
+    private List<Task> importAllTaskFromDirectoryLists() {
         List<Task> tasks = new LinkedList<>();
         TaskListFactory<?, File> factory = TaskListFactoryFacade.createDirectoryTaskListFactory(dir_list_read_charset, getDocumentArgument(), getPageArgument(), filter, fileSorter, pdf_dst);
         int previous_size = 0;
@@ -216,43 +215,19 @@ public class ConvertCommand implements Callable<Integer> {
         PDFConverter converter = PDFacade.createImagePDFConverter(maxMainMemoryBytes, tempFolder, overwrite_output, new DefaultConversionListener(locale));
 
         for (Task task : tasks) {
-            convertToFile(converter, task);
-//            File result = convertToFile(converter, task);
-//            if (open_when_complete && result != null)
-//                openPDF(result);
+            printDebugLog("Converting");
+            printDebugLog("Name: " + task.getPdfDestination());
+            printDebugLog("Images");
+            Arrays.stream(task.getImages()).forEach(img -> printDebugLog(getColor("\t|- " + img, Ansi.Color.CYAN)));
+
+            try {
+                converter.start(task);
+            } catch (PDFConversionException e) {
+                handleException(e, ExceptionHandlerFacade.getPDFConversionExceptionHandler(null), "\t", "");
+            }
         }
     }
 
-
-    private void openPDF(File file) {
-        printDebugLog("Open:" + file.getAbsolutePath());
-
-        Desktop desktop = Desktop.getDesktop();
-        if (file.exists()) try {
-            desktop.open(file);
-        } catch (Exception e) {
-            printErrorLog("Can't open:" + e.getMessage());
-            if (img2PDFCommand.isDebug()) printStackTrance(e);
-        }
-        else {
-            printErrorLog("File not exists,Can't open:" + file.getAbsolutePath());
-        }
-    }
-
-    private File convertToFile(PDFConverter converter, Task task) {
-        printDebugLog("Converting");
-        printDebugLog("Name: " + task.getPdfDestination());
-        printDebugLog("Images");
-        Arrays.stream(task.getImages()).forEach(img -> printDebugLog(getColor("\t|- " + img, Ansi.Color.CYAN)));
-        try {
-            return converter.start(task);
-        } catch (PDFConversionException e) {
-            handleException(e, ExceptionHandlerFacade.getPDFConversionExceptionHandler(null), "\t", "");
-        } catch (Exception e) {
-            printStackTrance(e);
-        }
-        return null;
-    }
 
     private void handleException(Exception e, ExceptionHandler handler, String prefix, String suffix) {
         try {
