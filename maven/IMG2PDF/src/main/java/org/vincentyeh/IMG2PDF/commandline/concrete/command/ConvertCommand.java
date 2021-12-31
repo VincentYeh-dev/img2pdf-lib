@@ -1,7 +1,7 @@
-package org.vincentyeh.IMG2PDF.commandline.command;
+package org.vincentyeh.IMG2PDF.commandline.concrete.command;
 
 import org.fusesource.jansi.Ansi;
-import org.vincentyeh.IMG2PDF.commandline.converter.*;
+import org.vincentyeh.IMG2PDF.commandline.concrete.converter.*;
 import org.vincentyeh.IMG2PDF.handler.ExceptionHandlerFacade;
 import org.vincentyeh.IMG2PDF.pdf.PDFacade;
 import org.vincentyeh.IMG2PDF.pdf.framework.converter.exception.PDFConversionException;

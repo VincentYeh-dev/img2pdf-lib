@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.commandline.command;
+package org.vincentyeh.IMG2PDF.commandline.concrete.command;
 
 import picocli.CommandLine;
 

@@ -1,6 +1,6 @@
-package org.vincentyeh.IMG2PDF.commandline.converter;
+package org.vincentyeh.IMG2PDF.commandline.concrete.converter;
 
-import org.vincentyeh.IMG2PDF.commandline.converter.core.BasicCheckConverter;
+import org.vincentyeh.IMG2PDF.commandline.framework.converter.BasicCheckConverter;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

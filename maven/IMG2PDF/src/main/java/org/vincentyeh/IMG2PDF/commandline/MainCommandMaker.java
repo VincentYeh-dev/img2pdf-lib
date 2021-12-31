@@ -1,7 +1,8 @@
 package org.vincentyeh.IMG2PDF.commandline;
 
-import org.vincentyeh.IMG2PDF.commandline.command.IMG2PDFCommand;
-import org.vincentyeh.IMG2PDF.commandline.command.ConvertCommand;
+import org.vincentyeh.IMG2PDF.commandline.concrete.command.IMG2PDFCommand;
+import org.vincentyeh.IMG2PDF.commandline.concrete.command.ConvertCommand;
+import org.vincentyeh.IMG2PDF.commandline.concrete.handler.ParameterHandlerAdaptor;
 import org.vincentyeh.IMG2PDF.handler.ExceptionHandlerFacade;
 import org.vincentyeh.IMG2PDF.configuration.framework.ConfigurationParser;
 import picocli.CommandLine;
@@ -16,9 +17,7 @@ public class MainCommandMaker {
 
         final CommandLine cmd = new CommandLine(new IMG2PDFCommand());
         cmd.setResourceBundle(ResourceBundle.getBundle("cmd",(Locale) config.get(ConfigurationParser.ConfigParam.LOCALE) ));
-
-        cmd.setParameterExceptionHandler(new CommandLineParameterHandlerAdaptor());
-
+        cmd.setParameterExceptionHandler(new ParameterHandlerAdaptor(ExceptionHandlerFacade.getParameterExceptionHandler(null)));
         cmd.addSubcommand(new ConvertCommand(config));
         return cmd;
     }

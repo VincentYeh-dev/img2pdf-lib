@@ -1,17 +1,16 @@
-package org.vincentyeh.IMG2PDF.commandline;
+package org.vincentyeh.IMG2PDF.commandline.concrete.handler;
 
 import org.fusesource.jansi.Ansi;
 import org.vincentyeh.IMG2PDF.handler.framework.ExceptionHandler;
-import org.vincentyeh.IMG2PDF.handler.ExceptionHandlerFacade;
 import org.vincentyeh.IMG2PDF.handler.framework.CantHandleException;
 import picocli.CommandLine;
 
 import static org.vincentyeh.IMG2PDF.util.PrinterUtils.*;
 
-public class CommandLineParameterHandlerAdaptor implements CommandLine.IParameterExceptionHandler {
+public class ParameterHandlerAdaptor implements CommandLine.IParameterExceptionHandler {
     private final ExceptionHandler handler;
-    public CommandLineParameterHandlerAdaptor() {
-        handler = ExceptionHandlerFacade.getParameterExceptionHandler(null);
+    public ParameterHandlerAdaptor(ExceptionHandler handler) {
+        this.handler = handler;
     }
 
     @Override
