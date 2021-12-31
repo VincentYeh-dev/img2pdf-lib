@@ -15,13 +15,13 @@ import org.vincentyeh.IMG2PDF.task.framework.Task;
 import org.vincentyeh.IMG2PDF.task.framework.factory.TaskListFactory;
 import org.vincentyeh.IMG2PDF.util.file.FileSorter;
 import org.vincentyeh.IMG2PDF.util.file.FileUtils;
-import org.vincentyeh.IMG2PDF.util.file.GlobbingFileFilter;
 import org.vincentyeh.IMG2PDF.util.file.exception.MakeDirectoryException;
 import org.vincentyeh.IMG2PDF.parameter.*;
 import picocli.CommandLine;
 
 import java.awt.*;
 import java.io.File;
+import java.io.FileFilter;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -42,8 +42,8 @@ public class ConvertCommand implements Callable<Integer> {
     @CommandLine.Option(names = {"--sorter", "-sr"}, defaultValue = "NAME-INCREASE", converter = FileSorterConverter.class)
     FileSorter fileSorter;
 
-    @CommandLine.Option(names = {"--filter", "-f"}, defaultValue = "*.{PNG,png,JPG,jpg}", converter = GlobbingFileFilterConverter.class)
-    GlobbingFileFilter filter;
+    @CommandLine.Option(names = {"--filter", "-f"}, defaultValue = "*.{PNG,png,JPG,jpg}", converter = FileFilterConverter.class)
+    FileFilter filter;
 
     @CommandLine.Option(names = {"--pdf_owner_password", "-popwd"})
     String pdf_owner_password;
