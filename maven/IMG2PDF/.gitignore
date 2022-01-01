@@ -1,4 +1,5 @@
 *.iml
+*.txt
 target
 .org.vincentyeh.IMG2PDF.tmp
 .gradle

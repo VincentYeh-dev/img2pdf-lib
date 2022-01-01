@@ -1,7 +1,7 @@
-package org.vincentyeh.IMG2PDF.commandline.command;
+package org.vincentyeh.IMG2PDF.commandline.concrete.command;
 
 import org.fusesource.jansi.Ansi;
-import org.vincentyeh.IMG2PDF.commandline.converter.*;
+import org.vincentyeh.IMG2PDF.commandline.concrete.converter.*;
 import org.vincentyeh.IMG2PDF.handler.ExceptionHandlerFacade;
 import org.vincentyeh.IMG2PDF.pdf.PDFacade;
 import org.vincentyeh.IMG2PDF.pdf.framework.converter.exception.PDFConversionException;
@@ -13,16 +13,14 @@ import org.vincentyeh.IMG2PDF.pdf.framework.converter.PDFConverter;
 import org.vincentyeh.IMG2PDF.pdf.concrete.listener.DefaultConversionListener;
 import org.vincentyeh.IMG2PDF.task.framework.Task;
 import org.vincentyeh.IMG2PDF.task.framework.factory.TaskListFactory;
-import org.vincentyeh.IMG2PDF.util.BytesSize;
 import org.vincentyeh.IMG2PDF.util.file.FileSorter;
 import org.vincentyeh.IMG2PDF.util.file.FileUtils;
-import org.vincentyeh.IMG2PDF.util.file.GlobbingFileFilter;
 import org.vincentyeh.IMG2PDF.util.file.exception.MakeDirectoryException;
 import org.vincentyeh.IMG2PDF.parameter.*;
 import picocli.CommandLine;
 
-import java.awt.*;
 import java.io.File;
+import java.io.FileFilter;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -43,8 +41,8 @@ public class ConvertCommand implements Callable<Integer> {
     @CommandLine.Option(names = {"--sorter", "-sr"}, defaultValue = "NAME-INCREASE", converter = FileSorterConverter.class)
     FileSorter fileSorter;
 
-    @CommandLine.Option(names = {"--filter", "-f"}, defaultValue = "*.{PNG,png,JPG,jpg}", converter = GlobbingFileFilterConverter.class)
-    GlobbingFileFilter filter;
+    @CommandLine.Option(names = {"--filter", "-f"}, defaultValue = "*.{PNG,png,JPG,jpg}", converter = FileFilterConverter.class)
+    FileFilter filter;
 
     @CommandLine.Option(names = {"--pdf_owner_password", "-popwd"})
     String pdf_owner_password;
@@ -77,7 +75,7 @@ public class ConvertCommand implements Callable<Integer> {
     File tempFolder;
 
     @CommandLine.Option(names = {"--memory_max_usage", "-mx"}, defaultValue = "50MB", converter = ByteSizeConverter.class)
-    BytesSize maxMainMemoryBytes;
+    long maxMainMemoryBytes;
 
 //    @CommandLine.Option(names = {"--open_when_complete", "-o"})
 //    boolean open_when_complete;
@@ -101,7 +99,7 @@ public class ConvertCommand implements Callable<Integer> {
     public Integer call() {
         try {
             checkParameters();
-            List<Task> tasks = importAllTaskFromDirlists();
+            List<Task> tasks = importAllTaskFromDirectoryLists();
 
             printLine(getResourceBundleString("execution.convert.start.start_conversion"));
 
@@ -114,7 +112,7 @@ public class ConvertCommand implements Callable<Integer> {
         }
     }
 
-    private List<Task> importAllTaskFromDirlists() {
+    private List<Task> importAllTaskFromDirectoryLists() {
         List<Task> tasks = new LinkedList<>();
         TaskListFactory<?, File> factory = TaskListFactoryFacade.createDirectoryTaskListFactory(dir_list_read_charset, getDocumentArgument(), getPageArgument(), filter, fileSorter, pdf_dst);
         int previous_size = 0;
@@ -211,49 +209,25 @@ public class ConvertCommand implements Callable<Integer> {
 
     private void convertAllToFile(List<Task> tasks) throws MakeDirectoryException {
         printDebugLog("Converter Configuration");
-        printDebugLog(getColor("\t|- max main memory usage:" + maxMainMemoryBytes.getBytes(), Ansi.Color.CYAN));
+        printDebugLog(getColor("\t|- max main memory usage:" + maxMainMemoryBytes, Ansi.Color.CYAN));
         printDebugLog(getColor("\t|- temporary folder:" + tempFolder.getAbsolutePath(), Ansi.Color.CYAN));
         printDebugLog(getColor("\t|- Overwrite:" + overwrite_output, Ansi.Color.CYAN));
         PDFConverter converter = PDFacade.createImagePDFConverter(maxMainMemoryBytes, tempFolder, overwrite_output, new DefaultConversionListener(locale));
 
         for (Task task : tasks) {
-            convertToFile(converter, task);
-//            File result = convertToFile(converter, task);
-//            if (open_when_complete && result != null)
-//                openPDF(result);
+            printDebugLog("Converting");
+            printDebugLog("Name: " + task.getPdfDestination());
+            printDebugLog("Images");
+            Arrays.stream(task.getImages()).forEach(img -> printDebugLog(getColor("\t|- " + img, Ansi.Color.CYAN)));
+
+            try {
+                converter.start(task);
+            } catch (PDFConversionException e) {
+                handleException(e, ExceptionHandlerFacade.getPDFConversionExceptionHandler(null), "\t", "");
+            }
         }
     }
 
-
-    private void openPDF(File file) {
-        printDebugLog("Open:" + file.getAbsolutePath());
-
-        Desktop desktop = Desktop.getDesktop();
-        if (file.exists()) try {
-            desktop.open(file);
-        } catch (Exception e) {
-            printErrorLog("Can't open:" + e.getMessage());
-            if (img2PDFCommand.isDebug()) printStackTrance(e);
-        }
-        else {
-            printErrorLog("File not exists,Can't open:" + file.getAbsolutePath());
-        }
-    }
-
-    private File convertToFile(PDFConverter converter, Task task) {
-        printDebugLog("Converting");
-        printDebugLog("Name: " + task.getPdfDestination());
-        printDebugLog("Images");
-        Arrays.stream(task.getImages()).forEach(img -> printDebugLog(getColor("\t|- " + img, Ansi.Color.CYAN)));
-        try {
-            return converter.start(task);
-        } catch (PDFConversionException e) {
-            handleException(e, ExceptionHandlerFacade.getPDFConversionExceptionHandler(null), "\t", "");
-        } catch (Exception e) {
-            printStackTrance(e);
-        }
-        return null;
-    }
 
     private void handleException(Exception e, ExceptionHandler handler, String prefix, String suffix) {
         try {
