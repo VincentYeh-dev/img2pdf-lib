@@ -3,6 +3,7 @@ package org.vincentyeh.IMG2PDF.pdf.concrete.converter;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.vincentyeh.IMG2PDF.image.reader.framework.ImageReader;
 import org.vincentyeh.IMG2PDF.pdf.framework.converter.exception.ReadImageException;
 import org.vincentyeh.IMG2PDF.pdf.concrete.objects.PdfBoxDocumentAdaptor;
 import org.vincentyeh.IMG2PDF.pdf.concrete.objects.PdfBoxPageAdaptor;
@@ -14,20 +15,19 @@ import org.vincentyeh.IMG2PDF.pdf.framework.objects.PdfPage;
 import org.vincentyeh.IMG2PDF.util.file.FileUtils;
 import org.vincentyeh.IMG2PDF.util.file.exception.MakeDirectoryException;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 public class ImagePDFConverter extends PDFConverter {
     private final MemoryUsageSetting setting;
     private final ImagePageCalculateStrategy strategy;
+    private final ImageReader reader;
 
-    public ImagePDFConverter(long maxMainMemoryBytes, File tempFolder, boolean overwrite,ImagePageCalculateStrategy strategy) throws MakeDirectoryException {
+    public ImagePDFConverter(long maxMainMemoryBytes, File tempFolder, boolean overwrite, ImagePageCalculateStrategy strategy, ImageReader reader) throws MakeDirectoryException {
         super(overwrite);
         this.strategy = strategy;
+        this.reader = reader;
         FileUtils.makeDirectories(tempFolder);
         setting = MemoryUsageSetting.setupMixed(maxMainMemoryBytes).setTempDir(tempFolder);
     }
@@ -54,12 +54,9 @@ public class ImagePDFConverter extends PDFConverter {
     private BufferedImage readImage(File file) throws ReadImageException {
         try {
             FileUtils.checkExists(file);
-            InputStream is = new FileInputStream(file);
-
-            BufferedImage image = ImageIO.read(is);
+            BufferedImage image = reader.read(file);
             if (image == null)
                 throw new RuntimeException("image==null");
-
             return image;
         } catch (Exception e) {
             throw new ReadImageException(e, file);
