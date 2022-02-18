@@ -69,6 +69,10 @@ public class ConvertCommand implements Callable<Integer> {
     @CommandLine.Option(names = {"--pdf_destination", "-pdst"}, defaultValue = "<NAME>.pdf")
     String pdf_dst;
 
+
+    @CommandLine.Option(names = {"--pdf_image_color", "-pic"}, defaultValue = "color")
+    PDFImageColor color;
+
     @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true)
     boolean usageHelpRequested;
 
@@ -181,8 +185,7 @@ public class ConvertCommand implements Callable<Integer> {
         printDebugLog(getColor("\t|- max main memory usage:" + maxMainMemoryBytes, Ansi.Color.CYAN));
         printDebugLog(getColor("\t|- temporary folder:" + tempFolder.getAbsolutePath(), Ansi.Color.CYAN));
         printDebugLog(getColor("\t|- Overwrite:" + overwrite_output, Ansi.Color.CYAN));
-        ColorSpace colorSpace= ColorSpace.getInstance(ColorSpace.CS_sRGB);
-        PDFConverter converter = PDFacade.createImagePDFConverter(maxMainMemoryBytes, tempFolder, overwrite_output, new DefaultConversionListener(locale),colorSpace);
+        PDFConverter converter = PDFacade.createImagePDFConverter(maxMainMemoryBytes, tempFolder, overwrite_output, new DefaultConversionListener(locale),color.getColorSpace());
 
         for (Task task : tasks) {
             printDebugLog("Converting");
