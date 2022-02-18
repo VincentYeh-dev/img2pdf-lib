@@ -19,7 +19,6 @@ import org.vincentyeh.IMG2PDF.util.file.FileUtils;
 import org.vincentyeh.IMG2PDF.util.file.exception.MakeDirectoryException;
 import picocli.CommandLine;
 
-import java.awt.color.ColorSpace;
 import java.io.File;
 import java.io.FileFilter;
 import java.lang.reflect.Field;
@@ -68,6 +67,10 @@ public class ConvertCommand implements Callable<Integer> {
 
     @CommandLine.Option(names = {"--pdf_destination", "-pdst"}, defaultValue = "<NAME>.pdf")
     String pdf_dst;
+
+
+    @CommandLine.Option(names = {"--pdf_image_color", "-pic"}, defaultValue = "color")
+    PDFImageColor pdf_image_color;
 
     @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true)
     boolean usageHelpRequested;
@@ -141,6 +144,7 @@ public class ConvertCommand implements Callable<Integer> {
         checkPrintNullParameter("pdf_size");
         checkPrintNullParameter("pdf_direction");
         checkPrintNullParameter("pdf_dst");
+        checkPrintNullParameter("pdf_image_color");
 //        checkPrintNullParameter("open_when_complete");
         checkPrintNullParameter("tempFolder");
         checkPrintNullParameter("maxMainMemoryBytes");
@@ -159,7 +163,7 @@ public class ConvertCommand implements Callable<Integer> {
     }
 
     private PageArgument getPageArgument() {
-        PageArgument argument=new PageArgument();
+        PageArgument argument = new PageArgument();
         argument.setAlign(pdf_align);
         argument.setSize(pdf_size);
         argument.setDirection(pdf_direction);
@@ -168,7 +172,7 @@ public class ConvertCommand implements Callable<Integer> {
     }
 
     private DocumentArgument getDocumentArgument() {
-        DocumentArgument argument=new DocumentArgument();
+        DocumentArgument argument = new DocumentArgument();
         argument.setInformation(null);
         argument.setOwnerPassword(pdf_owner_password);
         argument.setUserPassword(pdf_user_password);
@@ -181,8 +185,8 @@ public class ConvertCommand implements Callable<Integer> {
         printDebugLog(getColor("\t|- max main memory usage:" + maxMainMemoryBytes, Ansi.Color.CYAN));
         printDebugLog(getColor("\t|- temporary folder:" + tempFolder.getAbsolutePath(), Ansi.Color.CYAN));
         printDebugLog(getColor("\t|- Overwrite:" + overwrite_output, Ansi.Color.CYAN));
-        ColorSpace colorSpace= ColorSpace.getInstance(ColorSpace.CS_sRGB);
-        PDFConverter converter = PDFacade.createImagePDFConverter(maxMainMemoryBytes, tempFolder, overwrite_output, new DefaultConversionListener(locale),colorSpace);
+        PDFConverter converter = PDFacade.createImagePDFConverter(maxMainMemoryBytes, tempFolder, overwrite_output,
+                new DefaultConversionListener(locale), pdf_image_color.getColorSpace());
 
         for (Task task : tasks) {
             printDebugLog("Converting");

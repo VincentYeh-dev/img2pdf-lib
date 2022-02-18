@@ -17,6 +17,13 @@ public class ColorSpaceImageHelper extends ImageHelper {
 
     @Override
     protected final BufferedImage read(File file, BufferedImage image) {
+        ColorSpace image_cs = image.getColorModel().getColorSpace();
+        if (image_cs.getType() == cs.getType())
+            return image;
+
+        if (image_cs.getType() == ColorSpace.TYPE_GRAY)
+            return image;
+
         ColorConvertOp op = new ColorConvertOp(cs, null);
         return op.filter(image, null);
     }
