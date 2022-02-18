@@ -163,7 +163,7 @@ public class ConvertCommand implements Callable<Integer> {
     }
 
     private PageArgument getPageArgument() {
-        PageArgument argument=new PageArgument();
+        PageArgument argument = new PageArgument();
         argument.setAlign(pdf_align);
         argument.setSize(pdf_size);
         argument.setDirection(pdf_direction);
@@ -172,7 +172,7 @@ public class ConvertCommand implements Callable<Integer> {
     }
 
     private DocumentArgument getDocumentArgument() {
-        DocumentArgument argument=new DocumentArgument();
+        DocumentArgument argument = new DocumentArgument();
         argument.setInformation(null);
         argument.setOwnerPassword(pdf_owner_password);
         argument.setUserPassword(pdf_user_password);
@@ -185,7 +185,8 @@ public class ConvertCommand implements Callable<Integer> {
         printDebugLog(getColor("\t|- max main memory usage:" + maxMainMemoryBytes, Ansi.Color.CYAN));
         printDebugLog(getColor("\t|- temporary folder:" + tempFolder.getAbsolutePath(), Ansi.Color.CYAN));
         printDebugLog(getColor("\t|- Overwrite:" + overwrite_output, Ansi.Color.CYAN));
-        PDFConverter converter = PDFacade.createImagePDFConverter(maxMainMemoryBytes, tempFolder, overwrite_output, new DefaultConversionListener(locale),color.getColorSpace());
+        PDFConverter converter = PDFacade.createImagePDFConverter(maxMainMemoryBytes, tempFolder, overwrite_output,
+                new DefaultConversionListener(locale), color.getColorSpace());
 
         for (Task task : tasks) {
             printDebugLog("Converting");
