@@ -1,11 +1,11 @@
-package org.vincentyeh.IMG2PDF.image.reader.framework;
+package org.vincentyeh.IMG2PDF.image.helper.framework;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
-public abstract class ImageReader {
+public abstract class ImageHelper {
     public abstract BufferedImage read(File file) throws Exception;
 
     public static BufferedImage rotateImage(BufferedImage img, double degrees) {

@@ -1,18 +1,18 @@
-package org.vincentyeh.IMG2PDF.image.reader.concrete;
+package org.vincentyeh.IMG2PDF.image.helper.concrete;
 
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.MetadataException;
 import com.drew.metadata.exif.ExifIFD0Directory;
-import org.vincentyeh.IMG2PDF.image.reader.framework.ImageReader;
+import org.vincentyeh.IMG2PDF.image.helper.framework.ImageHelper;
 import org.vincentyeh.IMG2PDF.util.file.FileUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 
-public class FixedDirectionImageReader extends ImageReader {
+public class DirectionImageHelper extends ImageHelper {
     @Override
     public BufferedImage read(File file) throws IOException, ImageProcessingException, MetadataException {
         FileUtils.checkExists(file);
