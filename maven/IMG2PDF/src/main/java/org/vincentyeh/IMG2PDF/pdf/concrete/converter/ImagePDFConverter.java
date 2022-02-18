@@ -3,7 +3,7 @@ package org.vincentyeh.IMG2PDF.pdf.concrete.converter;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.vincentyeh.IMG2PDF.image.reader.framework.ImageReader;
+import org.vincentyeh.IMG2PDF.image.helper.framework.ImageHelper;
 import org.vincentyeh.IMG2PDF.pdf.framework.converter.exception.ReadImageException;
 import org.vincentyeh.IMG2PDF.pdf.concrete.objects.PdfBoxDocumentAdaptor;
 import org.vincentyeh.IMG2PDF.pdf.concrete.objects.PdfBoxPageAdaptor;
@@ -22,12 +22,12 @@ import java.io.IOException;
 public class ImagePDFConverter extends PDFConverter {
     private final MemoryUsageSetting setting;
     private final ImagePageCalculateStrategy strategy;
-    private final ImageReader reader;
+    private final ImageHelper helper;
 
-    public ImagePDFConverter(long maxMainMemoryBytes, File tempFolder, boolean overwrite, ImagePageCalculateStrategy strategy, ImageReader reader) throws MakeDirectoryException {
+    public ImagePDFConverter(long maxMainMemoryBytes, File tempFolder, boolean overwrite, ImagePageCalculateStrategy strategy, ImageHelper helper) throws MakeDirectoryException {
         super(overwrite);
         this.strategy = strategy;
-        this.reader = reader;
+        this.helper = helper;
         FileUtils.makeDirectories(tempFolder);
         setting = MemoryUsageSetting.setupMixed(maxMainMemoryBytes).setTempDir(tempFolder);
     }
@@ -54,7 +54,7 @@ public class ImagePDFConverter extends PDFConverter {
     private BufferedImage readImage(File file) throws ReadImageException {
         try {
             FileUtils.checkExists(file);
-            BufferedImage image = reader.read(file);
+            BufferedImage image = helper.read(file);
             if (image == null)
                 throw new RuntimeException("image==null");
             return image;
