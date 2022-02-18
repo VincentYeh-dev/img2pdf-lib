@@ -19,7 +19,6 @@ import org.vincentyeh.IMG2PDF.util.file.FileUtils;
 import org.vincentyeh.IMG2PDF.util.file.exception.MakeDirectoryException;
 import picocli.CommandLine;
 
-import java.awt.color.ColorSpace;
 import java.io.File;
 import java.io.FileFilter;
 import java.lang.reflect.Field;
@@ -71,7 +70,7 @@ public class ConvertCommand implements Callable<Integer> {
 
 
     @CommandLine.Option(names = {"--pdf_image_color", "-pic"}, defaultValue = "color")
-    PDFImageColor color;
+    PDFImageColor pdf_image_color;
 
     @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true)
     boolean usageHelpRequested;
@@ -145,6 +144,7 @@ public class ConvertCommand implements Callable<Integer> {
         checkPrintNullParameter("pdf_size");
         checkPrintNullParameter("pdf_direction");
         checkPrintNullParameter("pdf_dst");
+        checkPrintNullParameter("pdf_image_color");
 //        checkPrintNullParameter("open_when_complete");
         checkPrintNullParameter("tempFolder");
         checkPrintNullParameter("maxMainMemoryBytes");
@@ -186,7 +186,7 @@ public class ConvertCommand implements Callable<Integer> {
         printDebugLog(getColor("\t|- temporary folder:" + tempFolder.getAbsolutePath(), Ansi.Color.CYAN));
         printDebugLog(getColor("\t|- Overwrite:" + overwrite_output, Ansi.Color.CYAN));
         PDFConverter converter = PDFacade.createImagePDFConverter(maxMainMemoryBytes, tempFolder, overwrite_output,
-                new DefaultConversionListener(locale), color.getColorSpace());
+                new DefaultConversionListener(locale), pdf_image_color.getColorSpace());
 
         for (Task task : tasks) {
             printDebugLog("Converting");
