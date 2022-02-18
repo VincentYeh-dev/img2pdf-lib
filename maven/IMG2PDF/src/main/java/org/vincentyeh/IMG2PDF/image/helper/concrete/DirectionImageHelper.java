@@ -6,35 +6,39 @@ import com.drew.metadata.Metadata;
 import com.drew.metadata.MetadataException;
 import com.drew.metadata.exif.ExifIFD0Directory;
 import org.vincentyeh.IMG2PDF.image.helper.framework.ImageHelper;
-import org.vincentyeh.IMG2PDF.util.file.FileUtils;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 
 public class DirectionImageHelper extends ImageHelper {
-    @Override
-    public BufferedImage read(File file) throws IOException, ImageProcessingException, MetadataException {
-        FileUtils.checkExists(file);
-        Metadata metadata = ImageMetadataReader.readMetadata(file);
-        if (metadata.containsDirectoryOfType(ExifIFD0Directory.class))
-            return handleExifIFD0(file, metadata);
 
-        return ImageIO.read(file);
+    public DirectionImageHelper() {
+
     }
 
-    private BufferedImage handleExifIFD0(File file, Metadata metadata) throws MetadataException, IOException {
+    public DirectionImageHelper(ImageHelper imageHelper) {
+        super(imageHelper);
+    }
+
+    @Override
+    protected final BufferedImage read(File file, BufferedImage image) throws Exception {
+        Metadata metadata = ImageMetadataReader.readMetadata(file);
+        if (metadata.containsDirectoryOfType(ExifIFD0Directory.class))
+            return handleExifIFD0(image, metadata);
+        return image;
+    }
+
+    private BufferedImage handleExifIFD0(BufferedImage image, Metadata metadata) throws MetadataException, IOException {
         ExifIFD0Directory exifIFD0 = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
         int orientation = exifIFD0.getInt(ExifIFD0Directory.TAG_ORIENTATION);
         switch (orientation) {
             case 1: // [Exif IFD0] Orientation - Top, left side (Horizontal / normal)
-                return ImageIO.read(file);
+                return image;
             case 6: // [Exif IFD0] Orientation - Right side, top (Rotate 90 CW)
-                return rotateImage(ImageIO.read(file), 90);
+                return rotateImage(image, 90);
             case 3: // [Exif IFD0] Orientation - Bottom, right side (Rotate 180)
-                return rotateImage(ImageIO.read(file), 180);
+                return rotateImage(image, 180);
             case 8: // [Exif IFD0] Orientation - Left side, bottom (Rotate 270 CW)
-                return rotateImage(ImageIO.read(file), 270);
+                return rotateImage(image, 270);
             default:
                 throw new RuntimeException("image==null");
         }

@@ -19,6 +19,7 @@ import org.vincentyeh.IMG2PDF.util.file.FileUtils;
 import org.vincentyeh.IMG2PDF.util.file.exception.MakeDirectoryException;
 import picocli.CommandLine;
 
+import java.awt.color.ColorSpace;
 import java.io.File;
 import java.io.FileFilter;
 import java.lang.reflect.Field;
@@ -180,7 +181,8 @@ public class ConvertCommand implements Callable<Integer> {
         printDebugLog(getColor("\t|- max main memory usage:" + maxMainMemoryBytes, Ansi.Color.CYAN));
         printDebugLog(getColor("\t|- temporary folder:" + tempFolder.getAbsolutePath(), Ansi.Color.CYAN));
         printDebugLog(getColor("\t|- Overwrite:" + overwrite_output, Ansi.Color.CYAN));
-        PDFConverter converter = PDFacade.createImagePDFConverter(maxMainMemoryBytes, tempFolder, overwrite_output, new DefaultConversionListener(locale));
+        ColorSpace colorSpace= ColorSpace.getInstance(ColorSpace.CS_sRGB);
+        PDFConverter converter = PDFacade.createImagePDFConverter(maxMainMemoryBytes, tempFolder, overwrite_output, new DefaultConversionListener(locale),colorSpace);
 
         for (Task task : tasks) {
             printDebugLog("Converting");
