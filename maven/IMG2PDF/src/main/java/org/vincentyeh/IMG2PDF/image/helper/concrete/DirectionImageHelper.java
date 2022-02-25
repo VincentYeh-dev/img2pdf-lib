@@ -1,13 +1,14 @@
 package org.vincentyeh.IMG2PDF.image.helper.concrete;
 
 import com.drew.imaging.ImageMetadataReader;
-import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.MetadataException;
 import com.drew.metadata.exif.ExifIFD0Directory;
 import org.vincentyeh.IMG2PDF.image.helper.framework.ImageHelper;
+
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 
 public class DirectionImageHelper extends ImageHelper {
 
@@ -29,6 +30,9 @@ public class DirectionImageHelper extends ImageHelper {
 
     private BufferedImage handleExifIFD0(BufferedImage image, Metadata metadata) throws MetadataException, IOException {
         ExifIFD0Directory exifIFD0 = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
+        if (!exifIFD0.containsTag(ExifIFD0Directory.TAG_ORIENTATION))
+            return image;
+
         int orientation = exifIFD0.getInt(ExifIFD0Directory.TAG_ORIENTATION);
         switch (orientation) {
             case 1: // [Exif IFD0] Orientation - Top, left side (Horizontal / normal)
