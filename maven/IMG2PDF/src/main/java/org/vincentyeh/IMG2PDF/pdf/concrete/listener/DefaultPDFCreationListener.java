@@ -1,20 +1,21 @@
 package org.vincentyeh.IMG2PDF.pdf.concrete.listener;
 
 import org.fusesource.jansi.Ansi;
-import org.vincentyeh.IMG2PDF.pdf.framework.listener.ConversionListener;
+import org.vincentyeh.IMG2PDF.pdf.framework.listener.ImagePDFCreationListener;
 import org.vincentyeh.IMG2PDF.task.framework.Task;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 import static org.vincentyeh.IMG2PDF.util.PrinterUtils.*;
 
-public class DefaultConversionListener implements ConversionListener {
+public class DefaultPDFCreationListener implements ImagePDFCreationListener {
     private final char[] progress_bar;
     private final ResourceBundle resourceBundle;
 
-    public DefaultConversionListener(Locale locale) {
+    public DefaultPDFCreationListener(Locale locale) {
         this.resourceBundle = ResourceBundle.getBundle("pdf_converter_listener", locale);
         progress_bar = new char[10];
         Arrays.fill(progress_bar, ' ');
@@ -40,24 +41,30 @@ public class DefaultConversionListener implements ConversionListener {
     }
 
     @Override
-    public void onConverting(int index) {
+    public void onConversionComplete() {
+        backDel(previous_msg_length);
+        long completeSeconds = System.currentTimeMillis() / 1000;
+        printRenderFormat("\r"+resourceBundle.getString("convert.listener.done"), (completeSeconds - startSeconds), task.getPdfDestination().getAbsolutePath());
+    }
+
+    @Override
+    public void onSaved(File destination) {
+
+    }
+
+    @Override
+    public void onAppendingPage(int index) {
         progress += perImg;
         while (progress >= 1) {
             progress_bar[counter] = '=';
             progress -= 1;
             counter++;
         }
+
         String name = task.getPdfDestination().getName();
         Ansi msg=getRenderFormat("\r"+resourceBundle.getString("convert.listener.converting") , new String(progress_bar), name, index + 1, total);
         print(msg);
         previous_msg_length=msg.toString().length();
-    }
-
-    @Override
-    public void onConversionComplete() {
-        backDel(previous_msg_length);
-        long completeSeconds = System.currentTimeMillis() / 1000;
-        printRenderFormat("\r"+resourceBundle.getString("convert.listener.done"), (completeSeconds - startSeconds), task.getPdfDestination().getAbsolutePath());
     }
 
     @Override
@@ -80,4 +87,8 @@ public class DefaultConversionListener implements ConversionListener {
         return sb.toString().replaceAll("#+", "...");
     }
 
+    @Override
+    public void onAppendingImage(int index, int total, File file) {
+
+    }
 }

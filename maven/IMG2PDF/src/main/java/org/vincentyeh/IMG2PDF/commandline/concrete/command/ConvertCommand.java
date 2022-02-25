@@ -10,8 +10,8 @@ import org.vincentyeh.IMG2PDF.task.TaskListFactoryFacade;
 import org.vincentyeh.IMG2PDF.configuration.framework.ConfigurationParser;
 import org.vincentyeh.IMG2PDF.handler.framework.CantHandleException;
 import org.vincentyeh.IMG2PDF.handler.framework.ExceptionHandler;
-import org.vincentyeh.IMG2PDF.pdf.framework.converter.PDFConverter;
-import org.vincentyeh.IMG2PDF.pdf.concrete.listener.DefaultConversionListener;
+import org.vincentyeh.IMG2PDF.pdf.framework.converter.PDFCreator;
+import org.vincentyeh.IMG2PDF.pdf.concrete.listener.DefaultPDFCreationListener;
 import org.vincentyeh.IMG2PDF.task.framework.Task;
 import org.vincentyeh.IMG2PDF.task.framework.factory.TaskListFactory;
 import org.vincentyeh.IMG2PDF.util.file.FileSorter;
@@ -185,8 +185,8 @@ public class ConvertCommand implements Callable<Integer> {
         printDebugLog(getColor("\t|- max main memory usage:" + maxMainMemoryBytes, Ansi.Color.CYAN));
         printDebugLog(getColor("\t|- temporary folder:" + tempFolder.getAbsolutePath(), Ansi.Color.CYAN));
         printDebugLog(getColor("\t|- Overwrite:" + overwrite_output, Ansi.Color.CYAN));
-        PDFConverter converter = PDFacade.createImagePDFConverter(maxMainMemoryBytes, tempFolder, overwrite_output,
-                new DefaultConversionListener(locale), pdf_image_color.getColorSpace());
+        PDFCreator<?> converter = PDFacade.createImagePDFConverter(maxMainMemoryBytes, tempFolder, overwrite_output,
+                new DefaultPDFCreationListener(locale), pdf_image_color.getColorSpace());
 
         for (Task task : tasks) {
             printDebugLog("Converting");
