@@ -21,7 +21,7 @@ public abstract class BasicCheckConverter<T> implements CommandLine.ITypeConvert
             checkNull(s);
             checkEmpty(s);
             return doConvert(s);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException| IllegalStateException e) {
             throw new CommandLine.TypeConversionException(e.getMessage());
         }
     }

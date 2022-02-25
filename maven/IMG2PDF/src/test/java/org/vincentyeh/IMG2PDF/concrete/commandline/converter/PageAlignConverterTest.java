@@ -12,7 +12,7 @@ public class PageAlignConverterTest {
     @ParameterizedTest
     @NullAndEmptySource
     public void testNullAndEmpty(String input) {
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(CommandLine.TypeConversionException.class,
                 () -> new PageAlignConverter().convert(input));
     }
 
