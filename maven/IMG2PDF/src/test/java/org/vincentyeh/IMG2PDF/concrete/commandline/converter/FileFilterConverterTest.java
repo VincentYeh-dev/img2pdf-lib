@@ -12,7 +12,7 @@ public class FileFilterConverterTest {
     @ParameterizedTest
     @NullAndEmptySource
     public void testNullAndEmpty(String input) {
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(CommandLine.TypeConversionException.class,
                 () -> new FileFilterConverter().convert(input));
     }
 

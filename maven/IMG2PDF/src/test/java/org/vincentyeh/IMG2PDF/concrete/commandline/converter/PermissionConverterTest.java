@@ -19,7 +19,7 @@ public class PermissionConverterTest {
     @ParameterizedTest
     @NullAndEmptySource
     public void testNullAndEmptyConversion(String input) {
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(CommandLine.TypeConversionException.class,
                 () -> new PermissionConverter().convert(input));
     }
 
