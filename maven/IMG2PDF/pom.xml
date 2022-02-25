@@ -5,7 +5,7 @@
 
     <groupId>org.vincentyeh</groupId>
     <artifactId>IMG2PDF</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
     <developers>
         <developer>
@@ -84,6 +84,11 @@
             <groupId>org.fusesource.jansi</groupId>
             <artifactId>jansi</artifactId>
             <version>1.18</version>
+        </dependency>
+        <dependency>
+            <groupId>com.drewnoakes</groupId>
+            <artifactId>metadata-extractor</artifactId>
+            <version>2.16.0</version>
         </dependency>
     </dependencies>
 
