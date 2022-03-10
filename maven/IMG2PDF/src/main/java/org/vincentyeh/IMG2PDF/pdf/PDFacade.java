@@ -6,8 +6,8 @@ import org.vincentyeh.IMG2PDF.pdf.concrete.appender.ExecutorPageAppender;
 import org.vincentyeh.IMG2PDF.pdf.concrete.calculation.strategy.StandardImagePageCalculationStrategy;
 import org.vincentyeh.IMG2PDF.pdf.concrete.converter.PDFBoxCreatorImpl;
 import org.vincentyeh.IMG2PDF.pdf.framework.converter.PDFCreator;
+import org.vincentyeh.IMG2PDF.pdf.framework.listener.PDFCreationListener;
 import org.vincentyeh.IMG2PDF.pdf.function.converter.ImagePDFCreator;
-import org.vincentyeh.IMG2PDF.pdf.function.listener.ImagePDFCreationListener;
 import org.vincentyeh.IMG2PDF.util.file.exception.MakeDirectoryException;
 
 import java.awt.color.ColorSpace;
@@ -18,13 +18,14 @@ public class PDFacade {
 
     }
 
-    public static PDFCreator<?> createImagePDFConverter(long bytes_count, File tempFolder, boolean overwrite_output, ImagePDFCreationListener listener, ColorSpace colorSpace) throws MakeDirectoryException {
+    public static PDFCreator<?> createImagePDFConverter(long bytes_count, File tempFolder, boolean overwrite_output, PDFCreationListener listener, ColorSpace colorSpace) throws MakeDirectoryException {
         PDFBoxCreatorImpl impl = new PDFBoxCreatorImpl(tempFolder, bytes_count);
         ExecutorPageAppender appender=new ExecutorPageAppender(1);
-        appender.setPageAppendListener(index -> {
-            System.out.println(index+" done.");
+        appender.setPageAppendListener((index) -> {
+            if(listener!=null)
+                listener.onPageAppended(index);
         });
-        PDFCreator<ImagePDFCreationListener> converter = new ImagePDFCreator(impl,appender, overwrite_output, new StandardImagePageCalculationStrategy(), new DirectionImageHelper(new ColorSpaceImageHelper(colorSpace)));
+        PDFCreator<PDFCreationListener> converter = new ImagePDFCreator(impl,appender, overwrite_output, new StandardImagePageCalculationStrategy(), new DirectionImageHelper(new ColorSpaceImageHelper(colorSpace)));
         converter.setListener(listener);
         return converter;
     }

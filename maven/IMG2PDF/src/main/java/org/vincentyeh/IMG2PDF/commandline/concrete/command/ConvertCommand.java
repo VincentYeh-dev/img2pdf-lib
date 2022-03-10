@@ -2,16 +2,16 @@ package org.vincentyeh.IMG2PDF.commandline.concrete.command;
 
 import org.fusesource.jansi.Ansi;
 import org.vincentyeh.IMG2PDF.commandline.concrete.converter.*;
+import org.vincentyeh.IMG2PDF.configuration.framework.ConfigurationParser;
 import org.vincentyeh.IMG2PDF.handler.ExceptionHandlerFacade;
+import org.vincentyeh.IMG2PDF.handler.framework.CantHandleException;
+import org.vincentyeh.IMG2PDF.handler.framework.ExceptionHandler;
 import org.vincentyeh.IMG2PDF.pdf.PDFacade;
+import org.vincentyeh.IMG2PDF.pdf.concrete.listener.ProgressBarPDFCreationListener;
+import org.vincentyeh.IMG2PDF.pdf.framework.converter.PDFCreator;
 import org.vincentyeh.IMG2PDF.pdf.framework.converter.exception.PDFConversionException;
 import org.vincentyeh.IMG2PDF.pdf.parameter.*;
 import org.vincentyeh.IMG2PDF.task.TaskListFactoryFacade;
-import org.vincentyeh.IMG2PDF.configuration.framework.ConfigurationParser;
-import org.vincentyeh.IMG2PDF.handler.framework.CantHandleException;
-import org.vincentyeh.IMG2PDF.handler.framework.ExceptionHandler;
-import org.vincentyeh.IMG2PDF.pdf.framework.converter.PDFCreator;
-import org.vincentyeh.IMG2PDF.pdf.concrete.listener.DefaultPDFCreationListener;
 import org.vincentyeh.IMG2PDF.task.framework.Task;
 import org.vincentyeh.IMG2PDF.task.framework.factory.TaskListFactory;
 import org.vincentyeh.IMG2PDF.util.file.FileSorter;
@@ -24,7 +24,6 @@ import java.io.FileFilter;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.util.*;
-import java.util.List;
 import java.util.concurrent.Callable;
 
 import static org.vincentyeh.IMG2PDF.util.PrinterUtils.*;
@@ -186,7 +185,7 @@ public class ConvertCommand implements Callable<Integer> {
         printDebugLog(getColor("\t|- temporary folder:" + tempFolder.getAbsolutePath(), Ansi.Color.CYAN));
         printDebugLog(getColor("\t|- Overwrite:" + overwrite_output, Ansi.Color.CYAN));
         PDFCreator<?> converter = PDFacade.createImagePDFConverter(maxMainMemoryBytes, tempFolder, overwrite_output,
-                new DefaultPDFCreationListener(locale), pdf_image_color.getColorSpace());
+                new ProgressBarPDFCreationListener(locale), pdf_image_color.getColorSpace());
 
         for (Task task : tasks) {
             printDebugLog("Converting");

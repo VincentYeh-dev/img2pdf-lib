@@ -16,7 +16,7 @@ public class ExecutorPageAppender implements PageAppender {
     }
 
     @Override
-    public void appendAll(PdfDocument<?> document, List<Callable<PdfPage<?>>> list) throws Exception {
+    public void appendToDocument(PdfDocument<?> document, List<Callable<PdfPage<?>>> list) throws Exception {
         ExecutorService service = getExecutorService();
         try {
             List<Future<PdfPage<?>>> futures = service.invokeAll(list);
@@ -30,7 +30,7 @@ public class ExecutorPageAppender implements PageAppender {
                 if (pageFuture.isDone()) {
 
                     if (!flag_done[monitor] && pageAppendListener != null)
-                        pageAppendListener.onPageDone(monitor);
+                        pageAppendListener.onPageAppended(monitor);
 
                     flag_done[monitor] = true;
 
@@ -54,7 +54,7 @@ public class ExecutorPageAppender implements PageAppender {
                     monitor++;
                 try {
                     Thread.sleep(100);
-                }catch (InterruptedException ignored){
+                } catch (InterruptedException ignored) {
 
                 }
             }
@@ -67,21 +67,8 @@ public class ExecutorPageAppender implements PageAppender {
         return Executors.newFixedThreadPool(nThread);
     }
 
-    @Override
-    public void append(PdfDocument<?> document, Callable<PdfPage<?>> callable) throws Exception {
-        ExecutorService service = getExecutorService();
-        try {
-            Future<PdfPage<?>> future = service.submit(callable);
-            while (!future.isDone()) {
-                document.addPage(future.get());
-            }
-        } finally {
-            service.shutdown();
-        }
-    }
-
     public interface PageAppendListener {
-        void onPageDone(int index);
+        void onPageAppended(int index);
     }
 
     private PageAppendListener pageAppendListener;

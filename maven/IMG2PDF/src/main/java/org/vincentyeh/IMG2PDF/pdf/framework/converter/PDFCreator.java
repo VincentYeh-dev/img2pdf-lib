@@ -49,7 +49,7 @@ public abstract class PDFCreator<L extends PDFCreationListener> {
         try {
             checkOverwrite(task.getPdfDestination());
             PdfDocument<?> document = generateDocument(task);
-            appenderImpl.appendAll(document, getPageCallables(document, task));
+            appenderImpl.appendToDocument(document, getPageCallables(document, task));
             try {
                 document.save(task.getPdfDestination());
             } catch (IOException e) {

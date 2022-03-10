@@ -7,6 +7,5 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 public interface PageAppender {
-    void appendAll(PdfDocument<?> document, List<Callable<PdfPage<?>>> list) throws Exception;
-    void append(PdfDocument<?> document, Callable<PdfPage<?>> callable) throws Exception;
+    void appendToDocument(PdfDocument<?> document, List<Callable<PdfPage<?>>> list) throws Exception;
 }

@@ -12,12 +12,11 @@ import java.io.File;
 public interface PDFCreationListener {
 
 	void initializing(Task task);
-
 	void onConversionComplete();
 
 	void onSaved(File destination);
 
-	void onAppendingPage(int index);
+	void onPageAppended(int index);
 
 	void onFinally();
 }
