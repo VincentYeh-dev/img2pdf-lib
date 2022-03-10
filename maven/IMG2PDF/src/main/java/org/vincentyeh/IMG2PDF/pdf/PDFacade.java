@@ -18,14 +18,14 @@ public class PDFacade {
 
     }
 
-    public static PDFCreator<?> createImagePDFConverter(long bytes_count, File tempFolder, boolean overwrite_output, PDFCreationListener listener, ColorSpace colorSpace) throws MakeDirectoryException {
+    public static PDFCreator<?> createImagePDFConverter(long bytes_count, File tempFolder, boolean overwrite_output, PDFCreationListener listener, ColorSpace colorSpace, int nThread) throws MakeDirectoryException {
         PDFBoxCreatorImpl impl = new PDFBoxCreatorImpl(tempFolder, bytes_count);
-        ExecutorPageAppender appender=new ExecutorPageAppender(1);
+        ExecutorPageAppender appender = new ExecutorPageAppender(nThread);
         appender.setPageAppendListener((index) -> {
-            if(listener!=null)
+            if (listener != null)
                 listener.onPageAppended(index);
         });
-        PDFCreator<PDFCreationListener> converter = new ImagePDFCreator(impl,appender, overwrite_output, new StandardImagePageCalculationStrategy(), new DirectionImageHelper(new ColorSpaceImageHelper(colorSpace)));
+        PDFCreator<PDFCreationListener> converter = new ImagePDFCreator(impl, appender, overwrite_output, new StandardImagePageCalculationStrategy(), new DirectionImageHelper(new ColorSpaceImageHelper(colorSpace)));
         converter.setListener(listener);
         return converter;
     }

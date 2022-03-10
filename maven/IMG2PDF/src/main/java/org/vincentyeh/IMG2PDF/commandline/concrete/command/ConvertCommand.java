@@ -80,8 +80,8 @@ public class ConvertCommand implements Callable<Integer> {
     @CommandLine.Option(names = {"--memory_max_usage", "-mx"}, defaultValue = "50MB", converter = ByteSizeConverter.class)
     long maxMainMemoryBytes;
 
-//    @CommandLine.Option(names = {"--open_when_complete", "-o"})
-//    boolean open_when_complete;
+    @CommandLine.Option(names = {"--thread", "-t"}, defaultValue = "1")
+    private int nThread;
 
     @CommandLine.Option(names = {"--overwrite", "-ow"})
     boolean overwrite_output;
@@ -148,6 +148,9 @@ public class ConvertCommand implements Callable<Integer> {
         checkPrintNullParameter("tempFolder");
         checkPrintNullParameter("maxMainMemoryBytes");
         checkPrintNullParameter("sourceFiles");
+        if(nThread<=0){
+            throw new IllegalArgumentException("nThread<=0");
+        }
 
         for (File source : sourceFiles) {
             if (!source.isAbsolute()) throw new IllegalArgumentException("source is not absolute: " + source);
@@ -184,8 +187,9 @@ public class ConvertCommand implements Callable<Integer> {
         printDebugLog(getColor("\t|- max main memory usage:" + maxMainMemoryBytes, Ansi.Color.CYAN));
         printDebugLog(getColor("\t|- temporary folder:" + tempFolder.getAbsolutePath(), Ansi.Color.CYAN));
         printDebugLog(getColor("\t|- Overwrite:" + overwrite_output, Ansi.Color.CYAN));
+        printDebugLog(getColor("\t|- thread:" + nThread, Ansi.Color.CYAN));
         PDFCreator<?> converter = PDFacade.createImagePDFConverter(maxMainMemoryBytes, tempFolder, overwrite_output,
-                new ProgressBarPDFCreationListener(locale), pdf_image_color.getColorSpace());
+                new ProgressBarPDFCreationListener(locale), pdf_image_color.getColorSpace(), nThread);
 
         for (Task task : tasks) {
             printDebugLog("Converting");
