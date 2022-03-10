@@ -1,5 +1,6 @@
 package org.vincentyeh.IMG2PDF.pdf.framework.converter;
 
+import org.vincentyeh.IMG2PDF.pdf.framework.appender.PageAppender;
 import org.vincentyeh.IMG2PDF.pdf.framework.converter.exception.PDFConversionException;
 import org.vincentyeh.IMG2PDF.pdf.framework.converter.exception.SaveException;
 import org.vincentyeh.IMG2PDF.pdf.framework.listener.PDFCreationListener;
@@ -11,24 +12,22 @@ import org.vincentyeh.IMG2PDF.util.file.exception.OverwriteException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.Callable;
 
 public abstract class PDFCreator<L extends PDFCreationListener> {
-    public interface PageIterator {
-        PdfPage<?> next() throws Exception;
-
-        boolean hasNext();
-    }
-
     protected final PDFCreatorImpl impl;
     private final boolean overwrite;
     protected L listener;
+    private final PageAppender appenderImpl;
 
-    public PDFCreator(PDFCreatorImpl impl, boolean overwrite) {
+    public PDFCreator(PDFCreatorImpl impl, PageAppender pageAppender, boolean overwrite) {
         this.impl = impl;
         this.overwrite = overwrite;
+        appenderImpl = pageAppender;
     }
 
-    protected abstract PageIterator getPageIterator(PdfDocument<?> document, Task task);
+    protected abstract List<Callable<PdfPage<?>>> getPageCallables(PdfDocument<?> document, Task task);
 
     protected final PdfDocument<?> generateDocument(Task task) throws IOException {
         PdfDocument<?> document = impl.createEmptyDocument();
@@ -49,24 +48,13 @@ public abstract class PDFCreator<L extends PDFCreationListener> {
 
         try {
             checkOverwrite(task.getPdfDestination());
-
             PdfDocument<?> document = generateDocument(task);
-
-            PageIterator iterator = getPageIterator(document, task);
-
-            int index = 0;
-            while (iterator.hasNext()) {
-                if (listener != null)
-                    listener.onAppendingPage(index++);
-                document.addPage(iterator.next());
-            }
-
+            appenderImpl.appendAll(document, getPageCallables(document, task));
             try {
                 document.save(task.getPdfDestination());
             } catch (IOException e) {
                 throw new SaveException(e, task.getPdfDestination());
             }
-
             document.close();
 
             if (listener != null)
