@@ -38,7 +38,7 @@ public class ImagePDFCreator extends PDFCreator<ImagePDFCreationListener> {
                 PdfPage<?> page = impl.createEmptyPage(document);
 
                 BufferedImage bufferedImage = readImage(files[next++]);
-                strategy.study(task.getPageArgument(), bufferedImage);
+                strategy.execute(task.getPageArgument(), bufferedImage);
                 page.setSize(strategy.getPageSize());
                 page.putImage(bufferedImage, strategy.getImagePosition(), strategy.getImageSize());
                 return page;

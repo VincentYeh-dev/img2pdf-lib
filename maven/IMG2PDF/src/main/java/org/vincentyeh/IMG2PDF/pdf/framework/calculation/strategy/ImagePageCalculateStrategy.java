@@ -14,5 +14,5 @@ public interface ImagePageCalculateStrategy {
 
     Size getImageSize();
 
-    void study(PageArgument pageArgument, BufferedImage image);
+    void execute(PageArgument pageArgument, BufferedImage image);
 }
