@@ -1,7 +1,7 @@
 package org.vincentyeh.IMG2PDF.pdf.concrete.listener;
 
 import org.fusesource.jansi.Ansi;
-import org.vincentyeh.IMG2PDF.pdf.framework.listener.ImagePDFCreationListener;
+import org.vincentyeh.IMG2PDF.pdf.function.listener.ImagePDFCreationListener;
 import org.vincentyeh.IMG2PDF.task.framework.Task;
 
 import java.io.File;

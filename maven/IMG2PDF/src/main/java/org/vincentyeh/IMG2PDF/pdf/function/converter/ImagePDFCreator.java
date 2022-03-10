@@ -5,7 +5,7 @@ import org.vincentyeh.IMG2PDF.pdf.framework.calculation.strategy.ImagePageCalcul
 import org.vincentyeh.IMG2PDF.pdf.framework.converter.PDFCreator;
 import org.vincentyeh.IMG2PDF.pdf.framework.converter.PDFCreatorImpl;
 import org.vincentyeh.IMG2PDF.pdf.framework.converter.exception.ReadImageException;
-import org.vincentyeh.IMG2PDF.pdf.framework.listener.ImagePDFCreationListener;
+import org.vincentyeh.IMG2PDF.pdf.function.listener.ImagePDFCreationListener;
 import org.vincentyeh.IMG2PDF.pdf.framework.objects.PdfDocument;
 import org.vincentyeh.IMG2PDF.pdf.framework.objects.PdfPage;
 import org.vincentyeh.IMG2PDF.task.framework.Task;
@@ -38,7 +38,7 @@ public class ImagePDFCreator extends PDFCreator<ImagePDFCreationListener> {
                 PdfPage<?> page = impl.createEmptyPage(document);
 
                 BufferedImage bufferedImage = readImage(files[next++]);
-                strategy.study(task.getPageArgument(), bufferedImage);
+                strategy.execute(task.getPageArgument(), bufferedImage);
                 page.setSize(strategy.getPageSize());
                 page.putImage(bufferedImage, strategy.getImagePosition(), strategy.getImageSize());
                 return page;
