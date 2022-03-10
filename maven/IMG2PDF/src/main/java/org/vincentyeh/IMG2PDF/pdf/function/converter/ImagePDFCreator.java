@@ -5,7 +5,7 @@ import org.vincentyeh.IMG2PDF.pdf.framework.calculation.strategy.ImagePageCalcul
 import org.vincentyeh.IMG2PDF.pdf.framework.converter.PDFCreator;
 import org.vincentyeh.IMG2PDF.pdf.framework.converter.PDFCreatorImpl;
 import org.vincentyeh.IMG2PDF.pdf.framework.converter.exception.ReadImageException;
-import org.vincentyeh.IMG2PDF.pdf.framework.listener.ImagePDFCreationListener;
+import org.vincentyeh.IMG2PDF.pdf.function.listener.ImagePDFCreationListener;
 import org.vincentyeh.IMG2PDF.pdf.framework.objects.PdfDocument;
 import org.vincentyeh.IMG2PDF.pdf.framework.objects.PdfPage;
 import org.vincentyeh.IMG2PDF.task.framework.Task;
