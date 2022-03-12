@@ -7,7 +7,7 @@ import org.vincentyeh.IMG2PDF.pdf.framework.objects.PdfPage;
 import java.util.List;
 import java.util.concurrent.*;
 
-public class ExecutorPageAppender implements PageAppender {
+public class ExecutorPageAppender extends PageAppender {
 
     private final int nThread;
 
@@ -16,7 +16,7 @@ public class ExecutorPageAppender implements PageAppender {
     }
 
     @Override
-    public void appendToDocument(PdfDocument<?> document, List<Callable<PdfPage<?>>> list) throws Exception {
+    public void append(PdfDocument<?> document, List<Callable<PdfPage<?>>> list) throws Exception {
         ExecutorService service = getExecutorService();
         try {
             List<Future<PdfPage<?>>> futures = service.invokeAll(list);
@@ -29,8 +29,8 @@ public class ExecutorPageAppender implements PageAppender {
 
                 if (pageFuture.isDone()) {
 
-                    if (!flag_done[monitor] && pageAppendListener != null)
-                        pageAppendListener.onPageAppended(monitor);
+                    if (!flag_done[monitor])
+                        onPageAppended(monitor);
 
                     flag_done[monitor] = true;
 
@@ -52,10 +52,11 @@ public class ExecutorPageAppender implements PageAppender {
                     monitor = 0;
                 else
                     monitor++;
+
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException ignored) {
-
+                    break;
                 }
             }
         } finally {
@@ -66,16 +67,4 @@ public class ExecutorPageAppender implements PageAppender {
     private ExecutorService getExecutorService() {
         return Executors.newFixedThreadPool(nThread);
     }
-
-    public interface PageAppendListener {
-        void onPageAppended(int index);
-    }
-
-    private PageAppendListener pageAppendListener;
-
-    public void setPageAppendListener(PageAppendListener listener) {
-        this.pageAppendListener = listener;
-    }
-
-
 }

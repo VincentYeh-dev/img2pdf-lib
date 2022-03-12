@@ -7,7 +7,6 @@ import org.vincentyeh.IMG2PDF.handler.ExceptionHandlerFacade;
 import org.vincentyeh.IMG2PDF.handler.framework.CantHandleException;
 import org.vincentyeh.IMG2PDF.handler.framework.ExceptionHandler;
 import org.vincentyeh.IMG2PDF.pdf.PDFacade;
-import org.vincentyeh.IMG2PDF.pdf.concrete.listener.ProgressBarPDFCreationListener;
 import org.vincentyeh.IMG2PDF.pdf.framework.converter.PDFCreator;
 import org.vincentyeh.IMG2PDF.pdf.framework.converter.exception.PDFConversionException;
 import org.vincentyeh.IMG2PDF.pdf.parameter.*;
@@ -148,7 +147,7 @@ public class ConvertCommand implements Callable<Integer> {
         checkPrintNullParameter("tempFolder");
         checkPrintNullParameter("maxMainMemoryBytes");
         checkPrintNullParameter("sourceFiles");
-        if(nThread<=0){
+        if (nThread <= 0) {
             throw new IllegalArgumentException("nThread<=0");
         }
 
@@ -188,8 +187,8 @@ public class ConvertCommand implements Callable<Integer> {
         printDebugLog(getColor("\t|- temporary folder:" + tempFolder.getAbsolutePath(), Ansi.Color.CYAN));
         printDebugLog(getColor("\t|- Overwrite:" + overwrite_output, Ansi.Color.CYAN));
         printDebugLog(getColor("\t|- thread:" + nThread, Ansi.Color.CYAN));
-        PDFCreator<?> converter = PDFacade.createImagePDFConverter(maxMainMemoryBytes, tempFolder, overwrite_output,
-                new ProgressBarPDFCreationListener(locale), pdf_image_color.getColorSpace(), nThread);
+        PDFCreator converter = PDFacade.createImagePDFConverter(maxMainMemoryBytes, tempFolder, overwrite_output,
+                locale, pdf_image_color.getColorSpace(), nThread);
 
         for (Task task : tasks) {
             printDebugLog("Converting");

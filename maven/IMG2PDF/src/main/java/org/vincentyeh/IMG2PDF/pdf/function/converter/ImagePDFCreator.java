@@ -6,7 +6,6 @@ import org.vincentyeh.IMG2PDF.pdf.framework.calculation.strategy.ImagePageCalcul
 import org.vincentyeh.IMG2PDF.pdf.framework.converter.PDFCreator;
 import org.vincentyeh.IMG2PDF.pdf.framework.converter.PDFCreatorImpl;
 import org.vincentyeh.IMG2PDF.pdf.framework.converter.exception.ReadImageException;
-import org.vincentyeh.IMG2PDF.pdf.framework.listener.PDFCreationListener;
 import org.vincentyeh.IMG2PDF.pdf.framework.objects.PdfDocument;
 import org.vincentyeh.IMG2PDF.pdf.framework.objects.PdfPage;
 import org.vincentyeh.IMG2PDF.task.framework.Task;
@@ -18,7 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-public class ImagePDFCreator extends PDFCreator<PDFCreationListener> {
+public class ImagePDFCreator extends PDFCreator {
     private final ImagePageCalculateStrategy strategy;
     private final ImageHelper helper;
 

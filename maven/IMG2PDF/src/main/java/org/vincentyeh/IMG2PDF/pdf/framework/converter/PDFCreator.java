@@ -3,7 +3,6 @@ package org.vincentyeh.IMG2PDF.pdf.framework.converter;
 import org.vincentyeh.IMG2PDF.pdf.framework.appender.PageAppender;
 import org.vincentyeh.IMG2PDF.pdf.framework.converter.exception.PDFConversionException;
 import org.vincentyeh.IMG2PDF.pdf.framework.converter.exception.SaveException;
-import org.vincentyeh.IMG2PDF.pdf.framework.listener.PDFCreationListener;
 import org.vincentyeh.IMG2PDF.pdf.framework.objects.PdfDocument;
 import org.vincentyeh.IMG2PDF.pdf.framework.objects.PdfPage;
 import org.vincentyeh.IMG2PDF.task.framework.Task;
@@ -15,16 +14,24 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-public abstract class PDFCreator<L extends PDFCreationListener> {
+public abstract class PDFCreator {
+
+    public interface CreationListener {
+        void initializing(Task task);
+        void onConversionComplete();
+        void onSaved(File destination);
+        void onFinally();
+    }
+
     protected final PDFCreatorImpl impl;
     private final boolean overwrite;
-    protected L listener;
-    private final PageAppender appenderImpl;
+    protected CreationListener listener;
+    private final PageAppender appender;
 
     public PDFCreator(PDFCreatorImpl impl, PageAppender pageAppender, boolean overwrite) {
         this.impl = impl;
         this.overwrite = overwrite;
-        appenderImpl = pageAppender;
+        appender = pageAppender;
     }
 
     protected abstract List<Callable<PdfPage<?>>> getPageCallables(PdfDocument<?> document, Task task);
@@ -49,12 +56,15 @@ public abstract class PDFCreator<L extends PDFCreationListener> {
         try {
             checkOverwrite(task.getPdfDestination());
             PdfDocument<?> document = generateDocument(task);
-            appenderImpl.appendToDocument(document, getPageCallables(document, task));
+            appender.append(document, getPageCallables(document, task));
             try {
                 document.save(task.getPdfDestination());
+                if (listener != null)
+                    listener.onSaved(task.getPdfDestination());
             } catch (IOException e) {
                 throw new SaveException(e, task.getPdfDestination());
             }
+//            TODO: Close document finally.
             document.close();
 
             if (listener != null)
@@ -80,7 +90,7 @@ public abstract class PDFCreator<L extends PDFCreationListener> {
         }
     }
 
-    public void setListener(L listener) {
+    public final void setCreationListener(CreationListener listener) {
         this.listener = listener;
     }
 

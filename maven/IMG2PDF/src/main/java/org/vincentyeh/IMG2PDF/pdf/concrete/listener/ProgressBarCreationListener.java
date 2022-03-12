@@ -1,7 +1,8 @@
 package org.vincentyeh.IMG2PDF.pdf.concrete.listener;
 
 import org.fusesource.jansi.Ansi;
-import org.vincentyeh.IMG2PDF.pdf.framework.listener.PDFCreationListener;
+import org.vincentyeh.IMG2PDF.pdf.framework.appender.PageAppender;
+import org.vincentyeh.IMG2PDF.pdf.framework.converter.PDFCreator;
 import org.vincentyeh.IMG2PDF.task.framework.Task;
 
 import java.io.File;
@@ -11,11 +12,11 @@ import java.util.ResourceBundle;
 
 import static org.vincentyeh.IMG2PDF.util.PrinterUtils.*;
 
-public class ProgressBarPDFCreationListener implements PDFCreationListener {
+public class ProgressBarCreationListener implements PDFCreator.CreationListener, PageAppender.PageAppendListener {
     private final ResourceBundle resourceBundle;
     private long startSeconds;
 
-    public ProgressBarPDFCreationListener(Locale locale) {
+    public ProgressBarCreationListener(Locale locale) {
         this.resourceBundle = ResourceBundle.getBundle("pdf_converter_listener", locale);
 
     }
@@ -70,7 +71,7 @@ public class ProgressBarPDFCreationListener implements PDFCreationListener {
         print("\n\r");
     }
 
-    private void printWithLengthRecord(Object msg){
+    private void printWithLengthRecord(Object msg) {
         print(msg);
         previous_msg_length = msg.toString().length();
     }
