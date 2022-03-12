@@ -32,6 +32,8 @@ public abstract class PDFCreator {
     private final PageAppender appender;
 
     public PDFCreator(PDFCreatorImpl impl, PageAppender pageAppender, boolean overwrite) {
+        if (impl == null)
+            throw new IllegalArgumentException("impl is null");
         this.impl = impl;
         this.overwrite = overwrite;
         appender = pageAppender;
@@ -59,7 +61,10 @@ public abstract class PDFCreator {
         try {
             checkOverwrite(task.getPdfDestination());
             document = generateDocument(task);
-            appender.append(document, getPageCallables(document, task));
+
+            if(appender!=null)
+                appender.append(document, getPageCallables(document, task));
+
             try {
                 document.save(task.getPdfDestination());
                 if (listener != null)
