@@ -1,10 +1,8 @@
 package org.vincentyeh.IMG2PDF.pdf.framework.calculation.strategy;
 
-import org.vincentyeh.IMG2PDF.pdf.parameter.PageArgument;
 import org.vincentyeh.IMG2PDF.pdf.framework.calculation.Position;
 import org.vincentyeh.IMG2PDF.pdf.framework.calculation.Size;
-
-import java.awt.image.BufferedImage;
+import org.vincentyeh.IMG2PDF.pdf.parameter.PageArgument;
 
 public interface ImagePageCalculateStrategy {
 
@@ -14,5 +12,5 @@ public interface ImagePageCalculateStrategy {
 
     Size getImageSize();
 
-    void execute(PageArgument pageArgument, BufferedImage image);
+    void execute(PageArgument pageArgument, Size imageSize);
 }

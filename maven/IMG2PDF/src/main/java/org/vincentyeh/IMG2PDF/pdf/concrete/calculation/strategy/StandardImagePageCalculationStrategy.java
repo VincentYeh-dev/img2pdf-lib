@@ -9,14 +9,12 @@ import org.vincentyeh.IMG2PDF.pdf.framework.calculation.Position;
 import org.vincentyeh.IMG2PDF.pdf.framework.calculation.Size;
 import org.vincentyeh.IMG2PDF.pdf.framework.calculation.strategy.ImagePageCalculateStrategy;
 
-import java.awt.image.BufferedImage;
-
 import static org.vincentyeh.IMG2PDF.pdf.parameter.PageDirection.Landscape;
 import static org.vincentyeh.IMG2PDF.pdf.parameter.PageDirection.Portrait;
 
 public final class StandardImagePageCalculationStrategy implements ImagePageCalculateStrategy {
     private Size pageSize;
-    private Size imageSize;
+    private Size newImageSize;
     private Position imagePosition;
 
     @Override
@@ -31,47 +29,43 @@ public final class StandardImagePageCalculationStrategy implements ImagePageCalc
 
     @Override
     public Size getImageSize() {
-        return imageSize;
+        return newImageSize;
     }
 
     @Override
-    public void execute(PageArgument argument, BufferedImage bufferedImage) {
-        PageDirection direction = getSuitableDirection(argument, bufferedImage);
-        pageSize = getSuitablePageSize(direction, argument.getSize(), bufferedImage);
-        imageSize = getMaxScaleImageSize(bufferedImage, pageSize);
-        imagePosition = calculateImagePosition(getMaxScaleImageSize(bufferedImage, pageSize), pageSize, argument.getAlign());
+    public void execute(PageArgument argument, Size imageSize) {
+        PageDirection direction = getSuitableDirection(argument, imageSize);
+        pageSize = getSuitablePageSize(direction, argument.getSize(), imageSize);
+        newImageSize = getMaxScaleImageSize(imageSize, pageSize);
+        imagePosition = calculateImagePosition(newImageSize, pageSize, argument.getAlign());
     }
 
-    private Size getMaxScaleImageSize(BufferedImage rawImage, Size page_size) {
-        return scaleUpToMax(new Size(rawImage.getWidth(), rawImage.getHeight()), page_size);
+    private Size getMaxScaleImageSize(Size imageSize, Size page_size) {
+        return scaleUpToMax(imageSize, page_size);
     }
 
     private Position calculateImagePosition(Size img_size, Size page_size, PageAlign align) {
         return calculatePosition(align, img_size, page_size);
     }
 
-    private PageDirection getSuitableDirection(PageArgument argument, BufferedImage image) {
+    private PageDirection getSuitableDirection(PageArgument argument, Size size) {
         if (argument.getSize() == PageSize.DEPEND_ON_IMG) {
             return Portrait;
         }
         if (argument.autoRotate()) {
-            return detectDirection(image.getHeight(), image.getWidth());
+            return detectDirection(size.getHeight(), size.getWidth());
         } else {
             return argument.getDirection();
         }
     }
 
-    private Size getSuitablePageSize(PageDirection direction, PageSize pageSize, BufferedImage image) {
+    private Size getSuitablePageSize(PageDirection direction, PageSize pageSize, Size imageSize) {
         if (pageSize == PageSize.DEPEND_ON_IMG) {
-            return getImageSize(image, false);
+            return imageSize;
         } else {
             PDRectangle rect = pageSize.getPdrectangle();
             return getPageSize(rect, direction == Landscape);
         }
-    }
-
-    private Size getImageSize(BufferedImage image, boolean reverse) {
-        return new Size(reverse ? image.getHeight() : image.getWidth(), reverse ? image.getWidth() : image.getHeight());
     }
 
     private Size getPageSize(PDRectangle rectangle, boolean reverse) {
