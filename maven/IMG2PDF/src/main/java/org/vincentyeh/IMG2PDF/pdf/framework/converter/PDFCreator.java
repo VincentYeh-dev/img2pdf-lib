@@ -18,8 +18,11 @@ public abstract class PDFCreator {
 
     public interface CreationListener {
         void initializing(Task task);
+
         void onConversionComplete();
+
         void onSaved(File destination);
+
         void onFinally();
     }
 
@@ -52,10 +55,10 @@ public abstract class PDFCreator {
 
         if (listener != null)
             listener.initializing(task);
-
+        PdfDocument<?> document = null;
         try {
             checkOverwrite(task.getPdfDestination());
-            PdfDocument<?> document = generateDocument(task);
+            document = generateDocument(task);
             appender.append(document, getPageCallables(document, task));
             try {
                 document.save(task.getPdfDestination());
@@ -64,8 +67,6 @@ public abstract class PDFCreator {
             } catch (IOException e) {
                 throw new SaveException(e, task.getPdfDestination());
             }
-//            TODO: Close document finally.
-            document.close();
 
             if (listener != null)
                 listener.onConversionComplete();
@@ -74,6 +75,12 @@ public abstract class PDFCreator {
         } catch (Exception e) {
             throw new PDFConversionException(task, e);
         } finally {
+            try {
+                if (document != null)
+                    document.close();
+            } catch (IOException ignored) {
+
+            }
             if (listener != null)
                 listener.onFinally();
         }
