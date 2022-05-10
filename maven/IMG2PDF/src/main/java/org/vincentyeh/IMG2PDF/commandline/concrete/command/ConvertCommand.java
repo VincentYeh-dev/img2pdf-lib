@@ -2,7 +2,6 @@ package org.vincentyeh.IMG2PDF.commandline.concrete.command;
 
 import org.fusesource.jansi.Ansi;
 import org.vincentyeh.IMG2PDF.commandline.concrete.converter.*;
-import org.vincentyeh.IMG2PDF.configuration.framework.ConfigurationParser;
 import org.vincentyeh.IMG2PDF.handler.ExceptionHandlerFacade;
 import org.vincentyeh.IMG2PDF.handler.framework.CantHandleException;
 import org.vincentyeh.IMG2PDF.handler.framework.ExceptionHandler;
@@ -10,6 +9,7 @@ import org.vincentyeh.IMG2PDF.pdf.PDFacade;
 import org.vincentyeh.IMG2PDF.pdf.framework.converter.PDFCreator;
 import org.vincentyeh.IMG2PDF.pdf.framework.converter.exception.PDFConversionException;
 import org.vincentyeh.IMG2PDF.pdf.parameter.*;
+import org.vincentyeh.IMG2PDF.setting.SettingManager;
 import org.vincentyeh.IMG2PDF.task.TaskListFactoryFacade;
 import org.vincentyeh.IMG2PDF.task.concrete.factory.DirectoryTaskFactory;
 import org.vincentyeh.IMG2PDF.task.framework.Task;
@@ -25,8 +25,9 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.nio.charset.Charset;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import static org.vincentyeh.IMG2PDF.util.PrinterUtils.*;
@@ -92,13 +93,7 @@ public class ConvertCommand implements Callable<Integer> {
     @CommandLine.Parameters(arity = "1..*", converter = AbsoluteFileConverter.class)
     List<File> sourceFiles;
 
-
-    private final Charset dir_list_read_charset;
-    private final Locale locale;
-
-    public ConvertCommand(Map<ConfigurationParser.ConfigParam, Object> config) {
-        dir_list_read_charset = (Charset) config.get(ConfigurationParser.ConfigParam.DIR_LIST_READ_CHARSET);
-        locale = (Locale) config.get(ConfigurationParser.ConfigParam.LOCALE);
+    public ConvertCommand() {
     }
 
     @Override
@@ -127,7 +122,7 @@ public class ConvertCommand implements Callable<Integer> {
             try {
                 printColorFormat(getResourceBundleString("execution.convert.start.parsing") + "\n", Ansi.Color.BLUE, directoryList.getPath());
 
-                tasks.addAll(TaskListFactoryFacade.getTaskFromDirectoryList(directoryList, dir_list_read_charset, factory));
+                tasks.addAll(TaskListFactoryFacade.getTaskFromDirectoryList(directoryList, SettingManager.getDirectoryListCharset(), factory));
 
                 printColorFormat(getResourceBundleString("execution.convert.start.parsed") + "\n", Ansi.Color.BLUE, tasks.size() - previous_size, directoryList.getPath());
                 previous_size = tasks.size();
@@ -195,7 +190,7 @@ public class ConvertCommand implements Callable<Integer> {
         printDebugLog(getColor("\t|- Overwrite:" + overwrite_output, Ansi.Color.CYAN));
         printDebugLog(getColor("\t|- thread:" + nThread, Ansi.Color.CYAN));
         PDFCreator converter = PDFacade.createImagePDFConverter(maxMainMemoryBytes, tempFolder, overwrite_output,
-                locale, pdf_image_color.getColorSpace(), nThread);
+                SettingManager.getLocale(), pdf_image_color.getColorSpace(), nThread);
 
         for (Task task : tasks) {
             printDebugLog("Converting");
