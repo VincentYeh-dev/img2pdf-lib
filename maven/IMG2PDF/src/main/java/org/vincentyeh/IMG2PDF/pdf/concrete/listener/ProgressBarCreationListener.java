@@ -3,11 +3,11 @@ package org.vincentyeh.IMG2PDF.pdf.concrete.listener;
 import org.fusesource.jansi.Ansi;
 import org.vincentyeh.IMG2PDF.pdf.framework.appender.PageAppender;
 import org.vincentyeh.IMG2PDF.pdf.framework.converter.PDFCreator;
+import org.vincentyeh.IMG2PDF.resource.ResourceBundleManager;
 import org.vincentyeh.IMG2PDF.task.framework.Task;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Locale;
 import java.util.ResourceBundle;
 
 import static org.vincentyeh.IMG2PDF.util.PrinterUtils.*;
@@ -16,8 +16,8 @@ public class ProgressBarCreationListener implements PDFCreator.CreationListener,
     private final ResourceBundle resourceBundle;
     private long startSeconds;
 
-    public ProgressBarCreationListener(Locale locale) {
-        this.resourceBundle = ResourceBundle.getBundle("pdf_converter_listener", locale);
+    public ProgressBarCreationListener() {
+        this.resourceBundle = ResourceBundleManager.getListenerResourceBundle();
 
     }
 

@@ -189,8 +189,7 @@ public class ConvertCommand implements Callable<Integer> {
         printDebugLog(getColor("\t|- temporary folder:" + tempFolder.getAbsolutePath(), Ansi.Color.CYAN));
         printDebugLog(getColor("\t|- Overwrite:" + overwrite_output, Ansi.Color.CYAN));
         printDebugLog(getColor("\t|- thread:" + nThread, Ansi.Color.CYAN));
-        PDFCreator converter = PDFacade.createImagePDFConverter(maxMainMemoryBytes, tempFolder, overwrite_output,
-                SettingManager.getLocale(), pdf_image_color.getColorSpace(), nThread);
+        PDFCreator converter = PDFacade.createImagePDFConverter(maxMainMemoryBytes, tempFolder, overwrite_output, pdf_image_color.getColorSpace(), nThread);
 
         for (Task task : tasks) {
             printDebugLog("Converting");
