@@ -2,10 +2,13 @@ package org.vincentyeh.IMG2PDF.task.concrete.factory;
 
 import org.vincentyeh.IMG2PDF.pdf.parameter.DocumentArgument;
 import org.vincentyeh.IMG2PDF.pdf.parameter.PageArgument;
+import org.vincentyeh.IMG2PDF.task.concrete.factory.exception.DirectoryTaskFactoryProcessException;
 import org.vincentyeh.IMG2PDF.task.concrete.factory.exception.EmptyImagesException;
 import org.vincentyeh.IMG2PDF.task.framework.Task;
 import org.vincentyeh.IMG2PDF.task.framework.factory.TaskFactory;
 import org.vincentyeh.IMG2PDF.task.framework.factory.exception.TaskFactoryProcessException;
+import org.vincentyeh.IMG2PDF.util.file.exception.FileNotExistsException;
+import org.vincentyeh.IMG2PDF.util.file.exception.WrongFileTypeException;
 import org.vincentyeh.IMG2PDF.util.interfaces.NameFormatter;
 
 import java.io.File;
@@ -32,9 +35,15 @@ public class DirectoryTaskFactory implements TaskFactory<File> {
     @Override
     public Task create(File file) throws TaskFactoryProcessException {
         try {
+            if (!file.exists())
+                throw new FileNotExistsException(file);
+
+            if (file.isFile())
+                throw new WrongFileTypeException(WrongFileTypeException.Type.FOLDER, WrongFileTypeException.Type.FILE, file);
+
             return new Task(documentArgument, pageArgument, getImagesFromSource(file), getPdfDestinationFromSource(file));
         } catch (Exception e) {
-            throw new TaskFactoryProcessException(file, e);
+            throw new DirectoryTaskFactoryProcessException(file, e);
         }
     }
 
