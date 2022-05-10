@@ -2,6 +2,7 @@ package org.vincentyeh.IMG2PDF;
 
 import org.fusesource.jansi.AnsiConsole;
 import org.vincentyeh.IMG2PDF.commandline.MainCommandMaker;
+import org.vincentyeh.IMG2PDF.resource.ResourceBundleManager;
 import org.vincentyeh.IMG2PDF.setting.SettingManager;
 import picocli.CommandLine;
 import java.io.*;
@@ -13,6 +14,7 @@ public class MainProgram {
         try {
             SettingManager.load();
             SettingManager.save();
+            ResourceBundleManager.setLocale(SettingManager.getLocale());
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Config file error");

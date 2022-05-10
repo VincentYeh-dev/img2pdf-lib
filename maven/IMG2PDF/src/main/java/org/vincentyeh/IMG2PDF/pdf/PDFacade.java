@@ -14,21 +14,20 @@ import org.vincentyeh.IMG2PDF.util.file.exception.MakeDirectoryException;
 
 import java.awt.color.ColorSpace;
 import java.io.File;
-import java.util.Locale;
 
 public class PDFacade {
     private PDFacade() {
 
     }
 
-    public static PDFCreator createImagePDFConverter(long bytes_count, File tempFolder, boolean overwrite_output, Locale locale, ColorSpace colorSpace, int nThread) throws MakeDirectoryException {
+    public static PDFCreator createImagePDFConverter(long bytes_count, File tempFolder, boolean overwrite_output, ColorSpace colorSpace, int nThread) throws MakeDirectoryException {
         PDFBoxCreatorImpl pdfBoxCreatorImpl = new PDFBoxCreatorImpl(tempFolder, bytes_count);
         ImagePDFCreatorImpl imagePDFCreatorImpl = new ImageHelperPDFCreatorImpl(new DirectionImageHelper(new ColorSpaceImageHelper(colorSpace)));
         ExecutorPageAppender appender = new ExecutorPageAppender(nThread);
 
         PDFCreator converter = new ImagePDFCreator(pdfBoxCreatorImpl,imagePDFCreatorImpl, appender, overwrite_output, new StandardImagePageCalculationStrategy());
 
-        ProgressBarCreationListener listener = new ProgressBarCreationListener(locale);
+        ProgressBarCreationListener listener = new ProgressBarCreationListener();
         converter.setCreationListener(listener);
         appender.setPageAppendListener(listener);
         return converter;
