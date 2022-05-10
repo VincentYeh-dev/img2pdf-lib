@@ -11,8 +11,11 @@ import org.vincentyeh.IMG2PDF.pdf.framework.converter.PDFCreator;
 import org.vincentyeh.IMG2PDF.pdf.framework.converter.exception.PDFConversionException;
 import org.vincentyeh.IMG2PDF.pdf.parameter.*;
 import org.vincentyeh.IMG2PDF.task.TaskListFactoryFacade;
+import org.vincentyeh.IMG2PDF.task.concrete.factory.DirectoryTaskFactory;
 import org.vincentyeh.IMG2PDF.task.framework.Task;
-import org.vincentyeh.IMG2PDF.task.framework.factory.TaskListFactory;
+import org.vincentyeh.IMG2PDF.task.framework.factory.TaskFactory;
+import org.vincentyeh.IMG2PDF.task.framework.factory.exception.TaskFactoryProcessException;
+import org.vincentyeh.IMG2PDF.util.file.FileNameFormatter;
 import org.vincentyeh.IMG2PDF.util.file.FileSorter;
 import org.vincentyeh.IMG2PDF.util.file.FileUtils;
 import org.vincentyeh.IMG2PDF.util.file.exception.MakeDirectoryException;
@@ -20,6 +23,7 @@ import picocli.CommandLine;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -116,16 +120,19 @@ public class ConvertCommand implements Callable<Integer> {
 
     private List<Task> importAllTaskFromDirectoryLists() {
         List<Task> tasks = new LinkedList<>();
-        TaskListFactory<?, File> factory = TaskListFactoryFacade.createDirectoryTaskListFactory(dir_list_read_charset, getDocumentArgument(), getPageArgument(), filter, fileSorter, pdf_dst);
+        TaskFactory<File> factory = new DirectoryTaskFactory(getDocumentArgument(), getPageArgument(), filter, fileSorter, new FileNameFormatter(pdf_dst));
+
         int previous_size = 0;
         for (File directoryList : sourceFiles) {
             try {
                 printColorFormat(getResourceBundleString("execution.convert.start.parsing") + "\n", Ansi.Color.BLUE, directoryList.getPath());
-                factory.createTo(directoryList, tasks);
+
+                tasks.addAll(TaskListFactoryFacade.getTaskFromDirectoryList(directoryList, dir_list_read_charset, factory));
+
                 printColorFormat(getResourceBundleString("execution.convert.start.parsed") + "\n", Ansi.Color.BLUE, tasks.size() - previous_size, directoryList.getPath());
                 previous_size = tasks.size();
-            } catch (Exception e) {
-                handleException(e, ExceptionHandlerFacade.getTextFileTaskFactoryExceptionHandler(null), "\t", "");
+            } catch (TaskFactoryProcessException | IOException e) {
+                handleException(e, ExceptionHandlerFacade.getTaskFactoryProcessExceptionHandler(null), "\t", "");
             }
         }
         return tasks;
