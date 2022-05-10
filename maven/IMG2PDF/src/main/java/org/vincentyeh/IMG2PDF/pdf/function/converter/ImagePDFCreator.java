@@ -21,6 +21,8 @@ public class ImagePDFCreator extends PDFCreator {
 
     public ImagePDFCreator(PDFCreatorImpl pdfCreatorImpl, ImagePDFCreatorImpl imagePDFCreatorImpl, PageAppender pageAppender, boolean overwrite, ImagePageCalculateStrategy strategy) {
         super(pdfCreatorImpl, pageAppender, overwrite);
+        if(imagePDFCreatorImpl==null)
+            throw new IllegalArgumentException("imagePDFCreatorImpl is null.");
         this.imagePDFCreatorImpl = imagePDFCreatorImpl;
         this.strategy = strategy;
     }
