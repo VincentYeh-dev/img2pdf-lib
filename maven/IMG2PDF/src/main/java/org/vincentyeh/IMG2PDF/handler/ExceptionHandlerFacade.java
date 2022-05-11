@@ -1,6 +1,6 @@
 package org.vincentyeh.IMG2PDF.handler;
 
-import org.vincentyeh.IMG2PDF.handler.concrete.LineFileTaskFactoryExceptionHandler;
+import org.vincentyeh.IMG2PDF.handler.concrete.TaskFactoryProcessExceptionHandler;
 import org.vincentyeh.IMG2PDF.handler.concrete.PDFConversionExceptionHandler;
 import org.vincentyeh.IMG2PDF.handler.concrete.ParameterExceptionHandler;
 import org.vincentyeh.IMG2PDF.handler.framework.ExceptionHandler;
@@ -22,8 +22,8 @@ public class ExceptionHandlerFacade {
         return new PDFConversionExceptionHandler(next, resourceBundle);
     }
 
-    public static ExceptionHandler getTextFileTaskFactoryExceptionHandler(ExceptionHandler next) {
-        return new LineFileTaskFactoryExceptionHandler(next, resourceBundle);
+    public static ExceptionHandler getTaskFactoryProcessExceptionHandler(ExceptionHandler next) {
+        return new TaskFactoryProcessExceptionHandler(next, resourceBundle);
     }
 
     public static void setResourceBundle(ResourceBundle resourceBundle) {

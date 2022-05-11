@@ -3,17 +3,19 @@ package org.vincentyeh.IMG2PDF.commandline.concrete.command;
 import org.fusesource.jansi.Ansi;
 import org.vincentyeh.IMG2PDF.commandline.concrete.converter.*;
 import org.vincentyeh.IMG2PDF.handler.ExceptionHandlerFacade;
-import org.vincentyeh.IMG2PDF.pdf.PDFacade;
-import org.vincentyeh.IMG2PDF.pdf.framework.converter.exception.PDFConversionException;
-import org.vincentyeh.IMG2PDF.pdf.parameter.*;
-import org.vincentyeh.IMG2PDF.task.TaskListFactoryFacade;
-import org.vincentyeh.IMG2PDF.configuration.framework.ConfigurationParser;
 import org.vincentyeh.IMG2PDF.handler.framework.CantHandleException;
 import org.vincentyeh.IMG2PDF.handler.framework.ExceptionHandler;
+import org.vincentyeh.IMG2PDF.pdf.PDFacade;
 import org.vincentyeh.IMG2PDF.pdf.framework.converter.PDFCreator;
-import org.vincentyeh.IMG2PDF.pdf.concrete.listener.DefaultPDFCreationListener;
+import org.vincentyeh.IMG2PDF.pdf.framework.converter.exception.PDFConversionException;
+import org.vincentyeh.IMG2PDF.pdf.parameter.*;
+import org.vincentyeh.IMG2PDF.setting.SettingManager;
+import org.vincentyeh.IMG2PDF.task.TaskListFactoryFacade;
+import org.vincentyeh.IMG2PDF.task.concrete.factory.DirectoryTaskFactory;
 import org.vincentyeh.IMG2PDF.task.framework.Task;
-import org.vincentyeh.IMG2PDF.task.framework.factory.TaskListFactory;
+import org.vincentyeh.IMG2PDF.task.framework.factory.TaskFactory;
+import org.vincentyeh.IMG2PDF.task.framework.factory.exception.TaskFactoryProcessException;
+import org.vincentyeh.IMG2PDF.util.file.FileNameFormatter;
 import org.vincentyeh.IMG2PDF.util.file.FileSorter;
 import org.vincentyeh.IMG2PDF.util.file.FileUtils;
 import org.vincentyeh.IMG2PDF.util.file.exception.MakeDirectoryException;
@@ -21,9 +23,10 @@ import picocli.CommandLine;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.lang.reflect.Field;
-import java.nio.charset.Charset;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -81,8 +84,8 @@ public class ConvertCommand implements Callable<Integer> {
     @CommandLine.Option(names = {"--memory_max_usage", "-mx"}, defaultValue = "50MB", converter = ByteSizeConverter.class)
     long maxMainMemoryBytes;
 
-//    @CommandLine.Option(names = {"--open_when_complete", "-o"})
-//    boolean open_when_complete;
+    @CommandLine.Option(names = {"--thread", "-t"}, defaultValue = "1")
+    private int nThread;
 
     @CommandLine.Option(names = {"--overwrite", "-ow"})
     boolean overwrite_output;
@@ -90,13 +93,7 @@ public class ConvertCommand implements Callable<Integer> {
     @CommandLine.Parameters(arity = "1..*", converter = AbsoluteFileConverter.class)
     List<File> sourceFiles;
 
-
-    private final Charset dir_list_read_charset;
-    private final Locale locale;
-
-    public ConvertCommand(Map<ConfigurationParser.ConfigParam, Object> config) {
-        dir_list_read_charset = (Charset) config.get(ConfigurationParser.ConfigParam.DIR_LIST_READ_CHARSET);
-        locale = (Locale) config.get(ConfigurationParser.ConfigParam.LOCALE);
+    public ConvertCommand() {
     }
 
     @Override
@@ -118,16 +115,19 @@ public class ConvertCommand implements Callable<Integer> {
 
     private List<Task> importAllTaskFromDirectoryLists() {
         List<Task> tasks = new LinkedList<>();
-        TaskListFactory<?, File> factory = TaskListFactoryFacade.createDirectoryTaskListFactory(dir_list_read_charset, getDocumentArgument(), getPageArgument(), filter, fileSorter, pdf_dst);
+        TaskFactory<File> factory = new DirectoryTaskFactory(getDocumentArgument(), getPageArgument(), filter, fileSorter, new FileNameFormatter(pdf_dst));
+
         int previous_size = 0;
         for (File directoryList : sourceFiles) {
             try {
                 printColorFormat(getResourceBundleString("execution.convert.start.parsing") + "\n", Ansi.Color.BLUE, directoryList.getPath());
-                factory.createTo(directoryList, tasks);
+
+                tasks.addAll(TaskListFactoryFacade.getTaskFromDirectoryList(directoryList, SettingManager.getDirectoryListCharset(), factory));
+
                 printColorFormat(getResourceBundleString("execution.convert.start.parsed") + "\n", Ansi.Color.BLUE, tasks.size() - previous_size, directoryList.getPath());
                 previous_size = tasks.size();
-            } catch (Exception e) {
-                handleException(e, ExceptionHandlerFacade.getTextFileTaskFactoryExceptionHandler(null), "\t", "");
+            } catch (TaskFactoryProcessException | IOException e) {
+                handleException(e, ExceptionHandlerFacade.getTaskFactoryProcessExceptionHandler(null), "\t", "");
             }
         }
         return tasks;
@@ -149,6 +149,9 @@ public class ConvertCommand implements Callable<Integer> {
         checkPrintNullParameter("tempFolder");
         checkPrintNullParameter("maxMainMemoryBytes");
         checkPrintNullParameter("sourceFiles");
+        if (nThread <= 0) {
+            throw new IllegalArgumentException("nThread<=0");
+        }
 
         for (File source : sourceFiles) {
             if (!source.isAbsolute()) throw new IllegalArgumentException("source is not absolute: " + source);
@@ -185,8 +188,8 @@ public class ConvertCommand implements Callable<Integer> {
         printDebugLog(getColor("\t|- max main memory usage:" + maxMainMemoryBytes, Ansi.Color.CYAN));
         printDebugLog(getColor("\t|- temporary folder:" + tempFolder.getAbsolutePath(), Ansi.Color.CYAN));
         printDebugLog(getColor("\t|- Overwrite:" + overwrite_output, Ansi.Color.CYAN));
-        PDFCreator<?> converter = PDFacade.createImagePDFConverter(maxMainMemoryBytes, tempFolder, overwrite_output,
-                new DefaultPDFCreationListener(locale), pdf_image_color.getColorSpace());
+        printDebugLog(getColor("\t|- thread:" + nThread, Ansi.Color.CYAN));
+        PDFCreator converter = PDFacade.createImagePDFConverter(maxMainMemoryBytes, tempFolder, overwrite_output, pdf_image_color.getColorSpace(), nThread);
 
         for (Task task : tasks) {
             printDebugLog("Converting");
