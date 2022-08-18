@@ -5,7 +5,7 @@
 
     <groupId>org.vincentyeh</groupId>
     <artifactId>img2pdf-lib</artifactId>
-    <version>2.0.0</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
     <developers>
         <developer>
@@ -37,8 +37,6 @@
         <maven.compiler.target>16</maven.compiler.target>
         <exe-name>img2pdf</exe-name>
         <jar-name>${project.name}-${project.version}</jar-name>
-
-        <main-class>org.vincentyeh.IMG2PDF.MainProgram</main-class>
     </properties>
 
     <dependencies>
@@ -163,14 +161,6 @@
                                     <exclude>org.junit.jupiter:*</exclude>
                                 </excludes>
                             </artifactSet>
-
-                            <transformers>
-                                <transformer
-                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>${main-class}</mainClass>
-                                </transformer>
-                            </transformers>
-
                         </configuration>
                     </execution>
 
