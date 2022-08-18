@@ -1,16 +1,17 @@
-package org.vincentyeh.IMG2PDF.lib.pdf.concrete.calculation.strategy;
+package org.vincentyeh.img2pdf.lib.pdf.concrete.calculation.strategy;
 
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.calculation.strategy.ImagePageCalculateStrategy;
-import org.vincentyeh.IMG2PDF.lib.pdf.parameter.PageAlign;
-import org.vincentyeh.IMG2PDF.lib.pdf.parameter.PageArgument;
-import org.vincentyeh.IMG2PDF.lib.pdf.parameter.PageDirection;
-import org.vincentyeh.IMG2PDF.lib.pdf.parameter.PageSize;
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.calculation.Position;
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.calculation.Size;
+import org.vincentyeh.img2pdf.lib.pdf.framework.calculation.strategy.ImagePageCalculateStrategy;
+import org.vincentyeh.img2pdf.lib.pdf.parameter.PageAlign;
+import org.vincentyeh.img2pdf.lib.pdf.parameter.PageArgument;
+import org.vincentyeh.img2pdf.lib.pdf.parameter.PageDirection;
+import org.vincentyeh.img2pdf.lib.pdf.parameter.PageSize;
+import org.vincentyeh.img2pdf.lib.pdf.framework.calculation.Position;
+import org.vincentyeh.img2pdf.lib.pdf.framework.calculation.Size;
 
-import static org.vincentyeh.IMG2PDF.lib.pdf.parameter.PageDirection.Landscape;
-import static org.vincentyeh.IMG2PDF.lib.pdf.parameter.PageDirection.Portrait;
+import static org.vincentyeh.img2pdf.lib.pdf.parameter.PageDirection.Landscape;
+import static org.vincentyeh.img2pdf.lib.pdf.parameter.PageDirection.Portrait;
+
 
 public final class StandardImagePageCalculationStrategy implements ImagePageCalculateStrategy {
     private Size pageSize;

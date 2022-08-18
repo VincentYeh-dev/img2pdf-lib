@@ -1,13 +1,13 @@
-package org.vincentyeh.IMG2PDF.lib.pdf.concrete.converter;
+package org.vincentyeh.img2pdf.lib.pdf.concrete.converter;
 
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.objects.PdfDocument;
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.objects.PdfPage;
-import org.vincentyeh.IMG2PDF.lib.pdf.concrete.objects.PdfBoxDocumentAdaptor;
-import org.vincentyeh.IMG2PDF.lib.pdf.concrete.objects.PdfBoxPageAdaptor;
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.converter.PDFCreatorImpl;
+import org.vincentyeh.img2pdf.lib.pdf.framework.objects.PdfDocument;
+import org.vincentyeh.img2pdf.lib.pdf.framework.objects.PdfPage;
+import org.vincentyeh.img2pdf.lib.pdf.concrete.objects.PdfBoxDocumentAdaptor;
+import org.vincentyeh.img2pdf.lib.pdf.concrete.objects.PdfBoxPageAdaptor;
+import org.vincentyeh.img2pdf.lib.pdf.framework.converter.PDFCreatorImpl;
 
 import java.io.File;
 

@@ -1,6 +1,6 @@
-package org.vincentyeh.IMG2PDF.lib.image.helper.concrete;
+package org.vincentyeh.img2pdf.lib.image.helper.concrete;
 
-import org.vincentyeh.IMG2PDF.lib.image.helper.framework.ImageHelper;
+import org.vincentyeh.img2pdf.lib.image.helper.framework.ImageHelper;
 
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;

@@ -1,10 +1,10 @@
-package org.vincentyeh.IMG2PDF.lib.image.helper.concrete;
+package org.vincentyeh.img2pdf.lib.image.helper.concrete;
 
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.MetadataException;
 import com.drew.metadata.exif.ExifIFD0Directory;
-import org.vincentyeh.IMG2PDF.lib.image.helper.framework.ImageHelper;
+import org.vincentyeh.img2pdf.lib.image.helper.framework.ImageHelper;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

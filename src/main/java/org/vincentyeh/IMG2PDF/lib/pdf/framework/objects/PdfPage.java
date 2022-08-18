@@ -1,7 +1,7 @@
-package org.vincentyeh.IMG2PDF.lib.pdf.framework.objects;
+package org.vincentyeh.img2pdf.lib.pdf.framework.objects;
 
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.calculation.Position;
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.calculation.Size;
+import org.vincentyeh.img2pdf.lib.pdf.framework.calculation.Position;
+import org.vincentyeh.img2pdf.lib.pdf.framework.calculation.Size;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;

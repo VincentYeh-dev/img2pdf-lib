@@ -1,8 +1,9 @@
-package org.vincentyeh.IMG2PDF.lib.pdf.concrete.appender;
+package org.vincentyeh.img2pdf.lib.pdf.concrete.appender;
 
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.appender.PageAppender;
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.objects.PdfDocument;
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.objects.PdfPage;
+
+import org.vincentyeh.img2pdf.lib.pdf.framework.appender.PageAppender;
+import org.vincentyeh.img2pdf.lib.pdf.framework.objects.PdfDocument;
+import org.vincentyeh.img2pdf.lib.pdf.framework.objects.PdfPage;
 
 import java.util.List;
 import java.util.concurrent.*;

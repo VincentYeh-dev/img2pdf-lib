@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.lib.pdf.concrete.objects;
+package org.vincentyeh.img2pdf.lib.pdf.concrete.objects;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -6,9 +6,9 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.objects.PdfPage;
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.calculation.Position;
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.calculation.Size;
+import org.vincentyeh.img2pdf.lib.pdf.framework.calculation.Position;
+import org.vincentyeh.img2pdf.lib.pdf.framework.calculation.Size;
+import org.vincentyeh.img2pdf.lib.pdf.framework.objects.PdfPage;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;

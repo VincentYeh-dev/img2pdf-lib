@@ -1,14 +1,14 @@
-package org.vincentyeh.IMG2PDF.lib.pdf.function.converter;
+package org.vincentyeh.img2pdf.lib.pdf.function.converter;
 
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.appender.PageAppender;
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.calculation.Size;
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.calculation.strategy.ImagePageCalculateStrategy;
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.converter.PDFCreator;
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.converter.PDFCreatorImpl;
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.objects.PdfDocument;
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.objects.PdfPage;
-import org.vincentyeh.IMG2PDF.lib.pdf.parameter.DocumentArgument;
-import org.vincentyeh.IMG2PDF.lib.pdf.parameter.PageArgument;
+import org.vincentyeh.img2pdf.lib.pdf.framework.appender.PageAppender;
+import org.vincentyeh.img2pdf.lib.pdf.framework.calculation.Size;
+import org.vincentyeh.img2pdf.lib.pdf.framework.calculation.strategy.ImagePageCalculateStrategy;
+import org.vincentyeh.img2pdf.lib.pdf.framework.converter.PDFCreator;
+import org.vincentyeh.img2pdf.lib.pdf.framework.converter.PDFCreatorImpl;
+import org.vincentyeh.img2pdf.lib.pdf.framework.objects.PdfDocument;
+import org.vincentyeh.img2pdf.lib.pdf.framework.objects.PdfPage;
+import org.vincentyeh.img2pdf.lib.pdf.parameter.DocumentArgument;
+import org.vincentyeh.img2pdf.lib.pdf.parameter.PageArgument;
 
 import javax.imageio.ImageIO;
 import java.io.File;

@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.lib.pdf.framework.converter.exception;
+package org.vincentyeh.img2pdf.lib.pdf.framework.converter.exception;
 
 public class PDFConversionException extends RuntimeException {
 

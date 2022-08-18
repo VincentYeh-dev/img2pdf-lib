@@ -1,4 +1,4 @@
-package org.vincentyeh.IMG2PDF.lib.image.helper.framework;
+package org.vincentyeh.img2pdf.lib.image.helper.framework;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

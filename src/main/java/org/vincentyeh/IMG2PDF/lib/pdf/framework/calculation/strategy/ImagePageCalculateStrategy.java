@@ -1,8 +1,8 @@
-package org.vincentyeh.IMG2PDF.lib.pdf.framework.calculation.strategy;
+package org.vincentyeh.img2pdf.lib.pdf.framework.calculation.strategy;
 
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.calculation.Position;
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.calculation.Size;
-import org.vincentyeh.IMG2PDF.lib.pdf.parameter.PageArgument;
+import org.vincentyeh.img2pdf.lib.pdf.framework.calculation.Position;
+import org.vincentyeh.img2pdf.lib.pdf.framework.calculation.Size;
+import org.vincentyeh.img2pdf.lib.pdf.parameter.PageArgument;
 
 public interface ImagePageCalculateStrategy {
 

@@ -1,7 +1,7 @@
-package org.vincentyeh.IMG2PDF.lib.pdf.framework.objects;
+package org.vincentyeh.img2pdf.lib.pdf.framework.objects;
 
-import org.vincentyeh.IMG2PDF.lib.pdf.parameter.PDFDocumentInfo;
-import org.vincentyeh.IMG2PDF.lib.pdf.parameter.Permission;
+import org.vincentyeh.img2pdf.lib.pdf.parameter.PDFDocumentInfo;
+import org.vincentyeh.img2pdf.lib.pdf.parameter.Permission;
 
 import java.io.File;
 import java.io.IOException;
