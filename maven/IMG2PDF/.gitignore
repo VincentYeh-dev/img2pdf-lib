@@ -1,9 +1,0 @@
-*.iml
-*.txt
-target
-.org.vincentyeh.IMG2PDF.tmp
-.gradle
-.idea
-.run
-config.properties
-dependency-reduced-pom.xml
