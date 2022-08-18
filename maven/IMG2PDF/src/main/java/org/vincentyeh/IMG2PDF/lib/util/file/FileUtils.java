@@ -1,7 +1,6 @@
 package org.vincentyeh.IMG2PDF.lib.util.file;
 
 import org.vincentyeh.IMG2PDF.lib.util.file.exception.*;
-import org.vincentyeh.IMG2PDF.util.file.exception.*;
 
 import java.io.File;
 import java.io.IOException;
