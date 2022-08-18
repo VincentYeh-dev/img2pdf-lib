@@ -18,6 +18,7 @@ public final class PageAlign {
 	 * @param verti_align Vertical Align
 	 * @param hori_align Horizontal Align
 	 */
+
 	public PageAlign(final VerticalAlign verti_align, final HorizontalAlign hori_align) {
 		this.hori_align = hori_align;
 		this.verti_align = verti_align;

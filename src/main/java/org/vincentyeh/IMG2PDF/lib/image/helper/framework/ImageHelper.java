@@ -1,12 +1,11 @@
 package org.vincentyeh.IMG2PDF.lib.image.helper.framework;
 
-import org.vincentyeh.IMG2PDF.lib.util.file.FileUtils;
-
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 
 public abstract class ImageHelper {
     private final ImageHelper imageHelper;
@@ -22,7 +21,8 @@ public abstract class ImageHelper {
     }
 
     public final BufferedImage read(File file) throws Exception {
-        FileUtils.checkExists(file);
+        if(!file.exists())
+            throw new FileNotFoundException(file.getAbsolutePath()+" not found");
         if (imageHelper != null)
             return read(file, imageHelper.read(file));
         else

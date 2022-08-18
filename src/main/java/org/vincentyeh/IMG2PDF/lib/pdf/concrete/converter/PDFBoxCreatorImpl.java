@@ -5,8 +5,6 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.vincentyeh.IMG2PDF.lib.pdf.framework.objects.PdfDocument;
 import org.vincentyeh.IMG2PDF.lib.pdf.framework.objects.PdfPage;
-import org.vincentyeh.IMG2PDF.lib.util.file.FileUtils;
-import org.vincentyeh.IMG2PDF.lib.util.file.exception.MakeDirectoryException;
 import org.vincentyeh.IMG2PDF.lib.pdf.concrete.objects.PdfBoxDocumentAdaptor;
 import org.vincentyeh.IMG2PDF.lib.pdf.concrete.objects.PdfBoxPageAdaptor;
 import org.vincentyeh.IMG2PDF.lib.pdf.framework.converter.PDFCreatorImpl;
@@ -17,8 +15,7 @@ public class PDFBoxCreatorImpl implements PDFCreatorImpl {
 
     private final MemoryUsageSetting setting;
 
-    public PDFBoxCreatorImpl(File tempFolder, long maxMainMemoryBytes) throws MakeDirectoryException {
-        FileUtils.makeDirectories(tempFolder);
+    public PDFBoxCreatorImpl(File tempFolder, long maxMainMemoryBytes) {
         setting = MemoryUsageSetting.setupMixed(maxMainMemoryBytes).setTempDir(tempFolder);
     }
 
@@ -31,6 +28,5 @@ public class PDFBoxCreatorImpl implements PDFCreatorImpl {
         return new PdfBoxPageAdaptor(new PDPage(), (PDDocument) document.get());
 
     }
-
 
 }

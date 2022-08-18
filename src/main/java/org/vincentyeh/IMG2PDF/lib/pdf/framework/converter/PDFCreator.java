@@ -1,13 +1,11 @@
 package org.vincentyeh.IMG2PDF.lib.pdf.framework.converter;
 
 import org.vincentyeh.IMG2PDF.lib.pdf.framework.appender.PageAppender;
+import org.vincentyeh.IMG2PDF.lib.pdf.framework.converter.exception.PDFConversionException;
 import org.vincentyeh.IMG2PDF.lib.pdf.framework.converter.exception.SaveException;
 import org.vincentyeh.IMG2PDF.lib.pdf.framework.objects.PdfDocument;
 import org.vincentyeh.IMG2PDF.lib.pdf.framework.objects.PdfPage;
-import org.vincentyeh.IMG2PDF.lib.task.framework.Task;
-import org.vincentyeh.IMG2PDF.lib.util.file.FileUtils;
-import org.vincentyeh.IMG2PDF.lib.util.file.exception.OverwriteException;
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.converter.exception.PDFConversionException;
+import org.vincentyeh.IMG2PDF.lib.pdf.parameter.DocumentArgument;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,8 +14,10 @@ import java.util.concurrent.Callable;
 
 public abstract class PDFCreator {
 
+    private final DocumentArgument documentArgument;
+
     public interface CreationListener {
-        void initializing(Task task);
+        void initializing();
 
         void onConversionComplete();
 
@@ -31,7 +31,8 @@ public abstract class PDFCreator {
     protected CreationListener listener;
     private final PageAppender appender;
 
-    public PDFCreator(PDFCreatorImpl impl, PageAppender pageAppender, boolean overwrite) {
+    public PDFCreator(DocumentArgument documentArgument, PDFCreatorImpl impl, PageAppender pageAppender, boolean overwrite) {
+        this.documentArgument = documentArgument;
         if (impl == null)
             throw new IllegalArgumentException("impl is null");
         this.impl = impl;
@@ -39,46 +40,43 @@ public abstract class PDFCreator {
         appender = pageAppender;
     }
 
-    protected abstract List<Callable<PdfPage<?>>> getPageCallables(PdfDocument<?> document, Task task);
+    protected abstract List<Callable<PdfPage<?>>> getPageCallables(PdfDocument<?> document);
 
-    protected final PdfDocument<?> generateDocument(Task task) throws IOException {
+    protected final PdfDocument<?> generateDocument() throws IOException {
         PdfDocument<?> document = impl.createEmptyDocument();
-        document.setOwnerPassword(task.getDocumentArgument().getOwnerPassword());
-        document.setUserPassword(task.getDocumentArgument().getUserPassword());
-        document.setPermission(task.getDocumentArgument().getPermission());
+        document.setOwnerPassword(this.documentArgument.getOwnerPassword());
+        document.setUserPassword(this.documentArgument.getUserPassword());
+        document.setPermission(this.documentArgument.getPermission());
         document.encrypt();
-        document.setInfo(task.getDocumentArgument().getInformation());
+        document.setInfo(this.documentArgument.getInformation());
         return document;
     }
 
-    public final File start(Task task) throws PDFConversionException {
-        if (task == null)
-            throw new IllegalArgumentException("task is null.");
+    public final File start(File destination) throws PDFConversionException {
 
-        if (listener != null)
-            listener.initializing(task);
         PdfDocument<?> document = null;
         try {
-            checkOverwrite(task.getPdfDestination());
-            document = generateDocument(task);
+            checkOverwrite(destination);
+            document = generateDocument();
 
             if(appender!=null)
-                appender.append(document, getPageCallables(document, task));
+                appender.append(document, getPageCallables(document));
 
             try {
-                document.save(task.getPdfDestination());
+                destination.getParentFile().mkdirs();
+                document.save(destination);
                 if (listener != null)
-                    listener.onSaved(task.getPdfDestination());
+                    listener.onSaved(destination);
             } catch (IOException e) {
-                throw new SaveException(e, task.getPdfDestination());
+                throw new SaveException(e, destination);
             }
 
             if (listener != null)
                 listener.onConversionComplete();
 
-            return task.getPdfDestination();
+            return destination;
         } catch (Exception e) {
-            throw new PDFConversionException(task, e);
+            throw new PDFConversionException(e);
         } finally {
             try {
                 if (document != null)
@@ -93,12 +91,8 @@ public abstract class PDFCreator {
     }
 
     private void checkOverwrite(File file) throws SaveException {
-        if (!overwrite) {
-            try {
-                FileUtils.checkOverwrite(file, "PDF overwrite deny,File is already exists:" + file.getAbsoluteFile());
-            } catch (OverwriteException e) {
-                throw new SaveException(e, file);
-            }
+        if (!overwrite&&file.exists()) {
+            throw new SaveException(new IOException("Overwrite deny"),file);
         }
     }
 

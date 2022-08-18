@@ -1,46 +1,54 @@
 package org.vincentyeh.IMG2PDF.lib.pdf.function.converter;
 
 import org.vincentyeh.IMG2PDF.lib.pdf.framework.appender.PageAppender;
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.calculation.strategy.ImagePageCalculateStrategy;
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.objects.PdfDocument;
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.objects.PdfPage;
-import org.vincentyeh.IMG2PDF.lib.task.framework.Task;
 import org.vincentyeh.IMG2PDF.lib.pdf.framework.calculation.Size;
+import org.vincentyeh.IMG2PDF.lib.pdf.framework.calculation.strategy.ImagePageCalculateStrategy;
 import org.vincentyeh.IMG2PDF.lib.pdf.framework.converter.PDFCreator;
 import org.vincentyeh.IMG2PDF.lib.pdf.framework.converter.PDFCreatorImpl;
+import org.vincentyeh.IMG2PDF.lib.pdf.framework.objects.PdfDocument;
+import org.vincentyeh.IMG2PDF.lib.pdf.framework.objects.PdfPage;
+import org.vincentyeh.IMG2PDF.lib.pdf.parameter.DocumentArgument;
+import org.vincentyeh.IMG2PDF.lib.pdf.parameter.PageArgument;
 
-import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
 public class ImagePDFCreator extends PDFCreator {
-    private final ImagePDFCreatorImpl imagePDFCreatorImpl;
+    private final ImageReadImpl imageReadImpl;
     private final ImagePageCalculateStrategy strategy;
+    private final PageArgument pageArgument;
+    private File[] imageFiles;
 
-    public ImagePDFCreator(PDFCreatorImpl pdfCreatorImpl, ImagePDFCreatorImpl imagePDFCreatorImpl, PageAppender pageAppender, boolean overwrite, ImagePageCalculateStrategy strategy) {
-        super(pdfCreatorImpl, pageAppender, overwrite);
-        if(imagePDFCreatorImpl==null)
-            throw new IllegalArgumentException("imagePDFCreatorImpl is null.");
-        this.imagePDFCreatorImpl = imagePDFCreatorImpl;
+    public ImagePDFCreator(PageArgument pageArgument, DocumentArgument documentArgument, PDFCreatorImpl pdfCreatorImpl, ImageReadImpl imageReadImpl,
+                           PageAppender pageAppender, boolean overwrite, ImagePageCalculateStrategy strategy) {
+        super(documentArgument,pdfCreatorImpl, pageAppender, overwrite);
+        this.pageArgument = pageArgument;
+        this.imageReadImpl = imageReadImpl;
         this.strategy = strategy;
     }
 
+    public void setImages(File[] imageFiles){
+        this.imageFiles = imageFiles;
+    }
+
     @Override
-    protected List<Callable<PdfPage<?>>> getPageCallables(PdfDocument<?> document, Task task) {
-        File[] files = task.getImages();
-        List<Callable<PdfPage<?>>> list = new LinkedList<>();
-        for (File file : files) {
-            list.add(() -> {
-                PdfPage<?> page = impl.createEmptyPage(document);
-                BufferedImage bufferedImage = imagePDFCreatorImpl.readImage(file);
-                strategy.execute(task.getPageArgument(),new Size(bufferedImage.getWidth(),bufferedImage.getHeight()));
-                page.setSize(strategy.getPageSize());
-                page.putImage(bufferedImage, strategy.getImagePosition(), strategy.getImageSize());
-                return page;
-            });
-        }
+    protected List<Callable<PdfPage<?>>> getPageCallables(PdfDocument<?> document) {
+        var list = new LinkedList<Callable<PdfPage<?>>>();
+        if(imageFiles!=null)
+            for (File file : imageFiles) {
+                list.add(() -> {
+                    PdfPage<?> page = impl.createEmptyPage(document);
+                    var bufferedImage =imageReadImpl!=null?imageReadImpl.readImage(file): ImageIO.read(file);
+                    strategy.execute(this.pageArgument,new Size(bufferedImage.getWidth(),bufferedImage.getHeight()));
+                    page.setSize(strategy.getPageSize());
+                    page.putImage(bufferedImage, strategy.getImagePosition(), strategy.getImageSize());
+                    return page;
+                });
+            }
+        imageFiles=null;
         return list;
     }
 
