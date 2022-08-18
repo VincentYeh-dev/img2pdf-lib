@@ -74,18 +74,6 @@
         </dependency>
 
         <dependency>
-            <groupId>info.picocli</groupId>
-            <artifactId>picocli</artifactId>
-            <version>4.6.1</version>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.fusesource.jansi/jansi -->
-        <dependency>
-            <groupId>org.fusesource.jansi</groupId>
-            <artifactId>jansi</artifactId>
-            <version>1.18</version>
-        </dependency>
-        <dependency>
             <groupId>com.drewnoakes</groupId>
             <artifactId>metadata-extractor</artifactId>
             <version>2.16.0</version>
@@ -186,40 +174,6 @@
                         </configuration>
                     </execution>
 
-                </executions>
-            </plugin>
-
-            <!-- LAUNCH4J -->
-            <plugin>
-                <groupId>com.akathist.maven.plugins.launch4j</groupId>
-                <artifactId>launch4j-maven-plugin</artifactId>
-                <version>2.1.1</version>
-                <executions>
-                    <execution>
-                        <id>l4j-clui</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>launch4j</goal>
-                        </goals>
-                        <configuration>
-                            <headerType>console</headerType>
-                            <jar>target/${jar-name}.jar</jar>
-                            <outfile>target/bin/${exe-name}.exe</outfile>
-                            <downloadUrl>http://www.java.com</downloadUrl>
-                            <classPath>
-                                <mainClass>${main-class}</mainClass>
-                            </classPath>
-                            <jre>
-                                <opts>
-                                    <opt>-Dfile.encoding=UTF-8</opt>
-                                </opts>
-                                <bundledJre64Bit>false</bundledJre64Bit>
-                                <bundledJreAsFallback>false</bundledJreAsFallback>
-                                <minVersion>${maven.compiler.source}</minVersion>
-                                <jdkPreference>preferJre</jdkPreference>
-                            </jre>
-                        </configuration>
-                    </execution>
                 </executions>
             </plugin>
         </plugins>

@@ -6,7 +6,6 @@ import org.vincentyeh.IMG2PDF.pdf.concrete.appender.ExecutorPageAppender;
 import org.vincentyeh.IMG2PDF.pdf.concrete.calculation.strategy.StandardImagePageCalculationStrategy;
 import org.vincentyeh.IMG2PDF.pdf.concrete.converter.ImageHelperPDFCreatorImpl;
 import org.vincentyeh.IMG2PDF.pdf.concrete.converter.PDFBoxCreatorImpl;
-import org.vincentyeh.IMG2PDF.pdf.concrete.listener.ProgressBarCreationListener;
 import org.vincentyeh.IMG2PDF.pdf.framework.converter.PDFCreator;
 import org.vincentyeh.IMG2PDF.pdf.function.converter.ImagePDFCreator;
 import org.vincentyeh.IMG2PDF.pdf.function.converter.ImagePDFCreatorImpl;
@@ -27,9 +26,6 @@ public class PDFacade {
 
         PDFCreator converter = new ImagePDFCreator(pdfBoxCreatorImpl,imagePDFCreatorImpl, appender, overwrite_output, new StandardImagePageCalculationStrategy());
 
-        ProgressBarCreationListener listener = new ProgressBarCreationListener();
-        converter.setCreationListener(listener);
-        appender.setPageAppendListener(listener);
         return converter;
     }
 }
