@@ -2,16 +2,17 @@ package org.vincentyeh.img2pdf.lib.pdf.concrete.converter;
 
 import org.vincentyeh.img2pdf.lib.image.reader.framework.ImageReader;
 import org.vincentyeh.img2pdf.lib.pdf.framework.converter.exception.ReadImageException;
+import org.vincentyeh.img2pdf.lib.pdf.function.converter.ImageReadImpl;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 
-public class ImageReadImpl implements org.vincentyeh.img2pdf.lib.pdf.function.converter.ImageReadImpl {
-    private final ImageReader helper;
+public class ImageReaderReadImpl implements ImageReadImpl {
+    private final ImageReader reader;
 
-    public ImageReadImpl(ImageReader helper) {
-        this.helper = helper;
+    public ImageReaderReadImpl(ImageReader reader) {
+        this.reader = reader;
     }
 
     @Override
@@ -19,7 +20,7 @@ public class ImageReadImpl implements org.vincentyeh.img2pdf.lib.pdf.function.co
         try {
             if(!file.exists())
                 throw new FileNotFoundException(file.getAbsolutePath()+" not found");
-            BufferedImage image = helper.read(file);
+            BufferedImage image = reader.read(file);
             if (image == null)
                 throw new RuntimeException("image==null");
             return image;
