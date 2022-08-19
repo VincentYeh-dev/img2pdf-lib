@@ -6,61 +6,61 @@ import org.vincentyeh.img2pdf.lib.pdf.parameter.PageAlign;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageArgument;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageDirection;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageSize;
-import org.vincentyeh.img2pdf.lib.pdf.framework.calculation.Position;
-import org.vincentyeh.img2pdf.lib.pdf.framework.calculation.Size;
+import org.vincentyeh.img2pdf.lib.pdf.framework.objects.PointF;
+import org.vincentyeh.img2pdf.lib.pdf.framework.objects.SizeF;
 
 import static org.vincentyeh.img2pdf.lib.pdf.parameter.PageDirection.Landscape;
 import static org.vincentyeh.img2pdf.lib.pdf.parameter.PageDirection.Portrait;
 
 
 public final class StandardImagePageCalculationStrategy implements ImagePageCalculateStrategy {
-    private Size pageSize;
-    private Size newImageSize;
-    private Position imagePosition;
+    private SizeF pageSize;
+    private SizeF newImageSize;
+    private PointF imagePosition;
 
     @Override
-    public Position getImagePosition() {
+    public PointF getImagePosition() {
         return imagePosition;
     }
 
     @Override
-    public Size getPageSize() {
+    public SizeF getPageSize() {
         return pageSize;
     }
 
     @Override
-    public Size getImageSize() {
+    public SizeF getImageSize() {
         return newImageSize;
     }
 
     @Override
-    public void execute(PageArgument argument, Size imageSize) {
+    public void execute(PageArgument argument, SizeF imageSize) {
         PageDirection direction = getSuitableDirection(argument, imageSize);
         pageSize = getSuitablePageSize(direction, argument.size(), imageSize);
         newImageSize = getMaxScaleImageSize(imageSize, pageSize);
         imagePosition = calculateImagePosition(newImageSize, pageSize, argument.align());
     }
 
-    private Size getMaxScaleImageSize(Size imageSize, Size page_size) {
+    private SizeF getMaxScaleImageSize(SizeF imageSize, SizeF page_size) {
         return scaleUpToMax(imageSize, page_size);
     }
 
-    private Position calculateImagePosition(Size img_size, Size page_size, PageAlign align) {
+    private PointF calculateImagePosition(SizeF img_size, SizeF page_size, PageAlign align) {
         return calculatePosition(align, img_size, page_size);
     }
 
-    private PageDirection getSuitableDirection(PageArgument argument, Size size) {
+    private PageDirection getSuitableDirection(PageArgument argument, SizeF size) {
         if (argument.size() == PageSize.DEPEND_ON_IMG) {
             return Portrait;
         }
         if (argument.autoRotate()) {
-            return detectDirection(size.getHeight(), size.getWidth());
+            return detectDirection(size.height(), size.width());
         } else {
             return argument.direction();
         }
     }
 
-    private Size getSuitablePageSize(PageDirection direction, PageSize pageSize, Size imageSize) {
+    private SizeF getSuitablePageSize(PageDirection direction, PageSize pageSize, SizeF imageSize) {
         if (pageSize == PageSize.DEPEND_ON_IMG) {
             return imageSize;
         } else {
@@ -69,24 +69,24 @@ public final class StandardImagePageCalculationStrategy implements ImagePageCalc
         }
     }
 
-    private Size getPageSize(PDRectangle rectangle, boolean reverse) {
-        return new Size(reverse ? rectangle.getHeight() : rectangle.getWidth(), reverse ? rectangle.getWidth() : rectangle.getHeight());
+    private SizeF getPageSize(PDRectangle rectangle, boolean reverse) {
+        return new SizeF(reverse ? rectangle.getHeight() : rectangle.getWidth(), reverse ? rectangle.getWidth() : rectangle.getHeight());
     }
 
     private PageDirection detectDirection(float height, float width) {
         return PageDirection.detectDirection(height, width);
     }
 
-    private Size scaleUpToMax(Size img_size, Size page_size) {
+    private SizeF scaleUpToMax(SizeF img_size, SizeF page_size) {
         if (img_size == null)
             throw new IllegalArgumentException("img_size==null");
         if (page_size == null)
             throw new IllegalArgumentException("page_size==null");
 
-        float img_height = img_size.getHeight();
-        float img_width = img_size.getWidth();
-        float page_height = page_size.getHeight();
-        float page_width = page_size.getWidth();
+        float img_height = img_size.height();
+        float img_width = img_size.width();
+        float page_height = page_size.height();
+        float page_width = page_size.width();
 
         float out_width = (img_width / img_height) * page_height;
         float out_height = (img_height / img_width) * page_width;
@@ -100,20 +100,20 @@ public final class StandardImagePageCalculationStrategy implements ImagePageCalc
 //			out_width = (img_width / img_height) * page_height;
         }
 
-        return new Size(out_width, out_height);
+        return new SizeF(out_width, out_height);
     }
 
-    private Position calculatePosition(PageAlign align, Size object_size, Size container_size) {
+    private PointF calculatePosition(PageAlign align, SizeF object_size, SizeF container_size) {
         if (object_size == null)
             throw new IllegalArgumentException("object_size==null");
         if (container_size == null)
             throw new IllegalArgumentException("container_size==null");
 
-        return calculatePosition(align, object_size.getHeight(), object_size.getWidth(), container_size.getHeight(), container_size.getWidth());
+        return calculatePosition(align, object_size.height(), object_size.width(), container_size.height(), container_size.width());
     }
 
-    private Position calculatePosition(PageAlign align, float object_height, float object_width, float container_height,
-                                       float container_width) {
+    private PointF calculatePosition(PageAlign align, float object_height, float object_width, float container_height,
+                                     float container_width) {
         final float x_space;
         final float y_space;
         if (object_height < 0)
@@ -169,6 +169,6 @@ public final class StandardImagePageCalculationStrategy implements ImagePageCalc
 
         }
 
-        return new Position(position_x, position_y);
+        return new PointF(position_x, position_y);
     }
 }

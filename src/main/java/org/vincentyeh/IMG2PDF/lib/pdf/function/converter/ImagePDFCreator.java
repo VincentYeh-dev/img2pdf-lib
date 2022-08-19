@@ -1,7 +1,7 @@
 package org.vincentyeh.img2pdf.lib.pdf.function.converter;
 
 import org.vincentyeh.img2pdf.lib.pdf.framework.appender.PageAppender;
-import org.vincentyeh.img2pdf.lib.pdf.framework.calculation.Size;
+import org.vincentyeh.img2pdf.lib.pdf.framework.objects.SizeF;
 import org.vincentyeh.img2pdf.lib.pdf.framework.calculation.strategy.ImagePageCalculateStrategy;
 import org.vincentyeh.img2pdf.lib.pdf.framework.converter.PDFCreator;
 import org.vincentyeh.img2pdf.lib.pdf.framework.converter.PDFCreatorImpl;
@@ -42,7 +42,7 @@ public class ImagePDFCreator extends PDFCreator {
                 list.add(() -> {
                     PdfPage<?> page = impl.createEmptyPage(document);
                     var bufferedImage =imageReadImpl!=null?imageReadImpl.readImage(file): ImageIO.read(file);
-                    strategy.execute(this.pageArgument,new Size(bufferedImage.getWidth(),bufferedImage.getHeight()));
+                    strategy.execute(this.pageArgument,new SizeF(bufferedImage.getWidth(),bufferedImage.getHeight()));
                     page.setSize(strategy.getPageSize());
                     page.putImage(bufferedImage, strategy.getImagePosition(), strategy.getImageSize());
                     return page;
