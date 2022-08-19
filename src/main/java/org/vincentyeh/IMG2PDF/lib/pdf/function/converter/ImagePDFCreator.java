@@ -40,7 +40,7 @@ public class ImagePDFCreator extends PDFCreator {
         if(imageFiles!=null)
             for (File file : imageFiles) {
                 list.add(() -> {
-                    PdfPage<?> page = impl.createEmptyPage(document);
+                    PdfPage<?> page = pdfCreatorImpl.createEmptyPage(document);
                     var bufferedImage =imageReadImpl!=null?imageReadImpl.readImage(file): ImageIO.read(file);
                     strategy.execute(this.pageArgument,new SizeF(bufferedImage.getWidth(),bufferedImage.getHeight()));
                     page.setSize(strategy.getPageSize());

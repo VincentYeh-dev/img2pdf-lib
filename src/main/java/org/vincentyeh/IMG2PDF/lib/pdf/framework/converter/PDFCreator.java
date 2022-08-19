@@ -26,24 +26,27 @@ public abstract class PDFCreator {
         void onFinally();
     }
 
-    protected final PDFCreatorImpl impl;
+    protected final PDFCreatorImpl pdfCreatorImpl;
     private final boolean overwrite;
     protected CreationListener listener;
     private final PageAppender appender;
 
-    public PDFCreator(DocumentArgument documentArgument, PDFCreatorImpl impl, PageAppender pageAppender, boolean overwrite) {
+    public PDFCreator(DocumentArgument documentArgument, PDFCreatorImpl pdfCreatorImpl, PageAppender pageAppender, boolean overwrite) {
+        if (documentArgument == null)
+            throw new IllegalArgumentException("documentArgument is null");
+        if (pdfCreatorImpl == null)
+            throw new IllegalArgumentException("pdfCreatorImpl is null");
+
         this.documentArgument = documentArgument;
-        if (impl == null)
-            throw new IllegalArgumentException("impl is null");
-        this.impl = impl;
+        this.pdfCreatorImpl = pdfCreatorImpl;
+        this.appender = pageAppender;
         this.overwrite = overwrite;
-        appender = pageAppender;
     }
 
     protected abstract List<Callable<PdfPage<?>>> getPageCallables(PdfDocument<?> document);
 
     protected final PdfDocument<?> generateDocument() throws IOException {
-        PdfDocument<?> document = impl.createEmptyDocument();
+        var document = pdfCreatorImpl.createEmptyDocument();
         document.setOwnerPassword(this.documentArgument.ownerPassword());
         document.setUserPassword(this.documentArgument.userPassword());
         document.setPermission(this.documentArgument.permission());
@@ -53,13 +56,9 @@ public abstract class PDFCreator {
     }
 
     public final File start(File destination) throws PDFConversionException {
-
-        PdfDocument<?> document = null;
-        try {
+        try (PdfDocument<?> document = generateDocument()) {
             checkOverwrite(destination);
-            document = generateDocument();
-
-            if(appender!=null)
+            if (appender != null)
                 appender.append(document, getPageCallables(document));
 
             try {
@@ -74,25 +73,18 @@ public abstract class PDFCreator {
             if (listener != null)
                 listener.onConversionComplete();
 
+            if (listener != null)
+                listener.onFinally();
+
             return destination;
         } catch (Exception e) {
             throw new PDFConversionException(e);
-        } finally {
-            try {
-                if (document != null)
-                    document.close();
-            } catch (IOException ignored) {
-
-            }
-            if (listener != null)
-                listener.onFinally();
         }
-
     }
 
     private void checkOverwrite(File file) throws SaveException {
-        if (!overwrite&&file.exists()) {
-            throw new SaveException(new IOException("Overwrite deny"),file);
+        if (!overwrite && file.exists()) {
+            throw new SaveException(new IOException("Overwrite deny"), file);
         }
     }
 
