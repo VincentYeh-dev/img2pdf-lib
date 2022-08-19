@@ -44,11 +44,11 @@ public abstract class PDFCreator {
 
     protected final PdfDocument<?> generateDocument() throws IOException {
         PdfDocument<?> document = impl.createEmptyDocument();
-        document.setOwnerPassword(this.documentArgument.getOwnerPassword());
-        document.setUserPassword(this.documentArgument.getUserPassword());
-        document.setPermission(this.documentArgument.getPermission());
+        document.setOwnerPassword(this.documentArgument.ownerPassword());
+        document.setUserPassword(this.documentArgument.userPassword());
+        document.setPermission(this.documentArgument.permission());
         document.encrypt();
-        document.setInfo(this.documentArgument.getInformation());
+        document.setInfo(this.documentArgument.info());
         return document;
     }
 

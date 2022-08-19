@@ -36,9 +36,9 @@ public final class StandardImagePageCalculationStrategy implements ImagePageCalc
     @Override
     public void execute(PageArgument argument, Size imageSize) {
         PageDirection direction = getSuitableDirection(argument, imageSize);
-        pageSize = getSuitablePageSize(direction, argument.getSize(), imageSize);
+        pageSize = getSuitablePageSize(direction, argument.size(), imageSize);
         newImageSize = getMaxScaleImageSize(imageSize, pageSize);
-        imagePosition = calculateImagePosition(newImageSize, pageSize, argument.getAlign());
+        imagePosition = calculateImagePosition(newImageSize, pageSize, argument.align());
     }
 
     private Size getMaxScaleImageSize(Size imageSize, Size page_size) {
@@ -50,13 +50,13 @@ public final class StandardImagePageCalculationStrategy implements ImagePageCalc
     }
 
     private PageDirection getSuitableDirection(PageArgument argument, Size size) {
-        if (argument.getSize() == PageSize.DEPEND_ON_IMG) {
+        if (argument.size() == PageSize.DEPEND_ON_IMG) {
             return Portrait;
         }
         if (argument.autoRotate()) {
             return detectDirection(size.getHeight(), size.getWidth());
         } else {
-            return argument.getDirection();
+            return argument.direction();
         }
     }
 
@@ -135,10 +135,10 @@ public final class StandardImagePageCalculationStrategy implements ImagePageCalc
 
         float position_x = 0f, position_y = 0f;
 //        水平 X
-        PageAlign.HorizontalAlign hori_align = align.getHorizontal();
+        var hori_align = align.horizontal_align();
 
 //        垂直 Y
-        PageAlign.VerticalAlign verti_align = align.getVertical();
+        var verti_align = align.vertical_align();
 
         switch (hori_align) {
             case LEFT:
