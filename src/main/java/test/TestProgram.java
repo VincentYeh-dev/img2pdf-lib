@@ -21,7 +21,7 @@ public class TestProgram {
                         new PageArgument(PageSize.A4),
                         new DocumentArgument("1234","5678")
                         ,3*1024*1024,tempFolder, true,
-                        ColorSpace.getInstance(ColorSpace.CS_sRGB) ,10);
+                        ColorSpace.getInstance(ColorSpace.CS_GRAY) ,10);
 
         creator.setImages(new File("test").listFiles());
         creator.start(new File("ssss\\output.pdf"));

@@ -1,17 +1,16 @@
 package org.vincentyeh.img2pdf.lib.pdf.concrete.converter;
 
-import org.vincentyeh.img2pdf.lib.image.helper.framework.ImageHelper;
+import org.vincentyeh.img2pdf.lib.image.reader.framework.ImageReader;
 import org.vincentyeh.img2pdf.lib.pdf.framework.converter.exception.ReadImageException;
-import org.vincentyeh.img2pdf.lib.pdf.function.converter.ImageReadImpl;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 
-public class ImageHelperReadImpl implements ImageReadImpl {
-    private final ImageHelper helper;
+public class ImageReadImpl implements org.vincentyeh.img2pdf.lib.pdf.function.converter.ImageReadImpl {
+    private final ImageReader helper;
 
-    public ImageHelperReadImpl(ImageHelper helper) {
+    public ImageReadImpl(ImageReader helper) {
         this.helper = helper;
     }
 
