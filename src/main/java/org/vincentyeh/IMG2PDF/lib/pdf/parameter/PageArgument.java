@@ -1,42 +1,30 @@
-package org.vincentyeh.IMG2PDF.lib.pdf.parameter;
+package org.vincentyeh.img2pdf.lib.pdf.parameter;
 
 
-public final class PageArgument {
-    private PageAlign align;
-    private PageSize size;
-    private PageDirection direction;
-    private boolean autoRotate;
-
-
-    public PageAlign getAlign() {
-        return align;
+public record PageArgument(
+        PageAlign align,
+        PageSize size,
+        PageDirection direction,
+        boolean autoRotate
+) {
+    public PageArgument(PageAlign.VerticalAlign verticalAlign, PageAlign.HorizontalAlign horizontalAlign, PageSize size, PageDirection direction, boolean autoRotate) {
+        this(new PageAlign(verticalAlign, horizontalAlign), size, direction, autoRotate);
     }
 
-    public PageSize getSize() {
-        return size;
+    public PageArgument(PageAlign.VerticalAlign verticalAlign, PageAlign.HorizontalAlign horizontalAlign, PageSize size) {
+        this(verticalAlign, horizontalAlign, size, PageDirection.Portrait, true);
     }
 
-    public PageDirection getDirection() {
-        return direction;
+    public PageArgument(PageAlign.VerticalAlign verticalAlign, PageAlign.HorizontalAlign horizontalAlign) {
+        this(verticalAlign, horizontalAlign, PageSize.DEPEND_ON_IMG);
     }
 
-    public boolean autoRotate() {
-        return autoRotate;
+    public PageArgument(PageSize size) {
+        this(PageAlign.VerticalAlign.CENTER, PageAlign.HorizontalAlign.CENTER, size);
     }
 
-    public void setAlign(PageAlign align) {
-        this.align = align;
+    public PageArgument() {
+        this(PageAlign.VerticalAlign.CENTER, PageAlign.HorizontalAlign.CENTER);
     }
 
-    public void setSize(PageSize size) {
-        this.size = size;
-    }
-
-    public void setDirection(PageDirection direction) {
-        this.direction = direction;
-    }
-
-    public void setAutoRotate(boolean autoRotate) {
-        this.autoRotate = autoRotate;
-    }
 }

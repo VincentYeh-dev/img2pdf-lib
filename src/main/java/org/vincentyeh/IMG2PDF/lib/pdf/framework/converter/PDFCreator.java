@@ -1,13 +1,11 @@
-package org.vincentyeh.IMG2PDF.lib.pdf.framework.converter;
+package org.vincentyeh.img2pdf.lib.pdf.framework.converter;
 
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.appender.PageAppender;
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.converter.exception.SaveException;
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.objects.PdfDocument;
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.objects.PdfPage;
-import org.vincentyeh.IMG2PDF.lib.task.framework.Task;
-import org.vincentyeh.IMG2PDF.lib.util.file.FileUtils;
-import org.vincentyeh.IMG2PDF.lib.util.file.exception.OverwriteException;
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.converter.exception.PDFConversionException;
+import org.vincentyeh.img2pdf.lib.pdf.framework.appender.PageAppender;
+import org.vincentyeh.img2pdf.lib.pdf.framework.converter.exception.PDFConversionException;
+import org.vincentyeh.img2pdf.lib.pdf.framework.converter.exception.SaveException;
+import org.vincentyeh.img2pdf.lib.pdf.framework.objects.PdfDocument;
+import org.vincentyeh.img2pdf.lib.pdf.framework.objects.PdfPage;
+import org.vincentyeh.img2pdf.lib.pdf.parameter.DocumentArgument;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,94 +14,91 @@ import java.util.concurrent.Callable;
 
 public abstract class PDFCreator {
 
-    public interface CreationListener {
-        void initializing(Task task);
+    private final DocumentArgument documentArgument;
 
-        void onConversionComplete();
+    public interface Listener {
+        void initializing(long procedure_id);
 
-        void onSaved(File destination);
+        void onSaved(long procedure_id, File destination);
 
-        void onFinally();
+        void onConversionComplete(long procedure_id);
+
+        void onAppend(long procedure_id, int index);
     }
 
-    protected final PDFCreatorImpl impl;
+    protected final PDFImpl pdfImpl;
     private final boolean overwrite;
-    protected CreationListener listener;
     private final PageAppender appender;
 
-    public PDFCreator(PDFCreatorImpl impl, PageAppender pageAppender, boolean overwrite) {
-        if (impl == null)
-            throw new IllegalArgumentException("impl is null");
-        this.impl = impl;
-        this.overwrite = overwrite;
-        appender = pageAppender;
+    public PDFCreator(DocumentArgument documentArgument, PDFImpl pdfImpl, PageAppender pageAppender) {
+        this(documentArgument, pdfImpl,pageAppender,false);
     }
 
-    protected abstract List<Callable<PdfPage<?>>> getPageCallables(PdfDocument<?> document, Task task);
+    public PDFCreator(DocumentArgument documentArgument, PDFImpl pdfImpl, PageAppender pageAppender, boolean overwrite) {
+        if (documentArgument == null)
+            throw new IllegalArgumentException("documentArgument is null");
+        if (pdfImpl == null)
+            throw new IllegalArgumentException("pdfCreatorImpl is null");
 
-    protected final PdfDocument<?> generateDocument(Task task) throws IOException {
-        PdfDocument<?> document = impl.createEmptyDocument();
-        document.setOwnerPassword(task.getDocumentArgument().getOwnerPassword());
-        document.setUserPassword(task.getDocumentArgument().getUserPassword());
-        document.setPermission(task.getDocumentArgument().getPermission());
+        this.documentArgument = documentArgument;
+        this.pdfImpl = pdfImpl;
+        this.appender = pageAppender;
+        this.overwrite = overwrite;
+    }
+
+    protected abstract List<Callable<PdfPage<?>>> getPageCallables(PdfDocument<?> document);
+
+    protected final PdfDocument<?> generateDocument() throws IOException {
+        var document = pdfImpl.createEmptyDocument();
+        document.setOwnerPassword(this.documentArgument.ownerPassword());
+        document.setUserPassword(this.documentArgument.userPassword());
+        document.setPermission(this.documentArgument.permission());
         document.encrypt();
-        document.setInfo(task.getDocumentArgument().getInformation());
+        document.setInfo(this.documentArgument.info());
         return document;
     }
 
-    public final File start(Task task) throws PDFConversionException {
-        if (task == null)
-            throw new IllegalArgumentException("task is null.");
+    public final File start(File destination) throws PDFConversionException {
+        return start(destination, null);
+    }
+    public final File start(File destination, Listener listener) throws PDFConversionException {
+        return start(-1, destination, listener);
+    }
 
-        if (listener != null)
-            listener.initializing(task);
-        PdfDocument<?> document = null;
-        try {
-            checkOverwrite(task.getPdfDestination());
-            document = generateDocument(task);
+    public final File start(long procedure_id, File destination, Listener listener) throws PDFConversionException {
 
-            if(appender!=null)
-                appender.append(document, getPageCallables(document, task));
-
-            try {
-                document.save(task.getPdfDestination());
-                if (listener != null)
-                    listener.onSaved(task.getPdfDestination());
-            } catch (IOException e) {
-                throw new SaveException(e, task.getPdfDestination());
-            }
-
-            if (listener != null)
-                listener.onConversionComplete();
-
-            return task.getPdfDestination();
-        } catch (Exception e) {
-            throw new PDFConversionException(task, e);
-        } finally {
-            try {
-                if (document != null)
-                    document.close();
-            } catch (IOException ignored) {
-
-            }
-            if (listener != null)
-                listener.onFinally();
+        if (listener != null) {
+            listener.initializing(procedure_id);
+            appender.setPageAppendListener((page_index) -> listener.onAppend(procedure_id, page_index));
         }
 
+        try (PdfDocument<?> document = generateDocument()) {
+            checkOverwrite(destination);
+            if (appender != null)
+                appender.append(document, getPageCallables(document));
+
+            try {
+                destination.getParentFile().mkdirs();
+                document.save(destination);
+                if (listener != null)
+                    listener.onSaved(procedure_id, destination);
+            } catch (IOException e) {
+                throw new SaveException(e, destination);
+            }
+
+            if (listener != null)
+                listener.onConversionComplete(procedure_id);
+
+            return destination;
+        } catch (Exception e) {
+            throw new PDFConversionException(e);
+        }
     }
 
     private void checkOverwrite(File file) throws SaveException {
-        if (!overwrite) {
-            try {
-                FileUtils.checkOverwrite(file, "PDF overwrite deny,File is already exists:" + file.getAbsoluteFile());
-            } catch (OverwriteException e) {
-                throw new SaveException(e, file);
-            }
+        if (!overwrite && file.exists()) {
+            throw new SaveException(new IOException("Overwrite deny"), file);
         }
-    }
-
-    public final void setCreationListener(CreationListener listener) {
-        this.listener = listener;
     }
 
 }

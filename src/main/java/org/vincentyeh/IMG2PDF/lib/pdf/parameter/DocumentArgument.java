@@ -1,40 +1,23 @@
-package org.vincentyeh.IMG2PDF.lib.pdf.parameter;
+package org.vincentyeh.img2pdf.lib.pdf.parameter;
 
-public final class DocumentArgument {
-    private String ownerPassword;
-    private String userPassword;
-    private Permission permission;
-    private PDFDocumentInfo info;
+public record DocumentArgument(
+        String ownerPassword,
+        String userPassword,
+        Permission permission,
+        PDFDocumentInfo info) {
 
-    public String getOwnerPassword() {
-        return ownerPassword;
+    public DocumentArgument(String ownerPassword, String userPassword,Permission permission){
+        this(ownerPassword,userPassword,permission,null);
     }
 
-    public String getUserPassword() {
-        return userPassword;
+    public DocumentArgument(Permission permission){
+        this(null,null,permission,null);
+    }
+    public DocumentArgument(String ownerPassword, String userPassword){
+        this(ownerPassword,userPassword,new Permission());
+    }
+    public DocumentArgument(){
+        this(new Permission());
     }
 
-    public Permission getPermission() {
-        return permission;
-    }
-
-    public PDFDocumentInfo getInformation() {
-        return info;
-    }
-
-    public void setInformation(PDFDocumentInfo info) {
-        this.info = info;
-    }
-
-    public void setOwnerPassword(String ownerPassword) {
-        this.ownerPassword = ownerPassword;
-    }
-
-    public void setUserPassword(String userPassword) {
-        this.userPassword = userPassword;
-    }
-
-    public void setPermission(Permission permission) {
-        this.permission = permission;
-    }
 }

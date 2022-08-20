@@ -1,7 +1,4 @@
-package org.vincentyeh.IMG2PDF.lib.pdf.framework.objects;
-
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.calculation.Position;
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.calculation.Size;
+package org.vincentyeh.img2pdf.lib.pdf.framework.objects;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -9,9 +6,9 @@ import java.io.IOException;
 public interface PdfPage<PAGE> {
     PAGE get();
 
-    void setSize(Size size);
+    void setSize(SizeF size);
 
-    Size getSize();
+    SizeF getSize();
 
-    void putImage(BufferedImage image, Position position, Size size) throws IOException;
+    void putImage(BufferedImage image, PointF position, SizeF size) throws IOException;
 }

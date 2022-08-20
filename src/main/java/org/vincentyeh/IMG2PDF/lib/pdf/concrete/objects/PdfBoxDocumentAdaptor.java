@@ -1,13 +1,13 @@
-package org.vincentyeh.IMG2PDF.lib.pdf.concrete.objects;
+package org.vincentyeh.img2pdf.lib.pdf.concrete.objects;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.objects.PdfDocument;
-import org.vincentyeh.IMG2PDF.lib.pdf.framework.objects.PdfPage;
-import org.vincentyeh.IMG2PDF.lib.pdf.parameter.PDFDocumentInfo;
-import org.vincentyeh.IMG2PDF.lib.pdf.parameter.Permission;
+import org.vincentyeh.img2pdf.lib.pdf.framework.objects.PdfDocument;
+import org.vincentyeh.img2pdf.lib.pdf.framework.objects.PdfPage;
+import org.vincentyeh.img2pdf.lib.pdf.parameter.PDFDocumentInfo;
+import org.vincentyeh.img2pdf.lib.pdf.parameter.Permission;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,14 +35,14 @@ public class PdfBoxDocumentAdaptor implements PdfDocument<PDDocument> {
 
     @Override
     public void setPermission(Permission permission) {
-        this.permission.setCanAssembleDocument(permission.getCanAssembleDocument());
-        this.permission.setCanExtractContent(permission.getCanExtractContent());
-        this.permission.setCanExtractForAccessibility(permission.getCanExtractForAccessibility());
-        this.permission.setCanFillInForm(permission.getCanFillInForm());
-        this.permission.setCanModify(permission.getCanModify());
-        this.permission.setCanModifyAnnotations(permission.getCanModifyAnnotations());
-        this.permission.setCanPrint(permission.getCanPrint());
-        this.permission.setCanPrintDegraded(permission.getCanPrintDegraded());
+        this.permission.setCanAssembleDocument(permission.CanAssembleDocument);
+        this.permission.setCanExtractContent(permission.CanExtractContent);
+        this.permission.setCanExtractForAccessibility(permission.CanExtractForAccessibility);
+        this.permission.setCanFillInForm(permission.CanFillInForm);
+        this.permission.setCanModify(permission.CanModify);
+        this.permission.setCanModifyAnnotations(permission.CanModifyAnnotations);
+        this.permission.setCanPrint(permission.CanPrint);
+        this.permission.setCanPrintDegraded(permission.CanPrintDegraded);
     }
 
     @Override
@@ -50,11 +50,11 @@ public class PdfBoxDocumentAdaptor implements PdfDocument<PDDocument> {
         if (info == null) return;
 
         PDDocumentInformation information = new PDDocumentInformation();
-        information.setTitle(info.getTitle());
-        information.setAuthor(info.getAuthor());
-        information.setSubject(info.getSubject());
-        information.setCreator(info.getCreator());
-        information.setProducer(info.getProducer());
+        information.setTitle(info.Title);
+        information.setAuthor(info.Author);
+        information.setSubject(info.Subject);
+        information.setCreator(info.Creator);
+        information.setProducer(info.Producer);
 
         document.setDocumentInformation(information);
     }

@@ -4,16 +4,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.vincentyeh</groupId>
-    <artifactId>img2pdf-lib</artifactId>
-    <version>2.0.0</version>
+    <artifactId>img2pdf.lib</artifactId>
+    <version>3.0.0</version>
     <packaging>jar</packaging>
     <developers>
         <developer>
             <name>VincentYeh-dev</name>
         </developer>
     </developers>
-    <name>IMG2PDF</name>
-    <url>http://maven.apache.org</url>
+    <name>img2pdf-lib</name>
 
     <repositories>
         <repository>
@@ -23,44 +22,36 @@
         </repository>
     </repositories>
 
-    <distributionManagement>
-        <site>
-            <id>www.yourcompany.com</id>
-            <url>scp://www.yourcompany.com/www/docs/project/</url>
-        </site>
-    </distributionManagement>
-
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>16</maven.compiler.source>
         <maven.compiler.target>16</maven.compiler.target>
-        <exe-name>img2pdf</exe-name>
         <jar-name>${project.name}-${project.version}</jar-name>
     </properties>
 
     <dependencies>
-        <!-- ... -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>5.7.2</version>
-            <scope>test</scope>
-        </dependency>
+<!--        &lt;!&ndash; ... &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.junit.jupiter</groupId>-->
+<!--            <artifactId>junit-jupiter-api</artifactId>-->
+<!--            <version>5.7.2</version>-->
+<!--            <scope>test</scope>-->
+<!--        </dependency>-->
 
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.7.2</version>
-            <scope>test</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.junit.jupiter</groupId>-->
+<!--            <artifactId>junit-jupiter-engine</artifactId>-->
+<!--            <version>5.7.2</version>-->
+<!--            <scope>test</scope>-->
+<!--        </dependency>-->
 
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
-            <version>5.7.2</version>
-            <scope>test</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.junit.jupiter</groupId>-->
+<!--            <artifactId>junit-jupiter-params</artifactId>-->
+<!--            <version>5.7.2</version>-->
+<!--            <scope>test</scope>-->
+<!--        </dependency>-->
 
         <!-- ... -->
 
