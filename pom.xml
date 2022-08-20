@@ -12,7 +12,7 @@
             <name>VincentYeh-dev</name>
         </developer>
     </developers>
-    <name>IMG2PDF</name>
+    <name>img2pdf-lib</name>
 
     <repositories>
         <repository>
@@ -21,13 +21,6 @@
             <url>http://simulation.tudelft.nl/maven/</url>
         </repository>
     </repositories>
-
-    <distributionManagement>
-        <site>
-            <id>www.yourcompany.com</id>
-            <url>scp://www.yourcompany.com/www/docs/project/</url>
-        </site>
-    </distributionManagement>
 
 
     <properties>
@@ -38,27 +31,27 @@
     </properties>
 
     <dependencies>
-        <!-- ... -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>5.7.2</version>
-            <scope>test</scope>
-        </dependency>
+<!--        &lt;!&ndash; ... &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.junit.jupiter</groupId>-->
+<!--            <artifactId>junit-jupiter-api</artifactId>-->
+<!--            <version>5.7.2</version>-->
+<!--            <scope>test</scope>-->
+<!--        </dependency>-->
 
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.7.2</version>
-            <scope>test</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.junit.jupiter</groupId>-->
+<!--            <artifactId>junit-jupiter-engine</artifactId>-->
+<!--            <version>5.7.2</version>-->
+<!--            <scope>test</scope>-->
+<!--        </dependency>-->
 
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
-            <version>5.7.2</version>
-            <scope>test</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.junit.jupiter</groupId>-->
+<!--            <artifactId>junit-jupiter-params</artifactId>-->
+<!--            <version>5.7.2</version>-->
+<!--            <scope>test</scope>-->
+<!--        </dependency>-->
 
         <!-- ... -->
 
