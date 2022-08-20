@@ -7,15 +7,15 @@ import org.vincentyeh.img2pdf.lib.pdf.framework.objects.PdfDocument;
 import org.vincentyeh.img2pdf.lib.pdf.framework.objects.PdfPage;
 import org.vincentyeh.img2pdf.lib.pdf.concrete.objects.PdfBoxDocumentAdaptor;
 import org.vincentyeh.img2pdf.lib.pdf.concrete.objects.PdfBoxPageAdaptor;
-import org.vincentyeh.img2pdf.lib.pdf.framework.converter.PDFCreatorImpl;
+import org.vincentyeh.img2pdf.lib.pdf.framework.converter.PDFImpl;
 
 import java.io.File;
 
-public class PDFBoxCreatorImpl implements PDFCreatorImpl {
+public class PDFBoxImpl implements PDFImpl {
 
     private final MemoryUsageSetting setting;
 
-    public PDFBoxCreatorImpl(File tempFolder, long maxMainMemoryBytes) {
+    public PDFBoxImpl(File tempFolder, long maxMainMemoryBytes) {
         setting = MemoryUsageSetting.setupMixed(maxMainMemoryBytes).setTempDir(tempFolder);
     }
 

@@ -4,7 +4,7 @@ import org.vincentyeh.img2pdf.lib.pdf.framework.appender.PageAppender;
 import org.vincentyeh.img2pdf.lib.pdf.framework.objects.SizeF;
 import org.vincentyeh.img2pdf.lib.pdf.framework.calculation.strategy.ImagePageCalculateStrategy;
 import org.vincentyeh.img2pdf.lib.pdf.framework.converter.PDFCreator;
-import org.vincentyeh.img2pdf.lib.pdf.framework.converter.PDFCreatorImpl;
+import org.vincentyeh.img2pdf.lib.pdf.framework.converter.PDFImpl;
 import org.vincentyeh.img2pdf.lib.pdf.framework.objects.PdfDocument;
 import org.vincentyeh.img2pdf.lib.pdf.framework.objects.PdfPage;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.DocumentArgument;
@@ -22,9 +22,9 @@ public class ImagePDFCreator extends PDFCreator {
     private final PageArgument pageArgument;
     private File[] imageFiles;
 
-    public ImagePDFCreator(PageArgument pageArgument, DocumentArgument documentArgument, PDFCreatorImpl pdfCreatorImpl, ImageReadImpl imageReadImpl,
+    public ImagePDFCreator(PageArgument pageArgument, DocumentArgument documentArgument, PDFImpl pdfImpl, ImageReadImpl imageReadImpl,
                            PageAppender pageAppender, boolean overwrite, ImagePageCalculateStrategy strategy) {
-        super(documentArgument,pdfCreatorImpl, pageAppender, overwrite);
+        super(documentArgument, pdfImpl, pageAppender, overwrite);
         this.pageArgument = pageArgument;
         this.imageReadImpl = imageReadImpl;
         this.strategy = strategy;
@@ -40,7 +40,7 @@ public class ImagePDFCreator extends PDFCreator {
         if(imageFiles!=null)
             for (File file : imageFiles) {
                 list.add(() -> {
-                    PdfPage<?> page = pdfCreatorImpl.createEmptyPage(document);
+                    PdfPage<?> page = pdfImpl.createEmptyPage(document);
                     var bufferedImage =imageReadImpl!=null?imageReadImpl.readImage(file): ImageIO.read(file);
                     strategy.execute(this.pageArgument,new SizeF(bufferedImage.getWidth(),bufferedImage.getHeight()));
                     page.setSize(strategy.getPageSize());
