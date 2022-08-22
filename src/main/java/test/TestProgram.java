@@ -2,7 +2,7 @@ package test;
 
 
 import org.vincentyeh.img2pdf.lib.PDFacade;
-import org.vincentyeh.img2pdf.lib.pdf.framework.converter.PDFCreator;
+import org.vincentyeh.img2pdf.lib.pdf.framework.converter.PDFFactory;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.DocumentArgument;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageArgument;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageSize;
@@ -28,7 +28,7 @@ public class TestProgram {
         creator.start(new File("ssss\\output.pdf"),listener);
     }
 
-    private static final PDFCreator.Listener listener=new PDFCreator.Listener() {
+    private static final PDFFactory.Listener listener=new PDFFactory.Listener() {
         @Override
         public void initializing(long procedure_id) {
             System.out.println("initializing:"+procedure_id);
