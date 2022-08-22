@@ -4,7 +4,6 @@ import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.vincentyeh.img2pdf.lib.image.reader.concrete.ColorSpaceImageReader;
 import org.vincentyeh.img2pdf.lib.image.reader.concrete.DirectionImageReader;
 import org.vincentyeh.img2pdf.lib.pdf.concrete.builder.PDFBoxBuilder;
-import org.vincentyeh.img2pdf.lib.pdf.concrete.calculation.strategy.StandardImagePageCalculationStrategy;
 import org.vincentyeh.img2pdf.lib.pdf.concrete.converter.ImageReaderReadImpl;
 import org.vincentyeh.img2pdf.lib.pdf.function.converter.ImagePDFFactory;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.DocumentArgument;
@@ -25,6 +24,6 @@ public class PDFacade {
 
         var imageReadImpl = new ImageReaderReadImpl(new DirectionImageReader(new ColorSpaceImageReader(colorSpace)));
         return new ImagePDFFactory(pageArgument, documentArgument, new PDFBoxBuilder(setting), imageReadImpl,
-                overwrite_output, new StandardImagePageCalculationStrategy());
+                overwrite_output);
     }
 }

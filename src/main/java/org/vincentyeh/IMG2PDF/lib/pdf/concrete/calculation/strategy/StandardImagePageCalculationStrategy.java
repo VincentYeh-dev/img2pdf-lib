@@ -1,7 +1,6 @@
 package org.vincentyeh.img2pdf.lib.pdf.concrete.calculation.strategy;
 
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.vincentyeh.img2pdf.lib.pdf.framework.calculation.strategy.ImagePageCalculateStrategy;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageAlign;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageArgument;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageDirection;
@@ -13,27 +12,23 @@ import static org.vincentyeh.img2pdf.lib.pdf.parameter.PageDirection.Landscape;
 import static org.vincentyeh.img2pdf.lib.pdf.parameter.PageDirection.Portrait;
 
 
-public final class StandardImagePageCalculationStrategy implements ImagePageCalculateStrategy {
+public final class StandardImagePageCalculationStrategy {
     private SizeF pageSize;
     private SizeF newImageSize;
     private PointF imagePosition;
 
-    @Override
     public PointF getImagePosition() {
         return imagePosition;
     }
 
-    @Override
     public SizeF getPageSize() {
         return pageSize;
     }
 
-    @Override
     public SizeF getImageSize() {
         return newImageSize;
     }
 
-    @Override
     public void execute(PageArgument argument, SizeF imageSize) {
         PageDirection direction = getSuitableDirection(argument, imageSize);
         pageSize = getSuitablePageSize(direction, argument.size(), imageSize);

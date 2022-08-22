@@ -1,7 +1,7 @@
 package org.vincentyeh.img2pdf.lib.pdf.function.converter;
 
+import org.vincentyeh.img2pdf.lib.pdf.concrete.calculation.strategy.StandardImagePageCalculationStrategy;
 import org.vincentyeh.img2pdf.lib.pdf.framework.builder.PDFBuilder;
-import org.vincentyeh.img2pdf.lib.pdf.framework.calculation.strategy.ImagePageCalculateStrategy;
 import org.vincentyeh.img2pdf.lib.pdf.framework.converter.PDFFactory;
 import org.vincentyeh.img2pdf.lib.pdf.framework.objects.SizeF;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.DocumentArgument;
@@ -14,16 +14,16 @@ import java.io.IOException;
 
 public class ImagePDFFactory extends PDFFactory {
     private final ImageReadImpl imageReadImpl;
-    private final ImagePageCalculateStrategy strategy;
+    private final StandardImagePageCalculationStrategy strategy;
     private final PageArgument pageArgument;
     private File[] imageFiles;
 
     public ImagePDFFactory(PageArgument pageArgument, DocumentArgument documentArgument, PDFBuilder builder, ImageReadImpl imageReadImpl,
-                           boolean overwrite, ImagePageCalculateStrategy strategy) {
+                           boolean overwrite) {
         super(documentArgument, builder, overwrite);
         this.pageArgument = pageArgument;
         this.imageReadImpl = imageReadImpl;
-        this.strategy = strategy;
+        this.strategy = new StandardImagePageCalculationStrategy();
     }
 
     public void setImages(File[] imageFiles) {
