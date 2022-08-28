@@ -1,6 +1,7 @@
 package org.vincentyeh.img2pdf.lib.image.reader.concrete;
 
 import com.drew.imaging.ImageMetadataReader;
+import com.drew.lang.annotations.NotNull;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.MetadataException;
 import com.drew.metadata.exif.ExifIFD0Directory;
@@ -10,7 +11,7 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
+import java.util.Objects;
 
 public class DirectionImageReader implements ImageReader {
 
@@ -18,39 +19,45 @@ public class DirectionImageReader implements ImageReader {
     private final ImageReader imageReader;
 
     public DirectionImageReader() {
-        this.imageReader = ImageReader.getDefault();
+        this(ImageReader.getDefault());
     }
-    public DirectionImageReader(ImageReader imageReader) {
-        this.imageReader = imageReader;
-    }
-
-    public final BufferedImage read(File file) throws Exception {
-        Metadata metadata = ImageMetadataReader.readMetadata(file);
-        var image= imageReader.read(file);
-
-        if (metadata.containsDirectoryOfType(ExifIFD0Directory.class))
-            return handleExifIFD0(image, metadata);
-        return image;
+    public DirectionImageReader(@NotNull ImageReader imageReader) {
+        try {
+            this.imageReader = Objects.requireNonNull(imageReader, "imageReader==null");
+        } catch (NullPointerException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
-    private BufferedImage handleExifIFD0(BufferedImage image, Metadata metadata) throws MetadataException, IOException {
+    public final BufferedImage read(File file) throws ImageReadException{
+        try {
+            var metadata = ImageMetadataReader.readMetadata(file);
+            var image= imageReader.read(file);
+            if (metadata.containsDirectoryOfType(ExifIFD0Directory.class))
+                return handleExifIFD0(image, metadata);
+            return image;
+        } catch (Exception e) {
+            throw new ImageReadException(e);
+        }
+    }
+
+    private BufferedImage handleExifIFD0(BufferedImage image, Metadata metadata) throws MetadataException {
         ExifIFD0Directory exifIFD0 = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
         if (!exifIFD0.containsTag(ExifIFD0Directory.TAG_ORIENTATION))
             return image;
 
         int orientation = exifIFD0.getInt(ExifIFD0Directory.TAG_ORIENTATION);
-        switch (orientation) {
-            case 1: // [Exif IFD0] Orientation - Top, left side (Horizontal / normal)
-                return image;
-            case 6: // [Exif IFD0] Orientation - Right side, top (Rotate 90 CW)
-                return rotateImage(image, 90);
-            case 3: // [Exif IFD0] Orientation - Bottom, right side (Rotate 180)
-                return rotateImage(image, 180);
-            case 8: // [Exif IFD0] Orientation - Left side, bottom (Rotate 270 CW)
-                return rotateImage(image, 270);
-            default:
-                throw new RuntimeException("image==null");
-        }
+        return switch (orientation) {
+            case 1 -> // [Exif IFD0] Orientation - Top, left side (Horizontal / normal)
+                    image;
+            case 6 -> // [Exif IFD0] Orientation - Right side, top (Rotate 90 CW)
+                    rotateImage(image, 90);
+            case 3 -> // [Exif IFD0] Orientation - Bottom, right side (Rotate 180)
+                    rotateImage(image, 180);
+            case 8 -> // [Exif IFD0] Orientation - Left side, bottom (Rotate 270 CW)
+                    rotateImage(image, 270);
+            default -> throw new RuntimeException("image==null");
+        };
     }
 
     private static BufferedImage rotateImage(BufferedImage img, double degrees) {

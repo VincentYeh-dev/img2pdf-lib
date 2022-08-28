@@ -5,7 +5,7 @@
 
     <groupId>org.vincentyeh</groupId>
     <artifactId>img2pdf.lib</artifactId>
-    <version>3.0.0</version>
+    <version>4.0.0-alpha</version>
     <packaging>jar</packaging>
     <developers>
         <developer>
@@ -31,27 +31,21 @@
     </properties>
 
     <dependencies>
-<!--        &lt;!&ndash; ... &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>org.junit.jupiter</groupId>-->
-<!--            <artifactId>junit-jupiter-api</artifactId>-->
-<!--            <version>5.7.2</version>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
 
-<!--        <dependency>-->
-<!--            <groupId>org.junit.jupiter</groupId>-->
-<!--            <artifactId>junit-jupiter-engine</artifactId>-->
-<!--            <version>5.7.2</version>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.4.0</version>
+            <scope>test</scope>
+        </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>org.junit.jupiter</groupId>-->
-<!--            <artifactId>junit-jupiter-params</artifactId>-->
-<!--            <version>5.7.2</version>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
+        <!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>3.12.4</version>
+            <scope>test</scope>
+        </dependency>
 
         <!-- ... -->
 
@@ -98,6 +92,7 @@
                         <configuration>
                             <ignoredDependencies>
                                 <ignoredDependency>org.junit.jupiter:*</ignoredDependency>
+                                <ignoredDependency>org.mockito:*</ignoredDependency>
                             </ignoredDependencies>
                         </configuration>
                     </execution>
