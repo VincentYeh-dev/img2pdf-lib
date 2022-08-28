@@ -1,9 +1,10 @@
-package org.vincentyeh.img2pdf.lib.pdf.framework.factory;
+package org.vincentyeh.img2pdf.lib.pdf.concrete.factory;
 
 import com.drew.lang.annotations.NotNull;
 import com.drew.lang.annotations.Nullable;
 import org.vincentyeh.img2pdf.lib.image.reader.framework.ImageReader;
 import org.vincentyeh.img2pdf.lib.pdf.framework.builder.PDFBuilder;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePageStrategy;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.exception.PDFFactoryException;
 import org.vincentyeh.img2pdf.lib.pdf.framework.objects.SizeF;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.DocumentArgument;
@@ -58,14 +59,16 @@ public class ImagePDFFactory {
                            @Nullable ImageReader imageReader,
                            @NotNull ImagePageStrategy strategy,
                            boolean overwrite) {
-        this.builder = builder;
-
-        this.pageArgument = Objects.requireNonNullElseGet(pageArgument, PageArgument::new);
-        this.documentArgument = Objects.requireNonNullElseGet(documentArgument, DocumentArgument::new);
-
-        this.overwrite = overwrite;
-        this.imageReader = Objects.requireNonNullElseGet(imageReader, ImageReader::getDefault);
-        this.strategy = strategy;
+        try{
+            this.builder =Objects.requireNonNull(builder,"builder==null");
+            this.pageArgument = Objects.requireNonNullElseGet(pageArgument, PageArgument::new);
+            this.documentArgument = Objects.requireNonNullElseGet(documentArgument, DocumentArgument::new);
+            this.imageReader = Objects.requireNonNullElseGet(imageReader, ImageReader::getDefault);
+            this.strategy = Objects.requireNonNull(strategy,"strategy==null");
+            this.overwrite = overwrite;
+        }catch (NullPointerException e){
+            throw new IllegalArgumentException(e);
+        }
     }
 
     public final File start(File[] imageFiles, File destination, Listener listener) throws PDFFactoryException {

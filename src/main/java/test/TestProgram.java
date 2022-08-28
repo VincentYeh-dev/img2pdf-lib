@@ -7,7 +7,7 @@ import org.vincentyeh.img2pdf.lib.image.reader.concrete.DirectionImageReader;
 import org.vincentyeh.img2pdf.lib.pdf.concrete.builder.PDFBoxBuilder;
 import org.vincentyeh.img2pdf.lib.pdf.concrete.builder.TextPDFBuilder;
 import org.vincentyeh.img2pdf.lib.pdf.concrete.factory.StandardImagePageCalculationStrategy;
-import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePDFFactory;
+import org.vincentyeh.img2pdf.lib.pdf.concrete.factory.ImagePDFFactory;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.DocumentArgument;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageArgument;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageSize;
