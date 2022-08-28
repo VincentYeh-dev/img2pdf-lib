@@ -2,7 +2,7 @@ package org.vincentyeh.img2pdf.lib.pdf.concrete.converter;
 
 import org.vincentyeh.img2pdf.lib.image.reader.framework.ImageReader;
 import org.vincentyeh.img2pdf.lib.pdf.framework.converter.exception.ReadImageException;
-import org.vincentyeh.img2pdf.lib.pdf.function.converter.ImageReadImpl;
+import org.vincentyeh.img2pdf.lib.pdf.framework.converter.ImageReadImpl;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

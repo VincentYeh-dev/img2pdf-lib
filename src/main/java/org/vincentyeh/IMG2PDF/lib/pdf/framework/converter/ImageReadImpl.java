@@ -1,4 +1,4 @@
-package org.vincentyeh.img2pdf.lib.pdf.function.converter;
+package org.vincentyeh.img2pdf.lib.pdf.framework.converter;
 
 import org.vincentyeh.img2pdf.lib.pdf.framework.converter.exception.ReadImageException;
 

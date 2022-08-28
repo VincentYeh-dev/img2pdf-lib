@@ -2,7 +2,7 @@ package test;
 
 
 import org.vincentyeh.img2pdf.lib.PDFacade;
-import org.vincentyeh.img2pdf.lib.pdf.framework.converter.PDFFactory;
+import org.vincentyeh.img2pdf.lib.pdf.framework.converter.ImagePDFFactory;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.DocumentArgument;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageArgument;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageSize;
@@ -17,18 +17,18 @@ public class TestProgram {
     public static void main(String[] args) throws IOException {
         var tempFolder= Files.createTempDirectory("org.vincentyeh.img2pdf-lib.tmp.").toFile();
         tempFolder.deleteOnExit();
-        var creator =
-                PDFacade.createImagePDFConverter(
+        var factory =
+                PDFacade.createImagePDFFactory(
                         new PageArgument(PageSize.A4),
                         new DocumentArgument("1234","5678")
                         ,3*1024*1024,tempFolder, true,
-                        ColorSpace.getInstance(ColorSpace.CS_GRAY) ,10);
+                        ColorSpace.getInstance(ColorSpace.CS_GRAY));
 
-        creator.setImages(new File("test").listFiles());
-        creator.start(new File("ssss\\output.pdf"),listener);
+        var files=new File("test").listFiles();
+        factory.start(files,new File("ssss\\output.pdf"),listener);
     }
 
-    private static final PDFFactory.Listener listener=new PDFFactory.Listener() {
+    private static final ImagePDFFactory.Listener listener=new ImagePDFFactory.Listener() {
         @Override
         public void initializing(long procedure_id) {
             System.out.println("initializing:"+procedure_id);
