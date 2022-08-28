@@ -1,6 +1,7 @@
-package org.vincentyeh.img2pdf.lib.pdf.concrete.calculation.strategy;
+package org.vincentyeh.img2pdf.lib.pdf.concrete.factory;
 
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePageStrategy;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageAlign;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageArgument;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageDirection;
@@ -12,7 +13,7 @@ import static org.vincentyeh.img2pdf.lib.pdf.parameter.PageDirection.Landscape;
 import static org.vincentyeh.img2pdf.lib.pdf.parameter.PageDirection.Portrait;
 
 
-public final class StandardImagePageCalculationStrategy {
+public final class StandardImagePageCalculationStrategy implements ImagePageStrategy {
     private SizeF pageSize;
     private SizeF newImageSize;
     private PointF imagePosition;
