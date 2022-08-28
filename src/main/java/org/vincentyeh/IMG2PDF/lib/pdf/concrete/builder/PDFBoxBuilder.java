@@ -76,7 +76,7 @@ public class PDFBoxBuilder implements PDFBuilder {
 
     @Override
     public int addPage(SizeF size) {
-        var page=new PDPage();
+        var page = new PDPage();
         page.setMediaBox(new PDRectangle(size.width(), size.height()));
         pages.add(page);
         return pages.size() - 1;
@@ -96,12 +96,14 @@ public class PDFBoxBuilder implements PDFBuilder {
 
     @Override
     public void save(File destination) throws IOException {
-        if(ownerPassword!=null&&userPassword!=null)
+        if (ownerPassword != null && userPassword != null)
             document.protect(createProtectionPolicy());
-        for(var page:pages)
+        for (var page : pages)
             document.addPage(page);
         document.save(destination);
+        document.close();
     }
+
 
     @Override
     public void reset() {
