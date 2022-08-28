@@ -7,3 +7,5 @@ target
 .run
 config.properties
 dependency-reduced-pom.xml
+*.jpg
+*.pdf
