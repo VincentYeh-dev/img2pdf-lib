@@ -33,7 +33,7 @@ public class ImagePDFFactory {
 
         void onConversionComplete(long procedure_id);
 
-        void onAppend(long procedure_id, int index);
+        void onAppend(long procedure_id, int index,int total);
     }
 
     private final boolean overwrite;
@@ -122,7 +122,7 @@ public class ImagePDFFactory {
                     var index = builder.addPage(strategy.getPageSize());
                     builder.addImage(index, bufferedImage, strategy.getImagePosition(), strategy.getImageSize());
                     if (listener != null)
-                        listener.onAppend(procedure_id, i);
+                        listener.onAppend(procedure_id, i,imageFiles.length);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }

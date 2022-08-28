@@ -1,4 +1,4 @@
-package test;
+package org.vincentyeh.img2pdf.lib.test;
 
 
 import org.apache.pdfbox.io.MemoryUsageSetting;
@@ -57,7 +57,7 @@ public class TestProgram {
         }
 
         @Override
-        public void onAppend(long procedure_id, int index) {
+        public void onAppend(long procedure_id, int index,int total) {
             System.out.println("onAppend:"+procedure_id+"\t Page:"+index);
         }
     };
