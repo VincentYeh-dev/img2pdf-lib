@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 public class PDFBoxBuilder implements PDFBuilder {
 
@@ -33,7 +34,11 @@ public class PDFBoxBuilder implements PDFBuilder {
     private final MemoryUsageSetting setting;
 
     public PDFBoxBuilder(MemoryUsageSetting setting) {
-        this.setting = setting;
+        try{
+            this.setting = Objects.requireNonNull(setting);
+        }catch (NullPointerException e){
+            throw new IllegalArgumentException(e);
+        }
     }
 
     @Override
