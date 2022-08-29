@@ -105,9 +105,9 @@ public class ImagePDFFactory {
     }
 
 
-    private void checkOverwrite(File file) {
+    private void checkOverwrite(File file) throws IOException {
         if (!overwrite && file.exists()) {
-            throw new RuntimeException(new IOException("Overwrite deny"));
+            throw new IOException("Overwrite deny");
         }
     }
 
