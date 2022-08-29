@@ -99,7 +99,7 @@ public class ImagePDFFactory {
                 listener.onConversionComplete(procedure_id);
             builder.reset();
             return destination;
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new PDFFactoryException(e);
         }
     }
