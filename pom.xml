@@ -132,13 +132,17 @@
                         </goals>
                         <configuration>
                             <finalName>${jar-name}</finalName>
+                            <transformers>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer"/>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer"/>
+                            </transformers>
                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>
                                     <excludes>
                                         <exclude>META-INF/DEPENDENCIES</exclude>
-                                        <exclude>META-INF/LICENSE*</exclude>
-                                        <exclude>META-INF/NOTICE*</exclude>
                                         <exclude>META-INF/MANIFEST*</exclude>
                                     </excludes>
                                 </filter>
