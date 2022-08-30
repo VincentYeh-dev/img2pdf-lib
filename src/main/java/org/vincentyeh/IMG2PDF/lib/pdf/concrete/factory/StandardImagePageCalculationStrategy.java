@@ -45,7 +45,7 @@ public final class StandardImagePageCalculationStrategy implements ImagePageStra
         } else {
             direction = default_direction;
         }
-        var size = pageSize.getSize();
+        var size = pageSize.getSizeInPixels();
         if (direction == Portrait) {
             return new SizeF(size.width(), size.height());
         } else if (direction == Landscape) {
