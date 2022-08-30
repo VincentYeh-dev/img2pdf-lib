@@ -1,6 +1,7 @@
 package org.vincentyeh.img2pdf.lib.pdf.parameter;
 
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.vincentyeh.img2pdf.lib.pdf.framework.objects.SizeF;
 
 /**
  * Size is the variable that define size of pages of PDFFile.
@@ -22,6 +23,10 @@ public enum PageSize {
 
 	public PDRectangle getPdrectangle() {
 		return pdrectangle;
+	}
+
+	public SizeF getSize() {
+		return new SizeF(pdrectangle.getWidth(),pdrectangle.getHeight());
 	}
 
 }
