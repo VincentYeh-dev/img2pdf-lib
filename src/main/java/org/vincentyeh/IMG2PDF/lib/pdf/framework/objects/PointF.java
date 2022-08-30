@@ -1,7 +1,11 @@
 package org.vincentyeh.img2pdf.lib.pdf.framework.objects;
 
 
-public record PointF(float x, float y) {
+public record PointF(float x, float y) implements Comparable<PointF> {
+
+    public PointF() {
+        this(0, 0);
+    }
 
     @Override
     public String toString() {
@@ -13,6 +17,16 @@ public record PointF(float x, float y) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PointF position = (PointF) o;
-        return Float.compare(position.x, x) == 0 && Float.compare(position.y, y) == 0;
+        return compareTo(position) == 0;
+    }
+
+
+    @Override
+    public int compareTo(PointF o) {
+        return Double.compare(hypotenuse(), o.hypotenuse());
+    }
+
+    public float hypotenuse() {
+        return (float) Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
     }
 }
