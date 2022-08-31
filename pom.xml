@@ -14,15 +14,6 @@
     </developers>
     <name>img2pdf-lib</name>
 
-    <repositories>
-        <repository>
-            <id>dsol-xml</id>
-            <name>Simulation @ TU Delft</name>
-            <url>http://simulation.tudelft.nl/maven/</url>
-        </repository>
-    </repositories>
-
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>16</maven.compiler.source>
@@ -192,9 +183,9 @@
                             </filters>
                         </configuration>
                     </execution>
-
                 </executions>
             </plugin>
+
         </plugins>
     </build>
 
