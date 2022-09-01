@@ -7,7 +7,7 @@ public record PageArgument(
         PageDirection direction,
         boolean autoRotate
 ) {
-    private PageArgument(PageAlign.VerticalAlign verticalAlign,
+    public PageArgument(PageAlign.VerticalAlign verticalAlign,
                          PageAlign.HorizontalAlign horizontalAlign,
                          PageSize size, PageDirection direction,
                          boolean autoRotate) {
