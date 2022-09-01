@@ -1,6 +1,5 @@
 package org.vincentyeh.img2pdf.lib.image.reader.framework;
 
-import org.vincentyeh.img2pdf.lib.image.reader.concrete.ImageReadException;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

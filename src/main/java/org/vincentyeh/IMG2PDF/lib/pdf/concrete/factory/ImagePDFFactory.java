@@ -10,7 +10,6 @@ import org.vincentyeh.img2pdf.lib.pdf.framework.objects.SizeF;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.DocumentArgument;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageArgument;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +32,7 @@ public class ImagePDFFactory {
 
         void onConversionComplete(long procedure_id);
 
-        void onAppend(long procedure_id, int index);
+        void onAppend(long procedure_id, int index, int total);
     }
 
     private final boolean overwrite;
@@ -59,14 +58,14 @@ public class ImagePDFFactory {
                            @Nullable ImageReader imageReader,
                            @NotNull ImagePageStrategy strategy,
                            boolean overwrite) {
-        try{
-            this.builder =Objects.requireNonNull(builder,"builder==null");
+        try {
+            this.builder = Objects.requireNonNull(builder, "builder==null");
             this.pageArgument = Objects.requireNonNullElseGet(pageArgument, PageArgument::new);
             this.documentArgument = Objects.requireNonNullElseGet(documentArgument, DocumentArgument::new);
             this.imageReader = Objects.requireNonNullElseGet(imageReader, ImageReader::getDefault);
-            this.strategy = Objects.requireNonNull(strategy,"strategy==null");
+            this.strategy = Objects.requireNonNull(strategy, "strategy==null");
             this.overwrite = overwrite;
-        }catch (NullPointerException e){
+        } catch (NullPointerException e) {
             throw new IllegalArgumentException(e);
         }
     }
@@ -82,10 +81,6 @@ public class ImagePDFFactory {
             }
             checkOverwrite(destination);
             builder.createDocument();
-
-            if (listener != null)
-                listener.onSaved(procedure_id, destination);
-
             builder.setOwnerPassword(this.documentArgument.ownerPassword());
             builder.setUserPassword(this.documentArgument.userPassword());
             builder.setPermission(this.documentArgument.permission());
@@ -99,15 +94,15 @@ public class ImagePDFFactory {
                 listener.onConversionComplete(procedure_id);
             builder.reset();
             return destination;
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new PDFFactoryException(e);
         }
     }
 
 
-    private void checkOverwrite(File file) {
+    private void checkOverwrite(File file) throws IOException {
         if (!overwrite && file.exists()) {
-            throw new RuntimeException(new IOException("Overwrite deny"));
+            throw new IOException("Overwrite deny");
         }
     }
 
@@ -117,12 +112,12 @@ public class ImagePDFFactory {
         if (imageFiles != null)
             for (File file : imageFiles) {
                 try {
-                    BufferedImage bufferedImage = imageReader != null ? imageReader.read(file) : ImageIO.read(file);
+                    BufferedImage bufferedImage = imageReader.read(file);
                     strategy.execute(this.pageArgument, new SizeF(bufferedImage.getWidth(), bufferedImage.getHeight()));
                     var index = builder.addPage(strategy.getPageSize());
                     builder.addImage(index, bufferedImage, strategy.getImagePosition(), strategy.getImageSize());
                     if (listener != null)
-                        listener.onAppend(procedure_id, i);
+                        listener.onAppend(procedure_id, i, imageFiles.length);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }

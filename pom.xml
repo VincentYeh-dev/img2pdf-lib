@@ -5,7 +5,7 @@
 
     <groupId>org.vincentyeh</groupId>
     <artifactId>img2pdf.lib</artifactId>
-    <version>4.0.0-alpha</version>
+    <version>4.0.0-beta</version>
     <packaging>jar</packaging>
     <developers>
         <developer>
@@ -13,15 +13,6 @@
         </developer>
     </developers>
     <name>img2pdf-lib</name>
-
-    <repositories>
-        <repository>
-            <id>dsol-xml</id>
-            <name>Simulation @ TU Delft</name>
-            <url>http://simulation.tudelft.nl/maven/</url>
-        </repository>
-    </repositories>
-
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -63,26 +54,69 @@
         </dependency>
     </dependencies>
 
-    <build>
+    <reporting>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M5</version>
-                <configuration>
-                    <excludes>
-                        <include>**/Test*.java</include>
-                        <include>**/*Tests.java</include>
-                    </excludes>
-                </configuration>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>2.6</version>
+                <reportSets>
+                    <reportSet>
+                        <reports><!-- select reports -->
+                            <report>index</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9</version>
+                <reportSets>
+                    <reportSet><!-- by default, id = "default" -->
+                        <reports><!-- select non-aggregate reports -->
+                            <report>javadoc</report>
+                        </reports>
+                    </reportSet>
+                    <reportSet><!-- aggregate reportSet, to define in poms having modules -->
+                        <id>aggregate</id>
+                        <inherited>false</inherited><!-- don't run aggregate in child modules -->
+                        <reports>
+                            <report>aggregate</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.0.0-M5</version>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>3.0.0-M7</version>
             </plugin>
+        </plugins>
+    </reporting>
 
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.0.0-M7</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>2.1</version>
+                    <configuration>
+                        <locales>zh_TW</locales>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -104,17 +138,19 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <!-- annotationProcessorPaths requires maven-compiler-plugin version 3.5 or higher -->
                 <version>3.8.1</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.2</version>
                 <configuration>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>info.picocli</groupId>
-                            <artifactId>picocli-codegen</artifactId>
-                            <version>4.6.1</version>
-                        </path>
-                    </annotationProcessorPaths>
-                    <compilerArgs>
-                        <arg>-Aproject=${project.groupId}/${project.artifactId}</arg>
-                    </compilerArgs>
+                    <includes>
+                        <include>**/*</include>
+                    </includes>
+                    <excludes>
+                        <exclude>org/vincentyeh/img2pdf/lib/test/*</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
 
@@ -130,28 +166,26 @@
                         </goals>
                         <configuration>
                             <finalName>${jar-name}</finalName>
+                            <transformers>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer"/>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer"/>
+                            </transformers>
                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>
                                     <excludes>
                                         <exclude>META-INF/DEPENDENCIES</exclude>
-                                        <exclude>META-INF/LICENSE*</exclude>
-                                        <exclude>META-INF/NOTICE*</exclude>
                                         <exclude>META-INF/MANIFEST*</exclude>
                                     </excludes>
                                 </filter>
                             </filters>
-                            <artifactSet>
-                                <excludes>
-                                    <exclude>junit:junit</exclude>
-                                    <exclude>org.junit.jupiter:*</exclude>
-                                </excludes>
-                            </artifactSet>
                         </configuration>
                     </execution>
-
                 </executions>
             </plugin>
+
         </plugins>
     </build>
 
