@@ -12,7 +12,7 @@ public enum PageDirection {
     Landscape, Portrait;
 
     public static PageDirection detectDirection(SizeF size) {
-        return detectDirection(size.width(), size.height());
+        return detectDirection(size.width, size.height);
     }
 
     public static PageDirection detectDirection(float width, float height) {

@@ -69,7 +69,7 @@ public class TextPDFBuilder implements PDFBuilder {
 
     @Override
     public void save(File destination) throws IOException {
-        var writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destination), StandardCharsets.UTF_8));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destination), StandardCharsets.UTF_8));
         writer.write(buffer.toString());
         writer.close();
     }

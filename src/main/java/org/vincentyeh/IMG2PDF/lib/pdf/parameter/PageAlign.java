@@ -6,14 +6,17 @@ package org.vincentyeh.img2pdf.lib.pdf.parameter;
  *
  * @author vincent
  */
-public record PageAlign(
-        VerticalAlign vertical_align,
-        HorizontalAlign horizontal_align
-) {
+public class PageAlign {
+    public final VerticalAlign vertical_align;
+    public final HorizontalAlign horizontal_align;
 
+    public PageAlign(VerticalAlign vertical_align, HorizontalAlign horizontal_align) {
+        this.vertical_align = vertical_align;
+        this.horizontal_align = horizontal_align;
+    }
 
     public static PageAlign valueOf(String value) {
-        var verti_hori_align = value.split("-");
+        String[] verti_hori_align = value.split("-");
         return new PageAlign(VerticalAlign.valueOf(verti_hori_align[0]), HorizontalAlign.valueOf(verti_hori_align[1]));
     }
 

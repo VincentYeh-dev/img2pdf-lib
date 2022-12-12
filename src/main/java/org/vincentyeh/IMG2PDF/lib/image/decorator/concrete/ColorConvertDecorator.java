@@ -25,7 +25,7 @@ public class ColorConvertDecorator extends ImageDecorator {
         if (image_cs.getType() == ColorSpace.TYPE_GRAY)
             return image;
 
-        var op = new ColorConvertOp(targetColorSpace, null);
+        ColorConvertOp op = new ColorConvertOp(targetColorSpace, null);
         return op.filter(image, null);
     }
 }

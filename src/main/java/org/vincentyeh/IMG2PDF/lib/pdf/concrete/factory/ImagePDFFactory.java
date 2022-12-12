@@ -60,9 +60,21 @@ public class ImagePDFFactory {
                            boolean overwrite) {
         try {
             this.builder = Objects.requireNonNull(builder, "builder==null");
-            this.pageArgument = Objects.requireNonNullElseGet(pageArgument, PageArgument::new);
-            this.documentArgument = Objects.requireNonNullElseGet(documentArgument, DocumentArgument::new);
-            this.imageReader = Objects.requireNonNullElseGet(imageReader, ImageReader::getDefault);
+            if (pageArgument == null)
+                this.pageArgument = new PageArgument();
+            else
+                this.pageArgument = pageArgument;
+
+            if (documentArgument == null)
+                this.documentArgument = new DocumentArgument();
+            else
+                this.documentArgument = documentArgument;
+
+            if (imageReader == null)
+                this.imageReader = ImageReader.getDefault();
+            else
+                this.imageReader = imageReader;
+
             this.strategy = Objects.requireNonNull(strategy, "strategy==null");
             this.overwrite = overwrite;
         } catch (NullPointerException e) {
@@ -81,11 +93,11 @@ public class ImagePDFFactory {
             }
             checkOverwrite(destination);
             builder.createDocument();
-            builder.setOwnerPassword(this.documentArgument.ownerPassword());
-            builder.setUserPassword(this.documentArgument.userPassword());
-            builder.setPermission(this.documentArgument.permission());
-            if (documentArgument.info() != null)
-                builder.setInfo(this.documentArgument.info());
+            builder.setOwnerPassword(this.documentArgument.ownerPassword);
+            builder.setUserPassword(this.documentArgument.userPassword);
+            builder.setPermission(this.documentArgument.permission);
+            if (documentArgument.info != null)
+                builder.setInfo(this.documentArgument.info);
             AddPages(procedure_id, imageFiles, listener);
             if (listener != null)
                 listener.onSaved(procedure_id, destination);
@@ -114,7 +126,7 @@ public class ImagePDFFactory {
                 try {
                     BufferedImage bufferedImage = imageReader.read(file);
                     strategy.execute(this.pageArgument, new SizeF(bufferedImage.getWidth(), bufferedImage.getHeight()));
-                    var index = builder.addPage(strategy.getPageSize());
+                    int index = builder.addPage(strategy.getPageSize());
                     builder.addImage(index, bufferedImage, strategy.getImagePosition(), strategy.getImageSize());
                     if (listener != null)
                         listener.onAppend(procedure_id, i, imageFiles.length);
