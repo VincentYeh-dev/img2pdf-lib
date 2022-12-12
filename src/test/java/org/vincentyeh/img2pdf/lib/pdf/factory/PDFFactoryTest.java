@@ -37,17 +37,17 @@ public class PDFFactoryTest {
 
     @Test
     public void TestIdeal() {
-        var imageReader = Mockito.mock(ImageReader.class);
+        ImageReader imageReader = Mockito.mock(ImageReader.class);
         Mockito.when(imageReader.read(Mockito.any()))
                 .thenReturn(new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB));
-        var builder = Mockito.mock(PDFBuilder.class);
-        var strategy = Mockito.mock(ImagePageStrategy.class);
+        PDFBuilder builder = Mockito.mock(PDFBuilder.class);
+        ImagePageStrategy strategy = Mockito.mock(ImagePageStrategy.class);
 
-        var info=new PDFDocumentInfo();
+        PDFDocumentInfo info = new PDFDocumentInfo();
         info.Title="";
 
-        var factory = new ImagePDFFactory(null,
-                new DocumentArgument(null,null,null,info),
+        ImagePDFFactory factory = new ImagePDFFactory(null,
+                new DocumentArgument(null, null, null, info),
                 builder, imageReader, strategy, false);
         Assertions.assertDoesNotThrow(
                 () ->
@@ -56,12 +56,12 @@ public class PDFFactoryTest {
 
     @Test
     public void TestNullImage() {
-        var imageReader = Mockito.mock(ImageReader.class);
+        ImageReader imageReader = Mockito.mock(ImageReader.class);
         Mockito.when(imageReader.read(Mockito.any())).thenReturn(null);
-        var builder = Mockito.mock(PDFBuilder.class);
-        var strategy = Mockito.mock(ImagePageStrategy.class);
+        PDFBuilder builder = Mockito.mock(PDFBuilder.class);
+        ImagePageStrategy strategy = Mockito.mock(ImagePageStrategy.class);
 
-        var factory = new ImagePDFFactory(null, null,
+        ImagePDFFactory factory = new ImagePDFFactory(null, null,
                 builder, imageReader, strategy, false);
         Assertions.assertThrows(PDFFactoryException.class,
                 () ->
@@ -70,14 +70,14 @@ public class PDFFactoryTest {
 
     @Test
     public void TestListener() {
-        var imageReader = Mockito.mock(ImageReader.class);
+        ImageReader imageReader = Mockito.mock(ImageReader.class);
         Mockito.when(imageReader.read(Mockito.any()))
                 .thenReturn(new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB));
-        var builder = Mockito.mock(PDFBuilder.class);
-        var strategy = Mockito.mock(ImagePageStrategy.class);
-        var listener = Mockito.mock(ImagePDFFactory.Listener.class);
+        PDFBuilder builder = Mockito.mock(PDFBuilder.class);
+        ImagePageStrategy strategy = Mockito.mock(ImagePageStrategy.class);
+        ImagePDFFactory.Listener listener = Mockito.mock(ImagePDFFactory.Listener.class);
 
-        var factory = new ImagePDFFactory(null, null,
+        ImagePDFFactory factory = new ImagePDFFactory(null, null,
                 builder, imageReader, strategy, false);
         Assertions.assertDoesNotThrow(
                 () ->
@@ -86,14 +86,14 @@ public class PDFFactoryTest {
 
     @Test
     public void TestOverwrite() {
-        var imageReader = Mockito.mock(ImageReader.class);
+        ImageReader imageReader = Mockito.mock(ImageReader.class);
         Mockito.when(imageReader.read(Mockito.any()))
                 .thenReturn(new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB));
-        var builder = Mockito.mock(PDFBuilder.class);
-        var strategy = Mockito.mock(ImagePageStrategy.class);
-        var destination = Mockito.mock(File.class);
+        PDFBuilder builder = Mockito.mock(PDFBuilder.class);
+        ImagePageStrategy strategy = Mockito.mock(ImagePageStrategy.class);
+        File destination = Mockito.mock(File.class);
         Mockito.when(destination.exists()).thenReturn(true);
-        var factory = new ImagePDFFactory(null, null,
+        ImagePDFFactory factory = new ImagePDFFactory(null, null,
                 builder, imageReader, strategy, false);
         Assertions.assertThrows(PDFFactoryException.class,
                 () ->

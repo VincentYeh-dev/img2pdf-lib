@@ -5,6 +5,7 @@ import org.vincentyeh.img2pdf.lib.image.reader.concrete.DefaultImageChainReader;
 import org.vincentyeh.img2pdf.lib.image.reader.concrete.ExifImageChainReader;
 import org.vincentyeh.img2pdf.lib.image.reader.framework.ColorType;
 import org.vincentyeh.img2pdf.lib.image.decorator.framework.ImageDecorator;
+import org.vincentyeh.img2pdf.lib.image.reader.framework.ImageFileChainReader;
 import org.vincentyeh.img2pdf.lib.image.reader.framework.ImageReadException;
 import org.vincentyeh.img2pdf.lib.image.reader.framework.ImageReader;
 
@@ -17,18 +18,27 @@ public class ImageReaderFacade {
     }
 
     public static ImageReader getImageReader(ColorType colorType) {
-        var reader = new ExifImageChainReader()
+        ImageFileChainReader reader = new ExifImageChainReader()
                 .setNextChain(new DefaultImageChainReader());
-        var decorator=new ColorConvertDecorator(colorType,null);
+        ColorConvertDecorator decorator = new ColorConvertDecorator(colorType, null);
 
-        return new ImageDecorateReader(reader,decorator);
+        return new ImageDecorateReader(reader, decorator);
 
     }
 
-    private record ImageDecorateReader(ImageReader imageReader, ImageDecorator imageDecorator) implements ImageReader {
-        @Override
-            public BufferedImage read(File file) throws ImageReadException {
-                return imageDecorator.decorate(imageReader.read(file));
-            }
+    private static class ImageDecorateReader implements ImageReader {
+        private final ImageReader imageReader;
+        private final ImageDecorator imageDecorator;
+
+        public ImageDecorateReader(ImageReader imageReader,
+                                   ImageDecorator imageDecorator) {
+            this.imageReader = imageReader;
+            this.imageDecorator = imageDecorator;
         }
+
+        @Override
+        public BufferedImage read(File file) throws ImageReadException {
+            return imageDecorator.decorate(imageReader.read(file));
+        }
+    }
 }

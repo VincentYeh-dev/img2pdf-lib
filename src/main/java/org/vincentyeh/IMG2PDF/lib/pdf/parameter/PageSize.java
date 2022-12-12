@@ -33,9 +33,9 @@ public enum PageSize {
 	}
 
 	public SizeF getSizeInMillimeters() {
-		return new SizeF(size.width()/POINTS_PER_MM,size.height()/POINTS_PER_MM);
+		return new SizeF(size.width/POINTS_PER_MM,size.height/POINTS_PER_MM);
 	}
 	public SizeF getSizeInInches() {
-		return new SizeF(size.width()/POINTS_PER_INCH,size.height()/POINTS_PER_INCH);
+		return new SizeF(size.width/POINTS_PER_INCH,size.height/POINTS_PER_INCH);
 	}
 }

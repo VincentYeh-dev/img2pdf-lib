@@ -10,9 +10,9 @@ public class ObjectTest {
     @Test
     public void testSizeF() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> new SizeF(-1, -1));
-        var s1 = new SizeF(10, 10);
-        var s2 = new SizeF(5, 10);
-        var s3 = new SizeF(10, 10);
+        SizeF s1 = new SizeF(10, 10);
+        SizeF s2 = new SizeF(5, 10);
+        SizeF s3 = new SizeF(10, 10);
         Assertions.assertTrue(s1.compareTo(s2) > 0);
         Assertions.assertFalse(s1.compareTo(s2) < 0);
         Assertions.assertNotEquals(0, s1.compareTo(s2));
@@ -24,10 +24,10 @@ public class ObjectTest {
 
     @Test
     public void testPointF() {
-        var p1 = new PointF();
-        var p2 = new PointF(1, 1);
-        var p3 = new PointF(2, 2);
-        var p4 = new PointF(2, 2);
+        PointF p1 = new PointF();
+        PointF p2 = new PointF(1, 1);
+        PointF p3 = new PointF(2, 2);
+        PointF p4 = new PointF(2, 2);
         Assertions.assertEquals(-1, p1.compareTo(p2));
         Assertions.assertEquals(1, p3.compareTo(p2));
         Assertions.assertEquals(p3, p4);

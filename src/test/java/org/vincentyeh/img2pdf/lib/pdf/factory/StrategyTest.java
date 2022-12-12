@@ -12,30 +12,30 @@ import org.vincentyeh.img2pdf.lib.pdf.parameter.PageSize;
 public class StrategyTest {
     @Test
     public void MathTest1() {
-        var strategy = new StandardImagePageCalculationStrategy();
+        StandardImagePageCalculationStrategy strategy = new StandardImagePageCalculationStrategy();
         strategy.execute(new PageArgument(PageSize.A4), new SizeF(100, 100));
         Assertions.assertEquals(strategy.getPageSize(), PageSize.A4.getSizeInPixels());
 
-        Assertions.assertEquals(strategy.getImageSize().width(), PageSize.A4.getSizeInPixels().width());
-        Assertions.assertNotEquals(strategy.getImageSize().height(), PageSize.A4.getSizeInPixels().height());
+        Assertions.assertEquals(strategy.getImageSize().width, PageSize.A4.getSizeInPixels().width);
+        Assertions.assertNotEquals(strategy.getImageSize().height, PageSize.A4.getSizeInPixels().height);
 
     }
 
     @Test
     public void MathTest2() {
-        var strategy = new StandardImagePageCalculationStrategy();
+        StandardImagePageCalculationStrategy strategy = new StandardImagePageCalculationStrategy();
         strategy.execute(new PageArgument(PageSize.A4), new SizeF(1000, 1000));
         Assertions.assertEquals(strategy.getPageSize(), PageSize.A4.getSizeInPixels());
 
-        Assertions.assertEquals(strategy.getImageSize().width(), PageSize.A4.getSizeInPixels().width());
-        Assertions.assertNotEquals(strategy.getImageSize().height(), PageSize.A4.getSizeInPixels().height());
+        Assertions.assertEquals(strategy.getImageSize().width, PageSize.A4.getSizeInPixels().width);
+        Assertions.assertNotEquals(strategy.getImageSize().height, PageSize.A4.getSizeInPixels().height);
 
     }
 
     @Test
     public void MathTest3() {
-        var strategy = new StandardImagePageCalculationStrategy();
-        var img_size = new SizeF(1000, 1000);
+        StandardImagePageCalculationStrategy strategy = new StandardImagePageCalculationStrategy();
+        SizeF img_size = new SizeF(1000, 1000);
         strategy.execute(
                 new PageArgument(
                         PageAlign.VerticalAlign.CENTER,
@@ -48,8 +48,8 @@ public class StrategyTest {
 
     @Test
     public void MathTest4() {
-        var strategy = new StandardImagePageCalculationStrategy();
-        var img_size = new SizeF(500, 1000);
+        StandardImagePageCalculationStrategy strategy = new StandardImagePageCalculationStrategy();
+        SizeF img_size = new SizeF(500, 1000);
         strategy.execute(
                 new PageArgument(
                         PageAlign.VerticalAlign.CENTER,
@@ -57,21 +57,21 @@ public class StrategyTest {
                         PageSize.A4,
                         PageDirection.Landscape
                 ), img_size);
-        Assertions.assertEquals(strategy.getPageSize().height(), PageSize.A4.getSizeInPixels().width());
-        Assertions.assertEquals(strategy.getPageSize().width(), PageSize.A4.getSizeInPixels().height());
+        Assertions.assertEquals(strategy.getPageSize().height, PageSize.A4.getSizeInPixels().width);
+        Assertions.assertEquals(strategy.getPageSize().width, PageSize.A4.getSizeInPixels().height);
     }
 
     @Test
     public void MathTest5() {
-        var strategy = new StandardImagePageCalculationStrategy();
-        var img_size = new SizeF(5000, 1000);
+        StandardImagePageCalculationStrategy strategy = new StandardImagePageCalculationStrategy();
+        SizeF img_size = new SizeF(5000, 1000);
         strategy.execute(
                 new PageArgument(
                         PageAlign.VerticalAlign.CENTER,
                         PageAlign.HorizontalAlign.CENTER,
                         PageSize.A4
                 ), img_size);
-        Assertions.assertEquals(strategy.getPageSize().width(), PageSize.A4.getSizeInPixels().height());
+        Assertions.assertEquals(strategy.getPageSize().width, PageSize.A4.getSizeInPixels().height);
     }
 }
 

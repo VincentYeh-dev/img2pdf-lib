@@ -4,6 +4,7 @@ package org.vincentyeh.img2pdf.lib.test;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.vincentyeh.img2pdf.lib.image.ImageReaderFacade;
 import org.vincentyeh.img2pdf.lib.image.reader.framework.ColorType;
+import org.vincentyeh.img2pdf.lib.image.reader.framework.ImageReader;
 import org.vincentyeh.img2pdf.lib.pdf.concrete.builder.PDFBoxBuilder;
 import org.vincentyeh.img2pdf.lib.pdf.concrete.factory.ImagePDFFactory;
 import org.vincentyeh.img2pdf.lib.pdf.concrete.factory.StandardImagePageCalculationStrategy;
@@ -18,17 +19,16 @@ import java.nio.file.Files;
 public class TestProgram {
 
     public static void main(String[] args) throws IOException {
-        var tempFolder = Files.createTempDirectory("org.vincentyeh.img2pdf-lib.tmp.").toFile();
+        File tempFolder = Files.createTempDirectory("org.vincentyeh.img2pdf-lib.tmp.").toFile();
         tempFolder.deleteOnExit();
-        var factory =
-                createImagePDFFactory(
-                        new PageArgument(PageSize.A4),
-                        new DocumentArgument("1234", "5678")
-                        , 3 * 1024 * 1024, tempFolder, true
-                );
+        ImagePDFFactory factory = createImagePDFFactory(
+                new PageArgument(PageSize.A4),
+                new DocumentArgument("1234", "5678")
+                , 3 * 1024 * 1024, tempFolder, true
+        );
 
 
-        var files = new File("test").listFiles();
+        File[] files = new File("test").listFiles();
         factory.start(files, new File("output2.pdf"), listener);
     }
 
@@ -57,8 +57,8 @@ public class TestProgram {
     public static ImagePDFFactory createImagePDFFactory(PageArgument pageArgument, DocumentArgument documentArgument,
                                                         long bytes_count, File tempFolder, boolean overwrite_output
     ) {
-        var setting = MemoryUsageSetting.setupMixed(bytes_count).setTempDir(tempFolder);
-        var reader = ImageReaderFacade.getImageReader(ColorType.sRGB);
+        MemoryUsageSetting setting = MemoryUsageSetting.setupMixed(bytes_count).setTempDir(tempFolder);
+        ImageReader reader = ImageReaderFacade.getImageReader(ColorType.sRGB);
 
         return new ImagePDFFactory(pageArgument, documentArgument, new PDFBoxBuilder(setting),
                 reader, new StandardImagePageCalculationStrategy(),

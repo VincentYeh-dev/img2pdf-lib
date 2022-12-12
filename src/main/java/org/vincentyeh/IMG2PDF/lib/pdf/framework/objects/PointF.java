@@ -1,7 +1,15 @@
 package org.vincentyeh.img2pdf.lib.pdf.framework.objects;
 
 
-public record PointF(float x, float y) implements Comparable<PointF> {
+public class PointF implements Comparable<PointF> {
+
+    public final float x;
+    public final float y;
+
+    public PointF(float x, float y) {
+        this.x = x;
+        this.y = y;
+    }
 
     public PointF() {
         this(0, 0);

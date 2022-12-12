@@ -58,7 +58,7 @@ public class PDFBoxBuilder implements PDFBuilder {
 
     @Override
     public void setInfo(PDFDocumentInfo info) {
-        var information = new PDDocumentInformation();
+        PDDocumentInformation information = new PDDocumentInformation();
         information.setTitle(info.Title);
         information.setAuthor(info.Author);
         information.setSubject(info.Subject);
@@ -81,8 +81,8 @@ public class PDFBoxBuilder implements PDFBuilder {
 
     @Override
     public int addPage(SizeF size) {
-        var page = new PDPage();
-        page.setMediaBox(new PDRectangle(size.width(), size.height()));
+        PDPage page = new PDPage();
+        page.setMediaBox(new PDRectangle(size.width, size.height));
         pages.add(page);
         return pages.size() - 1;
     }
@@ -92,7 +92,7 @@ public class PDFBoxBuilder implements PDFBuilder {
         try {
             PDImageXObject pdImageXObject = LosslessFactory.createFromImage(document, image);
             PDPageContentStream contentStream = new PDPageContentStream(document, pages.get(index));
-            contentStream.drawImage(pdImageXObject, position.x(), position.y(), size.width(), size.height());
+            contentStream.drawImage(pdImageXObject, position.x, position.y, size.width, size.height);
             contentStream.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -103,7 +103,7 @@ public class PDFBoxBuilder implements PDFBuilder {
     public void save(File destination) throws IOException {
         if (ownerPassword != null && userPassword != null)
             document.protect(createProtectionPolicy());
-        for (var page : pages)
+        for (PDPage page : pages)
             document.addPage(page);
         document.save(destination);
         document.close();

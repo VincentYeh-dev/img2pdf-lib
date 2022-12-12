@@ -1,16 +1,23 @@
 package org.vincentyeh.img2pdf.lib.pdf.parameter;
 
 
-public record PageArgument(
-        PageAlign align,
-        PageSize size,
-        PageDirection direction,
-        boolean autoRotate
-) {
+public class PageArgument {
+    public final PageAlign align;
+    public final PageSize size;
+    public final PageDirection direction;
+    public final boolean autoRotate;
+
+    public PageArgument(PageAlign align, PageSize size, PageDirection direction, boolean autoRotate) {
+        this.align = align;
+        this.size = size;
+        this.direction = direction;
+        this.autoRotate = autoRotate;
+    }
+
     public PageArgument(PageAlign.VerticalAlign verticalAlign,
-                         PageAlign.HorizontalAlign horizontalAlign,
-                         PageSize size, PageDirection direction,
-                         boolean autoRotate) {
+                        PageAlign.HorizontalAlign horizontalAlign,
+                        PageSize size, PageDirection direction,
+                        boolean autoRotate) {
         this(new PageAlign(verticalAlign, horizontalAlign), size, direction, autoRotate);
     }
 
