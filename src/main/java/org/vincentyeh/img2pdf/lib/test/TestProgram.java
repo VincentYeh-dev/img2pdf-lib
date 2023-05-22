@@ -1,35 +1,23 @@
 package org.vincentyeh.img2pdf.lib.test;
 
 
-import org.apache.pdfbox.io.MemoryUsageSetting;
-import org.vincentyeh.img2pdf.lib.image.decorator.concrete.ColorConvertDecorator;
-import org.vincentyeh.img2pdf.lib.image.reader.concrete.MetaImageReader;
+import org.vincentyeh.img2pdf.lib.Img2Pdf;
 import org.vincentyeh.img2pdf.lib.image.reader.framework.ColorType;
-import org.vincentyeh.img2pdf.lib.image.reader.framework.ImageReader;
-import org.vincentyeh.img2pdf.lib.pdf.concrete.builder.PDFBoxBuilder;
 import org.vincentyeh.img2pdf.lib.pdf.concrete.factory.ImagePDFFactory;
-import org.vincentyeh.img2pdf.lib.pdf.concrete.factory.StandardImagePageCalculationStrategy;
-import org.vincentyeh.img2pdf.lib.pdf.framework.factory.FactoryImpl;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.DocumentArgument;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageArgument;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageSize;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 
 public class TestProgram {
 
     public static void main(String[] args) throws IOException {
-        File tempFolder = Files.createTempDirectory("org.vincentyeh.img2pdf-lib.tmp.").toFile();
-        tempFolder.deleteOnExit();
-        ImagePDFFactory factory = createImagePDFFactory(
+        ImagePDFFactory factory = Img2Pdf.createFactory(
                 new PageArgument(PageSize.A4),
                 new DocumentArgument("1234", "5678")
-                , ColorType.GRAY
-                , 3 * 1024 * 1024, tempFolder, true
-        );
-
+                , ColorType.GRAY, true);
 
         File[] files = new File("test").listFiles();
         factory.start(-1, files, new File("output2.pdf"), listener);
@@ -56,21 +44,4 @@ public class TestProgram {
             System.out.println("onAppend:" + procedure_id + "\t Page:" + index);
         }
     };
-
-    public static ImagePDFFactory createImagePDFFactory(PageArgument pageArgument, DocumentArgument documentArgument,
-                                                        ColorType colorType, long bytes_count, File tempFolder,
-                                                        boolean overwrite_output
-    ) {
-
-        MemoryUsageSetting setting = MemoryUsageSetting.setupMixed(bytes_count).setTempDir(tempFolder);
-        ImageReader reader = new MetaImageReader();
-        ColorConvertDecorator decorator = new ColorConvertDecorator(colorType, null);
-
-        final FactoryImpl factoryImpl = (file) -> decorator.decorate(reader.read(file));
-
-        return new ImagePDFFactory(pageArgument, documentArgument, factoryImpl, new PDFBoxBuilder(setting),
-                new StandardImagePageCalculationStrategy(), overwrite_output);
-    }
-
-
 }
