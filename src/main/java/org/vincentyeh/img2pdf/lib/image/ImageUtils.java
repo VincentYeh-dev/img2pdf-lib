@@ -1,22 +1,52 @@
-package org.vincentyeh.img2pdf.lib.image.reader.concrete;
+package org.vincentyeh.img2pdf.lib.image;
 
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.MetadataException;
 import com.drew.metadata.exif.ExifIFD0Directory;
-import org.vincentyeh.img2pdf.lib.image.reader.framework.ImageReadException;
-import org.vincentyeh.img2pdf.lib.image.reader.framework.ImageReader;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorConvertOp;
 import java.io.File;
 import java.io.IOException;
 
-public class MetaImageReader implements ImageReader {
+public final class ImageUtils {
+//    private static final ImageReader reader = new MetaImageReader();
 
+    private ImageUtils() {
+
+    }
+
+    public static BufferedImage readImage(File file, ColorType colorType) {
+        BufferedImage image;
+        try {
+            if (canHandleMetaData(file)) {
+                double rotate_angle = handleMetaData(file);
+                image = rotateImage(ImageIO.read(file), rotate_angle);
+            } else {
+                image = ImageIO.read(file);
+            }
+
+            final ColorSpace targetColorSpace = ColorSpace.getInstance(colorType.getColorSpace());
+            ColorSpace image_cs = image.getColorModel().getColorSpace();
+
+            if (image_cs.getType() == targetColorSpace.getType()) return image;
+
+            if (image_cs.getType() == ColorSpace.TYPE_GRAY) return image;
+
+            ColorConvertOp op = new ColorConvertOp(targetColorSpace, null);
+            return op.filter(image, null);
+
+        } catch (ImageProcessingException | IOException | MetadataException e) {
+            throw new ImageReadException(e);
+        }
+
+    }
 
     private static BufferedImage rotateImage(BufferedImage img, double degrees) {
         if (degrees == 0 || degrees == 360)
@@ -47,29 +77,25 @@ public class MetaImageReader implements ImageReader {
     }
 
 
-    private BufferedImage handleImpl(File file) throws ImageProcessingException, IOException, MetadataException {
-
+    private static double handleMetaData(File file) throws ImageProcessingException, IOException, MetadataException {
         Metadata metadata = ImageMetadataReader.readMetadata(file);
-        BufferedImage image = ImageIO.read(file);
-
         ExifIFD0Directory exifIFD0 = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
-
         int orientation = exifIFD0.getInt(ExifIFD0Directory.TAG_ORIENTATION);
         switch (orientation) {
             case 1: // [Exif IFD0] Orientation - Top, left side (Horizontal / normal)
-                return image;
+                return 0;
             case 6: // [Exif IFD0] Orientation - Right side, top (Rotate 90 CW)
-                return rotateImage(image, 90);
+                return 90;
             case 3: // [Exif IFD0] Orientation - Bottom, right side (Rotate 180)
-                return rotateImage(image, 180);
+                return 180;
             case 8: // [Exif IFD0] Orientation - Left side, bottom (Rotate 270 CW)
-                return rotateImage(image, 270);
+                return 270;
             default:
-                throw new RuntimeException("image==null");
+                throw new IllegalStateException("orientation==" + orientation);
         }
     }
 
-    private boolean canHandle(File file) {
+    private static boolean canHandleMetaData(File file) {
         try {
             Metadata metadata = ImageMetadataReader.readMetadata(file);
             if (metadata.containsDirectoryOfType(ExifIFD0Directory.class)) {
@@ -82,16 +108,4 @@ public class MetaImageReader implements ImageReader {
         }
     }
 
-    @Override
-    public BufferedImage read(File file) throws ImageReadException {
-        try {
-            if (canHandle(file)) {
-                return handleImpl(file);
-            }else{
-                return ImageIO.read(file);
-            }
-        } catch (ImageProcessingException | IOException | MetadataException e) {
-            throw new ImageReadException(e);
-        }
-    }
 }

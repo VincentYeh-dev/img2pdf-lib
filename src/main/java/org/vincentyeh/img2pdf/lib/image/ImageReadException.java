@@ -1,4 +1,4 @@
-package org.vincentyeh.img2pdf.lib.image.reader.framework;
+package org.vincentyeh.img2pdf.lib.image;
 
 public class ImageReadException extends RuntimeException{
     public ImageReadException(){

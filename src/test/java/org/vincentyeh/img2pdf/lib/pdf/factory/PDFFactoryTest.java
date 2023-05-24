@@ -3,9 +3,10 @@ package org.vincentyeh.img2pdf.lib.pdf.factory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.vincentyeh.img2pdf.lib.pdf.concrete.factory.ImagePDFFactory;
+import org.vincentyeh.img2pdf.lib.pdf.concrete.factory.DefaultImagePDFFactory;
 import org.vincentyeh.img2pdf.lib.pdf.framework.builder.PDFBuilder;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.FactoryImpl;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImageFactoryListener;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePageStrategy;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.exception.PDFFactoryException;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.DocumentArgument;
@@ -26,12 +27,18 @@ public class PDFFactoryTest {
 
         Assertions.assertDoesNotThrow(
                 () ->
-                        new ImagePDFFactory(null, null,
+                        new DefaultImagePDFFactory(null, null,
                                 impl, builder, strategy, false));
+
+        Assertions.assertDoesNotThrow(
+                () ->
+                        new DefaultImagePDFFactory(null, null,
+                                impl, builder, false));
         Assertions.assertThrows(IllegalArgumentException.class,
                 () ->
-                        new ImagePDFFactory(null, null,
+                        new DefaultImagePDFFactory(null, null,
                                 null, null, null, false));
+
 
     }
 
@@ -47,7 +54,7 @@ public class PDFFactoryTest {
         PDFDocumentInfo info = new PDFDocumentInfo();
         info.Title = "";
 
-        ImagePDFFactory factory = new ImagePDFFactory(null,
+        DefaultImagePDFFactory factory = new DefaultImagePDFFactory(null,
                 new DocumentArgument(null, null, null, info),
                 impl, builder, strategy, false);
 
@@ -66,7 +73,7 @@ public class PDFFactoryTest {
         PDFBuilder builder = Mockito.mock(PDFBuilder.class);
         ImagePageStrategy strategy = Mockito.mock(ImagePageStrategy.class);
 
-        ImagePDFFactory factory = new ImagePDFFactory(null, null,
+        DefaultImagePDFFactory factory = new DefaultImagePDFFactory(null, null,
                 impl, builder, strategy, false);
         Assertions.assertThrows(PDFFactoryException.class,
                 () ->
@@ -81,13 +88,13 @@ public class PDFFactoryTest {
 
         PDFBuilder builder = Mockito.mock(PDFBuilder.class);
         ImagePageStrategy strategy = Mockito.mock(ImagePageStrategy.class);
-        ImagePDFFactory.Listener listener = Mockito.mock(ImagePDFFactory.Listener.class);
+        ImageFactoryListener listener = Mockito.mock(ImageFactoryListener.class);
 
-        ImagePDFFactory factory = new ImagePDFFactory(null, null,
+        DefaultImagePDFFactory factory = new DefaultImagePDFFactory(null, null,
                 impl, builder, strategy, false);
         Assertions.assertDoesNotThrow(
                 () ->
-                        factory.start(-1,new File[]{null}, new File(""), listener));
+                        factory.start(-1, new File[]{null}, new File(""), listener));
     }
 
     @Test
@@ -100,16 +107,16 @@ public class PDFFactoryTest {
         ImagePageStrategy strategy = Mockito.mock(ImagePageStrategy.class);
         File destination = Mockito.mock(File.class);
         Mockito.when(destination.exists()).thenReturn(true);
-        ImagePDFFactory factory = new ImagePDFFactory(null, null,
-                impl,builder, strategy, false);
+        DefaultImagePDFFactory factory = new DefaultImagePDFFactory(null, null,
+                impl, builder, strategy, false);
         Assertions.assertThrows(PDFFactoryException.class,
                 () ->
-                        factory.start(-1,new File[]{null}, destination, null));
+                        factory.start(-1, new File[]{null}, destination, null));
 
         Mockito.when(destination.exists()).thenReturn(false);
         Assertions.assertDoesNotThrow(
                 () ->
-                        factory.start(-1,new File[]{null}, destination, null));
+                        factory.start(-1, new File[]{null}, destination, null));
     }
 
 }

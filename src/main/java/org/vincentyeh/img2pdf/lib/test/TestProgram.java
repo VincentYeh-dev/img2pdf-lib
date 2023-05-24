@@ -2,28 +2,28 @@ package org.vincentyeh.img2pdf.lib.test;
 
 
 import org.vincentyeh.img2pdf.lib.Img2Pdf;
-import org.vincentyeh.img2pdf.lib.image.reader.framework.ColorType;
-import org.vincentyeh.img2pdf.lib.pdf.concrete.factory.ImagePDFFactory;
+import org.vincentyeh.img2pdf.lib.image.ColorType;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImageFactoryListener;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePDFFactory;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.DocumentArgument;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageArgument;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageSize;
 
 import java.io.File;
-import java.io.IOException;
 
 public class TestProgram {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         ImagePDFFactory factory = Img2Pdf.createFactory(
                 new PageArgument(PageSize.A4),
                 new DocumentArgument("1234", "5678")
                 , ColorType.GRAY, true);
 
-        File[] files = new File("test").listFiles();
-        factory.start(-1, files, new File("output2.pdf"), listener);
+//        File[] files = new File("test").listFiles();
+        factory.start(-1,new File("test"),null,null, new File("output2.pdf"), listener);
     }
 
-    private static final ImagePDFFactory.Listener listener = new ImagePDFFactory.Listener() {
+    private static final ImageFactoryListener listener = new ImageFactoryListener() {
         @Override
         public void initializing(long procedure_id) {
             System.out.println("initializing:" + procedure_id);

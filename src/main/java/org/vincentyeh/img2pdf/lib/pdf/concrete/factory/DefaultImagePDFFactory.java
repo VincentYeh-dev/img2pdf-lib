@@ -4,6 +4,8 @@ import com.drew.lang.annotations.NotNull;
 import com.drew.lang.annotations.Nullable;
 import org.vincentyeh.img2pdf.lib.pdf.framework.builder.PDFBuilder;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.FactoryImpl;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImageFactoryListener;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePDFFactory;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePageStrategy;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.exception.PDFFactoryException;
 import org.vincentyeh.img2pdf.lib.pdf.framework.objects.SizeF;
@@ -12,10 +14,13 @@ import org.vincentyeh.img2pdf.lib.pdf.parameter.PageArgument;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Objects;
 
-public class ImagePDFFactory {
+public class DefaultImagePDFFactory implements ImagePDFFactory {
 
     private final DocumentArgument documentArgument;
     private final PageArgument pageArgument;
@@ -28,23 +33,20 @@ public class ImagePDFFactory {
     private final ImagePageStrategy strategy;
 
 
-    public interface Listener {
-        void initializing(long procedure_id);
-
-        void onSaved(long procedure_id, File destination);
-
-        void onConversionComplete(long procedure_id);
-
-        void onAppend(long procedure_id, int index, int total);
+    public DefaultImagePDFFactory(@Nullable PageArgument pageArgument,
+                                  @Nullable DocumentArgument documentArgument,
+                                  @NotNull FactoryImpl impl,
+                                  @NotNull PDFBuilder builder,
+                                  boolean overwrite) {
+        this(pageArgument, documentArgument, impl, builder, new DefaultImagePageStrategy(), overwrite);
     }
 
-
-    public ImagePDFFactory(@Nullable PageArgument pageArgument,
-                           @Nullable DocumentArgument documentArgument,
-                           @NotNull FactoryImpl impl,
-                           @NotNull PDFBuilder builder,
-                           @NotNull ImagePageStrategy strategy,
-                           boolean overwrite) {
+    public DefaultImagePDFFactory(@Nullable PageArgument pageArgument,
+                                  @Nullable DocumentArgument documentArgument,
+                                  @NotNull FactoryImpl impl,
+                                  @NotNull PDFBuilder builder,
+                                  @NotNull ImagePageStrategy strategy,
+                                  boolean overwrite) {
 
         try {
 
@@ -67,7 +69,7 @@ public class ImagePDFFactory {
         }
     }
 
-    public final File start(int procedure_id, File[] imageFiles, File destination, Listener listener) throws PDFFactoryException {
+    public final File start(int procedure_id, File[] imageFiles, File destination, ImageFactoryListener listener) throws PDFFactoryException {
         try {
             if (listener != null) {
                 listener.initializing(procedure_id);
@@ -105,6 +107,39 @@ public class ImagePDFFactory {
         } catch (Exception e) {
             throw new PDFFactoryException(e);
         }
+    }
+
+    @Override
+    public File start(int procedure_id, File[] imageFiles, File destination) throws PDFFactoryException {
+        return start(procedure_id, imageFiles, destination, null);
+    }
+
+
+    @Override
+    public File start(int procedure_id, File directory, FilenameFilter filter,
+                      Comparator<File> fileSorter, File destination, ImageFactoryListener listener) throws PDFFactoryException {
+
+        File[] files = directory.listFiles(filter);
+        try {
+            if (files == null) {
+                throw new RuntimeException("abstract pathname does not denote a directory");
+            }
+            if (files.length == 0) {
+                throw new RuntimeException("No image files is found");
+            }
+            if(fileSorter!=null)
+                Arrays.sort(files, fileSorter);
+        } catch (Exception e) {
+            throw new PDFFactoryException(e);
+        }
+
+        return start(procedure_id, files, destination, listener);
+    }
+
+    @Override
+    public File start(int procedure_id, File directory, FilenameFilter filter,
+                      Comparator<File> fileSorter, File destination) throws PDFFactoryException {
+        return start(procedure_id, directory, filter, fileSorter, destination, null);
     }
 
 

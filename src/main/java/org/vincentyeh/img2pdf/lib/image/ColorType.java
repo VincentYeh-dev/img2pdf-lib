@@ -1,4 +1,4 @@
-package org.vincentyeh.img2pdf.lib.image.reader.framework;
+package org.vincentyeh.img2pdf.lib.image;
 
 import java.awt.color.ColorSpace;
 
