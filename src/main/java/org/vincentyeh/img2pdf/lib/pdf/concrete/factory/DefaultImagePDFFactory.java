@@ -71,10 +71,13 @@ public class DefaultImagePDFFactory implements ImagePDFFactory {
 
     public final File start(int procedure_id, File[] imageFiles, File destination, ImageFactoryListener listener) throws PDFFactoryException {
         try {
+            if (!overwrite && destination.exists()) {
+                throw new IOException("Overwrite deny");
+            }
             if (listener != null) {
                 listener.initializing(procedure_id);
             }
-            checkOverwrite(destination);
+
             builder.createDocument();
             builder.setOwnerPassword(this.documentArgument.ownerPassword);
             builder.setUserPassword(this.documentArgument.userPassword);
@@ -85,16 +88,12 @@ public class DefaultImagePDFFactory implements ImagePDFFactory {
 
             if (imageFiles != null)
                 for (int i = 0; i < imageFiles.length; i++) {
-                    try {
-                        BufferedImage bufferedImage = impl.readImage(imageFiles[i]);
-                        strategy.execute(this.pageArgument, new SizeF(bufferedImage.getWidth(), bufferedImage.getHeight()));
-                        int index = builder.addPage(strategy.getPageSize());
-                        builder.addImage(index, bufferedImage, strategy.getImagePosition(), strategy.getImageSize());
-                        if (listener != null)
-                            listener.onAppend(procedure_id, i, imageFiles.length);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
+                    BufferedImage bufferedImage = impl.readImage(imageFiles[i]);
+                    strategy.execute(this.pageArgument, new SizeF(bufferedImage.getWidth(), bufferedImage.getHeight()));
+                    int index = builder.addPage(strategy.getPageSize());
+                    builder.addImage(index, bufferedImage, strategy.getImagePosition(), strategy.getImageSize());
+                    if (listener != null)
+                        listener.onAppend(procedure_id, imageFiles[i], i, imageFiles.length);
                 }
 
             if (listener != null)
@@ -127,7 +126,7 @@ public class DefaultImagePDFFactory implements ImagePDFFactory {
             if (files.length == 0) {
                 throw new RuntimeException("No image files is found");
             }
-            if(fileSorter!=null)
+            if (fileSorter != null)
                 Arrays.sort(files, fileSorter);
         } catch (Exception e) {
             throw new PDFFactoryException(e);
@@ -140,13 +139,6 @@ public class DefaultImagePDFFactory implements ImagePDFFactory {
     public File start(int procedure_id, File directory, FilenameFilter filter,
                       Comparator<File> fileSorter, File destination) throws PDFFactoryException {
         return start(procedure_id, directory, filter, fileSorter, destination, null);
-    }
-
-
-    private void checkOverwrite(File file) throws IOException {
-        if (!overwrite && file.exists()) {
-            throw new IOException("Overwrite deny");
-        }
     }
 
 }

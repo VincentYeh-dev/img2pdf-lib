@@ -10,6 +10,5 @@ public interface ImageFactoryListener {
 
     void onConversionComplete(long procedure_id);
 
-    void onAppend(long procedure_id, int index, int total);
-
+    void onAppend(int procedure_id, File file, int i, int length);
 }

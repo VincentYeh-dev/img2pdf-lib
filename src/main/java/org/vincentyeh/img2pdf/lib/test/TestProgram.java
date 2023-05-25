@@ -20,7 +20,7 @@ public class TestProgram {
                 , ColorType.GRAY, true);
 
 //        File[] files = new File("test").listFiles();
-        factory.start(-1,new File("test"),null,null, new File("output2.pdf"), listener);
+        factory.start(-1, new File("test"), null, null, new File("output2.pdf"), listener);
     }
 
     private static final ImageFactoryListener listener = new ImageFactoryListener() {
@@ -40,8 +40,9 @@ public class TestProgram {
         }
 
         @Override
-        public void onAppend(long procedure_id, int index, int total) {
-            System.out.println("onAppend:" + procedure_id + "\t Page:" + index);
+        public void onAppend(int procedure_id, File file, int i, int length) {
+            System.out.println("onAppend:" + procedure_id +"\t image:"+file.getName());
         }
+
     };
 }
