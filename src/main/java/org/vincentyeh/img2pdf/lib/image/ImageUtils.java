@@ -16,13 +16,19 @@ import java.io.File;
 import java.io.IOException;
 
 public final class ImageUtils {
-//    private static final ImageReader reader = new MetaImageReader();
 
     private ImageUtils() {
 
     }
 
     public static BufferedImage readImage(File file, ColorType colorType) {
+        if (file == null)
+            throw new IllegalArgumentException("image file equals null");
+
+        if (!file.exists())
+            throw new IllegalArgumentException("image file not found");
+
+
         BufferedImage image;
         try {
             if (canHandleMetaData(file)) {
@@ -32,12 +38,13 @@ public final class ImageUtils {
                 image = ImageIO.read(file);
             }
 
-            final ColorSpace targetColorSpace = ColorSpace.getInstance(colorType.getColorSpace());
-            ColorSpace image_cs = image.getColorModel().getColorSpace();
+            final ColorSpace targetColorSpace;
+            if (colorType != null)
+                targetColorSpace = ColorSpace.getInstance(colorType.getColorSpace());
+            else
+                targetColorSpace = image.getColorModel().getColorSpace();
 
-            if (image_cs.getType() == targetColorSpace.getType()) return image;
-
-            if (image_cs.getType() == ColorSpace.TYPE_GRAY) return image;
+            if (image.getColorModel().getColorSpace().getType() == targetColorSpace.getType()) return image;
 
             ColorConvertOp op = new ColorConvertOp(targetColorSpace, null);
             return op.filter(image, null);
@@ -95,17 +102,13 @@ public final class ImageUtils {
         }
     }
 
-    private static boolean canHandleMetaData(File file) {
-        try {
-            Metadata metadata = ImageMetadataReader.readMetadata(file);
-            if (metadata.containsDirectoryOfType(ExifIFD0Directory.class)) {
-                ExifIFD0Directory exifIFD0 = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
-                return exifIFD0.containsTag(ExifIFD0Directory.TAG_ORIENTATION);
-            }
-            return false;
-        } catch (ImageProcessingException | IOException e) {
-            throw new RuntimeException(e);
+    private static boolean canHandleMetaData(File file) throws ImageProcessingException, IOException {
+        Metadata metadata = ImageMetadataReader.readMetadata(file);
+        if (metadata.containsDirectoryOfType(ExifIFD0Directory.class)) {
+            ExifIFD0Directory exifIFD0 = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
+            return exifIFD0.containsTag(ExifIFD0Directory.TAG_ORIENTATION);
         }
+        return false;
     }
 
 }
