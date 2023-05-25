@@ -14,7 +14,7 @@ import org.vincentyeh.img2pdf.lib.pdf.parameter.PageArgument;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FilenameFilter;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -115,7 +115,7 @@ public class DefaultImagePDFFactory implements ImagePDFFactory {
 
 
     @Override
-    public File start(int procedure_id, File directory, FilenameFilter filter,
+    public File start(int procedure_id, File directory, FileFilter filter,
                       Comparator<File> fileSorter, File destination, ImageFactoryListener listener) throws PDFFactoryException {
 
         File[] files = directory.listFiles(filter);
@@ -136,7 +136,7 @@ public class DefaultImagePDFFactory implements ImagePDFFactory {
     }
 
     @Override
-    public File start(int procedure_id, File directory, FilenameFilter filter,
+    public File start(int procedure_id, File directory, FileFilter filter,
                       Comparator<File> fileSorter, File destination) throws PDFFactoryException {
         return start(procedure_id, directory, filter, fileSorter, destination, null);
     }
