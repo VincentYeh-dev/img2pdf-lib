@@ -25,18 +25,19 @@ public class TestProgram {
     }
 
     private static final ImageFactoryListener listener = new ImageFactoryListener() {
+
         @Override
-        public void initializing(long procedure_id) {
+        public void initializing(int procedure_id, int length) {
             System.out.println("initializing:" + procedure_id);
         }
 
         @Override
-        public void onSaved(long procedure_id, File destination) {
+        public void onSaved(int procedure_id, File destination) {
             System.out.println("onSaved:" + procedure_id + "\tDest:" + destination);
         }
 
         @Override
-        public void onConversionComplete(long procedure_id) {
+        public void onConversionComplete(int procedure_id) {
             System.out.println("onConversionComplete:" + procedure_id);
         }
 

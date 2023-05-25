@@ -4,11 +4,11 @@ import java.io.File;
 
 public interface ImageFactoryListener {
 
-    void initializing(long procedure_id);
+    void initializing(int procedure_id, int length);
 
-    void onSaved(long procedure_id, File destination);
+    void onSaved(int procedure_id, File destination);
 
-    void onConversionComplete(long procedure_id);
+    void onConversionComplete(int procedure_id);
 
     void onAppend(int procedure_id, File file, int i, int length);
 }

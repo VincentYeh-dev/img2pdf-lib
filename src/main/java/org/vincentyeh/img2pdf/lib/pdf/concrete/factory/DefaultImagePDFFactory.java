@@ -74,9 +74,6 @@ public class DefaultImagePDFFactory implements ImagePDFFactory {
             if (!overwrite && destination.exists()) {
                 throw new IOException("Overwrite deny");
             }
-            if (listener != null) {
-                listener.initializing(procedure_id);
-            }
 
             builder.createDocument();
             builder.setOwnerPassword(this.documentArgument.ownerPassword);
@@ -86,7 +83,11 @@ public class DefaultImagePDFFactory implements ImagePDFFactory {
             if (documentArgument.info != null)
                 builder.setInfo(this.documentArgument.info);
 
-            if (imageFiles != null)
+            if (imageFiles != null){
+                if (listener != null) {
+                    listener.initializing(procedure_id,imageFiles.length);
+                }
+
                 for (int i = 0; i < imageFiles.length; i++) {
                     BufferedImage bufferedImage = impl.readImage(imageFiles[i]);
                     strategy.execute(this.pageArgument, new SizeF(bufferedImage.getWidth(), bufferedImage.getHeight()));
@@ -95,6 +96,7 @@ public class DefaultImagePDFFactory implements ImagePDFFactory {
                     if (listener != null)
                         listener.onAppend(procedure_id, imageFiles[i], i, imageFiles.length);
                 }
+            }
 
             if (listener != null)
                 listener.onSaved(procedure_id, destination);
