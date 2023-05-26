@@ -1,5 +1,6 @@
 package org.vincentyeh.img2pdf.lib.pdf.concrete.builder;
 
+import com.drew.lang.annotations.NotNull;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
@@ -34,9 +35,9 @@ public class PDFBoxBuilder implements PDFBuilder {
     private final MemoryUsageSetting setting;
 
     public PDFBoxBuilder(MemoryUsageSetting setting) {
-        try{
+        try {
             this.setting = Objects.requireNonNull(setting);
-        }catch (NullPointerException e){
+        } catch (NullPointerException e) {
             throw new IllegalArgumentException(e);
         }
     }
@@ -58,6 +59,9 @@ public class PDFBoxBuilder implements PDFBuilder {
 
     @Override
     public void setInfo(PDFDocumentInfo info) {
+        if (info == null)
+            throw new IllegalArgumentException("info == null");
+
         PDDocumentInformation information = new PDDocumentInformation();
         information.setTitle(info.Title);
         information.setAuthor(info.Author);
@@ -69,6 +73,10 @@ public class PDFBoxBuilder implements PDFBuilder {
 
     @Override
     public void setPermission(Permission permission) {
+        if (permission == null) {
+            throw new IllegalArgumentException("permission==null");
+        }
+
         this.permission.setCanAssembleDocument(permission.CanAssembleDocument);
         this.permission.setCanExtractContent(permission.CanExtractContent);
         this.permission.setCanExtractForAccessibility(permission.CanExtractForAccessibility);
@@ -81,6 +89,8 @@ public class PDFBoxBuilder implements PDFBuilder {
 
     @Override
     public int addPage(SizeF size) {
+        if (size == null) throw new IllegalArgumentException("size==null");
+
         PDPage page = new PDPage();
         page.setMediaBox(new PDRectangle(size.width, size.height));
         pages.add(page);
@@ -88,21 +98,30 @@ public class PDFBoxBuilder implements PDFBuilder {
     }
 
     @Override
-    public void addImage(int index, BufferedImage image, PointF position, SizeF size) {
-        try {
-            PDImageXObject pdImageXObject = LosslessFactory.createFromImage(document, image);
-            PDPageContentStream contentStream = new PDPageContentStream(document, pages.get(index));
-            contentStream.drawImage(pdImageXObject, position.x, position.y, size.width, size.height);
-            contentStream.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    public void addImage(int index, @NotNull BufferedImage image, PointF position, @NotNull SizeF size) throws Exception {
+        if (index < 0) throw new IllegalArgumentException("index < 0");
+
+        if (image == null) throw new IllegalArgumentException("image==null");
+
+        if (position == null) {
+            position = new PointF(0, 0);
         }
+
+        if (size == null) throw new IllegalArgumentException("size==null");
+
+        if(pages.size()==0)
+            throw new IllegalArgumentException("pages.size()==0");
+
+        PDImageXObject pdImageXObject = LosslessFactory.createFromImage(document, image);
+        PDPageContentStream contentStream = new PDPageContentStream(document, pages.get(index));
+        contentStream.drawImage(pdImageXObject, position.x, position.y, size.width, size.height);
+        contentStream.close();
     }
 
     @Override
     public void save(File destination) throws IOException {
         if (ownerPassword != null && userPassword != null)
-            document.protect(createProtectionPolicy());
+            document.protect(createProtectionPolicy(ownerPassword, userPassword, permission));
         for (PDPage page : pages)
             document.addPage(page);
         document.save(destination);
@@ -118,7 +137,17 @@ public class PDFBoxBuilder implements PDFBuilder {
         ownerPassword = userPassword = null;
     }
 
-    private StandardProtectionPolicy createProtectionPolicy() {
+    public PDDocument getDocument(){
+        return document;
+    }
+    public List<PDPage> getPages(){
+        return pages;
+    }
+
+    public AccessPermission getPermission(){
+        return permission;
+    }
+    private static StandardProtectionPolicy createProtectionPolicy(String ownerPassword, String userPassword, AccessPermission permission) {
         // Define the length of the encryption key.
         // Possible values are 40 or 128 (256 will be available in PDFBox 2.0).
         int keyLength = 128;

@@ -83,16 +83,17 @@ public class DefaultImagePDFFactory implements ImagePDFFactory {
             if (documentArgument.info != null)
                 builder.setInfo(this.documentArgument.info);
 
-            if (imageFiles != null){
+            if (imageFiles != null) {
                 if (listener != null) {
-                    listener.initializing(procedure_id,imageFiles.length);
+                    listener.initializing(procedure_id, imageFiles.length);
                 }
 
                 for (int i = 0; i < imageFiles.length; i++) {
                     BufferedImage bufferedImage = impl.readImage(imageFiles[i]);
                     strategy.execute(this.pageArgument, new SizeF(bufferedImage.getWidth(), bufferedImage.getHeight()));
-                    int index = builder.addPage(strategy.getPageSize());
-                    builder.addImage(index, bufferedImage, strategy.getImagePosition(), strategy.getImageSize());
+                    builder.addImage(builder.addPage(strategy.getPageSize()),
+                            bufferedImage, strategy.getImagePosition(), strategy.getImageSize());
+
                     if (listener != null)
                         listener.onAppend(procedure_id, imageFiles[i], i, imageFiles.length);
                 }
