@@ -14,6 +14,7 @@ import org.vincentyeh.img2pdf.lib.pdf.parameter.PDFDocumentInfo;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.Permission;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 
 public class BuilderTest {
     @Test
@@ -97,5 +98,51 @@ public class BuilderTest {
 
     }
 
+    @Test
+    public void noPageTest() {
+        PDFBoxBuilder builder = new PDFBoxBuilder(MemoryUsageSetting.setupMainMemoryOnly());
+        BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+        builder.createDocument();
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> builder.addImage(1, image, null, new SizeF(100, 100))
+        );
+
+    }
+
+    @Test
+    public void noDocumentTest() {
+        PDFBoxBuilder builder = new PDFBoxBuilder(MemoryUsageSetting.setupMainMemoryOnly());
+        Assertions.assertThrows(IllegalStateException.class,
+                () -> builder.addPage(new SizeF(100, 100)));
+
+    }
+
+    @Test
+    public void noEnoughPage() {
+        PDFBoxBuilder builder = new PDFBoxBuilder(MemoryUsageSetting.setupMainMemoryOnly());
+        builder.createDocument();
+        builder.addPage(new SizeF(100, 100));
+
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> builder.addImage(1,
+                new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB),
+                null,
+                new SizeF(100, 100)));
+
+        builder.addPage(new SizeF(100, 100));
+        Assertions.assertDoesNotThrow(
+                () -> builder.addImage(1,
+                        new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB),
+                        null,
+                        new SizeF(100, 100)));
+
+
+    }
+    @Test
+    public void saveTest() {
+        PDFBoxBuilder builder = new PDFBoxBuilder(MemoryUsageSetting.setupMainMemoryOnly());
+        Assertions.assertThrows(IllegalStateException.class,()->builder.save(new File("AAA")));
+        builder.createDocument();
+    }
 
 }
