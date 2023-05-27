@@ -2,7 +2,7 @@ package org.vincentyeh.img2pdf.lib.pdf.factory;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.vincentyeh.img2pdf.lib.pdf.concrete.factory.StandardImagePageCalculationStrategy;
+import org.vincentyeh.img2pdf.lib.pdf.concrete.factory.DefaultImagePageStrategy;
 import org.vincentyeh.img2pdf.lib.pdf.framework.objects.SizeF;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageAlign;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageArgument;
@@ -12,7 +12,7 @@ import org.vincentyeh.img2pdf.lib.pdf.parameter.PageSize;
 public class StrategyTest {
     @Test
     public void MathTest1() {
-        StandardImagePageCalculationStrategy strategy = new StandardImagePageCalculationStrategy();
+        DefaultImagePageStrategy strategy = new DefaultImagePageStrategy();
         strategy.execute(new PageArgument(PageSize.A4), new SizeF(100, 100));
         Assertions.assertEquals(strategy.getPageSize(), PageSize.A4.getSizeInPixels());
 
@@ -23,7 +23,7 @@ public class StrategyTest {
 
     @Test
     public void MathTest2() {
-        StandardImagePageCalculationStrategy strategy = new StandardImagePageCalculationStrategy();
+        DefaultImagePageStrategy strategy = new DefaultImagePageStrategy();
         strategy.execute(new PageArgument(PageSize.A4), new SizeF(1000, 1000));
         Assertions.assertEquals(strategy.getPageSize(), PageSize.A4.getSizeInPixels());
 
@@ -34,7 +34,7 @@ public class StrategyTest {
 
     @Test
     public void MathTest3() {
-        StandardImagePageCalculationStrategy strategy = new StandardImagePageCalculationStrategy();
+        DefaultImagePageStrategy strategy = new DefaultImagePageStrategy();
         SizeF img_size = new SizeF(1000, 1000);
         strategy.execute(
                 new PageArgument(
@@ -48,7 +48,7 @@ public class StrategyTest {
 
     @Test
     public void MathTest4() {
-        StandardImagePageCalculationStrategy strategy = new StandardImagePageCalculationStrategy();
+        DefaultImagePageStrategy strategy = new DefaultImagePageStrategy();
         SizeF img_size = new SizeF(500, 1000);
         strategy.execute(
                 new PageArgument(
@@ -63,7 +63,7 @@ public class StrategyTest {
 
     @Test
     public void MathTest5() {
-        StandardImagePageCalculationStrategy strategy = new StandardImagePageCalculationStrategy();
+        DefaultImagePageStrategy strategy = new DefaultImagePageStrategy();
         SizeF img_size = new SizeF(5000, 1000);
         strategy.execute(
                 new PageArgument(

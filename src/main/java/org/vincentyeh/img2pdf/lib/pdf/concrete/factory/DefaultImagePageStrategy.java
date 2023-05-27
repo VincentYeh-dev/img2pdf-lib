@@ -12,7 +12,7 @@ import static org.vincentyeh.img2pdf.lib.pdf.parameter.PageDirection.Landscape;
 import static org.vincentyeh.img2pdf.lib.pdf.parameter.PageDirection.Portrait;
 
 
-public final class StandardImagePageCalculationStrategy implements ImagePageStrategy {
+public final class DefaultImagePageStrategy implements ImagePageStrategy {
     private SizeF pageSize;
     private SizeF newImageSize;
     private PointF imagePosition;
