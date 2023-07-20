@@ -104,10 +104,15 @@ public class DefaultImagePDFFactory implements ImagePDFFactory {
             builder.save(destination);
             if (listener != null)
                 listener.onConversionComplete(procedure_id);
-            builder.reset();
             return destination;
         } catch (Exception e) {
             throw new PDFFactoryException(e);
+        }finally {
+            try {
+                builder.reset();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
