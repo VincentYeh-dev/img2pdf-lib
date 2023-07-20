@@ -28,6 +28,6 @@ public interface PDFBuilder {
     void save(File destination) throws IOException;
 
 
-    void reset();
+    void reset() throws IOException;
 
 }

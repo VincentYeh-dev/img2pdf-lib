@@ -80,4 +80,5 @@ public class TextPDFBuilder implements PDFBuilder {
         page_count = 0;
     }
 
+
 }
