@@ -134,13 +134,16 @@ public class PDFBoxBuilder implements PDFBuilder {
         for (PDPage page : pages)
             document.addPage(page);
         document.save(destination);
-        document.close();
     }
 
 
+
+
     @Override
-    public void reset() {
+    public void reset() throws IOException {
         pages.clear();
+        if(document!=null)
+            document.close();
         document = null;
         permission = new AccessPermission();
         ownerPassword = userPassword = null;
