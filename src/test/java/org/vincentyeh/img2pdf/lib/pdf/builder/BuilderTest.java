@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.vincentyeh.img2pdf.lib.pdf.concrete.builder.PDFBoxBuilder;
 import org.vincentyeh.img2pdf.lib.pdf.framework.builder.PDFBuilder;
+import org.vincentyeh.img2pdf.lib.pdf.framework.objects.PointF;
 import org.vincentyeh.img2pdf.lib.pdf.framework.objects.SizeF;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PDFDocumentInfo;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.Permission;
@@ -43,7 +44,8 @@ public class BuilderTest {
         Assertions.assertThrows(IllegalArgumentException.class, () -> builder.addImage(0, image, null, null));
 
         builder.addPage(new SizeF(100, 100));
-        Assertions.assertDoesNotThrow(() -> builder.addImage(0, image, null, size));
+        Assertions.assertDoesNotThrow(() -> builder.addImage(0, image, new PointF(), size));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> builder.addImage(0, image, null, size));
     }
 
     @Test
@@ -125,23 +127,24 @@ public class BuilderTest {
 
         Assertions.assertThrows(IllegalArgumentException.class,
                 () -> builder.addImage(1,
-                new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB),
-                null,
-                new SizeF(100, 100)));
+                        new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB),
+                        null,
+                        new SizeF(100, 100)));
 
         builder.addPage(new SizeF(100, 100));
         Assertions.assertDoesNotThrow(
                 () -> builder.addImage(1,
                         new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB),
-                        null,
+                        new PointF(),
                         new SizeF(100, 100)));
 
 
     }
+
     @Test
     public void saveTest() {
         PDFBoxBuilder builder = new PDFBoxBuilder(MemoryUsageSetting.setupMainMemoryOnly());
-        Assertions.assertThrows(IllegalStateException.class,()->builder.save(new File("AAA")));
+        Assertions.assertThrows(IllegalStateException.class, () -> builder.save(new File("AAA")));
         builder.createDocument();
     }
 
