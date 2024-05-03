@@ -5,9 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.vincentyeh.img2pdf.lib.pdf.concrete.factory.DefaultImagePDFFactory;
 import org.vincentyeh.img2pdf.lib.pdf.framework.builder.PDFBuilder;
-import org.vincentyeh.img2pdf.lib.pdf.framework.factory.FactoryImpl;
-import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImageFactoryListener;
-import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePageStrategy;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImageReadImpl;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePDFFactoryListener;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImageScalingStrategy;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.exception.PDFFactoryException;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.DocumentArgument;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PDFDocumentInfo;
@@ -21,9 +21,9 @@ public class PDFFactoryTest {
     @Test
     public void TestNull() {
 
-        FactoryImpl impl = Mockito.mock(FactoryImpl.class);
+        ImageReadImpl impl = Mockito.mock(ImageReadImpl.class);
         PDFBuilder builder = Mockito.mock(PDFBuilder.class);
-        ImagePageStrategy strategy = Mockito.mock(ImagePageStrategy.class);
+        ImageScalingStrategy strategy = Mockito.mock(ImageScalingStrategy.class);
 
         Assertions.assertDoesNotThrow(
                 () ->
@@ -44,12 +44,12 @@ public class PDFFactoryTest {
 
     @Test
     public void TestIdeal() {
-        FactoryImpl impl = Mockito.mock(FactoryImpl.class);
+        ImageReadImpl impl = Mockito.mock(ImageReadImpl.class);
         Mockito.when(impl.readImage(Mockito.any()))
                 .thenReturn(new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB));
 
         PDFBuilder builder = Mockito.mock(PDFBuilder.class);
-        ImagePageStrategy strategy = Mockito.mock(ImagePageStrategy.class);
+        ImageScalingStrategy strategy = Mockito.mock(ImageScalingStrategy.class);
 
         PDFDocumentInfo info = new PDFDocumentInfo();
         info.Title = "";
@@ -66,12 +66,12 @@ public class PDFFactoryTest {
     @Test
     public void TestNullImage() {
 //        ImageReader imageReader = Mockito.mock(ImageReader.class);
-        FactoryImpl impl = Mockito.mock(FactoryImpl.class);
+        ImageReadImpl impl = Mockito.mock(ImageReadImpl.class);
         Mockito.when(impl.readImage(Mockito.any())).thenReturn(null);
 
 //        Mockito.when(imageReader.read(Mockito.any())).thenReturn(null);
         PDFBuilder builder = Mockito.mock(PDFBuilder.class);
-        ImagePageStrategy strategy = Mockito.mock(ImagePageStrategy.class);
+        ImageScalingStrategy strategy = Mockito.mock(ImageScalingStrategy.class);
 
         DefaultImagePDFFactory factory = new DefaultImagePDFFactory(null, null,
                 impl, builder, strategy, false);
@@ -82,13 +82,13 @@ public class PDFFactoryTest {
 
     @Test
     public void TestListener() {
-        FactoryImpl impl = Mockito.mock(FactoryImpl.class);
+        ImageReadImpl impl = Mockito.mock(ImageReadImpl.class);
         Mockito.when(impl.readImage(Mockito.any()))
                 .thenReturn(new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB));
 
         PDFBuilder builder = Mockito.mock(PDFBuilder.class);
-        ImagePageStrategy strategy = Mockito.mock(ImagePageStrategy.class);
-        ImageFactoryListener listener = Mockito.mock(ImageFactoryListener.class);
+        ImageScalingStrategy strategy = Mockito.mock(ImageScalingStrategy.class);
+        ImagePDFFactoryListener listener = Mockito.mock(ImagePDFFactoryListener.class);
 
         DefaultImagePDFFactory factory = new DefaultImagePDFFactory(null, null,
                 impl, builder, strategy, false);
@@ -99,12 +99,12 @@ public class PDFFactoryTest {
 
     @Test
     public void TestOverwrite() {
-        FactoryImpl impl = Mockito.mock(FactoryImpl.class);
+        ImageReadImpl impl = Mockito.mock(ImageReadImpl.class);
         Mockito.when(impl.readImage(Mockito.any()))
                 .thenReturn(new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB));
 
         PDFBuilder builder = Mockito.mock(PDFBuilder.class);
-        ImagePageStrategy strategy = Mockito.mock(ImagePageStrategy.class);
+        ImageScalingStrategy strategy = Mockito.mock(ImageScalingStrategy.class);
         File destination = Mockito.mock(File.class);
         Mockito.when(destination.exists()).thenReturn(true);
         DefaultImagePDFFactory factory = new DefaultImagePDFFactory(null, null,

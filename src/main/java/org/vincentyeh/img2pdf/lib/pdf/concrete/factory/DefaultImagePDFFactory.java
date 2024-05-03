@@ -3,10 +3,10 @@ package org.vincentyeh.img2pdf.lib.pdf.concrete.factory;
 import com.drew.lang.annotations.NotNull;
 import com.drew.lang.annotations.Nullable;
 import org.vincentyeh.img2pdf.lib.pdf.framework.builder.PDFBuilder;
-import org.vincentyeh.img2pdf.lib.pdf.framework.factory.FactoryImpl;
-import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImageFactoryListener;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImageReadImpl;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePDFFactoryListener;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePDFFactory;
-import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePageStrategy;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImageScalingStrategy;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.exception.PDFFactoryException;
 import org.vincentyeh.img2pdf.lib.pdf.framework.objects.SizeF;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.DocumentArgument;
@@ -25,35 +25,35 @@ public class DefaultImagePDFFactory implements ImagePDFFactory {
     private final DocumentArgument documentArgument;
     private final PageArgument pageArgument;
 
-    private final boolean overwrite;
+    private final boolean allowOverwriteFile;
 
-    private final FactoryImpl impl;
+    private final ImageReadImpl imageReadImpl;
 
-    private final PDFBuilder builder;
-    private final ImagePageStrategy strategy;
+    private final PDFBuilder pdfBuilder;
+    private final ImageScalingStrategy imageScalingStrategy;
 
 
     public DefaultImagePDFFactory(@Nullable PageArgument pageArgument,
                                   @Nullable DocumentArgument documentArgument,
-                                  @NotNull FactoryImpl impl,
-                                  @NotNull PDFBuilder builder,
-                                  boolean overwrite) {
-        this(pageArgument, documentArgument, impl, builder, new DefaultImagePageStrategy(), overwrite);
+                                  @NotNull ImageReadImpl imageReadImpl,
+                                  @NotNull PDFBuilder pdfBuilder,
+                                  boolean allowOverwriteFile) {
+        this(pageArgument, documentArgument, imageReadImpl, pdfBuilder, new DefaultImageScalingStrategy(), allowOverwriteFile);
     }
 
     public DefaultImagePDFFactory(@Nullable PageArgument pageArgument,
                                   @Nullable DocumentArgument documentArgument,
-                                  @NotNull FactoryImpl impl,
-                                  @NotNull PDFBuilder builder,
-                                  @NotNull ImagePageStrategy strategy,
-                                  boolean overwrite) {
+                                  @NotNull ImageReadImpl imageReadImpl,
+                                  @NotNull PDFBuilder pdfBuilder,
+                                  @NotNull ImageScalingStrategy imageScalingStrategy,
+                                  boolean allowOverwriteFile) {
 
         try {
 
-            this.impl = Objects.requireNonNull(impl, "impl==null");
-            this.builder = Objects.requireNonNull(builder, "builder==null");
-            this.strategy = Objects.requireNonNull(strategy, "strategy==null");
-            this.overwrite = overwrite;
+            this.imageReadImpl = Objects.requireNonNull(imageReadImpl, "impl==null");
+            this.pdfBuilder = Objects.requireNonNull(pdfBuilder, "builder==null");
+            this.imageScalingStrategy = Objects.requireNonNull(imageScalingStrategy, "strategy==null");
+            this.allowOverwriteFile = allowOverwriteFile;
             if (pageArgument == null) {
                 this.pageArgument = new PageArgument();
             } else {
@@ -69,19 +69,19 @@ public class DefaultImagePDFFactory implements ImagePDFFactory {
         }
     }
 
-    public final File start(int procedure_id, File[] imageFiles, File destination, ImageFactoryListener listener) throws PDFFactoryException {
+    public final File start(int procedure_id, File[] imageFiles, File destination, ImagePDFFactoryListener listener) throws PDFFactoryException {
         try {
-            if (!overwrite && destination.exists()) {
+            if (!allowOverwriteFile && destination.exists()) {
                 throw new IOException("Overwrite deny");
             }
 
-            builder.createDocument();
-            builder.setOwnerPassword(this.documentArgument.ownerPassword);
-            builder.setUserPassword(this.documentArgument.userPassword);
-            builder.setPermission(this.documentArgument.permission);
+            pdfBuilder.createDocument();
+            pdfBuilder.setOwnerPassword(this.documentArgument.ownerPassword);
+            pdfBuilder.setUserPassword(this.documentArgument.userPassword);
+            pdfBuilder.setPermission(this.documentArgument.permission);
 
             if (documentArgument.info != null)
-                builder.setInfo(this.documentArgument.info);
+                pdfBuilder.setInfo(this.documentArgument.info);
 
             if (imageFiles != null) {
                 if (listener != null) {
@@ -89,10 +89,10 @@ public class DefaultImagePDFFactory implements ImagePDFFactory {
                 }
 
                 for (int i = 0; i < imageFiles.length; i++) {
-                    BufferedImage bufferedImage = impl.readImage(imageFiles[i]);
-                    strategy.execute(this.pageArgument, new SizeF(bufferedImage.getWidth(), bufferedImage.getHeight()));
-                    builder.addImage(builder.addPage(strategy.getPageSize()),
-                            bufferedImage, strategy.getImagePosition(), strategy.getImageSize());
+                    BufferedImage bufferedImage = imageReadImpl.readImage(imageFiles[i]);
+                    imageScalingStrategy.execute(this.pageArgument, new SizeF(bufferedImage.getWidth(), bufferedImage.getHeight()));
+                    pdfBuilder.addImage(pdfBuilder.addPage(imageScalingStrategy.getPageSize()),
+                            bufferedImage, imageScalingStrategy.getImagePosition(), imageScalingStrategy.getImageSize());
 
                     if (listener != null)
                         listener.onAppend(procedure_id, imageFiles[i], i, imageFiles.length);
@@ -101,15 +101,15 @@ public class DefaultImagePDFFactory implements ImagePDFFactory {
 
             if (listener != null)
                 listener.onSaved(procedure_id, destination);
-            builder.save(destination);
+            pdfBuilder.save(destination);
             if (listener != null)
                 listener.onConversionComplete(procedure_id);
             return destination;
         } catch (Exception e) {
             throw new PDFFactoryException(e);
-        }finally {
+        } finally {
             try {
-                builder.reset();
+                pdfBuilder.reset();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -124,7 +124,7 @@ public class DefaultImagePDFFactory implements ImagePDFFactory {
 
     @Override
     public File start(int procedure_id, File directory, FileFilter filter,
-                      Comparator<File> fileSorter, File destination, ImageFactoryListener listener) throws PDFFactoryException {
+                      Comparator<File> fileSorter, File destination, ImagePDFFactoryListener listener) throws PDFFactoryException {
 
         File[] files = directory.listFiles(filter);
         try {

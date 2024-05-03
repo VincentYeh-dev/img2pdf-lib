@@ -1,6 +1,6 @@
 package org.vincentyeh.img2pdf.lib.pdf.concrete.factory;
 
-import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePageStrategy;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImageScalingStrategy;
 import org.vincentyeh.img2pdf.lib.pdf.framework.objects.PointF;
 import org.vincentyeh.img2pdf.lib.pdf.framework.objects.SizeF;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageAlign;
@@ -12,7 +12,7 @@ import static org.vincentyeh.img2pdf.lib.pdf.parameter.PageDirection.Landscape;
 import static org.vincentyeh.img2pdf.lib.pdf.parameter.PageDirection.Portrait;
 
 
-public final class DefaultImagePageStrategy implements ImagePageStrategy {
+public final class DefaultImageScalingStrategy implements ImageScalingStrategy {
     private SizeF pageSize;
     private SizeF newImageSize;
     private PointF imagePosition;
