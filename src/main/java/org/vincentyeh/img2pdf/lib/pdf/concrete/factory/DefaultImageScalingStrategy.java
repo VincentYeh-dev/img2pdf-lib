@@ -31,20 +31,22 @@ public final class DefaultImageScalingStrategy implements ImageScalingStrategy {
 
     public void execute(PageArgument argument, SizeF imageSize) {
         pageSize = getSuitablePageSize(argument.direction, argument.size, imageSize, argument.autoRotate);
-        newImageSize = scaleUpToMax(imageSize, pageSize);
-        imagePosition = calculatePosition(argument.align, newImageSize, pageSize);
+        newImageSize = getImageMaxSize(imageSize, pageSize);
+        imagePosition = calculateImagePosition(argument.align, newImageSize, pageSize);
     }
 
     private SizeF getSuitablePageSize(PageDirection default_direction, PageSize pageSize, SizeF imageSize, boolean autoRotate) {
 
         final PageDirection direction;
-        if (pageSize == PageSize.DEPEND_ON_IMG) {
+        if (pageSize == PageSize.DEPEND_ON_IMG)
             return imageSize;
-        } else if (autoRotate) {
+
+        if (autoRotate) {
             direction = PageDirection.detectDirection(imageSize);
         } else {
             direction = default_direction;
         }
+
         SizeF size = pageSize.getSizeInPixels();
         if (direction == Portrait) {
             return new SizeF(size.width, size.height);
@@ -53,7 +55,7 @@ public final class DefaultImageScalingStrategy implements ImageScalingStrategy {
         } else throw new IllegalArgumentException();
     }
 
-    private SizeF scaleUpToMax(SizeF img_size, SizeF page_size) {
+    private SizeF getImageMaxSize(SizeF img_size, SizeF page_size) {
         if (img_size == null) throw new IllegalArgumentException("img_size==null");
         if (page_size == null) throw new IllegalArgumentException("page_size==null");
 
@@ -70,47 +72,39 @@ public final class DefaultImageScalingStrategy implements ImageScalingStrategy {
         throw new IllegalStateException();
     }
 
-    private PointF calculatePosition(PageAlign align, SizeF object_size, SizeF container_size) {
-        if (object_size == null) throw new IllegalArgumentException("object_size==null");
-        if (container_size == null) throw new IllegalArgumentException("container_size==null");
+    private PointF calculateImagePosition(PageAlign align, SizeF objectSize, SizeF pageSize) {
+        if (objectSize == null) throw new IllegalArgumentException("objectSize==null");
+        if (pageSize == null) throw new IllegalArgumentException("pageSize==null");
+        float positionX = calculatePositionX(align.horizontal_align, objectSize, pageSize);
+        float positionY = calculatePositionY(align.vertical_align, objectSize, pageSize);
 
+        return new PointF(positionX, positionY);
+    }
 
-        float x_space = container_size.width - object_size.width;
-        if (x_space < 0) throw new IllegalArgumentException("The space of x axis is negative.");
+    private float calculatePositionX(PageAlign.HorizontalAlign horizontalAlign, SizeF objectSize, SizeF pageSize) {
+        float xSpace = pageSize.width - objectSize.width;
+        if (xSpace < 0) throw new IllegalArgumentException("The space of x axis is negative.");
 
-        float y_space = container_size.height - object_size.height;
-        if (y_space < 0) throw new IllegalArgumentException("The space of y axis is negative.");
-
-//        水平 X
-        PageAlign.HorizontalAlign hori_align = align.horizontal_align;
-
-//        垂直 Y
-        PageAlign.VerticalAlign verti_align = align.vertical_align;
-
-        float position_x = 0f, position_y = 0f;
-        switch (hori_align) {
-            case LEFT :
-                position_x = 0;
-                break;
+        switch (horizontalAlign) {
+            case LEFT:
+                return 0;
             case RIGHT:
-                position_x = x_space;
-                break;
-            case CENTER :
-                position_x = x_space / 2;
+                return xSpace;
+            default:
+                return xSpace / 2;
         }
+    }
 
-        switch (verti_align) {
-            case BOTTOM :
-                position_y = 0;
-                break;
-            case TOP :
-                position_y = y_space;
-                break;
-            case CENTER :
-                position_y = y_space / 2;
-                break;
+    private float calculatePositionY(PageAlign.VerticalAlign verticalAlign, SizeF objectSize, SizeF pageSize) {
+        float ySpace = pageSize.height - objectSize.height;
+        if (ySpace < 0) throw new IllegalArgumentException("The space of y axis is negative.");
+        switch (verticalAlign) {
+            case BOTTOM:
+                return 0;
+            case TOP:
+                return ySpace;
+            default:
+                return ySpace / 2;
         }
-
-        return new PointF(position_x, position_y);
     }
 }
