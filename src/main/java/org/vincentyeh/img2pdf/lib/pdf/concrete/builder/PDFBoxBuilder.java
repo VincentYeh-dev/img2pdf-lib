@@ -32,11 +32,11 @@ public class PDFBoxBuilder implements PDFBuilder {
     private String ownerPassword;
     private String userPassword;
 
-    private final MemoryUsageSetting setting;
+    private final MemoryUsageSetting memoryUsageSetting;
 
-    public PDFBoxBuilder(MemoryUsageSetting setting) {
+    public PDFBoxBuilder(MemoryUsageSetting memoryUsageSetting) {
         try {
-            this.setting = Objects.requireNonNull(setting);
+            this.memoryUsageSetting = Objects.requireNonNull(memoryUsageSetting);
         } catch (NullPointerException e) {
             throw new IllegalArgumentException(e);
         }
@@ -44,7 +44,7 @@ public class PDFBoxBuilder implements PDFBuilder {
 
     @Override
     public void createDocument() {
-        document = new PDDocument(this.setting);
+        document = new PDDocument(this.memoryUsageSetting);
     }
 
     @Override
@@ -100,10 +100,14 @@ public class PDFBoxBuilder implements PDFBuilder {
     }
 
     @Override
-    public void addImage(int index, @NotNull BufferedImage image, PointF position, @NotNull SizeF size) throws Exception {
+    public void addImage(int index, @NotNull BufferedImage image, @NotNull PointF position, @NotNull SizeF size) throws Exception {
         if (document == null)
             throw new IllegalStateException("document has not been created");
-        if (pages.size() == 0)
+
+        if (position == null)
+            throw new IllegalArgumentException("position==null");
+
+        if (pages.isEmpty())
             throw new IllegalArgumentException("No page has been created");
 
         if (index >= pages.size())
@@ -111,9 +115,6 @@ public class PDFBoxBuilder implements PDFBuilder {
 
         if (image == null) throw new IllegalArgumentException("image==null");
 
-        if (position == null) {
-            position = new PointF(0, 0);
-        }
 
         if (size == null) throw new IllegalArgumentException("size==null");
 
@@ -137,12 +138,10 @@ public class PDFBoxBuilder implements PDFBuilder {
     }
 
 
-
-
     @Override
     public void reset() throws IOException {
         pages.clear();
-        if(document!=null)
+        if (document != null)
             document.close();
         document = null;
         permission = new AccessPermission();

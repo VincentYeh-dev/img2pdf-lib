@@ -2,7 +2,7 @@ package org.vincentyeh.img2pdf.lib.pdf.framework.factory;
 
 import java.io.File;
 
-public interface ImageFactoryListener {
+public interface ImagePDFFactoryListener {
 
     void initializing(int procedure_id, int length);
 

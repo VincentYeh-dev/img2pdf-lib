@@ -3,7 +3,7 @@ package org.vincentyeh.img2pdf.lib.test;
 
 import org.vincentyeh.img2pdf.lib.Img2Pdf;
 import org.vincentyeh.img2pdf.lib.image.ColorType;
-import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImageFactoryListener;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePDFFactoryListener;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePDFFactory;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.*;
 
@@ -24,7 +24,7 @@ public class TestProgram {
         factory.start(-1, new File("test2"), null, null, new File("output2.pdf"), listener);
     }
 
-    private static final ImageFactoryListener listener = new ImageFactoryListener() {
+    private static final ImagePDFFactoryListener listener = new ImagePDFFactoryListener() {
 
         @Override
         public void initializing(int procedure_id, int length) {

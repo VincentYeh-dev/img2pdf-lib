@@ -5,7 +5,7 @@ import org.vincentyeh.img2pdf.lib.image.ImageUtils;
 import org.vincentyeh.img2pdf.lib.image.ColorType;
 import org.vincentyeh.img2pdf.lib.pdf.concrete.builder.PDFBoxBuilder;
 import org.vincentyeh.img2pdf.lib.pdf.concrete.factory.DefaultImagePDFFactory;
-import org.vincentyeh.img2pdf.lib.pdf.framework.factory.FactoryImpl;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImageReadImpl;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePDFFactory;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.DocumentArgument;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageArgument;
@@ -43,9 +43,9 @@ public class Img2Pdf {
     public static ImagePDFFactory createFactory(PageArgument pageArgument, DocumentArgument documentArgument,
                                                 ColorType colorType, boolean overwrite_output) {
 
-        final FactoryImpl factoryImpl = (file) -> ImageUtils.readImage(file, colorType);
+        final ImageReadImpl imageReadImpl = (file) -> ImageUtils.readImage(file, colorType);
 
-        return new DefaultImagePDFFactory(pageArgument, documentArgument, factoryImpl, new PDFBoxBuilder(setting), overwrite_output);
+        return new DefaultImagePDFFactory(pageArgument, documentArgument, imageReadImpl, new PDFBoxBuilder(setting), overwrite_output);
     }
 
 }
