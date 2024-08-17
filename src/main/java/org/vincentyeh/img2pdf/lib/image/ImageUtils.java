@@ -89,6 +89,20 @@ public final class ImageUtils {
         ExifIFD0Directory exifIFD0 = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
         int orientation = exifIFD0.getInt(ExifIFD0Directory.TAG_ORIENTATION);
         switch (orientation) {
+
+//              https://exiftool.org/TagNames/EXIF.html
+//            1 = Horizontal (normal)
+//            2 = Mirror horizontal
+//            3 = Rotate 180
+//            4 = Mirror vertical
+//            5 = Mirror horizontal and rotate 270 CW
+//            6 = Rotate 90 CW
+//            7 = Mirror horizontal and rotate 90 CW
+//            8 = Rotate 270 CW
+
+//          TODO:更改IFDO的旋轉角度
+            case 0:
+                return 0;
             case 1: // [Exif IFD0] Orientation - Top, left side (Horizontal / normal)
                 return 0;
             case 6: // [Exif IFD0] Orientation - Right side, top (Rotate 90 CW)
