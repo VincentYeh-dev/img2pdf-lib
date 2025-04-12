@@ -52,6 +52,22 @@
             <artifactId>metadata-extractor</artifactId>
             <version>2.16.0</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.twelvemonkeys.imageio/imageio-metadata -->
+        <dependency>
+            <groupId>com.twelvemonkeys.imageio</groupId>
+            <artifactId>imageio-metadata</artifactId>
+            <version>3.11.0</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.twelvemonkeys.imageio/imageio-webp -->
+        <dependency>
+            <groupId>com.twelvemonkeys.imageio</groupId>
+            <artifactId>imageio-webp</artifactId>
+            <version>3.11.0</version>
+        </dependency>
+
+
     </dependencies>
 
     <reporting>

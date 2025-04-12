@@ -37,6 +37,8 @@ public final class ImageUtils {
             } else {
                 image = ImageIO.read(file);
             }
+            if (image == null)
+                throw new IllegalArgumentException("image file not supported");
 
             final ColorSpace targetColorSpace;
             if (colorType != null)
