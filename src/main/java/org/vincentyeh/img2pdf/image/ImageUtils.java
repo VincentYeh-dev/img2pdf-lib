@@ -29,31 +29,38 @@ public final class ImageUtils {
             throw new IllegalArgumentException("image file not found");
 
 
-        BufferedImage image;
+        final BufferedImage rawImage;
+        try {
+            rawImage = ImageIO.read(file);
+        } catch (IOException e) {
+            throw new ImageReadException(e);
+        }
+
+        if (rawImage == null)
+            throw new ImageReadException("Unable to read image file: " + file.getAbsolutePath());
+
+        final BufferedImage image;
         try {
             if (canHandleMetaData(file)) {
                 double rotate_angle = handleMetaData(file);
-                image = rotateImage(ImageIO.read(file), rotate_angle);
+                image = rotateImage(rawImage, rotate_angle);
             } else {
-                image = ImageIO.read(file);
+                image = rawImage;
             }
-            if (image == null)
-                throw new IllegalArgumentException("image file not supported");
-
-            final ColorSpace targetColorSpace;
-            if (colorType != null)
-                targetColorSpace = ColorSpace.getInstance(colorType.getColorSpace());
-            else
-                targetColorSpace = image.getColorModel().getColorSpace();
-
-            if (image.getColorModel().getColorSpace().getType() == targetColorSpace.getType()) return image;
-
-            ColorConvertOp op = new ColorConvertOp(targetColorSpace, null);
-            return op.filter(image, null);
-
-        } catch (ImageProcessingException | IOException | MetadataException e) {
-            throw new ImageReadException(e);
+        } catch (IOException | ImageProcessingException | MetadataException e) {
+            throw new ImageReadException("Unable to handle metadata", e);
         }
+
+        final ColorSpace targetColorSpace;
+        if (colorType != null)
+            targetColorSpace = ColorSpace.getInstance(colorType.getColorSpace());
+        else
+            targetColorSpace = image.getColorModel().getColorSpace();
+
+        if (image.getColorModel().getColorSpace().getType() == targetColorSpace.getType()) return image;
+
+        ColorConvertOp op = new ColorConvertOp(targetColorSpace, null);
+        return op.filter(image, null);
 
     }
 
