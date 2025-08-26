@@ -11,6 +11,7 @@ import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImageScalingStrategy;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.exception.PDFFactoryException;
 import org.vincentyeh.img2pdf.lib.pdf.framework.objects.IDocument;
 import org.vincentyeh.img2pdf.lib.pdf.framework.objects.IPage;
+import org.vincentyeh.img2pdf.lib.pdf.framework.objects.ImageScalingResult;
 import org.vincentyeh.img2pdf.lib.pdf.framework.objects.SizeF;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.DocumentArgument;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageArgument;
@@ -84,10 +85,11 @@ public class DefaultImagePDFFactory implements ImagePDFFactory {
                 List<IPage> pages = new java.util.LinkedList<>();
                 for (int i = 0; i < imageFiles.length; i++) {
                     BufferedImage bufferedImage = imageReadImpl.readImage(imageFiles[i]);
-                    imageScalingStrategy.execute(this.pageArgument, new SizeF(bufferedImage.getWidth(), bufferedImage.getHeight()));
-                    PDFBoxPageAdaptor page = new PDFBoxPageAdaptor(i + 1,imageScalingStrategy.getPageSize());
+                    ImageScalingResult result = imageScalingStrategy.execute(this.pageArgument,
+                            new SizeF(bufferedImage.getWidth(), bufferedImage.getHeight()));
+                    PDFBoxPageAdaptor page = new PDFBoxPageAdaptor(i + 1, result.getPageSize());
 
-                    page.drawImage(bufferedImage, imageScalingStrategy.getImagePosition(), imageScalingStrategy.getImageSize());
+                    page.drawImage(bufferedImage, result.getImagePosition(), result.getImageSize());
                     page.render(pdfDocument);
                     pages.add(page);
                     if (listener != null)

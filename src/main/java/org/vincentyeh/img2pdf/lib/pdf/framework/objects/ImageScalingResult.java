@@ -5,7 +5,7 @@ public class ImageScalingResult {
     private final SizeF pageSize;
     private final SizeF imageSize;
 
-    public ImageScalingResult(PointF imagePosition, SizeF pageSize, SizeF imageSize) {
+    public ImageScalingResult(SizeF pageSize, SizeF imageSize, PointF imagePosition) {
         this.imagePosition = imagePosition;
         this.pageSize = pageSize;
         this.imageSize = imageSize;

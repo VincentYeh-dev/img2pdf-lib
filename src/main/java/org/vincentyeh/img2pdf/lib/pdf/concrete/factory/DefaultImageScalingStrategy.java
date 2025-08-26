@@ -1,6 +1,7 @@
 package org.vincentyeh.img2pdf.lib.pdf.concrete.factory;
 
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImageScalingStrategy;
+import org.vincentyeh.img2pdf.lib.pdf.framework.objects.ImageScalingResult;
 import org.vincentyeh.img2pdf.lib.pdf.framework.objects.PointF;
 import org.vincentyeh.img2pdf.lib.pdf.framework.objects.SizeF;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageAlign;
@@ -13,26 +14,11 @@ import static org.vincentyeh.img2pdf.lib.pdf.parameter.PageDirection.Portrait;
 
 
 public final class DefaultImageScalingStrategy implements ImageScalingStrategy {
-    private SizeF pageSize;
-    private SizeF newImageSize;
-    private PointF imagePosition;
-
-    public PointF getImagePosition() {
-        return imagePosition;
-    }
-
-    public SizeF getPageSize() {
-        return pageSize;
-    }
-
-    public SizeF getImageSize() {
-        return newImageSize;
-    }
-
-    public void execute(PageArgument argument, SizeF imageSize) {
-        pageSize = getSuitablePageSize(argument.direction, argument.size, imageSize, argument.autoRotate);
-        newImageSize = getImageMaxSize(imageSize, pageSize);
-        imagePosition = calculateImagePosition(argument.align, newImageSize, pageSize);
+    public ImageScalingResult execute(PageArgument argument, SizeF imageSize) {
+        SizeF pageSize = getSuitablePageSize(argument.direction, argument.size, imageSize, argument.autoRotate);
+        SizeF newImageSize = getImageMaxSize(imageSize, pageSize);
+        PointF imagePosition = calculateImagePosition(argument.align, newImageSize, pageSize);
+        return new ImageScalingResult(pageSize, newImageSize, imagePosition);
     }
 
     private SizeF getSuitablePageSize(PageDirection default_direction, PageSize pageSize, SizeF imageSize, boolean autoRotate) {
