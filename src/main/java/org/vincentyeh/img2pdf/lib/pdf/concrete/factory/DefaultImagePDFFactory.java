@@ -113,9 +113,8 @@ public class DefaultImagePDFFactory implements ImagePDFFactory {
                 }
                 List<Future<Void>> futures = executorService.invokeAll(tasks);
 
-                for (int i = 0; i < pages.size(); i++) {
-                    System.out.println("Add page " + (i + 1) + "/" + pages.size());
-                    pdfDocument.addPage(pages.get(i));
+                for (IPage page : pages) {
+                    pdfDocument.addPage(page);
                 }
             }
 
