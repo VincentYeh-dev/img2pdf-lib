@@ -2,10 +2,10 @@ package org.vincentyeh.img2pdf.lib.pdf.parameter;
 
 
 public class PageArgument {
-    public final PageAlign align;
-    public final PageSize size;
-    public final PageDirection direction;
-    public final boolean autoRotate;
+    public PageAlign align;
+    public PageSize size;
+    public PageDirection direction;
+    public boolean autoRotate;
 
     public PageArgument(PageAlign align, PageSize size, PageDirection direction, boolean autoRotate) {
         this.align = align;
@@ -40,4 +40,36 @@ public class PageArgument {
     public PageArgument() {
         this(PageAlign.VerticalAlign.CENTER, PageAlign.HorizontalAlign.CENTER, PageSize.DEPEND_ON_IMG);
     }
+
+    public PageAlign getAlign() {
+        return align;
+    }
+    public PageSize getSize() {
+        return size;
+    }
+
+    public PageDirection getDirection() {
+        return direction;
+    }
+
+    public boolean isAutoRotate() {
+        return autoRotate;
+    }
+
+    public void setAlign(PageAlign align) {
+        this.align = align;
+    }
+
+    public void setSize(PageSize size) {
+        this.size = size;
+    }
+
+    public void setDirection(PageDirection direction) {
+        this.direction = direction;
+    }
+
+    public void setAutoRotate(boolean autoRotate) {
+        this.autoRotate = autoRotate;
+    }
+
 }

@@ -1,10 +1,10 @@
 package org.vincentyeh.img2pdf.lib;
 
 import org.apache.pdfbox.io.MemoryUsageSetting;
-import org.vincentyeh.img2pdf.lib.image.ImageUtils;
 import org.vincentyeh.img2pdf.lib.image.ColorType;
-import org.vincentyeh.img2pdf.lib.pdf.concrete.builder.PDFBoxBuilder;
+import org.vincentyeh.img2pdf.lib.image.ImageUtils;
 import org.vincentyeh.img2pdf.lib.pdf.concrete.factory.DefaultImagePDFFactory;
+import org.vincentyeh.img2pdf.lib.pdf.concrete.object.PDFBoxDocumentAdaptor;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePDFFactory;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImageReadImpl;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.DocumentArgument;
@@ -44,8 +44,9 @@ public class Img2Pdf {
                                                 ColorType colorType, boolean overwrite_output) {
 
         final ImageReadImpl imageReadImpl = (file) -> ImageUtils.readImage(file, colorType);
+        PDFBoxDocumentAdaptor.setMemoryUsageSetting(setting);
 
-        return new DefaultImagePDFFactory(pageArgument, documentArgument, imageReadImpl, new PDFBoxBuilder(setting), overwrite_output);
+        return new DefaultImagePDFFactory(pageArgument, documentArgument, imageReadImpl, overwrite_output);
     }
 
 }
