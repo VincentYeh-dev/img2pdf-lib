@@ -28,6 +28,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class DefaultImagePDFFactory implements ImagePDFFactory {
 
@@ -91,6 +92,9 @@ public class DefaultImagePDFFactory implements ImagePDFFactory {
                 }
                 List<IPage> pages = new java.util.LinkedList<>();
                 List<Callable<Void>> tasks = new java.util.ArrayList<>();
+
+                AtomicInteger completedCount = new AtomicInteger(0);
+
                 for (int i = 0; i < imageFiles.length; i++) {
                     final int final_i = i;
                     Callable<Void> task = new Callable<Void>() {
@@ -104,8 +108,9 @@ public class DefaultImagePDFFactory implements ImagePDFFactory {
                             page.drawImage(bufferedImage, result.getImagePosition(), result.getImageSize());
                             page.render(pdfDocument);
                             pages.add(page);
+                            int done = completedCount.incrementAndGet();
                             if (listener != null)
-                                listener.onAppend(procedure_id, imageFiles[final_i], page.getPageNumber(), imageFiles.length);
+                                listener.onAppend(procedure_id, imageFiles[final_i], done, imageFiles.length);
                             return null;
                         }
                     };

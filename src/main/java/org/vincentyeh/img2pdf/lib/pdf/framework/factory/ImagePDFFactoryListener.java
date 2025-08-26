@@ -10,5 +10,5 @@ public interface ImagePDFFactoryListener {
 
     void onConversionComplete(int procedure_id);
 
-    void onAppend(int procedure_id, File file, int i, int length);
+    void onAppend(int procedure_id, File file, int appendedCount, int length);
 }

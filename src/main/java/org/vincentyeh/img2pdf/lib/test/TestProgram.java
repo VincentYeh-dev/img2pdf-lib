@@ -43,7 +43,7 @@ public class TestProgram {
         }
 
         @Override
-        public void onAppend(int procedure_id, File file, int i, int length) {
+        public void onAppend(int procedure_id, File file, int appendedCount, int length) {
             System.out.println("onAppend:" + procedure_id +"\t image:"+file.getName());
         }
 
