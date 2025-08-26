@@ -15,12 +15,12 @@ import java.util.List;
 
 public class PDFBoxPageAdaptor implements IPage {
     private final PDPage page;
-    private final int pageID;
+    private final int pageNumber;
     private final List<PDFBoxDrawingCommand> PDFBoxDrawingCommands = new LinkedList<>();
     private SizeF pageSize;
 
-    public PDFBoxPageAdaptor(int pageID, SizeF pageSize) {
-        this.pageID = pageID;
+    public PDFBoxPageAdaptor(int pageNumber, SizeF pageSize) {
+        this.pageNumber = pageNumber;
         page = new PDPage();
         if (pageSize == null)
             throw new IllegalArgumentException("size==null");
@@ -50,7 +50,7 @@ public class PDFBoxPageAdaptor implements IPage {
 
 
     public int getPageNumber() {
-        return pageID;
+        return pageNumber;
     }
 
     public PDPage getInternalPage() {

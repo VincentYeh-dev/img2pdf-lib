@@ -17,4 +17,6 @@ public interface ImagePDFFactory {
 
     File start(int procedure_id, File directory, FileFilter filter,
                Comparator<File> fileSorter, File destination) throws PDFFactoryException;
+
+    void shutdown();
 }

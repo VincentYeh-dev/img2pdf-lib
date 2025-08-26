@@ -22,6 +22,7 @@ public class TestProgram {
 
 //        File[] files = new File("test").listFiles();
         factory.start(-1, new File("test"), null, null, new File("output.pdf"), listener);
+        factory.shutdown();
     }
 
     private static final ImagePDFFactoryListener listener = new ImagePDFFactoryListener() {

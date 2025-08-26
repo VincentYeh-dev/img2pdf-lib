@@ -24,6 +24,10 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class DefaultImagePDFFactory implements ImagePDFFactory {
 
@@ -35,6 +39,8 @@ public class DefaultImagePDFFactory implements ImagePDFFactory {
     private final ImageReadImpl imageReadImpl;
 
     private final ImageScalingStrategy imageScalingStrategy;
+
+    private final ExecutorService executorService;
 
 
     public DefaultImagePDFFactory(@Nullable PageArgument pageArgument,
@@ -68,6 +74,7 @@ public class DefaultImagePDFFactory implements ImagePDFFactory {
         } catch (NullPointerException e) {
             throw new IllegalArgumentException(e);
         }
+        executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
     public final File start(int procedure_id, File[] imageFiles, File destination, ImagePDFFactoryListener listener) throws PDFFactoryException {
@@ -83,20 +90,31 @@ public class DefaultImagePDFFactory implements ImagePDFFactory {
                     listener.initializing(procedure_id, imageFiles.length);
                 }
                 List<IPage> pages = new java.util.LinkedList<>();
+                List<Callable<Void>> tasks = new java.util.ArrayList<>();
                 for (int i = 0; i < imageFiles.length; i++) {
-                    BufferedImage bufferedImage = imageReadImpl.readImage(imageFiles[i]);
-                    ImageScalingResult result = imageScalingStrategy.execute(this.pageArgument,
-                            new SizeF(bufferedImage.getWidth(), bufferedImage.getHeight()));
-                    PDFBoxPageAdaptor page = new PDFBoxPageAdaptor(i + 1, result.getPageSize());
+                    final int final_i = i;
+                    Callable<Void> task = new Callable<Void>() {
+                        @Override
+                        public Void call() throws Exception {
+                            BufferedImage bufferedImage = imageReadImpl.readImage(imageFiles[final_i]);
+                            ImageScalingResult result = imageScalingStrategy.execute(pageArgument,
+                                    new SizeF(bufferedImage.getWidth(), bufferedImage.getHeight()));
+                            PDFBoxPageAdaptor page = new PDFBoxPageAdaptor(final_i + 1, result.getPageSize());
 
-                    page.drawImage(bufferedImage, result.getImagePosition(), result.getImageSize());
-                    page.render(pdfDocument);
-                    pages.add(page);
-                    if (listener != null)
-                        listener.onAppend(procedure_id, imageFiles[i], i, imageFiles.length);
+                            page.drawImage(bufferedImage, result.getImagePosition(), result.getImageSize());
+                            page.render(pdfDocument);
+                            pages.add(page);
+                            if (listener != null)
+                                listener.onAppend(procedure_id, imageFiles[final_i], page.getPageNumber(), imageFiles.length);
+                            return null;
+                        }
+                    };
+                    tasks.add(task);
                 }
+                List<Future<Void>> futures = executorService.invokeAll(tasks);
 
                 for (int i = 0; i < pages.size(); i++) {
+                    System.out.println("Add page " + (i + 1) + "/" + pages.size());
                     pdfDocument.addPage(pages.get(i));
                 }
             }
@@ -143,6 +161,11 @@ public class DefaultImagePDFFactory implements ImagePDFFactory {
     public File start(int procedure_id, File directory, FileFilter filter,
                       Comparator<File> fileSorter, File destination) throws PDFFactoryException {
         return start(procedure_id, directory, filter, fileSorter, destination, null);
+    }
+
+    @Override
+    public void shutdown() {
+        executorService.shutdown();
     }
 
 }
