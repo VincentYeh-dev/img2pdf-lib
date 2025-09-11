@@ -6,7 +6,6 @@ public interface ImagePDFFactoryListener {
 
     void initializing(int procedure_id, int length);
 
-    void onSaved(int procedure_id, File destination);
 
     void onConversionComplete(int procedure_id);
 

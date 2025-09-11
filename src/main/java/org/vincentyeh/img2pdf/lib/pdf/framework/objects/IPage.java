@@ -7,4 +7,5 @@ import java.awt.image.BufferedImage;
 public interface IPage {
     void drawImage(@NotNull BufferedImage image, @NotNull PointF imagePosition, @NotNull SizeF imageSize) throws RuntimeException;
     int getPageNumber();
+    void render();
 }

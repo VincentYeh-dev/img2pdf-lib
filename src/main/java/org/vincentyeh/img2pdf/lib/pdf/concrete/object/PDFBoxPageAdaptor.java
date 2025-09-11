@@ -4,7 +4,6 @@ import com.drew.lang.annotations.NotNull;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.vincentyeh.img2pdf.lib.pdf.framework.objects.IDocument;
 import org.vincentyeh.img2pdf.lib.pdf.framework.objects.IPage;
 import org.vincentyeh.img2pdf.lib.pdf.framework.objects.PointF;
 import org.vincentyeh.img2pdf.lib.pdf.framework.objects.SizeF;
@@ -15,11 +14,13 @@ import java.util.List;
 
 public class PDFBoxPageAdaptor implements IPage {
     private final PDPage page;
+    private final PDDocument document;
     private final int pageNumber;
     private final List<PDFBoxDrawingCommand> PDFBoxDrawingCommands = new LinkedList<>();
     private SizeF pageSize;
 
-    public PDFBoxPageAdaptor(int pageNumber, SizeF pageSize) {
+    public PDFBoxPageAdaptor(PDDocument document, int pageNumber, SizeF pageSize) {
+        this.document = document;
         this.pageNumber = pageNumber;
         page = new PDPage();
         if (pageSize == null)
@@ -41,16 +42,16 @@ public class PDFBoxPageAdaptor implements IPage {
         PDFBoxDrawingCommands.add(new PDFBoxDrawingCommand(image, imagePosition, imageSize));
     }
 
-    public void render(IDocument document) {
-        PDDocument pddocument = ((PDFBoxDocumentAdaptor) document).getInternalDocument();
-        for (PDFBoxDrawingCommand command : PDFBoxDrawingCommands) {
-            command.execute(pddocument, page);
-        }
-    }
-
 
     public int getPageNumber() {
         return pageNumber;
+    }
+
+    @Override
+    public void render() {
+        for (PDFBoxDrawingCommand command : PDFBoxDrawingCommands) {
+            command.execute(document, page);
+        }
     }
 
     public PDPage getInternalPage() {

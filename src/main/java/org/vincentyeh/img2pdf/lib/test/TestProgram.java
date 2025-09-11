@@ -5,23 +5,31 @@ import org.vincentyeh.img2pdf.lib.Img2Pdf;
 import org.vincentyeh.img2pdf.lib.image.ColorType;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePDFFactory;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePDFFactoryListener;
+import org.vincentyeh.img2pdf.lib.pdf.framework.objects.IDocument;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.*;
 
 import java.io.File;
+import java.io.IOException;
 
 public class TestProgram {
 
-    public static void main(String[] args) {
-        PageArgument pageArgument=new PageArgument(PageAlign.VerticalAlign.CENTER, PageAlign.HorizontalAlign.CENTER,
-                PageSize.A4, PageDirection.Portrait,true);
+    public static void main(String[] args) throws IOException {
+        PageArgument pageArgument = new PageArgument(PageAlign.VerticalAlign.CENTER, PageAlign.HorizontalAlign.CENTER,
+                PageSize.A4, PageDirection.Portrait, true);
 
-        ImagePDFFactory factory = Img2Pdf.createFactory(pageArgument
-                ,
-                new DocumentArgument("1234", "5678")
-                , ColorType.GRAY, true);
+        ImagePDFFactory factory = Img2Pdf.createFactory(pageArgument,
+                new DocumentArgument("1234", "5678"),
+                ColorType.GRAY);
 
-//        File[] files = new File("test").listFiles();
-        factory.start(-1, new File("test"), null, null, new File("output.pdf"), listener);
+        File destination = new File("output.pdf");
+        boolean allowOverwriteFile = true;
+
+        if (!allowOverwriteFile && destination.exists()) {
+            throw new IOException("Overwrite deny");
+        }
+
+        IDocument pdf = factory.start(-1, new File("test"), null, null, listener);
+        pdf.save(destination);
         factory.shutdown();
     }
 
@@ -33,18 +41,13 @@ public class TestProgram {
         }
 
         @Override
-        public void onSaved(int procedure_id, File destination) {
-            System.out.println("onSaved:" + procedure_id + "\tDest:" + destination);
-        }
-
-        @Override
         public void onConversionComplete(int procedure_id) {
             System.out.println("onConversionComplete:" + procedure_id);
         }
 
         @Override
         public void onAppend(int procedure_id, File file, int appendedCount, int length) {
-            System.out.println("onAppend:" + procedure_id +"\t image:"+file.getName());
+            System.out.println("onAppend:" + procedure_id + "\t image:" + file.getName());
         }
 
     };
