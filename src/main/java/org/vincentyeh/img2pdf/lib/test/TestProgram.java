@@ -28,7 +28,19 @@ public class TestProgram {
             throw new IOException("Overwrite deny");
         }
 
-        IDocument pdf = factory.start(-1, new File("test"), null, null, listener);
+
+        File sourceDirectory = new File("test");
+        File[] images = sourceDirectory.listFiles();
+
+        if (images == null) {
+            throw new RuntimeException("abstract pathname does not denote a directory");
+        }
+
+        if (images.length == 0) {
+            throw new RuntimeException("No image files is found");
+        }
+
+        IDocument pdf = factory.start(-1, images, listener);
         pdf.save(destination);
         factory.shutdown();
     }

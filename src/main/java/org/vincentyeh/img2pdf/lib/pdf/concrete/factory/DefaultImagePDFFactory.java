@@ -16,8 +16,10 @@ import org.vincentyeh.img2pdf.lib.pdf.parameter.PageArgument;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileFilter;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -126,33 +128,33 @@ public abstract class DefaultImagePDFFactory implements ImagePDFFactory {
     }
 
 
-    @Override
-    public IDocument start(int procedure_id, File directory, FileFilter filter,
-                           Comparator<File> fileSorter, ImagePDFFactoryListener listener) throws PDFFactoryException {
-
-        File[] files = directory.listFiles(filter);
-        try {
-            if (files == null) {
-                throw new RuntimeException("abstract pathname does not denote a directory");
-            }
-            if (files.length == 0) {
-                throw new RuntimeException("No image files is found");
-            }
-            if (fileSorter != null)
-                Arrays.sort(files, fileSorter);
-        } catch (Exception e) {
-            throw new PDFFactoryException(e);
-        }
-
-        return start(procedure_id, files, listener);
-    }
-
-    @Override
-    public IDocument start(int procedure_id, File directory, FileFilter filter,
-                           Comparator<File> fileSorter) throws PDFFactoryException {
-        return start(procedure_id, directory, filter, fileSorter, null);
-    }
-
+//    @Override
+//    public IDocument start(int procedure_id, File directory, FileFilter filter,
+//                           Comparator<File> fileSorter, ImagePDFFactoryListener listener) throws PDFFactoryException {
+//
+//        File[] files = directory.listFiles(filter);
+//        try {
+//            if (files == null) {
+//                throw new RuntimeException("abstract pathname does not denote a directory");
+//            }
+//            if (files.length == 0) {
+//                throw new RuntimeException("No image files is found");
+//            }
+//            if (fileSorter != null)
+//                Arrays.sort(files, fileSorter);
+//        } catch (Exception e) {
+//            throw new PDFFactoryException(e);
+//        }
+//
+//        return start(procedure_id, files, listener);
+//    }
+//
+//    @Override
+//    public IDocument start(int procedure_id, File directory, FileFilter filter,
+//                           Comparator<File> fileSorter) throws PDFFactoryException {
+//        return start(procedure_id, directory, filter, fileSorter, null);
+//    }
+//
     @Override
     public void shutdown() {
         executorService.shutdown();
