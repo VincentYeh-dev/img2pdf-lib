@@ -26,7 +26,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public abstract class DefaultImagePDFFactory implements ImagePDFFactory {
+public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
 
     private final DocumentArgument documentArgument;
     private final PageArgument pageArgument;
@@ -41,9 +41,9 @@ public abstract class DefaultImagePDFFactory implements ImagePDFFactory {
 
     public abstract BufferedImage readImage(File imageFile, ColorType colorType);
 
-    public DefaultImagePDFFactory(@Nullable PageArgument pageArgument,
-                                  @Nullable DocumentArgument documentArgument,
-                                  @NotNull ImageScalingStrategy imageScalingStrategy) {
+    public TemplateImagePDFFactory(@Nullable PageArgument pageArgument,
+                                   @Nullable DocumentArgument documentArgument,
+                                   @NotNull ImageScalingStrategy imageScalingStrategy) {
 
         try {
             this.imageScalingStrategy = Objects.requireNonNull(imageScalingStrategy, "strategy==null");
@@ -113,7 +113,7 @@ public abstract class DefaultImagePDFFactory implements ImagePDFFactory {
 
     @Override
     public IDocument start(int procedure_id, File[] imageFiles, ColorType colorType) throws PDFFactoryException {
-        return start(procedure_id, imageFiles, colorType);
+        return start(procedure_id, imageFiles, colorType, null);
     }
 
 

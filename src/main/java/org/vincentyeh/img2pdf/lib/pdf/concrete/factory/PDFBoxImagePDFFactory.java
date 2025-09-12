@@ -14,7 +14,7 @@ import org.vincentyeh.img2pdf.lib.pdf.parameter.PageArgument;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
-public class PDFBoxImagePDFFactory extends DefaultImagePDFFactory {
+public class PDFBoxImagePDFFactory extends TemplateImagePDFFactory {
 
     public PDFBoxImagePDFFactory(PageArgument pageArgument, DocumentArgument documentArgument, ImageScalingStrategy imageScalingStrategy) {
         super(pageArgument, documentArgument, imageScalingStrategy);
