@@ -12,7 +12,6 @@ public class ImageUtilsTest {
     public void argumentTest() {
         File file= Mockito.mock(File.class);
         Mockito.when(file.exists()).thenReturn(false);
-
         Assertions.assertThrows(IllegalArgumentException.class, () -> ImageUtils.readImage(null, null));
         Assertions.assertThrows(IllegalArgumentException.class, () -> ImageUtils.readImage(file, null));
     }
