@@ -39,7 +39,7 @@ public class TestProgram {
             throw new RuntimeException("No image files is found");
         }
 
-        IDocument pdf = factory.start(1, images, ColorType.GRAY, listener);
+        IDocument pdf = factory.start(images, ColorType.GRAY, listener);
         pdf.save(destination);
         factory.shutdown();
     }
@@ -47,18 +47,18 @@ public class TestProgram {
     private static final ImagePDFFactoryListener listener = new ImagePDFFactoryListener() {
 
         @Override
-        public void initializing(int procedure_id, int length) {
-            System.out.println("initializing:" + procedure_id);
+        public void initializing(int length) {
+            System.out.println("initializing: length=" + length);
         }
 
         @Override
-        public void onConversionComplete(int procedure_id) {
-            System.out.println("onConversionComplete:" + procedure_id);
+        public void onConversionComplete() {
+            System.out.println("onConversionComplete");
         }
 
         @Override
-        public void onAppend(int procedure_id, File file, int appendedCount, int length) {
-            System.out.println("onAppend:" + procedure_id + "\t image:" + file.getName());
+        public void onAppend(File file, int appendedCount, int length) {
+            System.out.println("onAppend:" + "\t image:" + file.getName());
         }
 
     };

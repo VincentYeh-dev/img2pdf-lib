@@ -7,8 +7,9 @@ import org.vincentyeh.img2pdf.lib.pdf.framework.objects.IDocument;
 import java.io.File;
 
 public interface ImagePDFFactory {
-    IDocument start(int procedure_id, File[] imageFiles, ColorType colorType) throws PDFFactoryException;
-    IDocument start(int procedure_id, File[] imageFiles, ColorType colorType, ImagePDFFactoryListener listener);
+    IDocument start(File[] imageFiles, ColorType colorType) throws PDFFactoryException;
+
+    IDocument start(File[] imageFiles, ColorType colorType, ImagePDFFactoryListener listener);
 
 
 //    IDocument start(int procedure_id, File directory, FileFilter filter,

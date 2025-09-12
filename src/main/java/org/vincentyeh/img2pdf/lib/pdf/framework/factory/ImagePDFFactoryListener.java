@@ -4,10 +4,10 @@ import java.io.File;
 
 public interface ImagePDFFactoryListener {
 
-    void initializing(int procedure_id, int length);
+    void initializing(int length);
 
 
-    void onConversionComplete(int procedure_id);
+    void onConversionComplete();
 
-    void onAppend(int procedure_id, File file, int appendedCount, int length);
+    void onAppend(File file, int appendedCount, int length);
 }

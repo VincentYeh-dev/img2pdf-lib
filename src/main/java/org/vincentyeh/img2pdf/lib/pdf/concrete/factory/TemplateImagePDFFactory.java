@@ -54,14 +54,14 @@ public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
         executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
-    public final IDocument start(int procedure_id, File[] imageFiles, ColorType colorType, ImagePDFFactoryListener listener) throws PDFFactoryException {
+    public final IDocument start(File[] imageFiles, ColorType colorType, ImagePDFFactoryListener listener) throws PDFFactoryException {
         try {
 
             IDocument pdfDocument = createDocument(this.documentArgument);
 
             if (imageFiles != null) {
                 if (listener != null) {
-                    listener.initializing(procedure_id, imageFiles.length);
+                    listener.initializing(imageFiles.length);
                 }
                 List<IPage> pages = Collections.synchronizedList(new LinkedList<>());
                 List<Callable<Void>> tasks = new java.util.ArrayList<>();
@@ -81,7 +81,7 @@ public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
                         pages.add(page);
                         int done = completedCount.incrementAndGet();
                         if (listener != null)
-                            listener.onAppend(procedure_id, imageFiles[final_i], done, imageFiles.length);
+                            listener.onAppend(imageFiles[final_i], done, imageFiles.length);
                         return null;
                     };
                     tasks.add(task);
@@ -94,7 +94,7 @@ public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
             }
 
             if (listener != null)
-                listener.onConversionComplete(procedure_id);
+                listener.onConversionComplete();
             return pdfDocument;
         } catch (Exception e) {
             throw new PDFFactoryException(e);
@@ -102,8 +102,8 @@ public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
     }
 
     @Override
-    public IDocument start(int procedure_id, File[] imageFiles, ColorType colorType) throws PDFFactoryException {
-        return start(procedure_id, imageFiles, colorType, null);
+    public IDocument start(File[] imageFiles, ColorType colorType) throws PDFFactoryException {
+        return start(imageFiles, colorType, null);
     }
 
 
