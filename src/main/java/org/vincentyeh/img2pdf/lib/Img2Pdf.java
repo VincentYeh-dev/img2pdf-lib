@@ -1,12 +1,9 @@
 package org.vincentyeh.img2pdf.lib;
 
 import org.apache.pdfbox.io.MemoryUsageSetting;
-import org.vincentyeh.img2pdf.lib.image.ColorType;
-import org.vincentyeh.img2pdf.lib.image.ImageUtils;
+import org.vincentyeh.img2pdf.lib.pdf.concrete.factory.DefaultImageScalingStrategy;
 import org.vincentyeh.img2pdf.lib.pdf.concrete.factory.PDFBoxImagePDFFactory;
-import org.vincentyeh.img2pdf.lib.pdf.concrete.object.PDFBoxDocumentAdaptor;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePDFFactory;
-import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImageReadImpl;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.DocumentArgument;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageArgument;
 
@@ -40,13 +37,8 @@ public class Img2Pdf {
 
     }
 
-    public static ImagePDFFactory createFactory(PageArgument pageArgument, DocumentArgument documentArgument,
-                                                ColorType colorType) {
-
-        final ImageReadImpl imageReadImpl = (file) -> ImageUtils.readImage(file, colorType);
-        PDFBoxDocumentAdaptor.setMemoryUsageSetting(setting);
-
-        return new PDFBoxImagePDFFactory(pageArgument, documentArgument, imageReadImpl);
+    public static ImagePDFFactory createFactory(PageArgument pageArgument, DocumentArgument documentArgument) {
+        return new PDFBoxImagePDFFactory(pageArgument, documentArgument, new DefaultImageScalingStrategy());
     }
 
 }

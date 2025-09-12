@@ -2,9 +2,9 @@ package org.vincentyeh.img2pdf.lib.pdf.concrete.factory;
 
 import com.drew.lang.annotations.NotNull;
 import com.drew.lang.annotations.Nullable;
+import org.vincentyeh.img2pdf.lib.image.ColorType;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePDFFactory;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePDFFactoryListener;
-import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImageReadImpl;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImageScalingStrategy;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.exception.PDFFactoryException;
 import org.vincentyeh.img2pdf.lib.pdf.framework.objects.IDocument;
@@ -31,9 +31,6 @@ public abstract class DefaultImagePDFFactory implements ImagePDFFactory {
     private final DocumentArgument documentArgument;
     private final PageArgument pageArgument;
 
-
-    private final ImageReadImpl imageReadImpl;
-
     private final ImageScalingStrategy imageScalingStrategy;
 
     private final ExecutorService executorService;
@@ -42,21 +39,13 @@ public abstract class DefaultImagePDFFactory implements ImagePDFFactory {
 
     public abstract IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize);
 
+    public abstract BufferedImage readImage(File imageFile, ColorType colorType);
 
     public DefaultImagePDFFactory(@Nullable PageArgument pageArgument,
                                   @Nullable DocumentArgument documentArgument,
-                                  @NotNull ImageReadImpl imageReadImpl) {
-        this(pageArgument, documentArgument, imageReadImpl, new DefaultImageScalingStrategy());
-    }
-
-    public DefaultImagePDFFactory(@Nullable PageArgument pageArgument,
-                                  @Nullable DocumentArgument documentArgument,
-                                  @NotNull ImageReadImpl imageReadImpl,
                                   @NotNull ImageScalingStrategy imageScalingStrategy) {
 
         try {
-
-            this.imageReadImpl = Objects.requireNonNull(imageReadImpl, "impl==null");
             this.imageScalingStrategy = Objects.requireNonNull(imageScalingStrategy, "strategy==null");
 
             if (pageArgument == null) {
@@ -75,7 +64,7 @@ public abstract class DefaultImagePDFFactory implements ImagePDFFactory {
         executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
-    public final IDocument start(int procedure_id, File[] imageFiles, ImagePDFFactoryListener listener) throws PDFFactoryException {
+    public final IDocument start(int procedure_id, File[] imageFiles, ColorType colorType, ImagePDFFactoryListener listener) throws PDFFactoryException {
         try {
 
             IDocument pdfDocument = createDocument(this.documentArgument);
@@ -92,7 +81,7 @@ public abstract class DefaultImagePDFFactory implements ImagePDFFactory {
                 for (int i = 0; i < imageFiles.length; i++) {
                     final int final_i = i;
                     Callable<Void> task = () -> {
-                        BufferedImage bufferedImage = imageReadImpl.readImage(imageFiles[final_i]);
+                        BufferedImage bufferedImage = readImage(imageFiles[final_i], colorType);
                         ImageScalingResult result = imageScalingStrategy.execute(pageArgument,
                                 new SizeF(bufferedImage.getWidth(), bufferedImage.getHeight()));
 
@@ -123,8 +112,8 @@ public abstract class DefaultImagePDFFactory implements ImagePDFFactory {
     }
 
     @Override
-    public IDocument start(int procedure_id, File[] imageFiles) throws PDFFactoryException {
-        return start(procedure_id, imageFiles, null);
+    public IDocument start(int procedure_id, File[] imageFiles, ColorType colorType) throws PDFFactoryException {
+        return start(procedure_id, imageFiles, colorType);
     }
 
 

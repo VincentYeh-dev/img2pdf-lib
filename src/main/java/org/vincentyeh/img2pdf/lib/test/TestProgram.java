@@ -18,8 +18,7 @@ public class TestProgram {
                 PageSize.A4, PageDirection.Portrait, true);
 
         ImagePDFFactory factory = Img2Pdf.createFactory(pageArgument,
-                new DocumentArgument("1234", "5678"),
-                ColorType.GRAY);
+                new DocumentArgument("1234", "5678"));
 
         File destination = new File("output.pdf");
         boolean allowOverwriteFile = true;
@@ -40,7 +39,7 @@ public class TestProgram {
             throw new RuntimeException("No image files is found");
         }
 
-        IDocument pdf = factory.start(-1, images, listener);
+        IDocument pdf = factory.start(1, images, ColorType.GRAY, listener);
         pdf.save(destination);
         factory.shutdown();
     }
