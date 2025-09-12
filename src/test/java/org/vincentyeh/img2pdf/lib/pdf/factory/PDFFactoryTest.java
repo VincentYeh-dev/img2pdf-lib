@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.vincentyeh.img2pdf.lib.pdf.concrete.factory.PDFBoxImagePDFFactory;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImageScalingStrategy;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.exception.PDFFactoryException;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.DocumentArgument;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageArgument;
 
@@ -27,6 +28,16 @@ public class PDFFactoryTest {
 
         Assertions.assertDoesNotThrow(() ->
                 new PDFBoxImagePDFFactory(pageArgument, documentArgument, imageScalingStrategy));
+
+    }
+    @Test
+    public void StartNullArgumentTest() {
+        PageArgument pageArgument = Mockito.mock(PageArgument.class);
+        DocumentArgument documentArgument = Mockito.mock(DocumentArgument.class);
+        ImageScalingStrategy imageScalingStrategy = Mockito.mock(ImageScalingStrategy.class);
+        PDFBoxImagePDFFactory factory = new PDFBoxImagePDFFactory(pageArgument, documentArgument, imageScalingStrategy);
+        Assertions.assertThrows(PDFFactoryException.class, () -> factory.start(null, null, null));
+        Assertions.assertDoesNotThrow(() -> factory.shutdown());
 
     }
 

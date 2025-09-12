@@ -15,6 +15,7 @@ import org.vincentyeh.img2pdf.lib.pdf.parameter.PageArgument;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,41 +57,45 @@ public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
 
     public final IDocument start(File[] imageFiles, ColorType colorType, ImagePDFFactoryListener listener) throws PDFFactoryException {
         try {
+            Objects.requireNonNull(imageFiles, "imageFiles==null");
+            if (imageFiles.length == 0)
+                throw new PDFFactoryException(new IllegalArgumentException("imageFiles.length==0"));
+
 
             IDocument pdfDocument = createDocument(this.documentArgument);
 
-            if (imageFiles != null) {
-                if (listener != null) {
-                    listener.initializing(imageFiles.length);
-                }
-                List<IPage> pages = Collections.synchronizedList(new LinkedList<>());
-                List<Callable<Void>> tasks = new java.util.ArrayList<>();
+            if (listener != null) {
+                listener.initializing(imageFiles.length);
+            }
+            List<IPage> pages = Collections.synchronizedList(new LinkedList<>());
+            List<Callable<Void>> tasks = new java.util.ArrayList<>();
 
-                AtomicInteger completedCount = new AtomicInteger(0);
+            AtomicInteger completedCount = new AtomicInteger(0);
 
-                for (int i = 0; i < imageFiles.length; i++) {
-                    final int final_i = i;
-                    Callable<Void> task = () -> {
-                        BufferedImage bufferedImage = readImage(imageFiles[final_i], colorType);
-                        ImageScalingResult result = imageScalingStrategy.execute(pageArgument,
-                                new SizeF(bufferedImage.getWidth(), bufferedImage.getHeight()));
+            for (int i = 0; i < imageFiles.length; i++) {
+                final int final_i = i;
+                checkFileState(imageFiles[final_i]);
 
-                        IPage page = createPage(pdfDocument, final_i + 1, result.getPageSize());
-                        page.drawImage(bufferedImage, result.getImagePosition(), result.getImageSize());
-                        page.render();
-                        pages.add(page);
-                        int done = completedCount.incrementAndGet();
-                        if (listener != null)
-                            listener.onAppend(imageFiles[final_i], done, imageFiles.length);
-                        return null;
-                    };
-                    tasks.add(task);
-                }
-                List<Future<Void>> futures = executorService.invokeAll(tasks);
+                Callable<Void> task = () -> {
+                    BufferedImage bufferedImage = readImage(imageFiles[final_i], colorType);
+                    ImageScalingResult result = imageScalingStrategy.execute(pageArgument,
+                            new SizeF(bufferedImage.getWidth(), bufferedImage.getHeight()));
 
-                for (IPage page : pages) {
-                    pdfDocument.addPage(page);
-                }
+                    IPage page = createPage(pdfDocument, final_i + 1, result.getPageSize());
+                    page.drawImage(bufferedImage, result.getImagePosition(), result.getImageSize());
+                    page.render();
+                    pages.add(page);
+                    int done = completedCount.incrementAndGet();
+                    if (listener != null)
+                        listener.onAppend(imageFiles[final_i], done, imageFiles.length);
+                    return null;
+                };
+                tasks.add(task);
+            }
+            List<Future<Void>> futures = executorService.invokeAll(tasks);
+
+            for (IPage page : pages) {
+                pdfDocument.addPage(page);
             }
 
             if (listener != null)
@@ -99,6 +104,18 @@ public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
         } catch (Exception e) {
             throw new PDFFactoryException(e);
         }
+    }
+
+    private void checkFileState(File imageFile) {
+        if (imageFile == null)
+            throw new PDFFactoryException(new NullPointerException("imageFile==null"));
+        if (!imageFile.exists())
+            throw new PDFFactoryException(new IOException("imageFile does not exist"));
+        if (!imageFile.isFile())
+            throw new PDFFactoryException(new IOException("imageFile is not file"));
+        if (!imageFile.canRead())
+            throw new PDFFactoryException(new IOException("imageFile can not be read"));
+
     }
 
     @Override
