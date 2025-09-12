@@ -24,18 +24,18 @@ public class PDFBoxImagePDFFactory extends TemplateImagePDFFactory {
     }
 
     @Override
-    public IDocument createDocument(DocumentArgument argument) {
+    protected IDocument createDocument(DocumentArgument argument) {
         return new PDFBoxDocumentAdaptor(argument);
     }
 
     @Override
-    public IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) {
+    protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) {
         PDFBoxDocumentAdaptor document = (PDFBoxDocumentAdaptor) pdfDocument;
         return new PDFBoxPageAdaptor(document.getInternalDocument(), pageNumber, pageSize);
     }
 
     @Override
-    public BufferedImage readImage(File imageFile, ColorType colorType) {
+    protected BufferedImage readImage(File imageFile, ColorType colorType) {
         return ImageUtils.readImage(imageFile, colorType);
     }
 

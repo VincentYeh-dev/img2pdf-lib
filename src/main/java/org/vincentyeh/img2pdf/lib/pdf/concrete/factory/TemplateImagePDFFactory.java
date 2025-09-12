@@ -34,11 +34,11 @@ public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
 
     private final ExecutorService executorService;
 
-    public abstract IDocument createDocument(DocumentArgument argument);
+    protected abstract IDocument createDocument(DocumentArgument argument);
 
-    public abstract IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize);
+    protected abstract IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize);
 
-    public abstract BufferedImage readImage(File imageFile, ColorType colorType);
+    protected abstract BufferedImage readImage(File imageFile, ColorType colorType);
 
     public TemplateImagePDFFactory(@NotNull PageArgument pageArgument,
                                    @NotNull DocumentArgument documentArgument,
