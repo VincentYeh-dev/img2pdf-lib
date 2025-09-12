@@ -1,7 +1,6 @@
 package org.vincentyeh.img2pdf.lib.pdf.concrete.factory;
 
 import com.drew.lang.annotations.NotNull;
-import com.drew.lang.annotations.Nullable;
 import org.vincentyeh.img2pdf.lib.image.ColorType;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePDFFactory;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePDFFactoryListener;
@@ -41,23 +40,14 @@ public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
 
     public abstract BufferedImage readImage(File imageFile, ColorType colorType);
 
-    public TemplateImagePDFFactory(@Nullable PageArgument pageArgument,
-                                   @Nullable DocumentArgument documentArgument,
+    public TemplateImagePDFFactory(@NotNull PageArgument pageArgument,
+                                   @NotNull DocumentArgument documentArgument,
                                    @NotNull ImageScalingStrategy imageScalingStrategy) {
 
         try {
             this.imageScalingStrategy = Objects.requireNonNull(imageScalingStrategy, "strategy==null");
-
-            if (pageArgument == null) {
-                this.pageArgument = new PageArgument();
-            } else {
-                this.pageArgument = pageArgument;
-            }
-            if (documentArgument == null) {
-                this.documentArgument = new DocumentArgument();
-            } else {
-                this.documentArgument = documentArgument;
-            }
+            this.pageArgument = Objects.requireNonNull(pageArgument, "pageArgument==null");
+            this.documentArgument = Objects.requireNonNull(documentArgument, "documentArgument==null");
         } catch (NullPointerException e) {
             throw new IllegalArgumentException(e);
         }
