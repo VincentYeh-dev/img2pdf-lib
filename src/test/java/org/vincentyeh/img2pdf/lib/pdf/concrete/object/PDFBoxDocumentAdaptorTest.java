@@ -144,5 +144,85 @@ public class PDFBoxDocumentAdaptorTest {
 
     }
 
+//    @Test
+//    public void testSaveWithNullOutputStream() throws IOException {
+//        PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(new DocumentArgument());
+//        Assertions.assertThrows(NullPointerException.class, () -> adaptor.save(null));
+//        adaptor.close();
+//    }
+
+    @Test
+    public void testAddNullPageThrows() {
+        PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(new DocumentArgument());
+        Assertions.assertThrows(IllegalArgumentException.class, () -> adaptor.addPage(null));
+    }
+
+    @Test
+    public void testConstructorWithNullArgument() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new PDFBoxDocumentAdaptor(null));
+    }
+
+    @Test
+    public void testGetPageCountWhenNoPages() {
+        PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(new DocumentArgument());
+        Assertions.assertEquals(0, adaptor.getPageCount());
+    }
+
+    @Test
+    public void testSaveAfterMultipleClose() throws IOException {
+        PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(new DocumentArgument());
+        adaptor.close();
+        adaptor.close();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        Assertions.assertThrows(IOException.class, () -> adaptor.save(outputStream));
+    }
+
+    @Test
+    public void testSetNullDocumentInfo() throws IOException {
+        DocumentArgument arg = new DocumentArgument();
+        Assertions.assertThrows(IllegalArgumentException.class, () -> arg.setInfo(null));
+    }
+
+    @Test
+    public void testSetEmptyPassword() throws IOException {
+        DocumentArgument arg = new DocumentArgument();
+        Assertions.assertThrows(IllegalArgumentException.class, () -> arg.setOwnerPassword(""));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> arg.setUserPassword(""));
+        PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(arg);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        Assertions.assertDoesNotThrow(() -> adaptor.save(outputStream));
+    }
+
+    @Test
+    public void testPermissionSettings() throws IOException {
+        Permission permission = new Permission();
+        permission.CanPrint = false;
+        permission.CanModify = true;
+        permission.CanExtractContent = false;
+        permission.CanFillInForm = true;
+
+        DocumentArgument arg = new DocumentArgument(permission);
+        arg.setOwnerPassword("owner");
+        arg.setUserPassword("user");
+        PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(arg);
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        adaptor.save(outputStream);
+
+        // 使用擁有者密碼載入
+        PDDocument docOwner = PDDocument.load(outputStream.toByteArray(), "owner");
+        Assertions.assertTrue(docOwner.getCurrentAccessPermission().canModify());
+        Assertions.assertTrue(docOwner.getCurrentAccessPermission().canFillInForm());
+        Assertions.assertTrue(docOwner.getCurrentAccessPermission().canPrint());
+        Assertions.assertTrue(docOwner.getCurrentAccessPermission().canExtractContent());
+        docOwner.close();
+        // 使用使用者密碼載入
+        PDDocument docUser = PDDocument.load(outputStream.toByteArray(), "user");
+        Assertions.assertTrue(docUser.getCurrentAccessPermission().canModify());
+        Assertions.assertTrue(docUser.getCurrentAccessPermission().canFillInForm());
+        Assertions.assertFalse(docUser.getCurrentAccessPermission().canPrint());
+        Assertions.assertFalse(docUser.getCurrentAccessPermission().canExtractContent());
+        docUser.close();
+    }
 
 }
