@@ -20,6 +20,8 @@ public class DocumentArgument {
     }
 
     public void setInfo(@NotNull PDFDocumentInfo info) {
+        if(info==null)
+            throw new IllegalArgumentException("info==null");
         this.info = Optional.of(info);
     }
 
@@ -35,6 +37,8 @@ public class DocumentArgument {
 
     public void setOwnerPassword(@NotNull String ownerPassword) {
         Objects.requireNonNull(ownerPassword, "ownerPassword==null");
+        if(ownerPassword.isEmpty())
+            throw new IllegalArgumentException("ownerPassword can not be empty");
         this.ownerPassword = Optional.of(ownerPassword);
     }
 
@@ -44,6 +48,8 @@ public class DocumentArgument {
 
     public void setUserPassword(@NotNull String userPassword) {
         Objects.requireNonNull(userPassword, "userPassword==null");
+        if(userPassword.isEmpty())
+            throw new IllegalArgumentException("userPassword can not be empty");
         this.userPassword = Optional.of(userPassword);
     }
 

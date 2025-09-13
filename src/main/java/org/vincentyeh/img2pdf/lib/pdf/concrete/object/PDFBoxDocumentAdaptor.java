@@ -30,6 +30,12 @@ public class PDFBoxDocumentAdaptor implements IDocument {
     }
 
     public PDFBoxDocumentAdaptor(DocumentArgument argument, MemoryUsageSetting memoryUsageSetting) {
+        if(argument==null)
+            throw new IllegalArgumentException("argument==null");
+
+        if(memoryUsageSetting==null)
+            throw new IllegalArgumentException("memoryUsageSetting==null");
+
         document = new PDDocument(memoryUsageSetting);
         this.docArgument = argument;
     }
