@@ -16,7 +16,9 @@ public class TestProgram {
     public static void main(String[] args) throws IOException {
         PageArgument pageArgument = new PageArgument(PageAlign.VerticalAlign.CENTER, PageAlign.HorizontalAlign.CENTER,
                 PageSize.A4, PageDirection.Portrait, true);
-        DocumentArgument documentArgument = new DocumentArgument("1234", "5678");
+        DocumentArgument documentArgument = new DocumentArgument();
+        documentArgument.setOwnerPassword("1234");
+        documentArgument.setUserPassword("5678");
 
         ImagePDFFactory factory = Img2Pdf.createMaxPerformanceFactory();
 

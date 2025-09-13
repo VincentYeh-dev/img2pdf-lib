@@ -40,21 +40,21 @@ public class PDFBoxDocumentAdaptor implements IDocument {
             throw new IllegalArgumentException("page==null");
 
         if (pages.containsKey(page.getPageNumber()))
-            throw new IllegalArgumentException("page with ID " + page.getPageNumber() + " already exists");
+            throw new IllegalArgumentException("page number " + page.getPageNumber() + " already exists");
 
         pages.put(page.getPageNumber(), page);
 
     }
 
     @Override
-    public void save(OutputStream outputStream) throws IOException{
+    public void save(OutputStream outputStream) throws IOException {
         if (document == null)
             throw new IllegalStateException("document has not been created");
-        String ownerPassword = this.docArgument.ownerPassword;
-        String userPassword = this.docArgument.userPassword;
 
-        if (ownerPassword != null && userPassword != null)
-            document.protect(createProtectionPolicy(ownerPassword, userPassword, permission));
+        if (docArgument.hasOwnerPassword() && docArgument.hasUserPassword())
+            document.protect(
+                    createProtectionPolicy(docArgument.getOwnerPassword(),
+                            docArgument.getUserPassword(), permission));
 
         setInfo();
         setPermission();
@@ -85,17 +85,16 @@ public class PDFBoxDocumentAdaptor implements IDocument {
     }
 
     private void setInfo() {
-        PDFDocumentInfo info = docArgument.info;
-        if (info == null)
-            return;
-
-        PDDocumentInformation information = new PDDocumentInformation();
-        information.setTitle(info.Title);
-        information.setAuthor(info.Author);
-        information.setSubject(info.Subject);
-        information.setCreator(info.Creator);
-        information.setProducer(info.Producer);
-        document.setDocumentInformation(information);
+        if (docArgument.hasInfo()) {
+            PDFDocumentInfo info = docArgument.getInfo();
+            PDDocumentInformation information = new PDDocumentInformation();
+            information.setTitle(info.Title);
+            information.setAuthor(info.Author);
+            information.setSubject(info.Subject);
+            information.setCreator(info.Creator);
+            information.setProducer(info.Producer);
+            document.setDocumentInformation(information);
+        }
     }
 
     @Override
@@ -104,10 +103,7 @@ public class PDFBoxDocumentAdaptor implements IDocument {
     }
 
     private void setPermission() {
-        Permission permission = this.docArgument.permission;
-        if (permission == null) {
-            throw new IllegalArgumentException("permission==null");
-        }
+        Permission permission = docArgument.getPermission();
         this.permission.setCanAssembleDocument(permission.CanAssembleDocument);
         this.permission.setCanExtractContent(permission.CanExtractContent);
         this.permission.setCanExtractForAccessibility(permission.CanExtractForAccessibility);
