@@ -1,4 +1,4 @@
-package org.vincentyeh.img2pdf.lib.pdf.adaptor;
+package org.vincentyeh.img2pdf.lib.pdf.concrete.object;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -6,8 +6,6 @@ import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.vincentyeh.img2pdf.lib.pdf.concrete.object.PDFBoxDocumentAdaptor;
-import org.vincentyeh.img2pdf.lib.pdf.concrete.object.PDFBoxPageAdaptor;
 import org.vincentyeh.img2pdf.lib.pdf.framework.objects.IPage;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.DocumentArgument;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PDFDocumentInfo;
