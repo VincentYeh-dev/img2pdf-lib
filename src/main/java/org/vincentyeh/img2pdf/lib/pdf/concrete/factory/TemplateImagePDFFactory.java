@@ -27,12 +27,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
-
-    private final DocumentArgument documentArgument;
-    private final PageArgument pageArgument;
-
     private final ImageScalingStrategy imageScalingStrategy;
-
     private final ExecutorService executorService;
 
     protected abstract IDocument createDocument(DocumentArgument argument);
@@ -41,28 +36,32 @@ public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
 
     protected abstract BufferedImage readImage(File imageFile, ColorType colorType);
 
-    public TemplateImagePDFFactory(@NotNull PageArgument pageArgument,
-                                   @NotNull DocumentArgument documentArgument,
-                                   @NotNull ImageScalingStrategy imageScalingStrategy) {
+    public TemplateImagePDFFactory(@NotNull ImageScalingStrategy imageScalingStrategy, int nThreads) {
+        if (nThreads < 1)
+            throw new IllegalArgumentException("nThreads can not be less than 1");
 
         try {
             this.imageScalingStrategy = Objects.requireNonNull(imageScalingStrategy, "strategy==null");
-            this.pageArgument = Objects.requireNonNull(pageArgument, "pageArgument==null");
-            this.documentArgument = Objects.requireNonNull(documentArgument, "documentArgument==null");
         } catch (NullPointerException e) {
             throw new IllegalArgumentException(e);
         }
-        executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        executorService = Executors.newFixedThreadPool(nThreads);
     }
 
-    public final IDocument start(File[] imageFiles, ColorType colorType, ImagePDFFactoryListener listener) throws PDFFactoryException {
+    public final IDocument start(File[] imageFiles, ColorType colorType,
+                                 DocumentArgument documentArgument,
+                                 PageArgument pageArgument,
+                                 ImagePDFFactoryListener listener) throws PDFFactoryException {
         try {
             Objects.requireNonNull(imageFiles, "imageFiles==null");
+            Objects.requireNonNull(documentArgument, "documentArgument==null");
+            Objects.requireNonNull(pageArgument, "pageArgument==null");
+
             if (imageFiles.length == 0)
                 throw new PDFFactoryException(new IllegalArgumentException("imageFiles.length==0"));
 
 
-            IDocument pdfDocument = createDocument(this.documentArgument);
+            IDocument pdfDocument = createDocument(documentArgument);
 
             if (listener != null) {
                 listener.initializing(imageFiles.length);
@@ -119,8 +118,10 @@ public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
     }
 
     @Override
-    public IDocument start(File[] imageFiles, ColorType colorType) throws PDFFactoryException {
-        return start(imageFiles, colorType, null);
+    public IDocument start(File[] imageFiles, ColorType colorType,
+                           DocumentArgument documentArgument,
+                           PageArgument pageArgument) throws PDFFactoryException {
+        return start(imageFiles, colorType, documentArgument, pageArgument, null);
     }
 
 

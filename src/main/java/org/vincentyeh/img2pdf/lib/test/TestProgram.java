@@ -16,9 +16,9 @@ public class TestProgram {
     public static void main(String[] args) throws IOException {
         PageArgument pageArgument = new PageArgument(PageAlign.VerticalAlign.CENTER, PageAlign.HorizontalAlign.CENTER,
                 PageSize.A4, PageDirection.Portrait, true);
+        DocumentArgument documentArgument = new DocumentArgument("1234", "5678");
 
-        ImagePDFFactory factory = Img2Pdf.createFactory(pageArgument,
-                new DocumentArgument("1234", "5678"));
+        ImagePDFFactory factory = Img2Pdf.createMaxPerformanceFactory();
 
         File destination = new File("output.pdf");
         boolean allowOverwriteFile = true;
@@ -39,7 +39,7 @@ public class TestProgram {
             throw new RuntimeException("No image files is found");
         }
 
-        IDocument pdf = factory.start(images, ColorType.GRAY, listener);
+        IDocument pdf = factory.start(images, ColorType.GRAY, documentArgument, pageArgument, listener);
         pdf.save(destination);
         factory.shutdown();
     }

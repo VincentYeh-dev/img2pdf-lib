@@ -17,18 +17,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PDFBoxDocumentAdaptor implements IDocument {
-    private static MemoryUsageSetting memoryUsageSetting;
     private final PDDocument document;
     private final AccessPermission permission = new AccessPermission();
     private final Map<Integer, IPage> pages = new HashMap<>();
     private final DocumentArgument docArgument;
 
-    static {
-        memoryUsageSetting = MemoryUsageSetting.setupMainMemoryOnly();
-    }
-
 
     public PDFBoxDocumentAdaptor(DocumentArgument argument) {
+        this(argument, MemoryUsageSetting.setupMainMemoryOnly());
+    }
+
+    public PDFBoxDocumentAdaptor(DocumentArgument argument, MemoryUsageSetting memoryUsageSetting) {
         document = new PDDocument(memoryUsageSetting);
         this.docArgument = argument;
     }
@@ -110,10 +109,6 @@ public class PDFBoxDocumentAdaptor implements IDocument {
 
     public PDDocument getInternalDocument() {
         return document;
-    }
-
-    public static void setMemoryUsageSetting(MemoryUsageSetting setting) {
-        memoryUsageSetting = setting;
     }
 
     private static StandardProtectionPolicy createProtectionPolicy(String ownerPassword, String userPassword, AccessPermission permission) {

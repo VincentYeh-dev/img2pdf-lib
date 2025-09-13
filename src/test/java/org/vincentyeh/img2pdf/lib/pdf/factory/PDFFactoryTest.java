@@ -13,30 +13,31 @@ import org.vincentyeh.img2pdf.lib.pdf.parameter.PageArgument;
 public class PDFFactoryTest {
 
     @Test
-    public void ConstructorNullArgumentTest() {
+    public void ConstructorIllegalArgumentTest() {
 
-        PageArgument pageArgument = Mockito.mock(PageArgument.class);
-        DocumentArgument documentArgument = Mockito.mock(DocumentArgument.class);
+        Assertions.assertThrows(IllegalArgumentException.class, () ->
+                new PDFBoxImagePDFFactory(null, 1));
+
         ImageScalingStrategy imageScalingStrategy = Mockito.mock(ImageScalingStrategy.class);
-        Assertions.assertThrows(IllegalArgumentException.class, () ->
-                new PDFBoxImagePDFFactory(pageArgument, null, null));
-        Assertions.assertThrows(IllegalArgumentException.class, () ->
-                new PDFBoxImagePDFFactory(pageArgument, documentArgument, null));
-
-        Assertions.assertThrows(IllegalArgumentException.class, () ->
-                new PDFBoxImagePDFFactory(null, null, null));
-
         Assertions.assertDoesNotThrow(() ->
-                new PDFBoxImagePDFFactory(pageArgument, documentArgument, imageScalingStrategy));
+                new PDFBoxImagePDFFactory(imageScalingStrategy, 1));
+
+        Assertions.assertThrows(IllegalArgumentException.class, () ->
+                new PDFBoxImagePDFFactory(imageScalingStrategy,-1));
+
+        Assertions.assertThrows(IllegalArgumentException.class, () ->
+                new PDFBoxImagePDFFactory(imageScalingStrategy,0));
+
 
     }
+
     @Test
     public void StartNullArgumentTest() {
         PageArgument pageArgument = Mockito.mock(PageArgument.class);
         DocumentArgument documentArgument = Mockito.mock(DocumentArgument.class);
         ImageScalingStrategy imageScalingStrategy = Mockito.mock(ImageScalingStrategy.class);
-        PDFBoxImagePDFFactory factory = new PDFBoxImagePDFFactory(pageArgument, documentArgument, imageScalingStrategy);
-        Assertions.assertThrows(PDFFactoryException.class, () -> factory.start(null, null, null));
+        PDFBoxImagePDFFactory factory = new PDFBoxImagePDFFactory(imageScalingStrategy);
+        Assertions.assertThrows(PDFFactoryException.class, () -> factory.start(null, null, null,null));
         Assertions.assertDoesNotThrow(() -> factory.shutdown());
 
     }
