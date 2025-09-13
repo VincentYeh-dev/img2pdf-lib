@@ -12,7 +12,9 @@ import org.vincentyeh.img2pdf.lib.pdf.parameter.PDFDocumentInfo;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.Permission;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,9 +46,8 @@ public class PDFBoxDocumentAdaptor implements IDocument {
 
     }
 
-
     @Override
-    public void save(File destination) throws IOException {
+    public void save(OutputStream outputStream) throws IOException{
         if (document == null)
             throw new IllegalStateException("document has not been created");
         String ownerPassword = this.docArgument.ownerPassword;
@@ -64,7 +65,17 @@ public class PDFBoxDocumentAdaptor implements IDocument {
                 throw new IllegalStateException("page with ID " + i + " does not exist");
             document.addPage(((PDFBoxPageAdaptor) page).getInternalPage());
         }
-        document.save(destination);
+        document.save(outputStream);
+    }
+
+    @Override
+    public void save(File destination) throws IOException {
+        if (destination == null)
+            throw new IllegalArgumentException("destination==null");
+        if (destination.exists() && !destination.canWrite())
+            throw new IllegalArgumentException("destination is not writable");
+
+        this.save(new FileOutputStream(destination));
     }
 
     @Override
