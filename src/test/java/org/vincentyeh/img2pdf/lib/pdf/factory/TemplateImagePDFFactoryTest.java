@@ -47,7 +47,6 @@ public class TemplateImagePDFFactoryTest {
 
 
         ImageScalingStrategy mockStrategy = mock(ImageScalingStrategy.class);
-
         Mockito.when(mockStrategy.execute(Mockito.any(), Mockito.any())).thenReturn(mock(ImageScalingResult.class));
 
         ImagePDFFactory factory = new TemplateImagePDFFactory(mockStrategy, 1) {
@@ -63,7 +62,7 @@ public class TemplateImagePDFFactoryTest {
 
             @Override
             protected BufferedImage readImage(File imageFile, ColorType colorType) {
-                return new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+                return mock(BufferedImage.class);
             }
         };
 
