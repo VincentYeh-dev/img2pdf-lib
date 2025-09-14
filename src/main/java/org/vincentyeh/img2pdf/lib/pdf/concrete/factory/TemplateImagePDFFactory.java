@@ -105,15 +105,15 @@ public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
         }
     }
 
-    private void checkFileState(File imageFile) {
+    private void checkFileState(File imageFile) throws IOException {
         if (imageFile == null)
-            throw new PDFFactoryException(new NullPointerException("imageFile==null"));
+            throw new NullPointerException("imageFile==null");
         if (!imageFile.exists())
-            throw new PDFFactoryException(new IOException("imageFile does not exist"));
+            throw new IOException("imageFile does not exist");
         if (!imageFile.isFile())
-            throw new PDFFactoryException(new IOException("imageFile is not file"));
+            throw new IOException("imageFile is not file");
         if (!imageFile.canRead())
-            throw new PDFFactoryException(new IOException("imageFile can not be read"));
+            throw new IOException("imageFile can not be read");
 
     }
 

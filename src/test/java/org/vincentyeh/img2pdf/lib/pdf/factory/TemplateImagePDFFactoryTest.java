@@ -20,6 +20,7 @@ import org.vincentyeh.img2pdf.lib.pdf.parameter.PageArgument;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 
 import static org.mockito.Mockito.*;
 
@@ -37,7 +38,7 @@ public class TemplateImagePDFFactoryTest {
         Mockito.when(f2.isFile()).thenReturn(true);
         Mockito.when(f2.canRead()).thenReturn(true);
 
-        File[] imageFiles = {f1,f2};
+        File[] imageFiles = {f1, f2};
 
         DocumentArgument docArg = new DocumentArgument();
         PageArgument pageArg = new PageArgument();
@@ -80,9 +81,20 @@ public class TemplateImagePDFFactoryTest {
     @Test
     void testConstructorThrowsOnNullStrategy() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> new TemplateImagePDFFactory(null, 1) {
-            @Override protected IDocument createDocument(DocumentArgument argument) { return null; }
-            @Override protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) { return null; }
-            @Override protected BufferedImage readImage(File imageFile, ColorType colorType) { return null; }
+            @Override
+            protected IDocument createDocument(DocumentArgument argument) {
+                return null;
+            }
+
+            @Override
+            protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) {
+                return null;
+            }
+
+            @Override
+            protected BufferedImage readImage(File imageFile, ColorType colorType) {
+                return null;
+            }
         });
     }
 
@@ -90,14 +102,36 @@ public class TemplateImagePDFFactoryTest {
     void testConstructorThrowsOnInvalidThreadCount() {
         ImageScalingStrategy mockStrategy = mock(ImageScalingStrategy.class);
         Assertions.assertThrows(IllegalArgumentException.class, () -> new TemplateImagePDFFactory(mockStrategy, 0) {
-            @Override protected IDocument createDocument(DocumentArgument argument) { return null; }
-            @Override protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) { return null; }
-            @Override protected BufferedImage readImage(File imageFile, ColorType colorType) { return null; }
+            @Override
+            protected IDocument createDocument(DocumentArgument argument) {
+                return null;
+            }
+
+            @Override
+            protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) {
+                return null;
+            }
+
+            @Override
+            protected BufferedImage readImage(File imageFile, ColorType colorType) {
+                return null;
+            }
         });
         Assertions.assertThrows(IllegalArgumentException.class, () -> new TemplateImagePDFFactory(mockStrategy, -1) {
-            @Override protected IDocument createDocument(DocumentArgument argument) { return null; }
-            @Override protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) { return null; }
-            @Override protected BufferedImage readImage(File imageFile, ColorType colorType) { return null; }
+            @Override
+            protected IDocument createDocument(DocumentArgument argument) {
+                return null;
+            }
+
+            @Override
+            protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) {
+                return null;
+            }
+
+            @Override
+            protected BufferedImage readImage(File imageFile, ColorType colorType) {
+                return null;
+            }
         });
     }
 
@@ -105,9 +139,20 @@ public class TemplateImagePDFFactoryTest {
     void testStartThrowsOnNullFiles() {
         ImageScalingStrategy mockStrategy = mock(ImageScalingStrategy.class);
         TemplateImagePDFFactory factory = new TemplateImagePDFFactory(mockStrategy, 1) {
-            @Override protected IDocument createDocument(DocumentArgument argument) { return mock(IDocument.class); }
-            @Override protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) { return mock(IPage.class); }
-            @Override protected BufferedImage readImage(File imageFile, ColorType colorType) { return new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB); }
+            @Override
+            protected IDocument createDocument(DocumentArgument argument) {
+                return mock(IDocument.class);
+            }
+
+            @Override
+            protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) {
+                return mock(IPage.class);
+            }
+
+            @Override
+            protected BufferedImage readImage(File imageFile, ColorType colorType) {
+                return new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
+            }
         };
         Assertions.assertThrows(PDFFactoryException.class, () ->
                 factory.start(null, ColorType.sRGB, new DocumentArgument(), new PageArgument()));
@@ -117,9 +162,20 @@ public class TemplateImagePDFFactoryTest {
     void testStartThrowsOnNullDocumentArgument() {
         ImageScalingStrategy mockStrategy = mock(ImageScalingStrategy.class);
         TemplateImagePDFFactory factory = new TemplateImagePDFFactory(mockStrategy, 1) {
-            @Override protected IDocument createDocument(DocumentArgument argument) { return mock(IDocument.class); }
-            @Override protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) { return mock(IPage.class); }
-            @Override protected BufferedImage readImage(File imageFile, ColorType colorType) { return new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB); }
+            @Override
+            protected IDocument createDocument(DocumentArgument argument) {
+                return mock(IDocument.class);
+            }
+
+            @Override
+            protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) {
+                return mock(IPage.class);
+            }
+
+            @Override
+            protected BufferedImage readImage(File imageFile, ColorType colorType) {
+                return new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
+            }
         };
         File[] files = new File[]{mock(File.class)};
         Assertions.assertThrows(PDFFactoryException.class, () ->
@@ -130,9 +186,20 @@ public class TemplateImagePDFFactoryTest {
     void testStartThrowsOnNullPageArgument() {
         ImageScalingStrategy mockStrategy = mock(ImageScalingStrategy.class);
         TemplateImagePDFFactory factory = new TemplateImagePDFFactory(mockStrategy, 1) {
-            @Override protected IDocument createDocument(DocumentArgument argument) { return mock(IDocument.class); }
-            @Override protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) { return mock(IPage.class); }
-            @Override protected BufferedImage readImage(File imageFile, ColorType colorType) { return new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB); }
+            @Override
+            protected IDocument createDocument(DocumentArgument argument) {
+                return mock(IDocument.class);
+            }
+
+            @Override
+            protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) {
+                return mock(IPage.class);
+            }
+
+            @Override
+            protected BufferedImage readImage(File imageFile, ColorType colorType) {
+                return new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
+            }
         };
         File[] files = new File[]{mock(File.class)};
         Assertions.assertThrows(PDFFactoryException.class, () ->
@@ -143,9 +210,20 @@ public class TemplateImagePDFFactoryTest {
     void testStartThrowsOnEmptyFiles() {
         ImageScalingStrategy mockStrategy = mock(ImageScalingStrategy.class);
         TemplateImagePDFFactory factory = new TemplateImagePDFFactory(mockStrategy, 1) {
-            @Override protected IDocument createDocument(DocumentArgument argument) { return mock(IDocument.class); }
-            @Override protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) { return mock(IPage.class); }
-            @Override protected BufferedImage readImage(File imageFile, ColorType colorType) { return new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB); }
+            @Override
+            protected IDocument createDocument(DocumentArgument argument) {
+                return mock(IDocument.class);
+            }
+
+            @Override
+            protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) {
+                return mock(IPage.class);
+            }
+
+            @Override
+            protected BufferedImage readImage(File imageFile, ColorType colorType) {
+                return new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
+            }
         };
         File[] files = new File[0];
         Assertions.assertThrows(PDFFactoryException.class, () ->
@@ -159,9 +237,20 @@ public class TemplateImagePDFFactoryTest {
         File[] files = new File[]{f1};
         ImageScalingStrategy mockStrategy = mock(ImageScalingStrategy.class);
         TemplateImagePDFFactory factory = new TemplateImagePDFFactory(mockStrategy, 1) {
-            @Override protected IDocument createDocument(DocumentArgument argument) { return mock(IDocument.class); }
-            @Override protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) { return mock(IPage.class); }
-            @Override protected BufferedImage readImage(File imageFile, ColorType colorType) { return new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB); }
+            @Override
+            protected IDocument createDocument(DocumentArgument argument) {
+                return mock(IDocument.class);
+            }
+
+            @Override
+            protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) {
+                return mock(IPage.class);
+            }
+
+            @Override
+            protected BufferedImage readImage(File imageFile, ColorType colorType) {
+                return new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
+            }
         };
         Assertions.assertThrows(PDFFactoryException.class, () ->
                 factory.start(files, ColorType.sRGB, new DocumentArgument(), new PageArgument()));
@@ -171,9 +260,20 @@ public class TemplateImagePDFFactoryTest {
     void testShutdownDoesNotThrow() {
         ImageScalingStrategy mockStrategy = mock(ImageScalingStrategy.class);
         TemplateImagePDFFactory factory = new TemplateImagePDFFactory(mockStrategy, 1) {
-            @Override protected IDocument createDocument(DocumentArgument argument) { return mock(IDocument.class); }
-            @Override protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) { return mock(IPage.class); }
-            @Override protected BufferedImage readImage(File imageFile, ColorType colorType) { return new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB); }
+            @Override
+            protected IDocument createDocument(DocumentArgument argument) {
+                return mock(IDocument.class);
+            }
+
+            @Override
+            protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) {
+                return mock(IPage.class);
+            }
+
+            @Override
+            protected BufferedImage readImage(File imageFile, ColorType colorType) {
+                return new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
+            }
         };
         Assertions.assertDoesNotThrow(factory::shutdown);
     }
@@ -194,9 +294,20 @@ public class TemplateImagePDFFactoryTest {
         when(mockStrategy.execute(any(), any())).thenReturn(mock(ImageScalingResult.class));
 
         TemplateImagePDFFactory factory = new TemplateImagePDFFactory(mockStrategy, 1) {
-            @Override protected IDocument createDocument(DocumentArgument argument) { return mockDoc; }
-            @Override protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) { return mockPage; }
-            @Override protected BufferedImage readImage(File imageFile, ColorType colorType) { return new BufferedImage(10,10,BufferedImage.TYPE_INT_RGB); }
+            @Override
+            protected IDocument createDocument(DocumentArgument argument) {
+                return mockDoc;
+            }
+
+            @Override
+            protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) {
+                return mockPage;
+            }
+
+            @Override
+            protected BufferedImage readImage(File imageFile, ColorType colorType) {
+                return new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
+            }
         };
 
         ImagePDFFactoryListener listener = mock(ImagePDFFactoryListener.class);
@@ -207,5 +318,58 @@ public class TemplateImagePDFFactoryTest {
         inOrder.verify(listener).initializing(1);
         inOrder.verify(listener).onAppend(any(), eq(1), eq(1));
         inOrder.verify(listener).onConversionComplete();
+    }
+
+    @Test
+    public void testInvalidFileState() {
+        File f1 = mock(File.class);
+        when(f1.exists()).thenReturn(false); // does not exist
+        File f2 = mock(File.class);
+        when(f2.exists()).thenReturn(true);
+        when(f2.isFile()).thenReturn(false); // not a file
+
+        File f3 = mock(File.class);
+        when(f3.exists()).thenReturn(true);
+        when(f3.isFile()).thenReturn(true);
+        when(f3.canRead()).thenReturn(false); // cannot be read
+
+
+        ImageScalingStrategy mockStrategy = mock(ImageScalingStrategy.class);
+        TemplateImagePDFFactory factory = new TemplateImagePDFFactory(mockStrategy, 1) {
+            @Override
+            protected IDocument createDocument(DocumentArgument argument) {
+                return mock(IDocument.class);
+            }
+
+            @Override
+            protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) {
+                return mock(IPage.class);
+            }
+
+            @Override
+            protected BufferedImage readImage(File imageFile, ColorType colorType) {
+                return new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
+            }
+        };
+
+        PDFFactoryException exception1 = Assertions.assertThrows(PDFFactoryException.class, () ->
+                factory.start(new File[]{null}, ColorType.sRGB, new DocumentArgument(), new PageArgument()));
+        Assertions.assertTrue(exception1.getCause() instanceof NullPointerException);
+
+        PDFFactoryException exception2 = Assertions.assertThrows(PDFFactoryException.class, () ->
+                factory.start(new File[]{f1}, ColorType.sRGB, new DocumentArgument(), new PageArgument()));
+        Assertions.assertTrue(exception2.getCause() instanceof IOException);
+
+        PDFFactoryException exception3 = Assertions.assertThrows(PDFFactoryException.class, () ->
+                factory.start(new File[]{f2}, ColorType.sRGB, new DocumentArgument(), new PageArgument()));
+        Assertions.assertTrue(exception3.getCause() instanceof IOException);
+
+        PDFFactoryException exception4 = Assertions.assertThrows(PDFFactoryException.class, () ->
+                factory.start(new File[]{f3}, ColorType.sRGB, new DocumentArgument(), new PageArgument()));
+        Assertions.assertTrue(exception4.getCause() instanceof IOException);
+
+
+
+
     }
 }
