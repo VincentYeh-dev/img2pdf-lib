@@ -9,6 +9,7 @@ import org.vincentyeh.img2pdf.lib.pdf.parameter.PageArgument;
 import java.io.File;
 
 public interface ImagePDFFactory {
+
     IDocument start(File[] imageFiles,
                     ColorType colorType,
                     DocumentArgument documentArgument,
@@ -20,6 +21,7 @@ public interface ImagePDFFactory {
                     DocumentArgument documentArgument,
                     PageArgument pageArgument,
                     ImagePDFFactoryListener listener) throws PDFFactoryException;
+
 
 
     void shutdown();
