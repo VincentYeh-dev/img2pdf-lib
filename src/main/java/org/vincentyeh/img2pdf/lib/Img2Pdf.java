@@ -1,5 +1,7 @@
 package org.vincentyeh.img2pdf.lib;
 
+import org.vincentyeh.img2pdf.lib.image.concrete.reader.ImageIOReader;
+import org.vincentyeh.img2pdf.lib.image.framework.reader.ImageReader;
 import org.vincentyeh.img2pdf.lib.pdf.concrete.factory.DefaultImageScalingStrategy;
 import org.vincentyeh.img2pdf.lib.pdf.concrete.factory.PDFBoxImagePDFFactory;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePDFFactory;
@@ -11,11 +13,14 @@ public class Img2Pdf {
     }
 
     public static ImagePDFFactory createMaxPerformanceFactory() {
-        return new PDFBoxImagePDFFactory(new DefaultImageScalingStrategy());
+        ImageReader reader = ImageIOReader.getInstance();
+        return new PDFBoxImagePDFFactory(new DefaultImageScalingStrategy(), reader);
     }
 
     public static ImagePDFFactory createFactory(int nThreads, long maxMainMemoryBytes, long maxStorageBytes) {
-        return new PDFBoxImagePDFFactory(new DefaultImageScalingStrategy(), nThreads, maxMainMemoryBytes, maxStorageBytes);
+        ImageReader reader = ImageIOReader.getInstance();
+        return new PDFBoxImagePDFFactory(new DefaultImageScalingStrategy(), reader,
+                nThreads, maxMainMemoryBytes, maxStorageBytes);
     }
 
 

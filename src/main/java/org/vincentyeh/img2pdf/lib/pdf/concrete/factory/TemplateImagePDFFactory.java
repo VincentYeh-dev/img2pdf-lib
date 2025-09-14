@@ -2,6 +2,7 @@ package org.vincentyeh.img2pdf.lib.pdf.concrete.factory;
 
 import com.drew.lang.annotations.NotNull;
 import org.vincentyeh.img2pdf.lib.image.ColorType;
+import org.vincentyeh.img2pdf.lib.image.framework.reader.ImageReader;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePDFFactory;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePDFFactoryListener;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImageScalingStrategy;
@@ -29,14 +30,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
     private final ImageScalingStrategy imageScalingStrategy;
     private final ExecutorService executorService;
+    private final ImageReader imageReader;
 
     protected abstract IDocument createDocument(DocumentArgument argument);
 
     protected abstract IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize);
 
-    protected abstract BufferedImage readImage(File imageFile, ColorType colorType);
 
-    public TemplateImagePDFFactory(@NotNull ImageScalingStrategy imageScalingStrategy, int nThreads) {
+    public TemplateImagePDFFactory(@NotNull ImageScalingStrategy imageScalingStrategy, @NotNull ImageReader imageReader, int nThreads) {
+        this.imageReader = imageReader;
         if (nThreads < 1)
             throw new IllegalArgumentException("nThreads can not be less than 1");
 
@@ -76,7 +78,7 @@ public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
                 checkFileState(imageFiles[final_i]);
 
                 Callable<Void> task = () -> {
-                    BufferedImage bufferedImage = readImage(imageFiles[final_i], colorType);
+                    BufferedImage bufferedImage = imageReader.readImage(imageFiles[final_i], colorType);
                     ImageScalingResult result = imageScalingStrategy.execute(pageArgument,
                             new SizeF(bufferedImage.getWidth(), bufferedImage.getHeight()));
 

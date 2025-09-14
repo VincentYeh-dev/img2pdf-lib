@@ -1,10 +1,13 @@
-package org.vincentyeh.img2pdf.lib.image;
+package org.vincentyeh.img2pdf.lib.image.concrete.reader;
 
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.MetadataException;
 import com.drew.metadata.exif.ExifIFD0Directory;
+import org.vincentyeh.img2pdf.lib.image.ColorType;
+import org.vincentyeh.img2pdf.lib.image.ImageReadingException;
+import org.vincentyeh.img2pdf.lib.image.framework.reader.ImageReader;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -12,45 +15,68 @@ import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
 
-public final class ImageUtils {
+public final class ImageIOReader implements ImageReader {
 
-    private ImageUtils() {
+    private static final class InstanceHolder {
+        static final ImageReader instance = new ImageIOReader();
+    }
+
+    public static ImageReader getInstance() {
+        return InstanceHolder.instance;
+    }
+
+    private ImageIOReader() {
 
     }
 
-    public static BufferedImage readImage(File file, ColorType colorType) {
+    @Override
+    public BufferedImage readImage(InputStream inputStream) throws IOException {
+        return ImageIO.read(inputStream);
+    }
+
+    @Override
+    public BufferedImage readImage(InputStream inputStream, ColorType colorType) throws IOException {
+        return convertColorSpace(readImage(inputStream), colorType);
+    }
+
+    @Override
+    public BufferedImage readImage(byte[] imageData) throws IOException {
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(imageData);
+        return ImageIO.read(inputStream);
+    }
+
+    @Override
+    public BufferedImage readImage(byte[] imageData, ColorType colorType) throws IOException {
+        return convertColorSpace(readImage(imageData), colorType);
+    }
+
+    @Override
+    public BufferedImage readImage(File file) throws ImageReadingException {
         if (file == null)
             throw new IllegalArgumentException("image file equals null");
 
-        if (!file.exists())
-            throw new IllegalArgumentException("image file not found");
-
-
-        final BufferedImage rawImage;
         try {
-            rawImage = ImageIO.read(file);
-        } catch (IOException e) {
-            throw new ImageReadException(e);
-        }
-
-        if (rawImage == null)
-            throw new ImageReadException("Unable to read image file: " + file.getAbsolutePath());
-
-        final BufferedImage image;
-        try {
+            BufferedImage rawImage = readImage(Files.newInputStream(file.toPath()));
             if (canHandleMetaData(file)) {
                 double rotate_angle = handleMetaData(file);
-                image = rotateImage(rawImage, rotate_angle);
+                return rotateImage(rawImage, rotate_angle);
             } else {
-                image = rawImage;
+                return rawImage;
             }
         } catch (IOException | ImageProcessingException | MetadataException e) {
-            throw new ImageReadException("Unable to handle metadata", e);
+            throw new ImageReadingException("Unable to handle metadata", e);
         }
+    }
 
+    @Override
+    public BufferedImage readImage(File imagePath, ColorType colorType) throws IOException {
+        return convertColorSpace(readImage(imagePath), colorType);
+    }
+
+    public BufferedImage convertColorSpace(BufferedImage image, ColorType colorType) {
         final ColorSpace targetColorSpace;
         if (colorType != null)
             targetColorSpace = ColorSpace.getInstance(colorType.getColorSpace());
@@ -61,7 +87,6 @@ public final class ImageUtils {
 
         ColorConvertOp op = new ColorConvertOp(targetColorSpace, null);
         return op.filter(image, null);
-
     }
 
     private static BufferedImage rotateImage(BufferedImage img, double degrees) {
