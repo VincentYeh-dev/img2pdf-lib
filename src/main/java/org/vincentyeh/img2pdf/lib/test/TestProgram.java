@@ -5,7 +5,7 @@ import org.vincentyeh.img2pdf.lib.Img2Pdf;
 import org.vincentyeh.img2pdf.lib.image.ColorType;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePDFFactory;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePDFFactoryListener;
-import org.vincentyeh.img2pdf.lib.pdf.framework.objects.IDocument;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.IDocument;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.*;
 
 import java.io.File;
@@ -15,12 +15,11 @@ public class TestProgram {
 
     public static void main(String[] args) throws IOException {
         PageArgument pageArgument = new PageArgument(PageAlign.VerticalAlign.CENTER, PageAlign.HorizontalAlign.CENTER,
-                PageSize.A4, PageDirection.Portrait, true);
+                PageSize.A4, PageDirection.Portrait, false);
         DocumentArgument documentArgument = new DocumentArgument();
-        documentArgument.setOwnerPassword("1234");
-        documentArgument.setUserPassword("5678");
+        documentArgument.setEncryption("1234", "5678", new Permission());
 
-        ImagePDFFactory factory = Img2Pdf.createMaxPerformanceFactory();
+        ImagePDFFactory factory = Img2Pdf.createOpenPDFFactory(Runtime.getRuntime().availableProcessors());
 
         File destination = new File("output.pdf");
         boolean allowOverwriteFile = true;
@@ -41,7 +40,7 @@ public class TestProgram {
             throw new RuntimeException("No image files is found");
         }
 
-        IDocument pdf = factory.start(images, ColorType.GRAY, documentArgument, pageArgument, listener);
+        IDocument pdf = factory.start(images, ColorType.sRGB, documentArgument, pageArgument, listener);
         pdf.save(destination);
         factory.shutdown();
     }

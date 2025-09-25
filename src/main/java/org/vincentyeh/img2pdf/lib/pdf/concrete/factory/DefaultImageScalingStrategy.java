@@ -1,9 +1,9 @@
 package org.vincentyeh.img2pdf.lib.pdf.concrete.factory;
 
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImageScalingStrategy;
-import org.vincentyeh.img2pdf.lib.pdf.framework.objects.ImageScalingResult;
-import org.vincentyeh.img2pdf.lib.pdf.framework.objects.PointF;
-import org.vincentyeh.img2pdf.lib.pdf.framework.objects.SizeF;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImageScalingResult;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.PointF;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.SizeF;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageAlign;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageArgument;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageDirection;

@@ -1,6 +1,6 @@
 package org.vincentyeh.img2pdf.lib.pdf.parameter;
 
-import org.vincentyeh.img2pdf.lib.pdf.framework.objects.SizeF;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.SizeF;
 
 /**
  * Size is the variable that define size of pages of PDFFile.

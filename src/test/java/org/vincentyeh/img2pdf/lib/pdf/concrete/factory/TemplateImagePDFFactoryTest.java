@@ -1,4 +1,4 @@
-package org.vincentyeh.img2pdf.lib.pdf.factory;
+package org.vincentyeh.img2pdf.lib.pdf.concrete.factory;
 
 
 import org.junit.jupiter.api.Assertions;
@@ -7,15 +7,14 @@ import org.mockito.InOrder;
 import org.mockito.Mockito;
 import org.vincentyeh.img2pdf.lib.image.ColorType;
 import org.vincentyeh.img2pdf.lib.image.framework.reader.ImageReader;
-import org.vincentyeh.img2pdf.lib.pdf.concrete.factory.TemplateImagePDFFactory;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePDFFactory;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePDFFactoryListener;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImageScalingStrategy;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.exception.PDFFactoryException;
-import org.vincentyeh.img2pdf.lib.pdf.framework.objects.IDocument;
-import org.vincentyeh.img2pdf.lib.pdf.framework.objects.IPage;
-import org.vincentyeh.img2pdf.lib.pdf.framework.objects.ImageScalingResult;
-import org.vincentyeh.img2pdf.lib.pdf.framework.objects.SizeF;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.IDocument;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.IPage;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImageScalingResult;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.SizeF;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.DocumentArgument;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageArgument;
 
@@ -66,8 +65,13 @@ public class TemplateImagePDFFactoryTest {
             }
 
             @Override
-            protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) {
+            protected IPage createPage(int pageNumber, SizeF pageSize) {
                 return mockPage;
+            }
+
+            @Override
+            protected boolean parallelProcessingSupported() {
+                return true;
             }
 
         };
@@ -93,8 +97,13 @@ public class TemplateImagePDFFactoryTest {
             }
 
             @Override
-            protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) {
+            protected IPage createPage(int pageNumber, SizeF pageSize) {
                 return null;
+            }
+
+            @Override
+            protected boolean parallelProcessingSupported() {
+                return true;
             }
         });
     }
@@ -111,8 +120,13 @@ public class TemplateImagePDFFactoryTest {
             }
 
             @Override
-            protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) {
+            protected IPage createPage(int pageNumber, SizeF pageSize) {
                 return null;
+            }
+
+            @Override
+            protected boolean parallelProcessingSupported() {
+                return true;
             }
 
         });
@@ -124,8 +138,13 @@ public class TemplateImagePDFFactoryTest {
             }
 
             @Override
-            protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) {
+            protected IPage createPage(int pageNumber, SizeF pageSize) {
                 return null;
+            }
+
+            @Override
+            protected boolean parallelProcessingSupported() {
+                return true;
             }
 
         });
@@ -142,8 +161,13 @@ public class TemplateImagePDFFactoryTest {
             }
 
             @Override
-            protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) {
+            protected IPage createPage(int pageNumber, SizeF pageSize) {
                 return mock(IPage.class);
+            }
+
+            @Override
+            protected boolean parallelProcessingSupported() {
+                return true;
             }
 
         };
@@ -162,8 +186,13 @@ public class TemplateImagePDFFactoryTest {
             }
 
             @Override
-            protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) {
+            protected IPage createPage(int pageNumber, SizeF pageSize) {
                 return mock(IPage.class);
+            }
+
+            @Override
+            protected boolean parallelProcessingSupported() {
+                return true;
             }
 
         };
@@ -183,8 +212,13 @@ public class TemplateImagePDFFactoryTest {
             }
 
             @Override
-            protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) {
+            protected IPage createPage(int pageNumber, SizeF pageSize) {
                 return mock(IPage.class);
+            }
+
+            @Override
+            protected boolean parallelProcessingSupported() {
+                return true;
             }
 
         };
@@ -204,8 +238,13 @@ public class TemplateImagePDFFactoryTest {
             }
 
             @Override
-            protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) {
+            protected IPage createPage(int pageNumber, SizeF pageSize) {
                 return mock(IPage.class);
+            }
+
+            @Override
+            protected boolean parallelProcessingSupported() {
+                return true;
             }
 
         };
@@ -229,8 +268,13 @@ public class TemplateImagePDFFactoryTest {
             }
 
             @Override
-            protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) {
+            protected IPage createPage(int pageNumber, SizeF pageSize) {
                 return mock(IPage.class);
+            }
+
+            @Override
+            protected boolean parallelProcessingSupported() {
+                return true;
             }
 
         };
@@ -250,8 +294,13 @@ public class TemplateImagePDFFactoryTest {
             }
 
             @Override
-            protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) {
+            protected IPage createPage(int pageNumber, SizeF pageSize) {
                 return mock(IPage.class);
+            }
+
+            @Override
+            protected boolean parallelProcessingSupported() {
+                return true;
             }
 
         };
@@ -274,6 +323,7 @@ public class TemplateImagePDFFactoryTest {
         IDocument mockDoc = mock(IDocument.class);
         IPage mockPage = mock(IPage.class);
         ImageScalingStrategy mockStrategy = mock(ImageScalingStrategy.class);
+        when(mockStrategy.execute(any(), any())).thenReturn(mock(ImageScalingResult.class));
         ImageReader mockReader = mock(ImageReader.class);
         BufferedImage mockImage = mock(BufferedImage.class);
         when(mockImage.getWidth()).thenReturn(100);
@@ -288,8 +338,13 @@ public class TemplateImagePDFFactoryTest {
             }
 
             @Override
-            protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) {
+            protected IPage createPage(int pageNumber, SizeF pageSize) {
                 return mockPage;
+            }
+
+            @Override
+            protected boolean parallelProcessingSupported() {
+                return true;
             }
 
         };
@@ -327,8 +382,13 @@ public class TemplateImagePDFFactoryTest {
             }
 
             @Override
-            protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) {
+            protected IPage createPage(int pageNumber, SizeF pageSize) {
                 return mock(IPage.class);
+            }
+
+            @Override
+            protected boolean parallelProcessingSupported() {
+                return true;
             }
 
         };

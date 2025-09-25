@@ -1,21 +1,23 @@
-package org.vincentyeh.img2pdf.lib.pdf.concrete.object;
+package org.vincentyeh.img2pdf.lib.pdf.concrete.factory.pdfbox;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.vincentyeh.img2pdf.lib.pdf.framework.objects.PointF;
-import org.vincentyeh.img2pdf.lib.pdf.framework.objects.SizeF;
+import org.mockito.Mockito;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.PointF;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.SizeF;
 
 import java.awt.image.BufferedImage;
+
+import static org.mockito.Mockito.when;
 
 public class PDFBoxPageAdaptorTest {
 
     @Test
     public void testConstructorAndGetInternalPage() {
-        PDDocument doc = new PDDocument();
         SizeF size = new SizeF(200, 300);
-        PDFBoxPageAdaptor adaptor = new PDFBoxPageAdaptor(doc, 1, size);
+        PDFBoxPageAdaptor adaptor = new PDFBoxPageAdaptor(1, size);
         PDPage page = adaptor.getInternalPage();
         Assertions.assertNotNull(page);
         Assertions.assertEquals(200, page.getMediaBox().getWidth());
@@ -24,32 +26,34 @@ public class PDFBoxPageAdaptorTest {
 
     @Test
     public void testConstructorWithNullSizeThrows() {
-        PDDocument doc = new PDDocument();
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            new PDFBoxPageAdaptor(doc, 1, null);
+            new PDFBoxPageAdaptor(1, null);
         });
     }
 
     @Test
     public void testDrawImageAndRender() {
-        PDDocument doc = new PDDocument();
         SizeF size = new SizeF(100, 100);
-        PDFBoxPageAdaptor adaptor = new PDFBoxPageAdaptor(doc, 1, size);
+        PDFBoxPageAdaptor adaptor = new PDFBoxPageAdaptor(1, size);
 
         BufferedImage img = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
         PointF pos = new PointF(5, 5);
         SizeF imgSize = new SizeF(10, 10);
 
         adaptor.drawImage(img, pos, imgSize);
+        PDFBoxDocumentAdaptor mockDoc = Mockito.mock(PDFBoxDocumentAdaptor.class);
+        when(mockDoc.getInternalDocument()).thenReturn(new PDDocument());
+
         // render 不應丟出異常
-        Assertions.assertDoesNotThrow(adaptor::render);
+        Assertions.assertDoesNotThrow(() -> {
+            adaptor.render(mockDoc);
+        });
     }
 
     @Test
     public void testDrawImageWithNullImageThrows() {
-        PDDocument doc = new PDDocument();
         SizeF size = new SizeF(100, 100);
-        PDFBoxPageAdaptor adaptor = new PDFBoxPageAdaptor(doc, 1, size);
+        PDFBoxPageAdaptor adaptor = new PDFBoxPageAdaptor(1, size);
         PointF pos = new PointF(0, 0);
         SizeF imgSize = new SizeF(10, 10);
 
@@ -60,9 +64,8 @@ public class PDFBoxPageAdaptorTest {
 
     @Test
     public void testDrawImageWithNullPositionThrows() {
-        PDDocument doc = new PDDocument();
         SizeF size = new SizeF(100, 100);
-        PDFBoxPageAdaptor adaptor = new PDFBoxPageAdaptor(doc, 1, size);
+        PDFBoxPageAdaptor adaptor = new PDFBoxPageAdaptor(1, size);
         BufferedImage img = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
         SizeF imgSize = new SizeF(10, 10);
 
@@ -73,9 +76,8 @@ public class PDFBoxPageAdaptorTest {
 
     @Test
     public void testDrawImageWithNullSizeThrows() {
-        PDDocument doc = new PDDocument();
         SizeF size = new SizeF(100, 100);
-        PDFBoxPageAdaptor adaptor = new PDFBoxPageAdaptor(doc, 1, size);
+        PDFBoxPageAdaptor adaptor = new PDFBoxPageAdaptor(1, size);
         BufferedImage img = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
         PointF pos = new PointF(0, 0);
 
@@ -86,9 +88,8 @@ public class PDFBoxPageAdaptorTest {
 
     @Test
     public void testGetPageNumber() {
-        PDDocument doc = new PDDocument();
         SizeF size = new SizeF(100, 100);
-        PDFBoxPageAdaptor adaptor = new PDFBoxPageAdaptor(doc, 5, size);
+        PDFBoxPageAdaptor adaptor = new PDFBoxPageAdaptor(5, size);
         Assertions.assertEquals(5, adaptor.getPageNumber());
     }
 }

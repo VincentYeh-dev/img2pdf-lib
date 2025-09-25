@@ -1,12 +1,12 @@
-package org.vincentyeh.img2pdf.lib.pdf.concrete.object;
+package org.vincentyeh.img2pdf.lib.pdf.concrete.factory.pdfbox;
 
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
-import org.vincentyeh.img2pdf.lib.pdf.framework.objects.IDocument;
-import org.vincentyeh.img2pdf.lib.pdf.framework.objects.IPage;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.IDocument;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.IPage;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.DocumentArgument;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PDFDocumentInfo;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.Permission;
@@ -20,7 +20,6 @@ import java.util.Map;
 
 public class PDFBoxDocumentAdaptor implements IDocument {
     private final PDDocument document;
-    private final AccessPermission permission = new AccessPermission();
     private final Map<Integer, IPage> pages = new HashMap<>();
     private final DocumentArgument docArgument;
 
@@ -30,10 +29,10 @@ public class PDFBoxDocumentAdaptor implements IDocument {
     }
 
     public PDFBoxDocumentAdaptor(DocumentArgument argument, MemoryUsageSetting memoryUsageSetting) {
-        if(argument==null)
+        if (argument == null)
             throw new IllegalArgumentException("argument==null");
 
-        if(memoryUsageSetting==null)
+        if (memoryUsageSetting == null)
             throw new IllegalArgumentException("memoryUsageSetting==null");
 
         document = new PDDocument(memoryUsageSetting);
@@ -57,13 +56,13 @@ public class PDFBoxDocumentAdaptor implements IDocument {
         if (document == null)
             throw new IllegalStateException("document has not been created");
 
-        if (docArgument.hasOwnerPassword() && docArgument.hasUserPassword())
+        if (docArgument.isEncrypted())
             document.protect(
                     createProtectionPolicy(docArgument.getOwnerPassword(),
-                            docArgument.getUserPassword(), permission));
+                            docArgument.getUserPassword(), convertPermission(docArgument.getPermission())));
 
-        setInfo();
-        setPermission();
+        if(docArgument.hasInfo())
+            setInfo(docArgument.getInfo());
 
         for (int i = 1; i <= pages.size(); i++) {
             IPage page = pages.get(i);
@@ -90,17 +89,14 @@ public class PDFBoxDocumentAdaptor implements IDocument {
             document.close();
     }
 
-    private void setInfo() {
-        if (docArgument.hasInfo()) {
-            PDFDocumentInfo info = docArgument.getInfo();
-            PDDocumentInformation information = new PDDocumentInformation();
-            information.setTitle(info.Title);
-            information.setAuthor(info.Author);
-            information.setSubject(info.Subject);
-            information.setCreator(info.Creator);
-            information.setProducer(info.Producer);
-            document.setDocumentInformation(information);
-        }
+    private void setInfo(PDFDocumentInfo info) {
+        PDDocumentInformation information = new PDDocumentInformation();
+        information.setTitle(info.Title);
+        information.setAuthor(info.Author);
+        information.setSubject(info.Subject);
+        information.setCreator(info.Creator);
+        information.setProducer(info.Producer);
+        document.setDocumentInformation(information);
     }
 
     @Override
@@ -108,16 +104,17 @@ public class PDFBoxDocumentAdaptor implements IDocument {
         return pages.size();
     }
 
-    private void setPermission() {
-        Permission permission = docArgument.getPermission();
-        this.permission.setCanAssembleDocument(permission.CanAssembleDocument);
-        this.permission.setCanExtractContent(permission.CanExtractContent);
-        this.permission.setCanExtractForAccessibility(permission.CanExtractForAccessibility);
-        this.permission.setCanFillInForm(permission.CanFillInForm);
-        this.permission.setCanModify(permission.CanModify);
-        this.permission.setCanModifyAnnotations(permission.CanModifyAnnotations);
-        this.permission.setCanPrint(permission.CanPrint);
-        this.permission.setCanPrintDegraded(permission.CanPrintDegraded);
+    private AccessPermission convertPermission(Permission permission) {
+        AccessPermission accessPermission = new AccessPermission();
+        accessPermission.setCanAssembleDocument(permission.CanAssembleDocument);
+        accessPermission.setCanExtractContent(permission.CanExtractContent);
+        accessPermission.setCanExtractForAccessibility(permission.CanExtractForAccessibility);
+        accessPermission.setCanFillInForm(permission.CanFillInForm);
+        accessPermission.setCanModify(permission.CanModify);
+        accessPermission.setCanModifyAnnotations(permission.CanModifyAnnotations);
+        accessPermission.setCanPrint(permission.CanPrint);
+        accessPermission.setCanPrintDegraded(permission.CanPrintDegraded);
+        return accessPermission;
     }
 
     public PDDocument getInternalDocument() {

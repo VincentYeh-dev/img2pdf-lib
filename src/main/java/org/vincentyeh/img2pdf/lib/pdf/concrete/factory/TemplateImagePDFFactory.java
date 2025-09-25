@@ -3,22 +3,14 @@ package org.vincentyeh.img2pdf.lib.pdf.concrete.factory;
 import com.drew.lang.annotations.NotNull;
 import org.vincentyeh.img2pdf.lib.image.ColorType;
 import org.vincentyeh.img2pdf.lib.image.framework.reader.ImageReader;
-import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePDFFactory;
-import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImagePDFFactoryListener;
-import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImageScalingStrategy;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.*;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.exception.PDFFactoryException;
-import org.vincentyeh.img2pdf.lib.pdf.framework.objects.IDocument;
-import org.vincentyeh.img2pdf.lib.pdf.framework.objects.IPage;
-import org.vincentyeh.img2pdf.lib.pdf.framework.objects.ImageScalingResult;
-import org.vincentyeh.img2pdf.lib.pdf.framework.objects.SizeF;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.DocumentArgument;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageArgument;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Callable;
@@ -34,8 +26,9 @@ public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
 
     protected abstract IDocument createDocument(DocumentArgument argument);
 
-    protected abstract IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize);
+    protected abstract IPage createPage(int pageNumber, SizeF pageSize);
 
+    protected abstract boolean parallelProcessingSupported();
 
     public TemplateImagePDFFactory(@NotNull ImageScalingStrategy imageScalingStrategy, @NotNull ImageReader imageReader, int nThreads) {
         this.imageReader = imageReader;
@@ -47,6 +40,10 @@ public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
         } catch (NullPointerException e) {
             throw new IllegalArgumentException(e);
         }
+
+        if (!parallelProcessingSupported() && nThreads != 1)
+            throw new IllegalArgumentException("This PDF factory does not support parallel processing.");
+
         executorService = Executors.newFixedThreadPool(nThreads);
     }
 
@@ -68,8 +65,7 @@ public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
             if (listener != null) {
                 listener.initializing(imageFiles.length);
             }
-            List<IPage> pages = Collections.synchronizedList(new LinkedList<>());
-            List<Callable<Void>> tasks = new java.util.ArrayList<>();
+            List<Callable<IPage>> tasks = new java.util.ArrayList<>();
 
             AtomicInteger completedCount = new AtomicInteger(0);
 
@@ -77,26 +73,30 @@ public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
                 final int final_i = i;
                 checkFileState(imageFiles[final_i]);
 
-                Callable<Void> task = () -> {
+                Callable<IPage> task = () -> {
                     BufferedImage bufferedImage = imageReader.readImage(imageFiles[final_i], colorType);
                     ImageScalingResult result = imageScalingStrategy.execute(pageArgument,
                             new SizeF(bufferedImage.getWidth(), bufferedImage.getHeight()));
 
-                    IPage page = createPage(pdfDocument, final_i + 1, result.getPageSize());
+                    IPage page = createPage(final_i + 1, result.getPageSize());
                     page.drawImage(bufferedImage, result.getImagePosition(), result.getImageSize());
-                    page.render();
-                    pages.add(page);
+                    page.render(pdfDocument);
                     int done = completedCount.incrementAndGet();
                     if (listener != null)
                         listener.onAppend(imageFiles[final_i], done, imageFiles.length);
-                    return null;
+                    return page;
                 };
                 tasks.add(task);
             }
-            List<Future<Void>> futures = executorService.invokeAll(tasks);
+            List<Future<IPage>> futures = executorService.invokeAll(tasks);
 
-            for (IPage page : pages) {
-                pdfDocument.addPage(page);
+            for (Future<IPage> future : futures) {
+                try {
+                    IPage page = future.get();
+                    pdfDocument.addPage(page);
+                } catch (Exception e) {
+                    throw new PDFFactoryException(e);
+                }
             }
 
             if (listener != null)

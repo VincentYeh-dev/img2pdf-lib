@@ -1,9 +1,9 @@
-package org.vincentyeh.img2pdf.lib.pdf.factory;
+package org.vincentyeh.img2pdf.lib.pdf.concrete.factory;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.vincentyeh.img2pdf.lib.pdf.framework.objects.PointF;
-import org.vincentyeh.img2pdf.lib.pdf.framework.objects.SizeF;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.PointF;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.SizeF;
 
 public class ObjectTest {
 

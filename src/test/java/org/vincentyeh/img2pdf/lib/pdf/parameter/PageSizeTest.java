@@ -1,7 +1,7 @@
 package org.vincentyeh.img2pdf.lib.pdf.parameter;
 
 import org.junit.jupiter.api.Test;
-import org.vincentyeh.img2pdf.lib.pdf.framework.objects.SizeF;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.SizeF;
 
 import static org.junit.jupiter.api.Assertions.*;
 

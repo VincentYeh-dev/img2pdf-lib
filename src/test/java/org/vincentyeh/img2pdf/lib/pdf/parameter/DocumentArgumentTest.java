@@ -1,6 +1,7 @@
 package org.vincentyeh.img2pdf.lib.pdf.parameter;
 
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class DocumentArgumentTest {
@@ -8,16 +9,15 @@ class DocumentArgumentTest {
     @Test
     void testDefaultConstructor() {
         DocumentArgument arg = new DocumentArgument();
-        assertNotNull(arg.getPermission());
         assertFalse(arg.hasInfo());
-        assertFalse(arg.hasOwnerPassword());
-        assertFalse(arg.hasUserPassword());
+        assertFalse(arg.isEncrypted());
     }
 
     @Test
     void testConstructorWithPermission() {
+        DocumentArgument arg = new DocumentArgument();
         Permission perm = new Permission();
-        DocumentArgument arg = new DocumentArgument(perm);
+        arg.setEncryption("owner123", "user123", perm);
         assertEquals(perm, arg.getPermission());
     }
 
@@ -43,23 +43,26 @@ class DocumentArgumentTest {
     }
 
     @Test
-    void testSetAndGetOwnerPassword() {
+    void testSetAndGetPassword() {
         DocumentArgument arg = new DocumentArgument();
-        arg.setOwnerPassword("owner123");
-        assertTrue(arg.hasOwnerPassword());
-        assertEquals("owner123", arg.getOwnerPassword());
+        String ownerPwd = "owner123";
+        String userPwd = "user123";
+        arg.setEncryption(ownerPwd, userPwd, new Permission());
+        assertTrue(arg.isEncrypted());
+        assertEquals(ownerPwd, arg.getOwnerPassword());
+        assertEquals(userPwd, arg.getUserPassword());
     }
 
     @Test
-    void testSetOwnerPasswordNullThrows() {
+    void testSetEncryptionNullThrows() {
         DocumentArgument arg = new DocumentArgument();
-        assertThrows(NullPointerException.class, () -> arg.setOwnerPassword(null));
+        assertThrows(NullPointerException.class, () -> arg.setEncryption(null, null, new Permission()));
     }
 
     @Test
-    void testSetOwnerPasswordEmptyThrows() {
+    void testSetEncryptionEmptyThrows() {
         DocumentArgument arg = new DocumentArgument();
-        assertThrows(IllegalArgumentException.class, () -> arg.setOwnerPassword(""));
+        assertThrows(IllegalArgumentException.class, () -> arg.setEncryption("", "", new Permission()));
     }
 
     @Test
@@ -68,25 +71,6 @@ class DocumentArgumentTest {
         assertThrows(IllegalStateException.class, arg::getOwnerPassword);
     }
 
-    @Test
-    void testSetAndGetUserPassword() {
-        DocumentArgument arg = new DocumentArgument();
-        arg.setUserPassword("user123");
-        assertTrue(arg.hasUserPassword());
-        assertEquals("user123", arg.getUserPassword());
-    }
-
-    @Test
-    void testSetUserPasswordNullThrows() {
-        DocumentArgument arg = new DocumentArgument();
-        assertThrows(NullPointerException.class, () -> arg.setUserPassword(null));
-    }
-
-    @Test
-    void testSetUserPasswordEmptyThrows() {
-        DocumentArgument arg = new DocumentArgument();
-        assertThrows(IllegalArgumentException.class, () -> arg.setUserPassword(""));
-    }
 
     @Test
     void testGetUserPasswordNotSetThrows() {
@@ -99,7 +83,7 @@ class DocumentArgumentTest {
         DocumentArgument arg = new DocumentArgument();
         Permission perm = new Permission();
         perm.CanPrint = false;
-        arg.setPermission(perm);
+        arg.setEncryption("123", "456", perm);
         assertEquals(perm, arg.getPermission());
     }
 }

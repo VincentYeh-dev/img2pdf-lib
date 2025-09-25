@@ -1,4 +1,4 @@
-package org.vincentyeh.img2pdf.lib.pdf.framework.objects;
+package org.vincentyeh.img2pdf.lib.pdf.framework.factory;
 
 public class ImageScalingResult {
     private final PointF imagePosition;

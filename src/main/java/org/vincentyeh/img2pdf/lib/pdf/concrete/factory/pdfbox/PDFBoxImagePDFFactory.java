@@ -1,14 +1,13 @@
-package org.vincentyeh.img2pdf.lib.pdf.concrete.factory;
+package org.vincentyeh.img2pdf.lib.pdf.concrete.factory.pdfbox;
 
 import com.drew.lang.annotations.NotNull;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.vincentyeh.img2pdf.lib.image.framework.reader.ImageReader;
-import org.vincentyeh.img2pdf.lib.pdf.concrete.object.PDFBoxDocumentAdaptor;
-import org.vincentyeh.img2pdf.lib.pdf.concrete.object.PDFBoxPageAdaptor;
+import org.vincentyeh.img2pdf.lib.pdf.concrete.factory.TemplateImagePDFFactory;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.ImageScalingStrategy;
-import org.vincentyeh.img2pdf.lib.pdf.framework.objects.IDocument;
-import org.vincentyeh.img2pdf.lib.pdf.framework.objects.IPage;
-import org.vincentyeh.img2pdf.lib.pdf.framework.objects.SizeF;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.IDocument;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.IPage;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.SizeF;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.DocumentArgument;
 
 public class PDFBoxImagePDFFactory extends TemplateImagePDFFactory {
@@ -37,7 +36,7 @@ public class PDFBoxImagePDFFactory extends TemplateImagePDFFactory {
                                  int nThreads,
                                  long maxMainMemoryBytes,
                                  long maxStorageBytes) {
-        super(imageScalingStrategy,imageReader, nThreads);
+        super(imageScalingStrategy, imageReader, nThreads);
         this.memoryUsageSetting = MemoryUsageSetting.setupMixed(maxMainMemoryBytes, maxStorageBytes);
     }
 
@@ -47,9 +46,13 @@ public class PDFBoxImagePDFFactory extends TemplateImagePDFFactory {
     }
 
     @Override
-    protected IPage createPage(IDocument pdfDocument, int pageNumber, SizeF pageSize) {
-        PDFBoxDocumentAdaptor document = (PDFBoxDocumentAdaptor) pdfDocument;
-        return new PDFBoxPageAdaptor(document.getInternalDocument(), pageNumber, pageSize);
+    protected IPage createPage(int pageNumber, SizeF pageSize) {
+        return new PDFBoxPageAdaptor(pageNumber, pageSize);
+    }
+
+    @Override
+    protected boolean parallelProcessingSupported() {
+        return true;
     }
 
 }

@@ -1,12 +1,12 @@
-package org.vincentyeh.img2pdf.lib.pdf.concrete.object;
+package org.vincentyeh.img2pdf.lib.pdf.concrete.factory.pdfbox;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
-import org.vincentyeh.img2pdf.lib.pdf.framework.objects.PointF;
-import org.vincentyeh.img2pdf.lib.pdf.framework.objects.SizeF;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.PointF;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.SizeF;
 
 import java.awt.image.BufferedImage;
 

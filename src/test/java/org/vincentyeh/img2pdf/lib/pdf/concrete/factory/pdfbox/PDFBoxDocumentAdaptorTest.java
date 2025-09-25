@@ -1,12 +1,11 @@
-package org.vincentyeh.img2pdf.lib.pdf.concrete.object;
+package org.vincentyeh.img2pdf.lib.pdf.concrete.factory.pdfbox;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.vincentyeh.img2pdf.lib.pdf.framework.objects.IPage;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.IPage;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.DocumentArgument;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PDFDocumentInfo;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageSize;
@@ -14,6 +13,9 @@ import org.vincentyeh.img2pdf.lib.pdf.parameter.Permission;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class PDFBoxDocumentAdaptorTest {
 
@@ -56,7 +58,7 @@ public class PDFBoxDocumentAdaptorTest {
         info.Author = "TestAuthor";
         info.Subject = "TestSubject";
 
-        DocumentArgument arg = new DocumentArgument(new Permission());
+        DocumentArgument arg = new DocumentArgument();
         arg.setInfo(info);
 
         PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(arg);
@@ -93,8 +95,7 @@ public class PDFBoxDocumentAdaptorTest {
         String ownerPassword = "owner123";
         String userPassword = "user123";
         DocumentArgument arg = new DocumentArgument();
-        arg.setOwnerPassword(ownerPassword);
-        arg.setUserPassword(userPassword);
+        arg.setEncryption(ownerPassword, userPassword, new Permission());
         PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(arg);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         adaptor.save(outputStream);
@@ -108,12 +109,12 @@ public class PDFBoxDocumentAdaptorTest {
     @Test
     public void testPageCount() {
         PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(new DocumentArgument());
-        IPage page1 = Mockito.mock(IPage.class);
-        Mockito.when(page1.getPageNumber()).thenReturn(1);
-        IPage page2 = Mockito.mock(IPage.class);
-        Mockito.when(page2.getPageNumber()).thenReturn(2);
-        IPage page3 = Mockito.mock(IPage.class);
-        Mockito.when(page3.getPageNumber()).thenReturn(3);
+        IPage page1 = mock(IPage.class);
+        when(page1.getPageNumber()).thenReturn(1);
+        IPage page2 = mock(IPage.class);
+        when(page2.getPageNumber()).thenReturn(2);
+        IPage page3 = mock(IPage.class);
+        when(page3.getPageNumber()).thenReturn(3);
 
         adaptor.addPage(page1);
         Assertions.assertEquals(1, adaptor.getPageCount());
@@ -126,8 +127,8 @@ public class PDFBoxDocumentAdaptorTest {
     @Test
     public void testAddDuplicatePageThrows() {
         PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(new DocumentArgument());
-        IPage page1 = Mockito.mock(IPage.class);
-        Mockito.when(page1.getPageNumber()).thenReturn(1);
+        IPage page1 = mock(IPage.class);
+        when(page1.getPageNumber()).thenReturn(1);
         adaptor.addPage(page1);
         Assertions.assertThrows(IllegalArgumentException.class, () -> adaptor.addPage(page1));
     }
@@ -135,7 +136,7 @@ public class PDFBoxDocumentAdaptorTest {
     @Test
     public void testAddEntryPage() throws IOException {
         PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(new DocumentArgument());
-        adaptor.addPage(new PDFBoxPageAdaptor(adaptor.getInternalDocument(), 1, PageSize.A4.getSizeInPixels()));
+        adaptor.addPage(new PDFBoxPageAdaptor(1, PageSize.A4.getSizeInPixels()));
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         adaptor.save(outputStream);
 
@@ -185,9 +186,12 @@ public class PDFBoxDocumentAdaptorTest {
 
     @Test
     public void testSetEmptyPassword() throws IOException {
-        DocumentArgument arg = new DocumentArgument();
-        Assertions.assertThrows(IllegalArgumentException.class, () -> arg.setOwnerPassword(""));
-        Assertions.assertThrows(IllegalArgumentException.class, () -> arg.setUserPassword(""));
+        DocumentArgument arg = mock(DocumentArgument.class);
+        when(arg.isEncrypted()).thenReturn(true);
+        when(arg.getOwnerPassword()).thenReturn("");
+        when(arg.getUserPassword()).thenReturn("");
+        when(arg.getPermission()).thenReturn(new Permission());
+
         PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(arg);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Assertions.assertDoesNotThrow(() -> adaptor.save(outputStream));
@@ -201,9 +205,8 @@ public class PDFBoxDocumentAdaptorTest {
         permission.CanExtractContent = false;
         permission.CanFillInForm = true;
 
-        DocumentArgument arg = new DocumentArgument(permission);
-        arg.setOwnerPassword("owner");
-        arg.setUserPassword("user");
+        DocumentArgument arg = new DocumentArgument();
+        arg.setEncryption("owner", "user", permission);
         PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(arg);
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

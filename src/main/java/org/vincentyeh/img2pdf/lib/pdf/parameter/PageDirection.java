@@ -1,7 +1,7 @@
 package org.vincentyeh.img2pdf.lib.pdf.parameter;
 
 
-import org.vincentyeh.img2pdf.lib.pdf.framework.objects.SizeF;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.SizeF;
 
 /**
  * Direction of page.Horizontal or Vertical.
