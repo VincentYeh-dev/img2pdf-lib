@@ -13,12 +13,12 @@ public class Img2Pdf {
 
     }
 
-    public static ImagePDFFactory createMaxPerformanceFactory() {
+    public static ImagePDFFactory createPDFBoxMaxPerformanceFactory() {
         ImageReader reader = ImageIOReader.getInstance();
         return new PDFBoxImagePDFFactory(new DefaultImageScalingStrategy(), reader);
     }
 
-    public static ImagePDFFactory createFactory(int nThreads, long maxMainMemoryBytes, long maxStorageBytes) {
+    public static ImagePDFFactory createPDFBoxFactory(int nThreads, long maxMainMemoryBytes, long maxStorageBytes) {
         ImageReader reader = ImageIOReader.getInstance();
         return new PDFBoxImagePDFFactory(new DefaultImageScalingStrategy(), reader,
                 nThreads, maxMainMemoryBytes, maxStorageBytes);

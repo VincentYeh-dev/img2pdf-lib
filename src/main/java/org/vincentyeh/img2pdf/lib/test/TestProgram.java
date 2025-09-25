@@ -15,11 +15,12 @@ public class TestProgram {
 
     public static void main(String[] args) throws IOException {
         PageArgument pageArgument = new PageArgument(PageAlign.VerticalAlign.CENTER, PageAlign.HorizontalAlign.CENTER,
-                PageSize.A4, PageDirection.Portrait, false);
+                PageSize.A4, PageDirection.Portrait, true);
         DocumentArgument documentArgument = new DocumentArgument();
         documentArgument.setEncryption("1234", "5678", new Permission());
 
-        ImagePDFFactory factory = Img2Pdf.createOpenPDFFactory(Runtime.getRuntime().availableProcessors());
+//        ImagePDFFactory factory = Img2Pdf.createOpenPDFFactory(Runtime.getRuntime().availableProcessors());
+        ImagePDFFactory factory=Img2Pdf.createPDFBoxMaxPerformanceFactory();
 
         File destination = new File("output.pdf");
         boolean allowOverwriteFile = true;
