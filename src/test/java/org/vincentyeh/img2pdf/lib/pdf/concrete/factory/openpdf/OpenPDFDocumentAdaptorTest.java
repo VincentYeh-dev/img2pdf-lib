@@ -42,7 +42,7 @@ public class OpenPDFDocumentAdaptorTest {
         adaptor.addPage(page);
         page.render(adaptor);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        adaptor.save(outputStream);
+        adaptor.saveAndClose(outputStream);
         byte[] pdfBytes = outputStream.toByteArray();
         Assertions.assertTrue(pdfBytes.length > 0);
     }
@@ -64,7 +64,7 @@ public class OpenPDFDocumentAdaptorTest {
         adaptor.addPage(page);
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        adaptor.save(outputStream);
+        adaptor.saveAndClose(outputStream);
 
         PDDocument savedDocument = PDDocument.load(outputStream.toByteArray());
 
@@ -95,7 +95,7 @@ public class OpenPDFDocumentAdaptorTest {
 
         adaptor.addPage(page);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        adaptor.save(outputStream);
+        adaptor.saveAndClose(outputStream);
 
         Assertions.assertDoesNotThrow(() -> PDDocument.load(outputStream.toByteArray(), ownerPassword));
         Assertions.assertDoesNotThrow(() -> PDDocument.load(outputStream.toByteArray(), userPassword));
@@ -164,7 +164,7 @@ public class OpenPDFDocumentAdaptorTest {
         page.render(adaptor);
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        adaptor.save(outputStream);
+        adaptor.saveAndClose(outputStream);
 
         // 使用擁有者密碼載入
         PDDocument docOwner = PDDocument.load(outputStream.toByteArray(), "owner");

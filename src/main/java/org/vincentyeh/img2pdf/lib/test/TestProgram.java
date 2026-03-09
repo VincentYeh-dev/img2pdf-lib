@@ -42,7 +42,7 @@ public class TestProgram {
         }
 
         IDocument pdf = factory.start(images, ColorType.sRGB, documentArgument, pageArgument, listener);
-        pdf.save(destination);
+        pdf.saveAndClose(destination);
         factory.shutdown();
     }
 

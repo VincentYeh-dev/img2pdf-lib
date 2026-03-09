@@ -77,7 +77,7 @@ public class OpenPDFDocumentAdaptor implements IDocument {
     }
 
     @Override
-    public void save(OutputStream outputStream) throws IOException {
+    public void saveAndClose(OutputStream outputStream) throws IOException {
         document.close();
         PdfReader reader = new PdfReader(new ByteArrayInputStream(buffer.toByteArray()));
 
@@ -88,20 +88,14 @@ public class OpenPDFDocumentAdaptor implements IDocument {
         }
         stamper.close();
         reader.close();
-    }
-
-    @Override
-    public void save(File destination) throws IOException {
-        try (FileOutputStream fos = new FileOutputStream(destination)) {
-            save(fos);
-        }
-    }
-
-    @Override
-    public void close() throws IOException {
-        if (document.isOpen())
-            document.close();
         buffer.close();
+    }
+
+    @Override
+    public void saveAndClose(File destination) throws IOException {
+        try (FileOutputStream fos = new FileOutputStream(destination)) {
+            saveAndClose(fos);
+        }
     }
 
     @Override

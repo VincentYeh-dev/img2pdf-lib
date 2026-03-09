@@ -7,9 +7,8 @@ import java.io.OutputStream;
 public interface IDocument {
     void addPage(IPage page);
 
-    void save(OutputStream outputStream) throws IOException;
-    void save(File destination) throws IOException;
+    void saveAndClose(OutputStream outputStream) throws IOException;
+    void saveAndClose(File destination) throws IOException;
 
-    void close() throws IOException;
     int getPageCount();
 }
