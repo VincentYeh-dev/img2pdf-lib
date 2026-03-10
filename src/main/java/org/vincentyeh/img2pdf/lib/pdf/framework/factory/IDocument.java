@@ -24,11 +24,4 @@ public interface IDocument {
         saveAndClose(destination);
     }
 
-    /**
-     * @deprecated Resources are released by saveAndClose(). This is a no-op for backward compatibility.
-     */
-    @Deprecated
-    default void close() {
-        // no-op：saveAndClose 已在內部完成資源釋放
-    }
 }
