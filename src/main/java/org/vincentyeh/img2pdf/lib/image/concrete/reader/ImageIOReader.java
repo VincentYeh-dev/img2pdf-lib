@@ -11,7 +11,7 @@ import org.vincentyeh.img2pdf.lib.image.framework.reader.ImageReader;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageInputStream;
-import java.awt.*;
+import java.awt.Graphics2D;
 import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -113,8 +113,6 @@ public final class ImageIOReader implements ImageReader {
         at.rotate(rads, x, y);
         g2d.setTransform(at);
         g2d.drawImage(img, 0, 0, null);
-        g2d.setColor(Color.RED);
-        g2d.drawRect(0, 0, newWidth - 1, newHeight - 1);
         g2d.dispose();
         return rotated;
     }
