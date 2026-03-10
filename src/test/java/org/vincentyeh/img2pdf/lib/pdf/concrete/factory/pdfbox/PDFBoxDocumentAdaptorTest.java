@@ -26,29 +26,12 @@ public class PDFBoxDocumentAdaptorTest {
     }
 
     @Test
-    public void testSaveToOutputStream() throws IOException {
+    public void testSaveAndCloseToOutputStream() throws IOException {
         PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(new DocumentArgument());
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        adaptor.save(outputStream);
-        adaptor.close();
+        adaptor.saveAndClose(outputStream);
         byte[] pdfBytes = outputStream.toByteArray();
         Assertions.assertTrue(pdfBytes.length > 0);
-    }
-
-    @Test
-    public void testCloseTwice() throws IOException {
-        PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(new DocumentArgument());
-        adaptor.close();
-        // 再次關閉不應拋出異常
-        Assertions.assertDoesNotThrow(adaptor::close);
-    }
-
-    @Test
-    public void testSaveAfterCloseThrows() throws IOException {
-        PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(new DocumentArgument());
-        adaptor.close();
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        Assertions.assertThrows(IOException.class, () -> adaptor.save(outputStream));
     }
 
     @Test
@@ -64,7 +47,7 @@ public class PDFBoxDocumentAdaptorTest {
         PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(arg);
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        adaptor.save(outputStream);
+        adaptor.saveAndClose(outputStream);
 
         PDDocument savedDocument = PDDocument.load(outputStream.toByteArray());
 
@@ -83,14 +66,6 @@ public class PDFBoxDocumentAdaptorTest {
     }
 
     @Test
-    public void testSaveClosedDocument() throws IOException {
-        PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(new DocumentArgument());
-        adaptor.close();
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        Assertions.assertThrows(IOException.class, () -> adaptor.save(outputStream));
-    }
-
-    @Test
     public void testPassword() throws IOException {
         String ownerPassword = "owner123";
         String userPassword = "user123";
@@ -98,7 +73,7 @@ public class PDFBoxDocumentAdaptorTest {
         arg.setEncryption(ownerPassword, userPassword, new Permission());
         PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(arg);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        adaptor.save(outputStream);
+        adaptor.saveAndClose(outputStream);
 
         Assertions.assertDoesNotThrow(() -> PDDocument.load(outputStream.toByteArray(), ownerPassword));
         Assertions.assertDoesNotThrow(() -> PDDocument.load(outputStream.toByteArray(), userPassword));
@@ -138,19 +113,12 @@ public class PDFBoxDocumentAdaptorTest {
         PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(new DocumentArgument());
         adaptor.addPage(new PDFBoxPageAdaptor(1, PageSize.A4.getSizeInPixels()));
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        adaptor.save(outputStream);
+        adaptor.saveAndClose(outputStream);
 
         PDDocument savedDocument = PDDocument.load(outputStream.toByteArray());
         Assertions.assertEquals(1, savedDocument.getNumberOfPages());
 
     }
-
-//    @Test
-//    public void testSaveWithNullOutputStream() throws IOException {
-//        PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(new DocumentArgument());
-//        Assertions.assertThrows(NullPointerException.class, () -> adaptor.save(null));
-//        adaptor.close();
-//    }
 
     @Test
     public void testAddNullPageThrows() {
@@ -170,15 +138,6 @@ public class PDFBoxDocumentAdaptorTest {
     }
 
     @Test
-    public void testSaveAfterMultipleClose() throws IOException {
-        PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(new DocumentArgument());
-        adaptor.close();
-        adaptor.close();
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        Assertions.assertThrows(IOException.class, () -> adaptor.save(outputStream));
-    }
-
-    @Test
     public void testSetNullDocumentInfo() throws IOException {
         DocumentArgument arg = new DocumentArgument();
         Assertions.assertThrows(IllegalArgumentException.class, () -> arg.setInfo(null));
@@ -194,7 +153,7 @@ public class PDFBoxDocumentAdaptorTest {
 
         PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(arg);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        Assertions.assertDoesNotThrow(() -> adaptor.save(outputStream));
+        Assertions.assertDoesNotThrow(() -> adaptor.saveAndClose(outputStream));
     }
 
     @Test
@@ -210,7 +169,7 @@ public class PDFBoxDocumentAdaptorTest {
         PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(arg);
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        adaptor.save(outputStream);
+        adaptor.saveAndClose(outputStream);
 
         // 使用擁有者密碼載入
         PDDocument docOwner = PDDocument.load(outputStream.toByteArray(), "owner");

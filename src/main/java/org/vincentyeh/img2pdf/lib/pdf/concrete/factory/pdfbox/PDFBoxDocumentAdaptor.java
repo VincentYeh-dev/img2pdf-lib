@@ -52,7 +52,7 @@ public class PDFBoxDocumentAdaptor implements IDocument {
     }
 
     @Override
-    public void save(OutputStream outputStream) throws IOException {
+    public void saveAndClose(OutputStream outputStream) throws IOException {
         if (document == null)
             throw new IllegalStateException("document has not been created");
 
@@ -71,22 +71,19 @@ public class PDFBoxDocumentAdaptor implements IDocument {
             document.addPage(((PDFBoxPageAdaptor) page).getInternalPage());
         }
         document.save(outputStream);
+        document.close();
     }
 
     @Override
-    public void save(File destination) throws IOException {
+    public void saveAndClose(File destination) throws IOException {
         if (destination == null)
             throw new IllegalArgumentException("destination==null");
         if (destination.exists() && !destination.canWrite())
             throw new IllegalArgumentException("destination is not writable");
 
-        this.save(new FileOutputStream(destination));
-    }
-
-    @Override
-    public void close() throws IOException {
-        if (document != null)
-            document.close();
+        try (FileOutputStream fos = new FileOutputStream(destination)) {
+            saveAndClose(fos);
+        }
     }
 
     private void setInfo(PDFDocumentInfo info) {

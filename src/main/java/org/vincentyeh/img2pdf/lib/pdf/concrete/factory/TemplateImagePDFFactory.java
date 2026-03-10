@@ -61,47 +61,50 @@ public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
 
 
             IDocument pdfDocument = createDocument(documentArgument);
-
-            if (listener != null) {
-                listener.initializing(imageFiles.length);
-            }
-            List<Callable<IPage>> tasks = new java.util.ArrayList<>();
-
-            AtomicInteger completedCount = new AtomicInteger(0);
-
-            for (int i = 0; i < imageFiles.length; i++) {
-                final int final_i = i;
-                checkFileState(imageFiles[final_i]);
-
-                Callable<IPage> task = () -> {
-                    BufferedImage bufferedImage = imageReader.readImage(imageFiles[final_i], colorType);
-                    ImageScalingResult result = imageScalingStrategy.execute(pageArgument,
-                            new SizeF(bufferedImage.getWidth(), bufferedImage.getHeight()));
-
-                    IPage page = createPage(final_i + 1, result.getPageSize());
-                    page.drawImage(bufferedImage, result.getImagePosition(), result.getImageSize());
-                    page.render(pdfDocument);
-                    int done = completedCount.incrementAndGet();
-                    if (listener != null)
-                        listener.onAppend(imageFiles[final_i], done, imageFiles.length);
-                    return page;
-                };
-                tasks.add(task);
-            }
-            List<Future<IPage>> futures = executorService.invokeAll(tasks);
-
-            for (Future<IPage> future : futures) {
-                try {
-                    IPage page = future.get();
-                    pdfDocument.addPage(page);
-                } catch (Exception e) {
-                    throw new PDFFactoryException(e);
+            try {
+                if (listener != null) {
+                    listener.initializing(imageFiles.length);
                 }
-            }
+                List<Callable<IPage>> tasks = new java.util.ArrayList<>();
 
-            if (listener != null)
-                listener.onConversionComplete();
-            return pdfDocument;
+                AtomicInteger completedCount = new AtomicInteger(0);
+
+                for (int i = 0; i < imageFiles.length; i++) {
+                    final int final_i = i;
+                    checkFileState(imageFiles[final_i]);
+
+                    Callable<IPage> task = () -> {
+                        BufferedImage bufferedImage = imageReader.readImage(imageFiles[final_i], colorType);
+                        ImageScalingResult result = imageScalingStrategy.execute(pageArgument,
+                                new SizeF(bufferedImage.getWidth(), bufferedImage.getHeight()));
+
+                        IPage page = createPage(final_i + 1, result.getPageSize());
+                        page.drawImage(bufferedImage, result.getImagePosition(), result.getImageSize());
+                        page.render(pdfDocument);
+                        int done = completedCount.incrementAndGet();
+                        if (listener != null)
+                            listener.onAppend(imageFiles[final_i], done, imageFiles.length);
+                        return page;
+                    };
+                    tasks.add(task);
+                }
+                List<Future<IPage>> futures = executorService.invokeAll(tasks);
+
+                for (Future<IPage> future : futures) {
+                    try {
+                        IPage page = future.get();
+                        pdfDocument.addPage(page);
+                    } catch (Exception e) {
+                        throw new PDFFactoryException(e);
+                    }
+                }
+
+                if (listener != null)
+                    listener.onConversionComplete();
+                return pdfDocument;
+            } catch (Exception e) {
+                throw e;
+            }
         } catch (Exception e) {
             throw new PDFFactoryException(e);
         }
