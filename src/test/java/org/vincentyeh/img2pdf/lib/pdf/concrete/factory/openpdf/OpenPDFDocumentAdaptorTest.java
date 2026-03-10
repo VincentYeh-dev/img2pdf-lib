@@ -18,14 +18,20 @@ import java.io.IOException;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests for {@link OpenPDFDocumentAdaptor}, covering construction, page management,
+ * document metadata, password encryption, and permission enforcement.
+ */
 public class OpenPDFDocumentAdaptorTest {
 
+    /** Verifies that the adaptor can be constructed with a default DocumentArgument. */
     @Test
     public void testConstructorAndGetDocument() {
         OpenPDFDocumentAdaptor adaptor = new OpenPDFDocumentAdaptor(new DocumentArgument());
         Assertions.assertNotNull(adaptor);
     }
 
+    /** Verifies that an encrypted DocumentArgument with empty passwords throws IllegalArgumentException. */
     @Test
     public void testConstructorInvalidArgument() {
         DocumentArgument mockArg = mock(DocumentArgument.class);
@@ -35,6 +41,7 @@ public class OpenPDFDocumentAdaptorTest {
         Assertions.assertThrows(IllegalArgumentException.class, () -> new OpenPDFDocumentAdaptor(mockArg));
     }
 
+    /** Verifies that saveAndClose() writes a non-empty byte array to the output stream. */
     @Test
     public void testSaveToOutputStream() throws IOException {
         OpenPDFDocumentAdaptor adaptor = new OpenPDFDocumentAdaptor(new DocumentArgument());
@@ -47,6 +54,7 @@ public class OpenPDFDocumentAdaptorTest {
         Assertions.assertTrue(pdfBytes.length > 0);
     }
 
+    /** Verifies that document metadata set via DocumentArgument is embedded in the saved PDF. */
     @Test
     public void testSetAndGetDocumentInfo() throws IOException {
         PDFDocumentInfo info = new PDFDocumentInfo();
@@ -76,6 +84,7 @@ public class OpenPDFDocumentAdaptorTest {
 
     }
 
+    /** Verifies that the encrypted PDF is openable with owner and user passwords but rejects wrong passwords. */
     @Test
     public void testPassword() throws IOException {
         String ownerPassword = "owner123";
@@ -103,6 +112,7 @@ public class OpenPDFDocumentAdaptorTest {
                 PDDocument.load(outputStream.toByteArray(), "wrongpassword"));
     }
 
+    /** Verifies page-count tracking, duplicate page rejection, and null page rejection. */
     @Test
     public void testAddPage() {
         OpenPDFDocumentAdaptor adaptor = new OpenPDFDocumentAdaptor(new DocumentArgument());
@@ -125,17 +135,20 @@ public class OpenPDFDocumentAdaptorTest {
         Assertions.assertThrows(IllegalArgumentException.class, () -> adaptor.addPage(page4));
     }
 
+    /** Verifies that constructing with a null DocumentArgument throws IllegalArgumentException. */
     @Test
     public void testConstructorWithNullArgument() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> new OpenPDFDocumentAdaptor(null));
     }
 
+    /** Verifies that setInfo(null) on DocumentArgument throws IllegalArgumentException. */
     @Test
     public void testSetNullDocumentInfo() {
         DocumentArgument arg = new DocumentArgument();
         Assertions.assertThrows(IllegalArgumentException.class, () -> arg.setInfo(null));
     }
 
+    /** Verifies that an encrypted DocumentArgument with empty passwords causes IllegalArgumentException during construction. */
     @Test
     public void testSetEmptyPassword() {
         DocumentArgument arg = mock(DocumentArgument.class);
@@ -147,6 +160,7 @@ public class OpenPDFDocumentAdaptorTest {
         Assertions.assertThrows(IllegalArgumentException.class, () -> new OpenPDFDocumentAdaptor(arg));
     }
 
+    /** Verifies that permission flags are applied correctly for both owner and user access levels. */
     @Test
     public void testPermissionSettings() throws IOException {
         Permission permission = new Permission();
@@ -166,7 +180,7 @@ public class OpenPDFDocumentAdaptorTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         adaptor.saveAndClose(outputStream);
 
-        // 使用擁有者密碼載入
+        // Load with owner password
         PDDocument docOwner = PDDocument.load(outputStream.toByteArray(), "owner");
         Assertions.assertTrue(docOwner.getCurrentAccessPermission().canModify());
         Assertions.assertTrue(docOwner.getCurrentAccessPermission().canFillInForm());
@@ -174,7 +188,7 @@ public class OpenPDFDocumentAdaptorTest {
         Assertions.assertTrue(docOwner.getCurrentAccessPermission().canPrintDegraded());
         Assertions.assertTrue(docOwner.getCurrentAccessPermission().canExtractContent());
         docOwner.close();
-        // 使用使用者密碼載入
+        // Load with user password
         PDDocument docUser = PDDocument.load(outputStream.toByteArray(), "user");
         Assertions.assertTrue(docUser.getCurrentAccessPermission().canModify());
         Assertions.assertTrue(docUser.getCurrentAccessPermission().canFillInForm());

@@ -147,6 +147,22 @@
                 </executions>
             </plugin>
 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.6.3</version>
+                <configuration>
+                    <source>8</source>
+                    <encoding>UTF-8</encoding>
+                    <charset>UTF-8</charset>
+                    <docencoding>UTF-8</docencoding>
+                    <failOnError>false</failOnError>
+                    <show>protected</show>
+                    <subpackages>org.vincentyeh.img2pdf.lib</subpackages>
+                    <excludePackageNames>org.vincentyeh.img2pdf.lib.test</excludePackageNames>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 

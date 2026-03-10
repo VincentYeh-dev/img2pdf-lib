@@ -11,8 +11,18 @@ import org.vincentyeh.img2pdf.lib.pdf.parameter.*;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Manual integration test program that reads all images from the {@code test/} directory
+ * and converts them to a single {@code output.pdf} using PDFBox with AES encryption.
+ */
 public class TestProgram {
 
+    /**
+     * Entry point: loads images from {@code test/}, converts to PDF, and writes {@code output.pdf}.
+     *
+     * @param args command-line arguments (unused)
+     * @throws IOException if the output file cannot be written or the source directory is invalid
+     */
     public static void main(String[] args) throws IOException {
         PageArgument pageArgument = new PageArgument(PageAlign.VerticalAlign.CENTER, PageAlign.HorizontalAlign.CENTER,
                 PageSize.A4, PageDirection.Portrait, true);

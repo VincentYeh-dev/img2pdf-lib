@@ -17,14 +17,20 @@ import java.io.IOException;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests for {@link PDFBoxDocumentAdaptor}, covering construction, page management,
+ * document metadata, password encryption, and permission enforcement.
+ */
 public class PDFBoxDocumentAdaptorTest {
 
+    /** Verifies that the internal PDDocument is not null after construction. */
     @Test
     public void testConstructorAndGetDocument() {
         PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(new DocumentArgument());
         Assertions.assertNotNull(adaptor.getInternalDocument());
     }
 
+    /** Verifies that saveAndClose() writes a non-empty byte array to the output stream. */
     @Test
     public void testSaveAndCloseToOutputStream() throws IOException {
         PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(new DocumentArgument());
@@ -34,6 +40,7 @@ public class PDFBoxDocumentAdaptorTest {
         Assertions.assertTrue(pdfBytes.length > 0);
     }
 
+    /** Verifies that document metadata set via DocumentArgument is embedded in the saved PDF. */
     @Test
     public void testSetAndGetDocumentProperties() throws IOException {
         PDFDocumentInfo info = new PDFDocumentInfo();
@@ -56,6 +63,7 @@ public class PDFBoxDocumentAdaptorTest {
         Assertions.assertEquals("TestSubject", savedDocument.getDocumentInformation().getSubject());
     }
 
+    /** Verifies that adding a PDPage to the internal document increments the page count by one. */
     @Test
     public void testAddPageAndPageCount() {
         PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(new DocumentArgument());
@@ -65,6 +73,7 @@ public class PDFBoxDocumentAdaptorTest {
         Assertions.assertEquals(initialPageCount + 1, doc.getNumberOfPages());
     }
 
+    /** Verifies that the encrypted PDF is openable with owner and user passwords but rejects wrong passwords. */
     @Test
     public void testPassword() throws IOException {
         String ownerPassword = "owner123";
@@ -81,6 +90,7 @@ public class PDFBoxDocumentAdaptorTest {
                 PDDocument.load(outputStream.toByteArray(), "wrongpassword"));
     }
 
+    /** Verifies that getPageCount() increments correctly as pages are added via addPage(). */
     @Test
     public void testPageCount() {
         PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(new DocumentArgument());
@@ -99,6 +109,7 @@ public class PDFBoxDocumentAdaptorTest {
         Assertions.assertEquals(3, adaptor.getPageCount());
     }
 
+    /** Verifies that adding the same page twice throws IllegalArgumentException. */
     @Test
     public void testAddDuplicatePageThrows() {
         PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(new DocumentArgument());
@@ -108,6 +119,7 @@ public class PDFBoxDocumentAdaptorTest {
         Assertions.assertThrows(IllegalArgumentException.class, () -> adaptor.addPage(page1));
     }
 
+    /** Verifies that a PDFBoxPageAdaptor added via addPage() appears as exactly one page in the saved PDF. */
     @Test
     public void testAddEntryPage() throws IOException {
         PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(new DocumentArgument());
@@ -120,29 +132,34 @@ public class PDFBoxDocumentAdaptorTest {
 
     }
 
+    /** Verifies that addPage(null) throws IllegalArgumentException. */
     @Test
     public void testAddNullPageThrows() {
         PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(new DocumentArgument());
         Assertions.assertThrows(IllegalArgumentException.class, () -> adaptor.addPage(null));
     }
 
+    /** Verifies that constructing with a null DocumentArgument throws IllegalArgumentException. */
     @Test
     public void testConstructorWithNullArgument() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> new PDFBoxDocumentAdaptor(null));
     }
 
+    /** Verifies that getPageCount() returns 0 on a freshly created adaptor with no pages added. */
     @Test
     public void testGetPageCountWhenNoPages() {
         PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(new DocumentArgument());
         Assertions.assertEquals(0, adaptor.getPageCount());
     }
 
+    /** Verifies that setInfo(null) on DocumentArgument throws IllegalArgumentException. */
     @Test
     public void testSetNullDocumentInfo() throws IOException {
         DocumentArgument arg = new DocumentArgument();
         Assertions.assertThrows(IllegalArgumentException.class, () -> arg.setInfo(null));
     }
 
+    /** Verifies that saveAndClose() does not throw when encryption is configured with empty passwords. */
     @Test
     public void testSetEmptyPassword() throws IOException {
         DocumentArgument arg = mock(DocumentArgument.class);
@@ -156,6 +173,7 @@ public class PDFBoxDocumentAdaptorTest {
         Assertions.assertDoesNotThrow(() -> adaptor.saveAndClose(outputStream));
     }
 
+    /** Verifies that permission flags are applied correctly for both owner and user access levels. */
     @Test
     public void testPermissionSettings() throws IOException {
         Permission permission = new Permission();
@@ -171,14 +189,14 @@ public class PDFBoxDocumentAdaptorTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         adaptor.saveAndClose(outputStream);
 
-        // 使用擁有者密碼載入
+        // Load with owner password
         PDDocument docOwner = PDDocument.load(outputStream.toByteArray(), "owner");
         Assertions.assertTrue(docOwner.getCurrentAccessPermission().canModify());
         Assertions.assertTrue(docOwner.getCurrentAccessPermission().canFillInForm());
         Assertions.assertTrue(docOwner.getCurrentAccessPermission().canPrint());
         Assertions.assertTrue(docOwner.getCurrentAccessPermission().canExtractContent());
         docOwner.close();
-        // 使用使用者密碼載入
+        // Load with user password
         PDDocument docUser = PDDocument.load(outputStream.toByteArray(), "user");
         Assertions.assertTrue(docUser.getCurrentAccessPermission().canModify());
         Assertions.assertTrue(docUser.getCurrentAccessPermission().canFillInForm());

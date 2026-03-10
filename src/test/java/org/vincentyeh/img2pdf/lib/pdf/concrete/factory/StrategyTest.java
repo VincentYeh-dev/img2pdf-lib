@@ -9,7 +9,13 @@ import org.vincentyeh.img2pdf.lib.pdf.parameter.PageArgument;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageDirection;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageSize;
 
+/**
+ * Tests for {@link DefaultImageScalingStrategy}, verifying image scaling math
+ * across various page sizes, directions, and image dimensions.
+ */
 public class StrategyTest {
+
+    /** Verifies that a small image is scaled to fill the A4 page width while preserving aspect ratio. */
     @Test
     public void MathTest1() {
         DefaultImageScalingStrategy strategy = new DefaultImageScalingStrategy();
@@ -21,6 +27,7 @@ public class StrategyTest {
 
     }
 
+    /** Verifies that a large square image is scaled to fit the A4 page width while preserving aspect ratio. */
     @Test
     public void MathTest2() {
         DefaultImageScalingStrategy strategy = new DefaultImageScalingStrategy();
@@ -31,6 +38,7 @@ public class StrategyTest {
 
     }
 
+    /** Verifies that DEPEND_ON_IMG page size causes the page to match the image dimensions exactly. */
     @Test
     public void MathTest3() {
         DefaultImageScalingStrategy strategy = new DefaultImageScalingStrategy();
@@ -46,6 +54,7 @@ public class StrategyTest {
         Assertions.assertEquals(result.getPageSize(), img_size);
     }
 
+    /** Verifies that Landscape direction swaps the A4 page dimensions correctly. */
     @Test
     public void MathTest4() {
         DefaultImageScalingStrategy strategy = new DefaultImageScalingStrategy();
@@ -61,6 +70,7 @@ public class StrategyTest {
         Assertions.assertEquals(result.getPageSize().width, PageSize.A4.getSizeInPixels().height);
     }
 
+    /** Verifies that a wide image triggers auto-rotation so the page width equals the A4 height. */
     @Test
     public void MathTest5() {
         DefaultImageScalingStrategy strategy = new DefaultImageScalingStrategy();

@@ -9,8 +9,13 @@ import java.awt.image.BufferedImage;
 
 import static org.mockito.Mockito.mock;
 
+/**
+ * Tests for {@link OpenPDFPageAdaptor}, covering construction, drawImage, render,
+ * state transitions, and PDF byte output.
+ */
 public class OpenPDFPageAdaptorTest {
 
+    /** Verifies that getPageSize() returns the size provided at construction. */
     @Test
     public void testGetPageSize() {
         SizeF size = new SizeF(200, 300);
@@ -18,6 +23,7 @@ public class OpenPDFPageAdaptorTest {
         Assertions.assertEquals(size, adaptor.getPageSize());
     }
 
+    /** Verifies that the constructor throws IllegalArgumentException for null size, zero size, negative size, or non-positive page number. */
     @Test
     public void testConstructorWithInvalidArgument() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
@@ -39,6 +45,7 @@ public class OpenPDFPageAdaptorTest {
         });
     }
 
+    /** Verifies drawImage null-argument guards, double-draw guard, post-render draw guard, and that a normal draw followed by render does not throw. */
     @Test
     public void testDrawImage() {
         SizeF size = new SizeF(100, 100);
@@ -50,6 +57,7 @@ public class OpenPDFPageAdaptorTest {
 
         adaptor.drawImage(img, pos, imgSize);
 
+        // render should not throw exception
         Assertions.assertDoesNotThrow(() -> {
             adaptor.render(mock(OpenPDFDocumentAdaptor.class));
         });
@@ -80,6 +88,7 @@ public class OpenPDFPageAdaptorTest {
         });
     }
 
+    /** Verifies that the first render call succeeds and a second render call on the same adaptor throws IllegalStateException. */
     @Test
     public void testRender() {
         SizeF size = new SizeF(100, 100);
@@ -93,6 +102,7 @@ public class OpenPDFPageAdaptorTest {
                 adaptor.render(mock(OpenPDFDocumentAdaptor.class)));
     }
 
+    /** Verifies that getPDFBytesContent() returns a non-null, non-empty byte array after draw and render. */
     @Test
     public void testGetPDFBytesContent() {
         SizeF size = new SizeF(100, 100);
@@ -108,6 +118,7 @@ public class OpenPDFPageAdaptorTest {
     }
 
 
+    /** Verifies that getPageNumber() returns the page number provided at construction. */
     @Test
     public void testGetPageNumber() {
         SizeF size = new SizeF(100, 100);
@@ -116,4 +127,3 @@ public class OpenPDFPageAdaptorTest {
     }
 
 }
-

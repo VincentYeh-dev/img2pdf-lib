@@ -70,6 +70,7 @@ public class TemplateImagePDFFactoryExceptionPathTest {
         return f;
     }
 
+    /** Verifies that an IOException from ImageReader is wrapped and rethrown as PDFFactoryException. */
     @Test
     void whenImageReaderThrowsIOException_thenStartThrowsPDFFactoryException() throws IOException {
         when(mockReader.readImage(any(File.class), any(ColorType.class)))
@@ -82,6 +83,7 @@ public class TemplateImagePDFFactoryExceptionPathTest {
                 factory.start(new File[]{f}, ColorType.sRGB, new DocumentArgument(), new PageArgument()));
     }
 
+    /** Verifies that a RuntimeException from ImageReader is wrapped and rethrown as PDFFactoryException. */
     @Test
     void whenImageReaderThrowsRuntimeException_thenStartThrowsPDFFactoryException() throws IOException {
         when(mockReader.readImage(any(File.class), any(ColorType.class)))
@@ -94,6 +96,7 @@ public class TemplateImagePDFFactoryExceptionPathTest {
                 factory.start(new File[]{f}, ColorType.sRGB, new DocumentArgument(), new PageArgument()));
     }
 
+    /** Verifies that a RuntimeException from IDocument.addPage() is wrapped and rethrown as PDFFactoryException. */
     @Test
     void whenAddPageThrowsRuntimeException_thenStartThrowsPDFFactoryException() {
         doThrow(new RuntimeException("simulated addPage failure")).when(mockDoc).addPage(any(IPage.class));
@@ -105,6 +108,7 @@ public class TemplateImagePDFFactoryExceptionPathTest {
                 factory.start(new File[]{f}, ColorType.sRGB, new DocumentArgument(), new PageArgument()));
     }
 
+    /** Verifies that an IllegalArgumentException from IDocument.addPage() is wrapped and rethrown as PDFFactoryException. */
     @Test
     void whenAddPageThrowsIllegalArgumentException_thenStartThrowsPDFFactoryException() {
         doThrow(new IllegalArgumentException("page already exists")).when(mockDoc).addPage(any(IPage.class));
@@ -116,6 +120,7 @@ public class TemplateImagePDFFactoryExceptionPathTest {
                 factory.start(new File[]{f}, ColorType.sRGB, new DocumentArgument(), new PageArgument()));
     }
 
+    /** Verifies that a read failure on the second file still results in PDFFactoryException being thrown. */
     @Test
     void whenImageReaderThrowsOnSecondFile_thenStartThrowsPDFFactoryException() throws IOException {
         File f1 = createValidMockFile();
@@ -131,6 +136,7 @@ public class TemplateImagePDFFactoryExceptionPathTest {
                 factory.start(new File[]{f1, f2}, ColorType.sRGB, new DocumentArgument(), new PageArgument()));
     }
 
+    /** Verifies that the original IOException is preserved in the cause chain of the thrown PDFFactoryException. */
     @Test
     void whenImageReaderThrowsIOException_thenCauseIsPreservedInPDFFactoryException() throws IOException {
         IOException cause = new IOException("disk error");
@@ -155,6 +161,7 @@ public class TemplateImagePDFFactoryExceptionPathTest {
         Assertions.assertTrue(foundIOException, "Root cause should eventually be IOException");
     }
 
+    /** Verifies that a RuntimeException from IPage.render() is wrapped and rethrown as PDFFactoryException. */
     @Test
     void whenPageRenderThrowsRuntimeException_thenStartThrowsPDFFactoryException() {
         doThrow(new RuntimeException("render failure")).when(mockPage).render(any(IDocument.class));
@@ -166,6 +173,7 @@ public class TemplateImagePDFFactoryExceptionPathTest {
                 factory.start(new File[]{f}, ColorType.sRGB, new DocumentArgument(), new PageArgument()));
     }
 
+    /** Verifies that a RuntimeException from ImageScalingStrategy.execute() is wrapped and rethrown as PDFFactoryException. */
     @Test
     void whenScalingStrategyThrowsRuntimeException_thenStartThrowsPDFFactoryException() {
         when(mockStrategy.execute(any(), any())).thenThrow(new RuntimeException("scaling failure"));
@@ -177,6 +185,7 @@ public class TemplateImagePDFFactoryExceptionPathTest {
                 factory.start(new File[]{f}, ColorType.sRGB, new DocumentArgument(), new PageArgument()));
     }
 
+    /** Verifies that a page-add failure on the first file of a batch still results in PDFFactoryException being thrown. */
     @Test
     void whenAddPageThrowsOnFirstOfMany_thenPDFFactoryExceptionIsThrown() {
         doThrow(new RuntimeException("addPage fail on first")).when(mockDoc).addPage(any(IPage.class));

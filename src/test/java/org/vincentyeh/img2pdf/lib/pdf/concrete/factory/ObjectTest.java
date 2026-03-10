@@ -5,8 +5,13 @@ import org.junit.jupiter.api.Test;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.PointF;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.SizeF;
 
+/**
+ * Tests for value-object classes {@link SizeF} and {@link PointF},
+ * covering construction validation, comparison, and equality.
+ */
 public class ObjectTest {
 
+    /** Verifies that SizeF rejects negative dimensions, compares sizes correctly, and respects equals. */
     @Test
     public void testSizeF() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> new SizeF(-1, -1));
@@ -22,6 +27,7 @@ public class ObjectTest {
         Assertions.assertEquals(s1, s3);
     }
 
+    /** Verifies that PointF compares coordinates correctly and respects equals. */
     @Test
     public void testPointF() {
         PointF p1 = new PointF();

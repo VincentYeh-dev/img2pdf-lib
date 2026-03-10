@@ -24,8 +24,13 @@ import java.io.IOException;
 
 import static org.mockito.Mockito.*;
 
+/**
+ * Tests for {@link TemplateImagePDFFactory}, covering page creation, listener callbacks,
+ * constructor validation, and input argument guard clauses.
+ */
 public class TemplateImagePDFFactoryTest {
 
+    /** Verifies that start() creates a page per image file, adds each to the document, and notifies the listener. */
     @Test
     void testStartCreatesPagesAndCallsListener() throws Exception {
         // Arrange
@@ -87,6 +92,7 @@ public class TemplateImagePDFFactoryTest {
         Mockito.verify(mockListener, Mockito.times(2)).onAppend(Mockito.any(), Mockito.anyInt(), Mockito.anyInt());
     }
 
+    /** Verifies that passing a null scaling strategy to the constructor throws IllegalArgumentException. */
     @Test
     void testConstructorThrowsOnNullStrategy() {
 
@@ -108,6 +114,7 @@ public class TemplateImagePDFFactoryTest {
         });
     }
 
+    /** Verifies that passing zero or negative thread counts to the constructor throws IllegalArgumentException. */
     @Test
     void testConstructorThrowsOnInvalidThreadCount() {
         ImageScalingStrategy mockStrategy = mock(ImageScalingStrategy.class);
@@ -150,6 +157,7 @@ public class TemplateImagePDFFactoryTest {
         });
     }
 
+    /** Verifies that start() throws PDFFactoryException when the image files array is null. */
     @Test
     void testStartThrowsOnNullFiles() {
         ImageScalingStrategy mockStrategy = mock(ImageScalingStrategy.class);
@@ -175,6 +183,7 @@ public class TemplateImagePDFFactoryTest {
                 factory.start(null, ColorType.sRGB, new DocumentArgument(), new PageArgument()));
     }
 
+    /** Verifies that start() throws PDFFactoryException when the DocumentArgument is null. */
     @Test
     void testStartThrowsOnNullDocumentArgument() {
         ImageScalingStrategy mockStrategy = mock(ImageScalingStrategy.class);
@@ -201,6 +210,7 @@ public class TemplateImagePDFFactoryTest {
                 factory.start(files, ColorType.sRGB, null, new PageArgument()));
     }
 
+    /** Verifies that start() throws PDFFactoryException when the PageArgument is null. */
     @Test
     void testStartThrowsOnNullPageArgument() {
         ImageScalingStrategy mockStrategy = mock(ImageScalingStrategy.class);
@@ -227,6 +237,7 @@ public class TemplateImagePDFFactoryTest {
                 factory.start(files, ColorType.sRGB, new DocumentArgument(), null));
     }
 
+    /** Verifies that start() throws PDFFactoryException when the image files array is empty. */
     @Test
     void testStartThrowsOnEmptyFiles() {
         ImageScalingStrategy mockStrategy = mock(ImageScalingStrategy.class);
@@ -253,6 +264,7 @@ public class TemplateImagePDFFactoryTest {
                 factory.start(files, ColorType.sRGB, new DocumentArgument(), new PageArgument()));
     }
 
+    /** Verifies that start() throws PDFFactoryException when a file does not exist on disk. */
     @Test
     void testStartThrowsOnUnreadableFile() {
         File f1 = mock(File.class);
@@ -282,6 +294,7 @@ public class TemplateImagePDFFactoryTest {
                 factory.start(files, ColorType.sRGB, new DocumentArgument(), new PageArgument()));
     }
 
+    /** Verifies that shutdown() completes without throwing any exception. */
     @Test
     void testShutdownDoesNotThrow() {
         ImageScalingStrategy mockStrategy = mock(ImageScalingStrategy.class);
@@ -307,6 +320,7 @@ public class TemplateImagePDFFactoryTest {
         Assertions.assertDoesNotThrow(factory::shutdown);
     }
 
+    /** Verifies that the listener receives initializing() before onConversionComplete() for a multi-file batch. */
     @Test
     void testListenerMethodsCalledInOrder() throws Exception {
         File[] files = new File[10];
@@ -358,6 +372,7 @@ public class TemplateImagePDFFactoryTest {
         inOrder.verify(listener).onConversionComplete();
     }
 
+    /** Verifies that null file element, non-existent file, non-file path, and unreadable file each throw PDFFactoryException with the correct cause. */
     @Test
     public void testInvalidFileState() {
         File f1 = mock(File.class);

@@ -3,8 +3,13 @@ package org.vincentyeh.img2pdf.lib.pdf.parameter;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Tests for {@link Permission}, verifying default field values and that
+ * individual permission flags can be toggled independently.
+ */
 class PermissionTest {
 
+    /** Verifies that all permission flags default to true on a newly constructed Permission object. */
     @Test
     void testDefaultValues() {
         Permission perm = new Permission();
@@ -18,6 +23,7 @@ class PermissionTest {
         assertTrue(perm.CanPrintDegraded);
     }
 
+    /** Verifies that each permission flag can be set to false and the change is reflected immediately. */
     @Test
     void testFieldAssignment() {
         Permission perm = new Permission();
@@ -40,4 +46,3 @@ class PermissionTest {
         assertFalse(perm.CanPrintDegraded);
     }
 }
-

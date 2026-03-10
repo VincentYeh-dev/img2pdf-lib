@@ -12,8 +12,13 @@ import java.awt.image.BufferedImage;
 
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests for {@link PDFBoxPageAdaptor}, covering construction, internal page dimensions,
+ * drawImage guard clauses, render, and page number retrieval.
+ */
 public class PDFBoxPageAdaptorTest {
 
+    /** Verifies that the internal PDPage media box matches the dimensions passed to the constructor. */
     @Test
     public void testConstructorAndGetInternalPage() {
         SizeF size = new SizeF(200, 300);
@@ -24,6 +29,7 @@ public class PDFBoxPageAdaptorTest {
         Assertions.assertEquals(300, page.getMediaBox().getHeight());
     }
 
+    /** Verifies that passing a null size to the constructor throws IllegalArgumentException. */
     @Test
     public void testConstructorWithNullSizeThrows() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
@@ -31,6 +37,7 @@ public class PDFBoxPageAdaptorTest {
         });
     }
 
+    /** Verifies that drawImage followed by render does not throw an exception. */
     @Test
     public void testDrawImageAndRender() {
         SizeF size = new SizeF(100, 100);
@@ -44,12 +51,13 @@ public class PDFBoxPageAdaptorTest {
         PDFBoxDocumentAdaptor mockDoc = Mockito.mock(PDFBoxDocumentAdaptor.class);
         when(mockDoc.getInternalDocument()).thenReturn(new PDDocument());
 
-        // render 不應丟出異常
+        // render should not throw exception
         Assertions.assertDoesNotThrow(() -> {
             adaptor.render(mockDoc);
         });
     }
 
+    /** Verifies that drawImage throws IllegalArgumentException when the image argument is null. */
     @Test
     public void testDrawImageWithNullImageThrows() {
         SizeF size = new SizeF(100, 100);
@@ -62,6 +70,7 @@ public class PDFBoxPageAdaptorTest {
         });
     }
 
+    /** Verifies that drawImage throws IllegalArgumentException when the position argument is null. */
     @Test
     public void testDrawImageWithNullPositionThrows() {
         SizeF size = new SizeF(100, 100);
@@ -74,6 +83,7 @@ public class PDFBoxPageAdaptorTest {
         });
     }
 
+    /** Verifies that drawImage throws IllegalArgumentException when the image size argument is null. */
     @Test
     public void testDrawImageWithNullSizeThrows() {
         SizeF size = new SizeF(100, 100);
@@ -86,6 +96,7 @@ public class PDFBoxPageAdaptorTest {
         });
     }
 
+    /** Verifies that getPageNumber() returns the page number provided at construction. */
     @Test
     public void testGetPageNumber() {
         SizeF size = new SizeF(100, 100);
@@ -93,4 +104,3 @@ public class PDFBoxPageAdaptorTest {
         Assertions.assertEquals(5, adaptor.getPageNumber());
     }
 }
-

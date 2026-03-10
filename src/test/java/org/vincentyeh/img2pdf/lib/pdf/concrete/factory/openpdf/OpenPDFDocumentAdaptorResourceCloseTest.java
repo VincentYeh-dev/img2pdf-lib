@@ -149,6 +149,7 @@ public class OpenPDFDocumentAdaptorResourceCloseTest {
     // saveAndClose resource tracking tests
     // =========================================================================
 
+    /** Verifies that PdfReader is closed on the normal saveAndClose path. */
     @Test
     void saveAndClose_normalPath_pdfReaderIsClosed() throws IOException {
         SaveCloseTrackingAdaptor adaptor = new SaveCloseTrackingAdaptor(new DocumentArgument());
@@ -159,6 +160,7 @@ public class OpenPDFDocumentAdaptorResourceCloseTest {
         Assertions.assertTrue(adaptor.readerClosed.get(), "PdfReader must be closed on normal path");
     }
 
+    /** Verifies that PdfStamper is closed on the normal saveAndClose path. */
     @Test
     void saveAndClose_normalPath_pdfStamperIsClosed() throws IOException {
         SaveCloseTrackingAdaptor adaptor = new SaveCloseTrackingAdaptor(new DocumentArgument());
@@ -169,6 +171,7 @@ public class OpenPDFDocumentAdaptorResourceCloseTest {
         Assertions.assertTrue(adaptor.stamperClosed.get(), "PdfStamper must be closed on normal path");
     }
 
+    /** Verifies that the internal buffer is closed on the normal saveAndClose path. */
     @Test
     void saveAndClose_normalPath_bufferIsClosed() throws IOException {
         SaveCloseTrackingAdaptor adaptor = new SaveCloseTrackingAdaptor(new DocumentArgument());
@@ -179,6 +182,7 @@ public class OpenPDFDocumentAdaptorResourceCloseTest {
         Assertions.assertTrue(adaptor.bufferClosed.get(), "buffer must be closed on normal path");
     }
 
+    /** Verifies that PdfReader is closed even when an exception is thrown inside the stamper body. */
     @Test
     void saveAndClose_exceptionInStamperBody_pdfReaderIsStillClosed() {
         SaveCloseTrackingAdaptor adaptor = new SaveCloseTrackingAdaptor(new DocumentArgument());
@@ -190,6 +194,7 @@ public class OpenPDFDocumentAdaptorResourceCloseTest {
         Assertions.assertTrue(adaptor.readerClosed.get(), "PdfReader must be closed even when encrypt throws");
     }
 
+    /** Verifies that PdfStamper is closed even when an exception is thrown inside the stamper body. */
     @Test
     void saveAndClose_exceptionInStamperBody_pdfStamperIsStillClosed() {
         SaveCloseTrackingAdaptor adaptor = new SaveCloseTrackingAdaptor(new DocumentArgument());
@@ -201,6 +206,7 @@ public class OpenPDFDocumentAdaptorResourceCloseTest {
         Assertions.assertTrue(adaptor.stamperClosed.get(), "PdfStamper must be closed even when encrypt throws");
     }
 
+    /** Verifies that the internal buffer is closed even when an exception is thrown inside the stamper body. */
     @Test
     void saveAndClose_exceptionInStamperBody_bufferIsStillClosed() {
         SaveCloseTrackingAdaptor adaptor = new SaveCloseTrackingAdaptor(new DocumentArgument());
@@ -216,6 +222,7 @@ public class OpenPDFDocumentAdaptorResourceCloseTest {
     // mergePage PdfReader close tracking tests
     // =========================================================================
 
+    /** Verifies that PdfReader is closed after a successful mergePage call. */
     @Test
     void mergePage_normalPath_pdfReaderIsClosed() {
         MergeReaderTrackingAdaptor adaptor = new MergeReaderTrackingAdaptor(new DocumentArgument());
@@ -225,6 +232,7 @@ public class OpenPDFDocumentAdaptorResourceCloseTest {
         Assertions.assertEquals(1, adaptor.readerCloseCount, "PdfReader must be closed after successful mergePage");
     }
 
+    /** Verifies that PdfReader is closed even when copy.addPage throws during mergePage. */
     @Test
     void mergePage_copyAddPageThrows_pdfReaderIsStillClosed() {
         MergeReaderTrackingAdaptor adaptor = new MergeReaderTrackingAdaptor(new DocumentArgument());
@@ -235,6 +243,7 @@ public class OpenPDFDocumentAdaptorResourceCloseTest {
         Assertions.assertEquals(1, adaptor.readerCloseCount, "PdfReader must be closed even when copy.addPage throws");
     }
 
+    /** Verifies that each of three merged pages closes its own PdfReader. */
     @Test
     void mergePage_threeSuccessfulPages_allThreeReadersAreClosed() {
         MergeReaderTrackingAdaptor adaptor = new MergeReaderTrackingAdaptor(new DocumentArgument());
@@ -246,6 +255,7 @@ public class OpenPDFDocumentAdaptorResourceCloseTest {
         Assertions.assertEquals(3, adaptor.readerCloseCount, "Each merged page must close its PdfReader");
     }
 
+    /** Verifies that the second PdfReader is closed even when the second mergePage call fails. */
     @Test
     void mergePage_failsOnSecondPage_secondReaderIsAlsoClosed() {
         MergeReaderTrackingAdaptor adaptor = new MergeReaderTrackingAdaptor(new DocumentArgument());
@@ -262,6 +272,7 @@ public class OpenPDFDocumentAdaptorResourceCloseTest {
     // Integration tests: verify observable output correctness
     // =========================================================================
 
+    /** Verifies that saveAndClose() with multiple pages produces a non-empty byte stream starting with the PDF header. */
     @Test
     void saveAndClose_withPages_producesValidPdfOutput() throws IOException {
         OpenPDFDocumentAdaptor adaptor = new OpenPDFDocumentAdaptor(new DocumentArgument());
@@ -279,6 +290,7 @@ public class OpenPDFDocumentAdaptorResourceCloseTest {
         Assertions.assertEquals('F', (char) bytes[3]);
     }
 
+    /** Verifies that the encrypted output PDF can be loaded using the owner password. */
     @Test
     void saveAndClose_withEncryption_producesEncryptedPdfReadableByOwnerPassword() throws Exception {
         DocumentArgument arg = new DocumentArgument();
@@ -295,6 +307,7 @@ public class OpenPDFDocumentAdaptorResourceCloseTest {
         doc.close();
     }
 
+    /** Verifies that loading the encrypted PDF with a wrong password throws InvalidPasswordException. */
     @Test
     void saveAndClose_withEncryption_wrongPasswordIsRejected() throws Exception {
         DocumentArgument arg = new DocumentArgument();
