@@ -27,11 +27,20 @@ import java.util.Set;
  *   <li><strong>Accumulation phase</strong> — each call to {@link #addPage(IPage)} extracts
  *       the raw single-page PDF bytes from an {@link OpenPDFPageAdaptor} and merges them into
  *       an in-memory {@link PdfCopy} stream backed by a {@link ByteArrayOutputStream}.</li>
- *   <li><strong>Save phase</strong> — {@link #saveAndClose(java.io.OutputStream)} closes the
- *       {@link PdfCopy} document, then re-opens the accumulated bytes via a {@link PdfStamper}
- *       to apply AES-128 encryption (if configured) before writing the final bytes to the
- *       caller-provided stream.</li>
+ *   <li><strong>Save phase</strong> — {@link #save(java.io.OutputStream)} closes the
+ *       {@link PdfCopy} document (first call only), then re-opens the accumulated bytes via a
+ *       {@link PdfStamper} to apply AES-128 encryption (if configured) before writing the
+ *       final bytes to the caller-provided stream.</li>
  * </ol>
+ *
+ * <p>{@link #save} only serializes the document without releasing the internal buffer.
+ * {@link #close()} releases all resources without saving. Use try-with-resources to ensure
+ * proper cleanup:</p>
+ * <pre>{@code
+ * try (IDocument doc = factory.start(...)) {
+ *     doc.save(destination);
+ * }
+ * }</pre>
  *
  * <p>Page ordering is enforced by the caller ({@link TemplateImagePDFFactory}); duplicate
  * page numbers are rejected to catch programming errors early.</p>
@@ -47,6 +56,11 @@ public class OpenPDFDocumentAdaptor implements IDocument {
     private final Set<Integer> pageMap = Collections.synchronizedSet(new HashSet<>());
     private final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
     private final PdfCopy copy;
+
+    // PdfCopy 已 close，buffer 已填充
+    private boolean documentFlushed = false;
+    // buffer 已釋放，整個 adaptor 已關閉
+    private boolean closed = false;
 
     /**
      * Constructs a new adaptor and opens an in-memory OpenPDF document ready to receive pages.
@@ -84,10 +98,10 @@ public class OpenPDFDocumentAdaptor implements IDocument {
         if (argument == null) {
             throw new IllegalArgumentException("argument==null");
         }
-        if(argument.isEncrypted()){
-            if(Objects.requireNonNull(argument.getOwnerPassword()).isEmpty())
+        if (argument.isEncrypted()) {
+            if (Objects.requireNonNull(argument.getOwnerPassword()).isEmpty())
                 throw new IllegalArgumentException("ownerPassword can not be empty");
-            if(Objects.requireNonNull(argument.getUserPassword()).isEmpty())
+            if (Objects.requireNonNull(argument.getUserPassword()).isEmpty())
                 throw new IllegalArgumentException("userPassword can not be empty");
         }
     }
@@ -145,21 +159,32 @@ public class OpenPDFDocumentAdaptor implements IDocument {
     }
 
     /**
-     * Finalises the document and writes it to the given output stream.
+     * Serializes the document to the given output stream without releasing resources.
      *
-     * <p>The internal {@link PdfCopy} document is closed first, then the accumulated bytes
-     * are re-read via a {@link PdfStamper}. If the document argument specifies AES encryption,
-     * the stamper applies 128-bit standard encryption with the configured permissions before
-     * writing the final output. All intermediate resources (reader, stamper, buffer) are
-     * closed in {@code finally} blocks.</p>
+     * <p>On the first call, the internal {@link PdfCopy} document is closed to flush all
+     * accumulated page data into the buffer. On subsequent calls (e.g., saving to multiple
+     * destinations), the buffer is reused directly. If AES encryption is configured, a
+     * {@link PdfStamper} applies it before writing to the stream.</p>
+     *
+     * <p>The provided {@code outputStream} is <em>not</em> closed by this method, nor is
+     * the internal buffer released. Call {@link #close()} to release all resources.</p>
      *
      * @param outputStream the stream to which the final PDF bytes are written;
      *                     must not be {@code null}
-     * @throws IOException if writing to the stream or any internal PDF operation fails
+     * @throws IllegalStateException if this document has already been closed
+     * @throws IOException           if writing to the stream or any internal PDF operation fails
      */
     @Override
-    public void saveAndClose(OutputStream outputStream) throws IOException {
-        document.close();
+    public void save(OutputStream outputStream) throws IOException {
+        if (closed)
+            throw new IllegalStateException("Document has already been closed");
+
+        // 第一次 save 時關閉 PdfCopy 以確保所有頁面資料已寫入 buffer
+        if (!documentFlushed) {
+            document.close();
+            documentFlushed = true;
+        }
+
         PdfReader reader = new PdfReader(new ByteArrayInputStream(buffer.toByteArray()));
         try {
             PdfStamper stamper = new PdfStamper(reader, outputStream);
@@ -172,23 +197,57 @@ public class OpenPDFDocumentAdaptor implements IDocument {
             }
         } finally {
             reader.close();
-            buffer.close();
+        }
+        // 注意：buffer 不在此處關閉，由 close() 負責
+    }
+
+    /**
+     * Serializes the document to the given file without releasing resources.
+     *
+     * <p>Opens a {@link java.io.FileOutputStream} over {@code destination} and delegates to
+     * {@link #save(OutputStream)}. Resources held by this document are <em>not</em>
+     * released; call {@link #close()} to free them.</p>
+     *
+     * @param destination the target file; will be created or overwritten; must not be {@code null}
+     * @throws IllegalArgumentException if {@code destination} is {@code null}
+     * @throws IOException              if the file cannot be opened or if the underlying save
+     *                                  operation fails
+     */
+    @Override
+    public void save(File destination) throws IOException {
+        if (destination == null)
+            throw new IllegalArgumentException("destination==null");
+
+        try (FileOutputStream fos = new FileOutputStream(destination)) {
+            save(fos);
         }
     }
 
     /**
-     * Finalises the document and writes it to the given file.
+     * Releases all resources held by this adaptor without saving.
      *
-     * <p>Opens a {@link java.io.FileOutputStream} over {@code destination} and delegates to
-     * {@link #saveAndClose(OutputStream)}.</p>
-     *
-     * @param destination the target file; will be created or overwritten
-     * @throws IOException if the file cannot be opened or if the underlying save operation fails
+     * <p>If the internal {@link PdfCopy} document has not yet been flushed, it is closed
+     * here to release OpenPDF's native resources. The internal buffer is also closed.
+     * This method is idempotent: multiple calls are safe.</p>
      */
     @Override
-    public void saveAndClose(File destination) throws IOException {
-        try (FileOutputStream fos = new FileOutputStream(destination)) {
-            saveAndClose(fos);
+    public void close() {
+        if (closed)
+            return;
+        closed = true;
+        // 若從未 save，需要先 flush document 以釋放 PdfCopy 持有的資源
+        if (!documentFlushed) {
+            try {
+                document.close();
+            } catch (Exception ignored) {
+                // 釋放資源失敗時靜默忽略
+            }
+            documentFlushed = true;
+        }
+        try {
+            buffer.close();
+        } catch (IOException ignored) {
+            // ByteArrayOutputStream.close() 實際上是空操作，此處保留以防子類覆寫
         }
     }
 
@@ -264,7 +323,7 @@ public class OpenPDFDocumentAdaptor implements IDocument {
      * Returns the underlying OpenPDF {@link Document} instance.
      *
      * <p>This accessor is intended for testing and diagnostic purposes only. The document
-     * may already be closed after {@link #saveAndClose(OutputStream)} has been called.</p>
+     * may already be closed after {@link #save(OutputStream)} has been called.</p>
      *
      * @return the internal {@link Document}; never {@code null}
      */

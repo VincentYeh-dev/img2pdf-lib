@@ -51,8 +51,9 @@ public class TestProgram {
             throw new RuntimeException("No image files is found");
         }
 
-        IDocument pdf = factory.start(images, ColorType.sRGB, documentArgument, pageArgument, listener);
-        pdf.saveAndClose(destination);
+        try (IDocument pdf = factory.start(images, ColorType.sRGB, documentArgument, pageArgument, listener)) {
+            pdf.save(destination);
+        }
         factory.shutdown();
     }
 

@@ -40,7 +40,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * <p>Callers <strong>must</strong> invoke {@link #shutdown()} after all conversions are
  * finished to release the thread pool and allow the JVM to exit cleanly.</p>
  *
- * @see OpenPDFImagePDFFactory
  */
 public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
     private final ImageScalingStrategy imageScalingStrategy;
@@ -137,61 +136,65 @@ public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
                                  DocumentArgument documentArgument,
                                  PageArgument pageArgument,
                                  ImagePDFFactoryListener listener) throws PDFFactoryException {
+        if (imageFiles == null)
+            throw new PDFFactoryException(new NullPointerException("imageFiles==null"));
+        if (documentArgument == null)
+            throw new PDFFactoryException(new NullPointerException("documentArgument==null"));
+        if (pageArgument == null)
+            throw new PDFFactoryException(new NullPointerException("pageArgument==null"));
+        if (imageFiles.length == 0)
+            throw new PDFFactoryException(new IllegalArgumentException("imageFiles.length==0"));
+
+        IDocument pdfDocument = createDocument(documentArgument);
         try {
-            Objects.requireNonNull(imageFiles, "imageFiles==null");
-            Objects.requireNonNull(documentArgument, "documentArgument==null");
-            Objects.requireNonNull(pageArgument, "pageArgument==null");
+            if (listener != null)
+                listener.initializing(imageFiles.length);
 
-            if (imageFiles.length == 0)
-                throw new PDFFactoryException(new IllegalArgumentException("imageFiles.length==0"));
+            List<Callable<IPage>> tasks = new java.util.ArrayList<>();
+            AtomicInteger completedCount = new AtomicInteger(0);
 
+            for (int i = 0; i < imageFiles.length; i++) {
+                final int final_i = i;
+                checkFileState(imageFiles[final_i]);
 
-            IDocument pdfDocument = createDocument(documentArgument);
-            try {
-                if (listener != null) {
-                    listener.initializing(imageFiles.length);
-                }
-                List<Callable<IPage>> tasks = new java.util.ArrayList<>();
+                Callable<IPage> task = () -> {
+                    BufferedImage bufferedImage = imageReader.readImage(imageFiles[final_i], colorType);
+                    ImageScalingResult result = imageScalingStrategy.execute(pageArgument,
+                            new SizeF(bufferedImage.getWidth(), bufferedImage.getHeight()));
 
-                AtomicInteger completedCount = new AtomicInteger(0);
-
-                for (int i = 0; i < imageFiles.length; i++) {
-                    final int final_i = i;
-                    checkFileState(imageFiles[final_i]);
-
-                    Callable<IPage> task = () -> {
-                        BufferedImage bufferedImage = imageReader.readImage(imageFiles[final_i], colorType);
-                        ImageScalingResult result = imageScalingStrategy.execute(pageArgument,
-                                new SizeF(bufferedImage.getWidth(), bufferedImage.getHeight()));
-
-                        IPage page = createPage(final_i + 1, result.getPageSize());
-                        page.drawImage(bufferedImage, result.getImagePosition(), result.getImageSize());
-                        page.render(pdfDocument);
-                        int done = completedCount.incrementAndGet();
-                        if (listener != null)
-                            listener.onAppend(imageFiles[final_i], done, imageFiles.length);
-                        return page;
-                    };
-                    tasks.add(task);
-                }
-                List<Future<IPage>> futures = executorService.invokeAll(tasks);
-
-                for (Future<IPage> future : futures) {
-                    try {
-                        IPage page = future.get();
-                        pdfDocument.addPage(page);
-                    } catch (Exception e) {
-                        throw new PDFFactoryException(e);
-                    }
-                }
-
-                if (listener != null)
-                    listener.onConversionComplete();
-                return pdfDocument;
-            } catch (Exception e) {
-                throw e;
+                    IPage page = createPage(final_i + 1, result.getPageSize());
+                    page.drawImage(bufferedImage, result.getImagePosition(), result.getImageSize());
+                    page.render(pdfDocument);
+                    int done = completedCount.incrementAndGet();
+                    if (listener != null)
+                        listener.onAppend(imageFiles[final_i], done, imageFiles.length);
+                    return page;
+                };
+                tasks.add(task);
             }
+            List<Future<IPage>> futures = executorService.invokeAll(tasks);
+
+            for (Future<IPage> future : futures) {
+                try {
+                    IPage page = future.get();
+                    pdfDocument.addPage(page);
+                } catch (java.util.concurrent.ExecutionException e) {
+                    // 解包 ExecutionException，直接以原始例外作為 cause
+                    Throwable cause = e.getCause() != null ? e.getCause() : e;
+                    throw new PDFFactoryException(cause);
+                } catch (Exception e) {
+                    throw new PDFFactoryException(e);
+                }
+            }
+
+            if (listener != null)
+                listener.onConversionComplete();
+            return pdfDocument;
+        } catch (PDFFactoryException e) {
+            pdfDocument.close();
+            throw e;
         } catch (Exception e) {
+            pdfDocument.close();
             throw new PDFFactoryException(e);
         }
     }

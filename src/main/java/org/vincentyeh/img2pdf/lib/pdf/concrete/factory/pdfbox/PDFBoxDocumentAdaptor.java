@@ -24,8 +24,17 @@ import java.util.Map;
  * <p>This class acts as an <em>Adapter</em> between the library's document abstraction
  * ({@link IDocument}) and the Apache PDFBox {@link PDDocument} API. It accumulates
  * {@link IPage} instances in an insertion-keyed map, then flushes them to the
- * underlying {@link PDDocument} in page-number order when
- * {@link #saveAndClose(OutputStream)} or {@link #saveAndClose(File)} is called.</p>
+ * underlying {@link PDDocument} in page-number order when {@link #save(OutputStream)}
+ * or {@link #save(File)} is called.</p>
+ *
+ * <p>{@link #save} only serializes the document without releasing resources.
+ * {@link #close()} releases the underlying {@link PDDocument} without saving.
+ * Use try-with-resources to ensure proper cleanup:</p>
+ * <pre>{@code
+ * try (IDocument doc = factory.start(...)) {
+ *     doc.save(destination);
+ * }
+ * }</pre>
  *
  * <p>Optional features applied at save time:</p>
  * <ul>
@@ -43,12 +52,14 @@ import java.util.Map;
  * default is {@link MemoryUsageSetting#setupMainMemoryOnly()}.</p>
  *
  * <p>This class is <strong>not</strong> thread-safe. {@link #addPage(IPage)} and the
- * {@code saveAndClose} methods must be called from the same thread.</p>
+ * {@code save}/{@code close} methods must be called from the same thread.</p>
  */
 public class PDFBoxDocumentAdaptor implements IDocument {
     private final PDDocument document;
     private final Map<Integer, IPage> pages = new HashMap<>();
     private final DocumentArgument docArgument;
+    // 標記文件是否已關閉，用於實現冪等的 close()
+    private boolean closed = false;
 
 
     /**
@@ -88,7 +99,7 @@ public class PDFBoxDocumentAdaptor implements IDocument {
      *
      * <p>Pages are stored by their page number and will be appended to the
      * {@link PDDocument} in ascending page-number order during
-     * {@link #saveAndClose(OutputStream)}. Duplicate page numbers are rejected.</p>
+     * {@link #save(OutputStream)}. Duplicate page numbers are rejected.</p>
      *
      * @param page the page to add; must not be {@code null}
      * @throws IllegalArgumentException if {@code page} is {@code null} or if a page
@@ -107,8 +118,7 @@ public class PDFBoxDocumentAdaptor implements IDocument {
     }
 
     /**
-     * Serializes this document to the given output stream, then closes the underlying
-     * {@link PDDocument}.
+     * Serializes this document to the given output stream without releasing resources.
      *
      * <p>Before writing, this method:</p>
      * <ol>
@@ -117,26 +127,27 @@ public class PDFBoxDocumentAdaptor implements IDocument {
      *   <li>Appends all pages in ascending page-number order.</li>
      * </ol>
      *
-     * <p>The provided {@code outputStream} is <em>not</em> closed by this method.</p>
+     * <p>The provided {@code outputStream} is <em>not</em> closed by this method.
+     * Resources held by this document are also <em>not</em> released; call
+     * {@link #close()} to free them.</p>
      *
      * @param outputStream the destination stream; must not be {@code null}
-     * @throws IllegalStateException if the internal {@link PDDocument} is {@code null}
-     *                               (should not occur under normal usage)
+     * @throws IllegalStateException if this document has already been closed
      * @throws IllegalStateException if an expected page number is missing from the
      *                               internal page map
      * @throws IOException           if an I/O error occurs while saving
      */
     @Override
-    public void saveAndClose(OutputStream outputStream) throws IOException {
-        if (document == null)
-            throw new IllegalStateException("document has not been created");
+    public void save(OutputStream outputStream) throws IOException {
+        if (closed)
+            throw new IllegalStateException("Document has already been closed");
 
         if (docArgument.isEncrypted())
             document.protect(
                     createProtectionPolicy(docArgument.getOwnerPassword(),
                             docArgument.getUserPassword(), convertPermission(docArgument.getPermission())));
 
-        if(docArgument.hasInfo())
+        if (docArgument.hasInfo())
             setInfo(docArgument.getInfo());
 
         for (int i = 1; i <= pages.size(); i++) {
@@ -146,15 +157,14 @@ public class PDFBoxDocumentAdaptor implements IDocument {
             document.addPage(((PDFBoxPageAdaptor) page).getInternalPage());
         }
         document.save(outputStream);
-        document.close();
     }
 
     /**
-     * Serializes this document to the given file, then closes the underlying
-     * {@link PDDocument}.
+     * Serializes this document to the given file without releasing resources.
      *
-     * <p>Delegates to {@link #saveAndClose(OutputStream)} after opening a
-     * {@link FileOutputStream} for {@code destination}.</p>
+     * <p>Delegates to {@link #save(OutputStream)} after opening a
+     * {@link FileOutputStream} for {@code destination}. Resources held by this document
+     * are <em>not</em> released; call {@link #close()} to free them.</p>
      *
      * @param destination the output file; must not be {@code null} and must be writable
      *                    if it already exists
@@ -163,14 +173,33 @@ public class PDFBoxDocumentAdaptor implements IDocument {
      * @throws IOException              if an I/O error occurs while saving
      */
     @Override
-    public void saveAndClose(File destination) throws IOException {
+    public void save(File destination) throws IOException {
         if (destination == null)
             throw new IllegalArgumentException("destination==null");
         if (destination.exists() && !destination.canWrite())
             throw new IllegalArgumentException("destination is not writable");
 
         try (FileOutputStream fos = new FileOutputStream(destination)) {
-            saveAndClose(fos);
+            save(fos);
+        }
+    }
+
+    /**
+     * Releases the underlying {@link PDDocument} without saving.
+     *
+     * <p>This method is idempotent: if already closed, subsequent calls return immediately
+     * without effect. Any {@link IOException} thrown by {@link PDDocument#close()} is
+     * silently swallowed. The instance must not be used after this method returns.</p>
+     */
+    @Override
+    public void close() {
+        if (closed)
+            return;
+        closed = true;
+        try {
+            document.close();
+        } catch (IOException ignored) {
+            // 釋放資源失敗時靜默忽略，確保冪等語義
         }
     }
 
@@ -243,8 +272,7 @@ public class PDFBoxDocumentAdaptor implements IDocument {
      * @return a configured {@link StandardProtectionPolicy}; never {@code null}
      */
     private static StandardProtectionPolicy createProtectionPolicy(String ownerPassword, String userPassword, AccessPermission permission) {
-        // Define the length of the encryption key.
-        // Possible values are 40 or 128 (256 will be available in PDFBox 2.0).
+        // 加密金鑰長度，可選 40 或 128（PDFBox 2.0 支援 256）
         int keyLength = 128;
         StandardProtectionPolicy spp = new StandardProtectionPolicy(ownerPassword, userPassword, permission);
         spp.setEncryptionKeyLength(keyLength);
