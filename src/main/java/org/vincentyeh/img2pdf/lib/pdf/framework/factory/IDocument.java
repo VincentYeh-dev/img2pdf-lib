@@ -25,10 +25,12 @@ import java.io.OutputStream;
 public interface IDocument extends AutoCloseable {
 
     /**
-     * Appends a rendered page to this document.
+     * Appends a page to this document.
      *
      * <p>Pages are added in insertion order and appear in the same order in the saved PDF.
-     * This method delegates to {@link IPage#render(IDocument)} internally.</p>
+     * This method is the single integration point responsible for committing all page
+     * content into the document; implementations perform any necessary rendering or
+     * merging internally.</p>
      *
      * @param page the page to append; must not be {@code null}
      */

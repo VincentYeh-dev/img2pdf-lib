@@ -1,11 +1,10 @@
 package org.vincentyeh.img2pdf.lib.pdf.concrete.factory.pdfbox;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.vincentyeh.img2pdf.lib.pdf.framework.factory.IPage;
+import org.vincentyeh.img2pdf.lib.pdf.framework.factory.SizeF;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.DocumentArgument;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PDFDocumentInfo;
 import org.vincentyeh.img2pdf.lib.pdf.parameter.PageSize;
@@ -23,11 +22,11 @@ import static org.mockito.Mockito.when;
  */
 public class PDFBoxDocumentAdaptorTest {
 
-    /** Verifies that the internal PDDocument is not null after construction. */
+    /** Verifies that construction succeeds and the adaptor is not null. */
     @Test
     public void testConstructorAndGetDocument() {
         PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(new DocumentArgument());
-        Assertions.assertNotNull(adaptor.getInternalDocument());
+        Assertions.assertNotNull(adaptor);
     }
 
     /** Verifies that saveAndClose() writes a non-empty byte array to the output stream. */
@@ -63,14 +62,13 @@ public class PDFBoxDocumentAdaptorTest {
         Assertions.assertEquals("TestSubject", savedDocument.getDocumentInformation().getSubject());
     }
 
-    /** Verifies that adding a PDPage to the internal document increments the page count by one. */
+    /** Verifies that adding a PDFBoxPageAdaptor increments getPageCount() by one. */
     @Test
     public void testAddPageAndPageCount() {
         PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(new DocumentArgument());
-        PDDocument doc = adaptor.getInternalDocument();
-        int initialPageCount = doc.getNumberOfPages();
-        doc.addPage(new PDPage());
-        Assertions.assertEquals(initialPageCount + 1, doc.getNumberOfPages());
+        Assertions.assertEquals(0, adaptor.getPageCount());
+        adaptor.addPage(new PDFBoxPageAdaptor(1, new org.vincentyeh.img2pdf.lib.pdf.framework.factory.SizeF(100, 100)));
+        Assertions.assertEquals(1, adaptor.getPageCount());
     }
 
     /** Verifies that the encrypted PDF is openable with owner and user passwords but rejects wrong passwords. */
@@ -90,33 +88,29 @@ public class PDFBoxDocumentAdaptorTest {
                 PDDocument.load(outputStream.toByteArray(), "wrongpassword"));
     }
 
-    /** Verifies that getPageCount() increments correctly as pages are added via addPage(). */
+    /** Verifies that getPageCount() increments correctly as real pages are added via addPage(). */
     @Test
     public void testPageCount() {
         PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(new DocumentArgument());
-        IPage page1 = mock(IPage.class);
-        when(page1.getPageNumber()).thenReturn(1);
-        IPage page2 = mock(IPage.class);
-        when(page2.getPageNumber()).thenReturn(2);
-        IPage page3 = mock(IPage.class);
-        when(page3.getPageNumber()).thenReturn(3);
-
-        adaptor.addPage(page1);
+        SizeF sz = new SizeF(100, 100);
+        adaptor.addPage(new PDFBoxPageAdaptor(1, sz));
         Assertions.assertEquals(1, adaptor.getPageCount());
-        adaptor.addPage(page2);
+        adaptor.addPage(new PDFBoxPageAdaptor(2, sz));
         Assertions.assertEquals(2, adaptor.getPageCount());
-        adaptor.addPage(page3);
+        adaptor.addPage(new PDFBoxPageAdaptor(3, sz));
         Assertions.assertEquals(3, adaptor.getPageCount());
     }
 
-    /** Verifies that adding the same page twice throws IllegalArgumentException. */
+    /** Verifies that adding two pages with the same page number throws IllegalArgumentException. */
     @Test
     public void testAddDuplicatePageThrows() {
         PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(new DocumentArgument());
-        IPage page1 = mock(IPage.class);
-        when(page1.getPageNumber()).thenReturn(1);
+        SizeF sz = new SizeF(100, 100);
+        PDFBoxPageAdaptor page1 = new PDFBoxPageAdaptor(1, sz);
         adaptor.addPage(page1);
-        Assertions.assertThrows(IllegalArgumentException.class, () -> adaptor.addPage(page1));
+        // 第二個頁號相同的頁面應拋出例外
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> adaptor.addPage(new PDFBoxPageAdaptor(1, sz)));
     }
 
     /** Verifies that a PDFBoxPageAdaptor added via addPage() appears as exactly one page in the saved PDF. */

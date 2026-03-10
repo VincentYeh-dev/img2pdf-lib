@@ -7,10 +7,8 @@ import org.vincentyeh.img2pdf.lib.pdf.framework.factory.SizeF;
 
 import java.awt.image.BufferedImage;
 
-import static org.mockito.Mockito.mock;
-
 /**
- * Tests for {@link OpenPDFPageAdaptor}, covering construction, drawImage, render,
+ * Tests for {@link OpenPDFPageAdaptor}, covering construction, drawImage, getPDFBytesContent,
  * state transitions, and PDF byte output.
  */
 public class OpenPDFPageAdaptorTest {
@@ -45,7 +43,7 @@ public class OpenPDFPageAdaptorTest {
         });
     }
 
-    /** Verifies drawImage null-argument guards, double-draw guard, post-render draw guard, and that a normal draw followed by render does not throw. */
+    /** Verifies drawImage null-argument guards, double-draw guard, post-render draw guard, and that a normal draw followed by getPDFBytesContent does not throw. */
     @Test
     public void testDrawImage() {
         SizeF size = new SizeF(100, 100);
@@ -57,9 +55,9 @@ public class OpenPDFPageAdaptorTest {
 
         adaptor.drawImage(img, pos, imgSize);
 
-        // render should not throw exception
+        // getPDFBytesContent should not throw
         Assertions.assertDoesNotThrow(() -> {
-            adaptor.render(mock(OpenPDFDocumentAdaptor.class));
+            adaptor.getPDFBytesContent();
         });
 
         OpenPDFPageAdaptor adaptor2 = new OpenPDFPageAdaptor(1, size);
@@ -83,38 +81,38 @@ public class OpenPDFPageAdaptorTest {
 
         Assertions.assertThrows(IllegalStateException.class, () -> {
             OpenPDFPageAdaptor adaptor3 = new OpenPDFPageAdaptor(1, size);
-            adaptor3.render(mock(OpenPDFDocumentAdaptor.class));
+            adaptor3.getPDFBytesContent();
             adaptor3.drawImage(img, pos, imgSize);
         });
     }
 
-    /** Verifies that the first render call succeeds and a second render call on the same adaptor throws IllegalStateException. */
+    /** Verifies that the first getPDFBytesContent call succeeds and a second call throws IllegalStateException. */
     @Test
     public void testRender() {
         SizeF size = new SizeF(100, 100);
         OpenPDFPageAdaptor adaptor = new OpenPDFPageAdaptor(1, size);
 
         Assertions.assertDoesNotThrow(() -> {
-            adaptor.render(mock(OpenPDFDocumentAdaptor.class));
+            adaptor.getPDFBytesContent();
         });
 
         Assertions.assertThrows(IllegalStateException.class, () ->
-                adaptor.render(mock(OpenPDFDocumentAdaptor.class)));
+                adaptor.getPDFBytesContent());
     }
 
-    /** Verifies that getPDFBytesContent() returns a non-null, non-empty byte array after draw and render. */
+    /** Verifies that getPDFBytesContent() returns a non-null, non-empty byte array after draw. */
     @Test
     public void testGetPDFBytesContent() {
         SizeF size = new SizeF(100, 100);
         OpenPDFPageAdaptor adaptor = new OpenPDFPageAdaptor(1, size);
 
         BufferedImage img = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
-        adaptor.drawImage(img ,
+        adaptor.drawImage(img,
                 new PointF(0, 0), new SizeF(10, 10));
-        adaptor.render(mock(OpenPDFDocumentAdaptor.class));
 
-        Assertions.assertNotNull(adaptor.getPDFBytesContent());
-        Assertions.assertTrue(adaptor.getPDFBytesContent().length > 0);
+        byte[] bytes = adaptor.getPDFBytesContent();
+        Assertions.assertNotNull(bytes);
+        Assertions.assertTrue(bytes.length > 0);
     }
 
 

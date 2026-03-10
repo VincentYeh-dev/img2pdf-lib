@@ -1,32 +1,29 @@
 package org.vincentyeh.img2pdf.lib.pdf.concrete.factory.pdfbox;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.PointF;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.SizeF;
 
 import java.awt.image.BufferedImage;
 
-import static org.mockito.Mockito.when;
-
 /**
  * Tests for {@link PDFBoxPageAdaptor}, covering construction, internal page dimensions,
- * drawImage guard clauses, render, and page number retrieval.
+ * drawImage guard clauses, and page number retrieval.
  */
 public class PDFBoxPageAdaptorTest {
 
-    /** Verifies that the internal PDPage media box matches the dimensions passed to the constructor. */
+    /** Verifies that getOwnDocument() returns a PDDocument with one page having the correct media box. */
     @Test
-    public void testConstructorAndGetInternalPage() {
+    public void testConstructorAndGetOwnDocument() {
         SizeF size = new SizeF(200, 300);
         PDFBoxPageAdaptor adaptor = new PDFBoxPageAdaptor(1, size);
-        PDPage page = adaptor.getInternalPage();
-        Assertions.assertNotNull(page);
-        Assertions.assertEquals(200, page.getMediaBox().getWidth());
-        Assertions.assertEquals(300, page.getMediaBox().getHeight());
+        PDDocument ownDoc = adaptor.getOwnDocument();
+        Assertions.assertNotNull(ownDoc);
+        Assertions.assertEquals(1, ownDoc.getNumberOfPages());
+        Assertions.assertEquals(200, ownDoc.getPage(0).getMediaBox().getWidth());
+        Assertions.assertEquals(300, ownDoc.getPage(0).getMediaBox().getHeight());
     }
 
     /** Verifies that passing a null size to the constructor throws IllegalArgumentException. */
@@ -37,9 +34,9 @@ public class PDFBoxPageAdaptorTest {
         });
     }
 
-    /** Verifies that drawImage followed by render does not throw an exception. */
+    /** Verifies that drawImage followed by addPage in a real document does not throw an exception. */
     @Test
-    public void testDrawImageAndRender() {
+    public void testDrawImageAndAddPage() {
         SizeF size = new SizeF(100, 100);
         PDFBoxPageAdaptor adaptor = new PDFBoxPageAdaptor(1, size);
 
@@ -47,14 +44,12 @@ public class PDFBoxPageAdaptorTest {
         PointF pos = new PointF(5, 5);
         SizeF imgSize = new SizeF(10, 10);
 
-        adaptor.drawImage(img, pos, imgSize);
-        PDFBoxDocumentAdaptor mockDoc = Mockito.mock(PDFBoxDocumentAdaptor.class);
-        when(mockDoc.getInternalDocument()).thenReturn(new PDDocument());
+        // drawImage should not throw
+        Assertions.assertDoesNotThrow(() -> adaptor.drawImage(img, pos, imgSize));
 
-        // render should not throw exception
-        Assertions.assertDoesNotThrow(() -> {
-            adaptor.render(mockDoc);
-        });
+        // getOwnDocument should contain the page
+        PDDocument ownDoc = adaptor.getOwnDocument();
+        Assertions.assertEquals(1, ownDoc.getNumberOfPages());
     }
 
     /** Verifies that drawImage throws IllegalArgumentException when the image argument is null. */

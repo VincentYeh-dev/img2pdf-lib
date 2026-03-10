@@ -1,6 +1,7 @@
 package org.vincentyeh.img2pdf.lib.pdf.concrete.factory.pdfbox;
 
 import org.apache.pdfbox.io.MemoryUsageSetting;
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
@@ -15,17 +16,17 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * PDFBox-backed implementation of {@link IDocument}.
  *
  * <p>This class acts as an <em>Adapter</em> between the library's document abstraction
- * ({@link IDocument}) and the Apache PDFBox {@link PDDocument} API. It accumulates
- * {@link IPage} instances in an insertion-keyed map, then flushes them to the
- * underlying {@link PDDocument} in page-number order when {@link #save(OutputStream)}
- * or {@link #save(File)} is called.</p>
+ * ({@link IDocument}) and the Apache PDFBox {@link PDDocument} API. Each call to
+ * {@link #addPage(IPage)} merges the single-page document owned by the supplied
+ * {@link PDFBoxPageAdaptor} directly into the underlying {@link PDDocument} using
+ * {@link PDFMergerUtility}, so pages are available immediately after addition.</p>
  *
  * <p>{@link #save} only serializes the document without releasing resources.
  * {@link #close()} releases the underlying {@link PDDocument} without saving.
@@ -56,7 +57,7 @@ import java.util.Map;
  */
 public class PDFBoxDocumentAdaptor implements IDocument {
     private final PDDocument document;
-    private final Map<Integer, IPage> pages = new HashMap<>();
+    private final Set<Integer> addedPageNumbers = new HashSet<>();
     private final DocumentArgument docArgument;
     // 標記文件是否已關閉，用於實現冪等的 close()
     private boolean closed = false;
@@ -95,26 +96,41 @@ public class PDFBoxDocumentAdaptor implements IDocument {
     }
 
     /**
-     * Registers a rendered page with this document.
+     * Merges the given page into this document by appending the page's own
+     * {@link PDDocument} via {@link PDFMergerUtility}.
      *
-     * <p>Pages are stored by their page number and will be appended to the
-     * {@link PDDocument} in ascending page-number order during
-     * {@link #save(OutputStream)}. Duplicate page numbers are rejected.</p>
+     * <p>Duplicate page numbers are rejected immediately. The single-page document owned
+     * by the supplied {@link PDFBoxPageAdaptor} is closed after the merge regardless of
+     * success or failure.</p>
      *
-     * @param page the page to add; must not be {@code null}
+     * @param page the page to add; must not be {@code null} and must be a
+     *             {@link PDFBoxPageAdaptor}
      * @throws IllegalArgumentException if {@code page} is {@code null} or if a page
      *                                  with the same page number has already been added
+     * @throws RuntimeException         if the merge operation fails
      */
     @Override
     public void addPage(IPage page) {
         if (page == null)
             throw new IllegalArgumentException("page==null");
 
-        if (pages.containsKey(page.getPageNumber()))
+        if (addedPageNumbers.contains(page.getPageNumber()))
             throw new IllegalArgumentException("page number " + page.getPageNumber() + " already exists");
 
-        pages.put(page.getPageNumber(), page);
-
+        PDFBoxPageAdaptor p = (PDFBoxPageAdaptor) page;
+        PDDocument singlePageDoc = p.getOwnDocument();
+        try {
+            new PDFMergerUtility().appendDocument(document, singlePageDoc);
+            addedPageNumbers.add(page.getPageNumber());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                singlePageDoc.close();
+            } catch (IOException e) {
+                // ignore
+            }
+        }
     }
 
     /**
@@ -124,7 +140,6 @@ public class PDFBoxDocumentAdaptor implements IDocument {
      * <ol>
      *   <li>Optionally applies 128-bit AES encryption if configured.</li>
      *   <li>Optionally sets document metadata (title, author, etc.) if configured.</li>
-     *   <li>Appends all pages in ascending page-number order.</li>
      * </ol>
      *
      * <p>The provided {@code outputStream} is <em>not</em> closed by this method.
@@ -133,8 +148,6 @@ public class PDFBoxDocumentAdaptor implements IDocument {
      *
      * @param outputStream the destination stream; must not be {@code null}
      * @throws IllegalStateException if this document has already been closed
-     * @throws IllegalStateException if an expected page number is missing from the
-     *                               internal page map
      * @throws IOException           if an I/O error occurs while saving
      */
     @Override
@@ -150,12 +163,6 @@ public class PDFBoxDocumentAdaptor implements IDocument {
         if (docArgument.hasInfo())
             setInfo(docArgument.getInfo());
 
-        for (int i = 1; i <= pages.size(); i++) {
-            IPage page = pages.get(i);
-            if (page == null)
-                throw new IllegalStateException("page with ID " + i + " does not exist");
-            document.addPage(((PDFBoxPageAdaptor) page).getInternalPage());
-        }
         document.save(outputStream);
     }
 
@@ -220,13 +227,13 @@ public class PDFBoxDocumentAdaptor implements IDocument {
     }
 
     /**
-     * Returns the number of pages currently registered with this document.
+     * Returns the number of pages currently in this document.
      *
      * @return the page count; zero if no pages have been added yet
      */
     @Override
     public int getPageCount() {
-        return pages.size();
+        return document.getNumberOfPages();
     }
 
     /**
@@ -247,19 +254,6 @@ public class PDFBoxDocumentAdaptor implements IDocument {
         accessPermission.setCanPrint(permission.CanPrint);
         accessPermission.setCanPrintDegraded(permission.CanPrintDegraded);
         return accessPermission;
-    }
-
-    /**
-     * Returns the underlying PDFBox {@link PDDocument} instance.
-     *
-     * <p>This method is intended for use by {@link PDFBoxPageAdaptor#render(IDocument)}
-     * when a live {@link PDDocument} reference is needed to execute drawing commands.
-     * External callers should use the {@link IDocument} abstraction instead.</p>
-     *
-     * @return the internal {@link PDDocument}; never {@code null}
-     */
-    public PDDocument getInternalDocument() {
-        return document;
     }
 
     /**

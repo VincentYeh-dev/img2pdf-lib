@@ -164,7 +164,6 @@ public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
 
                     IPage page = createPage(final_i + 1, result.getPageSize());
                     page.drawImage(bufferedImage, result.getImagePosition(), result.getImageSize());
-                    page.render(pdfDocument);
                     int done = completedCount.incrementAndGet();
                     if (listener != null)
                         listener.onAppend(imageFiles[final_i], done, imageFiles.length);

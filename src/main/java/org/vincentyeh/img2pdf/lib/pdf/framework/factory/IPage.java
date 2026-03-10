@@ -7,17 +7,12 @@ import java.awt.image.BufferedImage;
 /**
  * Represents a single page within a PDF document being constructed.
  *
- * <p>The life cycle of a page follows a two-phase model:</p>
- * <ol>
- *   <li><strong>Draw phase</strong> — image data and layout metrics are supplied via
- *       {@link #drawImage(BufferedImage, PointF, SizeF)}. This phase may run on a worker
- *       thread when parallel rendering is enabled.</li>
- *   <li><strong>Render phase</strong> — the page is committed to the document via
- *       {@link #render(IDocument)}. Depending on the PDF backend, this phase may need to
- *       run on the document-owner thread.</li>
- * </ol>
+ * <p>{@link #drawImage(BufferedImage, PointF, SizeF)} is the sole operation on a page;
+ * it records image data and layout metrics for the page. Integration into the document
+ * is handled exclusively by {@link IDocument#addPage(IPage)}, which acts as the single
+ * point of responsibility for committing page content into the parent document.</p>
  *
- * <p>Implementations are not required to be thread-safe across both phases simultaneously.</p>
+ * <p>Implementations are not required to be thread-safe.</p>
  */
 public interface IPage {
 
@@ -43,16 +38,4 @@ public interface IPage {
      * @return the page number; always greater than zero
      */
     int getPageNumber();
-
-    /**
-     * Commits this page to the given document.
-     *
-     * <p>After this method returns the page has been appended to {@code document} and must
-     * not be used again. Calling {@link IDocument#addPage(IPage)} delegates to this
-     * method.</p>
-     *
-     * @param document the document to which this page will be added; must not be
-     *                 {@code null}
-     */
-    void render(IDocument document);
 }

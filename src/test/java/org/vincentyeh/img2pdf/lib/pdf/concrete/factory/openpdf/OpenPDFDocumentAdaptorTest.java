@@ -47,7 +47,6 @@ public class OpenPDFDocumentAdaptorTest {
         OpenPDFDocumentAdaptor adaptor = new OpenPDFDocumentAdaptor(new DocumentArgument());
         IPage page = createMockPage(1);
         adaptor.addPage(page);
-        page.render(adaptor);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         adaptor.saveAndClose(outputStream);
         byte[] pdfBytes = outputStream.toByteArray();
@@ -175,7 +174,6 @@ public class OpenPDFDocumentAdaptorTest {
         OpenPDFDocumentAdaptor adaptor = new OpenPDFDocumentAdaptor(arg);
         IPage page = createMockPage(1);
         adaptor.addPage(page);
-        page.render(adaptor);
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         adaptor.saveAndClose(outputStream);

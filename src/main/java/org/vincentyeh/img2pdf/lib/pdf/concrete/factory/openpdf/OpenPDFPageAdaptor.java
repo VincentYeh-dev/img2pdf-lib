@@ -2,7 +2,6 @@ package org.vincentyeh.img2pdf.lib.pdf.concrete.factory.openpdf;
 
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfWriter;
-import org.vincentyeh.img2pdf.lib.pdf.framework.factory.IDocument;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.IPage;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.PointF;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.SizeF;
@@ -16,23 +15,14 @@ import java.util.Objects;
  * Adapter that wraps an OpenPDF (librepdf) {@link Document} to implement the {@link IPage}
  * contract for a single PDF page.
  *
- * <p>Each instance represents exactly one page and follows a strict two-step lifecycle:</p>
- * <ol>
- *   <li>{@link #drawImage(BufferedImage, PointF, SizeF)} — records the image and its layout
- *       parameters. This step may be called at most once and must occur before
- *       {@link #render(IDocument)}.</li>
- *   <li>{@link #render(IDocument)} — commits the image to the internal OpenPDF
- *       {@link Document}. After this call, no further drawing is permitted.</li>
- * </ol>
+ * <p>Each instance represents exactly one page. {@link #drawImage(BufferedImage, PointF, SizeF)}
+ * records the image and its layout parameters. {@link #getPDFBytesContent()} performs the
+ * actual rendering into the internal OpenPDF document and returns the resulting raw PDF bytes.
+ * Rendering is guaranteed to occur exactly once; calling {@link #getPDFBytesContent()} a second
+ * time throws {@link IllegalStateException}.</p>
  *
- * <p>After {@link #render(IDocument)} has been called, {@link #getPDFBytesContent()} closes
- * the internal document and returns the raw single-page PDF bytes. These bytes are then
- * consumed by {@link OpenPDFDocumentAdaptor#addPage(IPage)} to merge the page into the
- * parent document.</p>
- *
- * <p>The {@code IDocument} parameter of {@link #render(IDocument)} is ignored because the
- * page manages its own in-memory OpenPDF document independently, enabling thread-safe
- * parallel rendering.</p>
+ * <p>The raw bytes returned by {@link #getPDFBytesContent()} are then consumed by
+ * {@link OpenPDFDocumentAdaptor#addPage(IPage)} to merge the page into the parent document.</p>
  *
  * <p>Instances of this class are not thread-safe individually; concurrent calls to any
  * method on the same instance produce undefined behaviour.</p>
@@ -75,7 +65,7 @@ public class OpenPDFPageAdaptor implements IPage {
      * Records the image and its layout parameters to be rendered on this page.
      *
      * <p>This method only stores the parameters; actual rendering is deferred to
-     * {@link #render(IDocument)}. It may be called at most once per page instance.</p>
+     * {@link #getPDFBytesContent()}. It may be called at most once per page instance.</p>
      *
      * @param image         the decoded image to place on the page; must not be {@code null}
      * @param imagePosition the absolute position of the image's origin in user-space units;
@@ -89,14 +79,14 @@ public class OpenPDFPageAdaptor implements IPage {
      */
     @Override
     public void drawImage(BufferedImage image, PointF imagePosition, SizeF imageSize) throws RuntimeException {
-        if(isRendered)
+        if (isRendered)
             throw new IllegalStateException("page has already been rendered, can not draw image anymore");
 
         Objects.requireNonNull(image, "image==null");
         Objects.requireNonNull(imagePosition, "imagePosition==null");
         Objects.requireNonNull(imageSize, "imageSize==null");
 
-        if(isDrawn)
+        if (isDrawn)
             throw new IllegalStateException("image has already been drawn on this page");
 
         if (imageSize.width <= 0 || imageSize.height <= 0)
@@ -120,41 +110,6 @@ public class OpenPDFPageAdaptor implements IPage {
 
 
     /**
-     * Renders the previously drawn image into the internal OpenPDF document.
-     *
-     * <p>If no image has been drawn (i.e., {@link #drawImage} was never called), this
-     * method still marks the page as rendered but writes nothing. This allows empty pages
-     * to be represented without error.</p>
-     *
-     * <p>The {@code ignored} parameter is not used; this page maintains its own internal
-     * OpenPDF document so that rendering can proceed on any thread without shared state.</p>
-     *
-     * @param ignored not used; may be {@code null}
-     * @throws IllegalStateException if this page has already been rendered
-     * @throws RuntimeException      if the OpenPDF image conversion fails internally
-     */
-    @Override
-    public void render(IDocument ignored) {
-        if (isRendered)
-            throw new IllegalStateException("page has already been rendered");
-        isRendered = true;
-
-        if(!isDrawn)
-            return;
-
-        document.newPage();
-        try {
-            Image image1 = Image.getInstance(bufferedImage, null);
-            image1.setAbsolutePosition(imagePosition.x, imagePosition.y);
-            image1.scaleToFit(imageSize.width, imageSize.height);
-            document.add(image1);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-
-    /**
      * Returns the page dimensions in PDF user-space units (points).
      *
      * @return the page size; never {@code null}
@@ -164,19 +119,37 @@ public class OpenPDFPageAdaptor implements IPage {
     }
 
     /**
-     * Closes the internal OpenPDF document and returns its raw byte representation.
+     * Renders any previously drawn image into the internal OpenPDF document, closes it,
+     * and returns the raw single-page PDF bytes.
      *
-     * <p>This method should be called only after {@link #render(IDocument)} has been
-     * invoked. The returned bytes represent a valid single-page PDF document, ready to
-     * be merged into the parent document by {@link OpenPDFDocumentAdaptor}.</p>
-     *
-     * <p><strong>Note:</strong> after this method is called the internal document is
-     * permanently closed; calling this method more than once returns the same bytes
-     * (already captured in the buffer) but does not re-close the document.</p>
+     * <p>This method may be called exactly once. A second call throws
+     * {@link IllegalStateException}. If no image has been drawn, the page is closed
+     * without any image content.</p>
      *
      * @return a byte array containing the single-page PDF; never {@code null}
+     * @throws IllegalStateException if this method has already been called
+     * @throws RuntimeException      if the OpenPDF image conversion fails internally
      */
     public byte[] getPDFBytesContent() {
+        if (isRendered) {
+            throw new IllegalStateException("getPDFBytesContent() can only be called once");
+        }
+        isRendered = true;
+
+        try {
+            if (isDrawn) {
+                document.newPage();
+                Image image1 = Image.getInstance(bufferedImage, null);
+                image1.setAbsolutePosition(imagePosition.x, imagePosition.y);
+                image1.scaleToFit(imageSize.width, imageSize.height);
+                document.add(image1);
+            } else {
+                // OpenPDF 需要至少一個頁面才能正常 close；加入空白 Chunk 確保頁面被建立
+                document.add(new Chunk(""));
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         document.close();
         return buffer.toByteArray();
     }

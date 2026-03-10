@@ -161,18 +161,6 @@ public class TemplateImagePDFFactoryExceptionPathTest {
         Assertions.assertTrue(foundIOException, "Root cause should eventually be IOException");
     }
 
-    /** Verifies that a RuntimeException from IPage.render() is wrapped and rethrown as PDFFactoryException. */
-    @Test
-    void whenPageRenderThrowsRuntimeException_thenStartThrowsPDFFactoryException() {
-        doThrow(new RuntimeException("render failure")).when(mockPage).render(any(IDocument.class));
-
-        File f = createValidMockFile();
-        TemplateImagePDFFactory factory = createFactory();
-
-        Assertions.assertThrows(PDFFactoryException.class, () ->
-                factory.start(new File[]{f}, ColorType.sRGB, new DocumentArgument(), new PageArgument()));
-    }
-
     /** Verifies that a RuntimeException from ImageScalingStrategy.execute() is wrapped and rethrown as PDFFactoryException. */
     @Test
     void whenScalingStrategyThrowsRuntimeException_thenStartThrowsPDFFactoryException() {
