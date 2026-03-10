@@ -72,36 +72,37 @@ public class OpenPDFDocumentAdaptor implements IDocument {
 
     private void mergePage(byte[] pdfBytes) throws Exception {
         PdfReader reader = new PdfReader(new ByteArrayInputStream(pdfBytes));
-        copy.addPage(copy.getImportedPage(reader, 1));
-        reader.close();
+        try {
+            copy.addPage(copy.getImportedPage(reader, 1));
+        } finally {
+            reader.close();
+        }
     }
 
     @Override
-    public void save(OutputStream outputStream) throws IOException {
+    public void saveAndClose(OutputStream outputStream) throws IOException {
         document.close();
         PdfReader reader = new PdfReader(new ByteArrayInputStream(buffer.toByteArray()));
-
-        PdfStamper stamper = new PdfStamper(reader, outputStream);
-
-        if(docArgument.isEncrypted()){
-            encryptDocument(stamper, docArgument);
+        try {
+            PdfStamper stamper = new PdfStamper(reader, outputStream);
+            try {
+                if (docArgument.isEncrypted()) {
+                    encryptDocument(stamper, docArgument);
+                }
+            } finally {
+                stamper.close();
+            }
+        } finally {
+            reader.close();
+            buffer.close();
         }
-        stamper.close();
-        reader.close();
     }
 
     @Override
-    public void save(File destination) throws IOException {
+    public void saveAndClose(File destination) throws IOException {
         try (FileOutputStream fos = new FileOutputStream(destination)) {
-            save(fos);
+            saveAndClose(fos);
         }
-    }
-
-    @Override
-    public void close() throws IOException {
-        if (document.isOpen())
-            document.close();
-        buffer.close();
     }
 
     @Override
