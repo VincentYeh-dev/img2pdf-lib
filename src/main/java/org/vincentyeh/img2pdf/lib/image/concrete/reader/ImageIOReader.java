@@ -1,15 +1,16 @@
 package org.vincentyeh.img2pdf.lib.image.concrete.reader;
 
-import com.drew.imaging.ImageMetadataReader;
-import com.drew.imaging.ImageProcessingException;
-import com.drew.metadata.Metadata;
-import com.drew.metadata.MetadataException;
-import com.drew.metadata.exif.ExifIFD0Directory;
+import com.twelvemonkeys.imageio.metadata.CompoundDirectory;
+import com.twelvemonkeys.imageio.metadata.Directory;
+import com.twelvemonkeys.imageio.metadata.Entry;
+import com.twelvemonkeys.imageio.metadata.tiff.TIFF;
+import com.twelvemonkeys.imageio.metadata.tiff.TIFFReader;
 import org.vincentyeh.img2pdf.lib.image.ColorType;
 import org.vincentyeh.img2pdf.lib.image.ImageReadingException;
 import org.vincentyeh.img2pdf.lib.image.framework.reader.ImageReader;
 
 import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageInputStream;
 import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
@@ -17,6 +18,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
 import java.io.*;
 import java.nio.file.Files;
+import java.util.OptionalInt;
 
 public final class ImageIOReader implements ImageReader {
 
@@ -60,13 +62,13 @@ public final class ImageIOReader implements ImageReader {
 
         try {
             BufferedImage rawImage = readImage(Files.newInputStream(file.toPath()));
-            if (canHandleMetaData(file)) {
-                double rotate_angle = handleMetaData(file);
-                return rotateImage(rawImage, rotate_angle);
-            } else {
-                return rawImage;
+            OptionalInt orientationOpt = readExifOrientation(file);
+            if (orientationOpt.isPresent()) {
+                double angle = orientationToAngle(orientationOpt.getAsInt());
+                return rotateImage(rawImage, angle);
             }
-        } catch (IOException | ImageProcessingException | MetadataException e) {
+            return rawImage;
+        } catch (IOException e) {
             throw new ImageReadingException("Unable to handle metadata", e);
         }
     }
@@ -117,14 +119,74 @@ public final class ImageIOReader implements ImageReader {
         return rotated;
     }
 
+    /**
+     * Reads the EXIF Orientation tag from a file.
+     * Supports JPEG and TIFF formats via magic byte detection.
+     *
+     * @return orientation value (1-8), or empty if not present
+     */
+    private static OptionalInt readExifOrientation(File file) throws IOException {
+        try (ImageInputStream iis = ImageIO.createImageInputStream(file)) {
+            if (iis == null) return OptionalInt.empty();
+            if (!positionAtExifTiff(iis)) return OptionalInt.empty();
 
-    private static double handleMetaData(File file) throws ImageProcessingException, IOException, MetadataException {
-        Metadata metadata = ImageMetadataReader.readMetadata(file);
-        ExifIFD0Directory exifIFD0 = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
-        int orientation = exifIFD0.getInt(ExifIFD0Directory.TAG_ORIENTATION);
+            Directory dir = new TIFFReader().read(iis);
+            Directory ifd0 = (dir instanceof CompoundDirectory)
+                    ? ((CompoundDirectory) dir).getDirectory(0) : dir;
+
+            Entry entry = ifd0.getEntryById(TIFF.TAG_ORIENTATION);
+            if (entry == null) return OptionalInt.empty();
+            return OptionalInt.of(((Number) entry.getValue()).intValue());
+        }
+    }
+
+    /**
+     * Positions the stream at the start of the TIFF header containing EXIF data.
+     * Detects format by magic bytes: 0xFFD8=JPEG, 0x4949/0x4D4D=TIFF.
+     *
+     * @return true if successfully positioned, false if no EXIF found
+     */
+    private static boolean positionAtExifTiff(ImageInputStream iis) throws IOException {
+        long startPos = iis.getStreamPosition();
+        int magic = iis.readUnsignedShort();
+
+        if (magic == 0xFFD8) {
+            return seekJpegExifTiff(iis);
+        } else if (magic == 0x4949 || magic == 0x4D4D) {
+            iis.seek(startPos);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Scans JPEG markers to find APP1 EXIF segment,
+     * positioning the stream at the embedded TIFF header.
+     */
+    private static boolean seekJpegExifTiff(ImageInputStream iis) throws IOException {
+        while (true) {
+            int marker = iis.readUnsignedShort();
+            int length = iis.readUnsignedShort();
+
+            if (marker == 0xFFE1) {
+                byte[] header = new byte[6];
+                iis.readFully(header);
+                if (header[0] == 'E' && header[1] == 'x' && header[2] == 'i'
+                        && header[3] == 'f' && header[4] == 0 && header[5] == 0) {
+                    return true;
+                }
+                iis.skipBytes(length - 2 - 6);
+            } else if (marker == 0xFFD9) {
+                return false;
+            } else {
+                iis.skipBytes(length - 2);
+            }
+        }
+    }
+
+    private static double orientationToAngle(int orientation) {
         switch (orientation) {
-
-//              https://exiftool.org/TagNames/EXIF.html
+//          https://exiftool.org/TagNames/EXIF.html
 //            1 = Horizontal (normal)
 //            2 = Mirror horizontal
 //            3 = Rotate 180
@@ -136,7 +198,6 @@ public final class ImageIOReader implements ImageReader {
 
 //          TODO:更改IFDO的旋轉角度
             case 0:
-                return 0;
             case 1: // [Exif IFD0] Orientation - Top, left side (Horizontal / normal)
                 return 0;
             case 6: // [Exif IFD0] Orientation - Right side, top (Rotate 90 CW)
@@ -148,15 +209,6 @@ public final class ImageIOReader implements ImageReader {
             default:
                 throw new IllegalStateException("orientation==" + orientation);
         }
-    }
-
-    private static boolean canHandleMetaData(File file) throws ImageProcessingException, IOException {
-        Metadata metadata = ImageMetadataReader.readMetadata(file);
-        if (metadata.containsDirectoryOfType(ExifIFD0Directory.class)) {
-            ExifIFD0Directory exifIFD0 = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
-            return exifIFD0.containsTag(ExifIFD0Directory.TAG_ORIENTATION);
-        }
-        return false;
     }
 
 }
