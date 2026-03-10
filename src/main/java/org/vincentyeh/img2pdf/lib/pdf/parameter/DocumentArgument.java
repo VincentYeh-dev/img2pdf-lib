@@ -1,6 +1,6 @@
 package org.vincentyeh.img2pdf.lib.pdf.parameter;
 
-import com.drew.lang.annotations.NotNull;
+import org.vincentyeh.img2pdf.lib.annotation.NotNull;
 
 import java.util.Objects;
 import java.util.Optional;

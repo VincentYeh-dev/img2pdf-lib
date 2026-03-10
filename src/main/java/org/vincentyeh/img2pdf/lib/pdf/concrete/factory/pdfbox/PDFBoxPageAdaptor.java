@@ -1,6 +1,6 @@
 package org.vincentyeh.img2pdf.lib.pdf.concrete.factory.pdfbox;
 
-import com.drew.lang.annotations.NotNull;
+import org.vincentyeh.img2pdf.lib.annotation.NotNull;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
