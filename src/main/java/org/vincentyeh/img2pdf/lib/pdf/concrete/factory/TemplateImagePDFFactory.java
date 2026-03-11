@@ -33,11 +33,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  *       page preparation.</li>
  * </ul>
  *
- * <p>Worker tasks (image reading, scaling, and drawing) are submitted concurrently to a
- * {@link java.util.concurrent.ExecutorService} backed by a fixed-size thread pool. Each worker
- * operates only on its own private {@link IPage} instance, with no shared state. Once all workers
- * complete, pages are integrated into the document sequentially via {@link IDocument#addPage(IPage)}
- * in their original order, ensuring correct page sequence.</p>
+ * <p>Worker tasks (image reading, scaling, drawing, and adding to the document) are submitted
+ * concurrently to a {@link java.util.concurrent.ExecutorService} backed by a fixed-size thread
+ * pool. Each worker calls {@link IDocument#addPage(IPage)} directly after drawing, relying on
+ * the document's thread-safe buffering. The calling thread waits for all futures and propagates
+ * any worker exception as a {@link org.vincentyeh.img2pdf.lib.pdf.framework.factory.exception.PDFFactoryException}.</p>
  *
  * <p>Callers <strong>must</strong> invoke {@link #shutdown()} after all conversions are
  * finished to release the thread pool and allow the JVM to exit cleanly.</p>
@@ -114,12 +114,13 @@ public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
      *   <li>Read the image via the {@link ImageReader}.</li>
      *   <li>Compute page layout via the {@link ImageScalingStrategy}.</li>
      *   <li>Create the page via {@link #createPage(int, SizeF)} and draw the image onto it.</li>
-     *   <li>Add the page to the document via {@link IDocument#addPage(IPage)} in page-number order.</li>
+     *   <li>Add the page to the document via {@link IDocument#addPage(IPage)} directly within the worker.</li>
      * </ol>
      *
-     * <p>Steps 2–4 run concurrently across the thread pool; each worker operates exclusively on
-     * its own private {@link IPage} with no shared state. Step 5 runs sequentially on the calling
-     * thread in the original file order after all workers complete.</p>
+     * <p>Steps 2–4 run concurrently across the thread pool. Each worker calls
+     * {@link IDocument#addPage(IPage)} directly after step 4, relying on the document's
+     * thread-safe page buffer. The calling thread awaits all futures in order and propagates
+     * the first worker exception encountered.</p>
      *
      * @param imageFiles       ordered array of image files to convert; must not be
      *                         {@code null} or empty, and each element must be a readable file
@@ -151,13 +152,12 @@ public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
             if (listener != null)
                 listener.initializing(imageFiles.length);
 
-            List<Callable<IPage>> workers = generateWorkers(imageFiles, pageArgument, colorType, listener);
-            List<Future<IPage>> futures = executorService.invokeAll(workers);
+            List<Callable<Void>> workers = generateWorkers(pdfDocument, imageFiles, pageArgument, colorType, listener);
+            List<Future<Void>> futures = executorService.invokeAll(workers);
 
-            for (Future<IPage> future : futures) {
+            for (Future<Void> future : futures) {
                 try {
-                    IPage page = future.get();
-                    pdfDocument.addPage(page);
+                    future.get();
                 } catch (java.util.concurrent.ExecutionException e) {
                     // 解包 ExecutionException，直接以原始例外作為 cause
                     Throwable cause = e.getCause() != null ? e.getCause() : e;
@@ -189,6 +189,7 @@ public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
      *   <li>Compute the page size and image placement via the {@link ImageScalingStrategy}.</li>
      *   <li>Create a new {@link IPage} via {@link #createPage(int, SizeF)} and draw the
      *       image onto it.</li>
+     *   <li>Call {@link IDocument#addPage(IPage)} on the shared document directly.</li>
      *   <li>Notify the listener (if present) that one more page has been prepared.</li>
      * </ol>
      *
@@ -196,35 +197,38 @@ public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
      * calling thread before any worker is submitted, so invalid files are detected immediately
      * rather than asynchronously inside a worker.</p>
      *
+     * @param pdfDocument  the document to which each worker adds its page; must be thread-safe
+     *                     for concurrent {@link IDocument#addPage(IPage)} calls
      * @param imageFiles   ordered array of image files; each element must pass
      *                     {@link #checkFileState(File)}
      * @param pageArgument page-level settings passed to the {@link ImageScalingStrategy}
-     * @param colorType        target colour space applied during image reading;
-     *                         {@code null} means no conversion
-     * @param listener         optional progress callback invoked after each page is prepared;
-     *                         may be {@code null}
+     * @param colorType    target colour space applied during image reading;
+     *                     {@code null} means no conversion
+     * @param listener     optional progress callback invoked after each page is added;
+     *                     may be {@code null}
      * @return an ordered list of {@link Callable} workers, one per image file
      * @throws IOException if any file fails the state check
      */
-    private List<Callable<IPage>> generateWorkers(File[] imageFiles, PageArgument pageArgument, ColorType colorType, ImagePDFFactoryListener listener) throws IOException {
-        List<Callable<IPage>> workers = new java.util.ArrayList<>();
+    private List<Callable<Void>> generateWorkers(IDocument pdfDocument, File[] imageFiles, PageArgument pageArgument, ColorType colorType, ImagePDFFactoryListener listener) throws IOException {
+        List<Callable<Void>> workers = new java.util.ArrayList<>();
         AtomicInteger completedCount = new AtomicInteger(0);
 
         for (int i = 0; i < imageFiles.length; i++) {
             final int final_i = i;
             checkFileState(imageFiles[final_i]);
 
-            Callable<IPage> task = () -> {
+            Callable<Void> task = () -> {
                 BufferedImage bufferedImage = imageReader.readImage(imageFiles[final_i], colorType);
                 ImageScalingResult result = imageScalingStrategy.execute(pageArgument,
                         new SizeF(bufferedImage.getWidth(), bufferedImage.getHeight()));
 
                 IPage page = createPage(final_i + 1, result.getPageSize());
                 page.drawImage(bufferedImage, result.getImagePosition(), result.getImageSize());
+                pdfDocument.addPage(page);
                 int done = completedCount.incrementAndGet();
                 if (listener != null)
                     listener.onAppend(imageFiles[final_i], done, imageFiles.length);
-                return page;
+                return null;
             };
             workers.add(task);
         }
