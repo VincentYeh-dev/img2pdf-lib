@@ -107,12 +107,14 @@ public class OpenPDFDocumentAdaptor implements IDocument {
     }
 
     /**
-     * Merges the rendered page into the in-memory PDF document.
+     * Extracts the rendered PDF bytes from the given page and merges them into the
+     * in-memory {@link PdfCopy} stream.
      *
-     * <p>The supplied {@code page} must be an {@link OpenPDFPageAdaptor} whose
-     * {@link OpenPDFPageAdaptor#render(IDocument)} has already been called. The page's
-     * raw PDF bytes are extracted and appended to the internal {@link PdfCopy} stream.
-     * Each page number may only appear once; duplicate numbers are rejected immediately.</p>
+     * <p>The supplied {@code page} must be an {@link OpenPDFPageAdaptor}. Its
+     * {@link OpenPDFPageAdaptor#getPDFBytesContent()} is called to obtain the raw
+     * single-page PDF bytes, which are then appended to the internal {@link PdfCopy}
+     * via a temporary {@link com.lowagie.text.pdf.PdfReader}. Each page number may
+     * only appear once; duplicate numbers are rejected immediately.</p>
      *
      * @param page the rendered page to add; must not be {@code null} and must be an
      *             instance of {@link OpenPDFPageAdaptor}
