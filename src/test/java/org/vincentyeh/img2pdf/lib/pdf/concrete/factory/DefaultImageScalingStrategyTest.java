@@ -13,7 +13,7 @@ import org.vincentyeh.img2pdf.lib.pdf.parameter.PageSize;
  * Tests for {@link DefaultImageScalingStrategy}, verifying image scaling math
  * across various page sizes, directions, and image dimensions.
  */
-public class StrategyTest {
+public class DefaultImageScalingStrategyTest {
 
     /** Verifies that a small image is scaled to fill the A4 page width while preserving aspect ratio. */
     @Test
@@ -84,4 +84,3 @@ public class StrategyTest {
         Assertions.assertEquals(result.getPageSize().width, PageSize.A4.getSizeInPixels().height);
     }
 }
-

@@ -2,14 +2,13 @@ package org.vincentyeh.img2pdf.lib.pdf.concrete.factory;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.vincentyeh.img2pdf.lib.pdf.framework.factory.PointF;
 import org.vincentyeh.img2pdf.lib.pdf.framework.factory.SizeF;
 
 /**
- * Tests for value-object classes {@link SizeF} and {@link PointF},
+ * Tests for the {@link SizeF} value-object class,
  * covering construction validation, comparison, and equality.
  */
-public class ObjectTest {
+public class SizeFTest {
 
     /** Verifies that SizeF rejects negative dimensions, compares sizes correctly, and respects equals. */
     @Test
@@ -25,17 +24,5 @@ public class ObjectTest {
 
         Assertions.assertNotEquals(s1, s2);
         Assertions.assertEquals(s1, s3);
-    }
-
-    /** Verifies that PointF compares coordinates correctly and respects equals. */
-    @Test
-    public void testPointF() {
-        PointF p1 = new PointF();
-        PointF p2 = new PointF(1, 1);
-        PointF p3 = new PointF(2, 2);
-        PointF p4 = new PointF(2, 2);
-        Assertions.assertEquals(-1, p1.compareTo(p2));
-        Assertions.assertEquals(1, p3.compareTo(p2));
-        Assertions.assertEquals(p3, p4);
     }
 }
