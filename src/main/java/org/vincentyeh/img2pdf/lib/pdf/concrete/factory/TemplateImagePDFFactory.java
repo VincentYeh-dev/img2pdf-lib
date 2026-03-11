@@ -12,7 +12,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,22 +23,24 @@ import java.util.concurrent.atomic.AtomicInteger;
  * <em>Template Method</em> design pattern to coordinate the image-to-PDF conversion pipeline.
  *
  * <p>This class handles the common orchestration logic — validating inputs, reading images,
- * invoking the {@link ImageScalingStrategy}, and dispatching page-rendering tasks to a fixed
+ * invoking the {@link ImageScalingStrategy}, and dispatching page preparation tasks to a fixed
  * thread pool — while delegating backend-specific operations to concrete subclasses through
  * three abstract hook methods:</p>
  * <ul>
  *   <li>{@link #createDocument(DocumentArgument)} — instantiate the backend PDF document.</li>
  *   <li>{@link #createPage(int, SizeF)} — instantiate a backend-specific page object.</li>
- *   <li>{@link #parallelProcessingSupported()} — declare whether the backend is thread-safe.</li>
+ *   <li>{@link #parallelProcessingSupported()} — declare whether the backend supports parallel
+ *       page preparation.</li>
  * </ul>
  *
- * <p>Page rendering tasks are submitted concurrently to a {@link java.util.concurrent.ExecutorService}
- * backed by a fixed-size thread pool. When rendering is complete, pages are added to the
- * document in their original order (not completion order), ensuring correct page sequence.</p>
+ * <p>Worker tasks (image reading, scaling, and drawing) are submitted concurrently to a
+ * {@link java.util.concurrent.ExecutorService} backed by a fixed-size thread pool. Each worker
+ * operates only on its own private {@link IPage} instance, with no shared state. Once all workers
+ * complete, pages are integrated into the document sequentially via {@link IDocument#addPage(IPage)}
+ * in their original order, ensuring correct page sequence.</p>
  *
  * <p>Callers <strong>must</strong> invoke {@link #shutdown()} after all conversions are
  * finished to release the thread pool and allow the JVM to exit cleanly.</p>
- *
  */
 public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
     private final ImageScalingStrategy imageScalingStrategy;
@@ -83,24 +84,23 @@ public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
      * @param nThreads             the number of worker threads for parallel page rendering;
      *                             must be at least {@code 1}; must be {@code 1} when
      *                             {@link #parallelProcessingSupported()} returns {@code false}
-     * @throws IllegalArgumentException if {@code nThreads < 1}, if {@code imageScalingStrategy}
-     *                                  is {@code null}, or if {@code nThreads > 1} and the
-     *                                  backend does not support parallel processing
+     * @throws IllegalArgumentException if {@code imageScalingStrategy} or {@code imageReader}
+     *                                  is {@code null}, if {@code nThreads < 1}, or if
+     *                                  {@code nThreads > 1} and the backend does not support
+     *                                  parallel processing
      */
     public TemplateImagePDFFactory(@NotNull ImageScalingStrategy imageScalingStrategy, @NotNull ImageReader imageReader, int nThreads) {
-        this.imageReader = imageReader;
+        if (imageScalingStrategy == null)
+            throw new IllegalArgumentException("imageScalingStrategy==null");
+        if (imageReader == null)
+            throw new IllegalArgumentException("imageReader==null");
         if (nThreads < 1)
             throw new IllegalArgumentException("nThreads can not be less than 1");
-
-        try {
-            this.imageScalingStrategy = Objects.requireNonNull(imageScalingStrategy, "strategy==null");
-        } catch (NullPointerException e) {
-            throw new IllegalArgumentException(e);
-        }
-
         if (!parallelProcessingSupported() && nThreads != 1)
             throw new IllegalArgumentException("This PDF factory does not support parallel processing.");
 
+        this.imageScalingStrategy = imageScalingStrategy;
+        this.imageReader = imageReader;
         executorService = Executors.newFixedThreadPool(nThreads);
     }
 
@@ -113,12 +113,13 @@ public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
      *   <li>Validate the file (existence, readability).</li>
      *   <li>Read the image via the {@link ImageReader}.</li>
      *   <li>Compute page layout via the {@link ImageScalingStrategy}.</li>
-     *   <li>Create and render the page via {@link #createPage(int, SizeF)}.</li>
-     *   <li>Add the rendered page to the document in page-number order.</li>
+     *   <li>Create the page via {@link #createPage(int, SizeF)} and draw the image onto it.</li>
+     *   <li>Add the page to the document via {@link IDocument#addPage(IPage)} in page-number order.</li>
      * </ol>
      *
-     * <p>Steps 2–4 are executed in parallel across the thread pool. Pages are added to the
-     * document sequentially in their original order after all tasks complete.</p>
+     * <p>Steps 2–4 run concurrently across the thread pool; each worker operates exclusively on
+     * its own private {@link IPage} with no shared state. Step 5 runs sequentially on the calling
+     * thread in the original file order after all workers complete.</p>
      *
      * @param imageFiles       ordered array of image files to convert; must not be
      *                         {@code null} or empty, and each element must be a readable file
@@ -150,28 +151,8 @@ public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
             if (listener != null)
                 listener.initializing(imageFiles.length);
 
-            List<Callable<IPage>> tasks = new java.util.ArrayList<>();
-            AtomicInteger completedCount = new AtomicInteger(0);
-
-            for (int i = 0; i < imageFiles.length; i++) {
-                final int final_i = i;
-                checkFileState(imageFiles[final_i]);
-
-                Callable<IPage> task = () -> {
-                    BufferedImage bufferedImage = imageReader.readImage(imageFiles[final_i], colorType);
-                    ImageScalingResult result = imageScalingStrategy.execute(pageArgument,
-                            new SizeF(bufferedImage.getWidth(), bufferedImage.getHeight()));
-
-                    IPage page = createPage(final_i + 1, result.getPageSize());
-                    page.drawImage(bufferedImage, result.getImagePosition(), result.getImageSize());
-                    int done = completedCount.incrementAndGet();
-                    if (listener != null)
-                        listener.onAppend(imageFiles[final_i], done, imageFiles.length);
-                    return page;
-                };
-                tasks.add(task);
-            }
-            List<Future<IPage>> futures = executorService.invokeAll(tasks);
+            List<Callable<IPage>> workers = generateWorkers(imageFiles, pageArgument, colorType, listener);
+            List<Future<IPage>> futures = executorService.invokeAll(workers);
 
             for (Future<IPage> future : futures) {
                 try {
@@ -196,6 +177,59 @@ public abstract class TemplateImagePDFFactory implements ImagePDFFactory {
             pdfDocument.close();
             throw new PDFFactoryException(e);
         }
+    }
+
+        /**
+     * Validates each image file and builds one {@link Callable} worker per file.
+     *
+     * <p>Each worker, when executed, performs the following steps independently:</p>
+     * <ol>
+     *   <li>Decode the image file into a {@link java.awt.image.BufferedImage} via the
+     *       {@link ImageReader}.</li>
+     *   <li>Compute the page size and image placement via the {@link ImageScalingStrategy}.</li>
+     *   <li>Create a new {@link IPage} via {@link #createPage(int, SizeF)} and draw the
+     *       image onto it.</li>
+     *   <li>Notify the listener (if present) that one more page has been prepared.</li>
+     * </ol>
+     *
+     * <p>File state validation ({@link #checkFileState(File)}) is performed eagerly on the
+     * calling thread before any worker is submitted, so invalid files are detected immediately
+     * rather than asynchronously inside a worker.</p>
+     *
+     * @param imageFiles   ordered array of image files; each element must pass
+     *                     {@link #checkFileState(File)}
+     * @param pageArgument page-level settings passed to the {@link ImageScalingStrategy}
+     * @param colorType        target colour space applied during image reading;
+     *                         {@code null} means no conversion
+     * @param listener         optional progress callback invoked after each page is prepared;
+     *                         may be {@code null}
+     * @return an ordered list of {@link Callable} workers, one per image file
+     * @throws IOException if any file fails the state check
+     */
+    private List<Callable<IPage>> generateWorkers(File[] imageFiles, PageArgument pageArgument, ColorType colorType, ImagePDFFactoryListener listener) throws IOException {
+        List<Callable<IPage>> workers = new java.util.ArrayList<>();
+        AtomicInteger completedCount = new AtomicInteger(0);
+
+        for (int i = 0; i < imageFiles.length; i++) {
+            final int final_i = i;
+            checkFileState(imageFiles[final_i]);
+
+            Callable<IPage> task = () -> {
+                BufferedImage bufferedImage = imageReader.readImage(imageFiles[final_i], colorType);
+                ImageScalingResult result = imageScalingStrategy.execute(pageArgument,
+                        new SizeF(bufferedImage.getWidth(), bufferedImage.getHeight()));
+
+                IPage page = createPage(final_i + 1, result.getPageSize());
+                page.drawImage(bufferedImage, result.getImagePosition(), result.getImageSize());
+                int done = completedCount.incrementAndGet();
+                if (listener != null)
+                    listener.onAppend(imageFiles[final_i], done, imageFiles.length);
+                return page;
+            };
+            workers.add(task);
+        }
+
+        return workers;
     }
 
     /**
