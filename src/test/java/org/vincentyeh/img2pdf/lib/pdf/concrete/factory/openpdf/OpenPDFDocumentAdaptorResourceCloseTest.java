@@ -57,7 +57,8 @@ public class OpenPDFDocumentAdaptorResourceCloseTest {
 
         @Override
         public void saveAndClose(OutputStream outputStream) throws IOException {
-            getInternalDocument().close();
+            // Flush pageBuffer into PdfCopy and close Document so that buffer is populated
+            flushPageBuffer();
             ByteArrayOutputStream buf = getBufferViaReflection();
             PdfReader reader = new PdfReader(new ByteArrayInputStream(buf.toByteArray()));
             try {

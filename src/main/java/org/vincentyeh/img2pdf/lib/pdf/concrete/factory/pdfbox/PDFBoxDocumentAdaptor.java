@@ -16,21 +16,25 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * PDFBox-backed implementation of {@link IDocument}.
  *
  * <p>This class acts as an <em>Adapter</em> between the library's document abstraction
- * ({@link IDocument}) and the Apache PDFBox {@link PDDocument} API. Each call to
- * {@link #addPage(IPage)} merges the single-page document owned by the supplied
- * {@link PDFBoxPageAdaptor} directly into the underlying {@link PDDocument} using
- * {@link PDFMergerUtility}, so pages are available immediately after addition.</p>
+ * ({@link IDocument}) and the Apache PDFBox {@link PDDocument} API.</p>
+ *
+ * <p>Pages are accumulated in a thread-safe buffer via {@link #addPage(IPage)}, which stores
+ * each page's {@link PDDocument} in a {@link ConcurrentHashMap} keyed by page number. Actual
+ * merging into the underlying {@link PDDocument} is deferred until {@link #save} is called,
+ * at which point pages are drained from the buffer in sorted order and appended via
+ * {@link PDFMergerUtility}.</p>
  *
  * <p>{@link #save} only serializes the document without releasing resources.
- * {@link #close()} releases the underlying {@link PDDocument} without saving.
- * Use try-with-resources to ensure proper cleanup:</p>
+ * {@link #close()} releases the underlying {@link PDDocument} and any remaining buffered
+ * {@link PDDocument} instances without saving. Use try-with-resources to ensure proper
+ * cleanup:</p>
  * <pre>{@code
  * try (IDocument doc = factory.start(...)) {
  *     doc.save(destination);
@@ -52,14 +56,16 @@ import java.util.Set;
  * {@link MemoryUsageSetting} supplied at construction time. When none is provided the
  * default is {@link MemoryUsageSetting#setupMainMemoryOnly()}.</p>
  *
- * <p>This class is <strong>not</strong> thread-safe. {@link #addPage(IPage)} and the
- * {@code save}/{@code close} methods must be called from the same thread.</p>
+ * <p>{@link #addPage(IPage)} is thread-safe due to the use of {@link ConcurrentHashMap}.
+ * However, {@link #save} and {@link #close} must not be called concurrently with each
+ * other or with {@link #addPage(IPage)}.</p>
  */
 public class PDFBoxDocumentAdaptor implements IDocument {
     private final PDDocument document;
-    private final Set<Integer> addedPageNumbers = new HashSet<>();
+    /** Thread-safe buffer that holds single-page PDDocuments keyed by page number. */
+    private final ConcurrentHashMap<Integer, PDDocument> pageBuffer = new ConcurrentHashMap<>();
     private final DocumentArgument docArgument;
-    // 標記文件是否已關閉，用於實現冪等的 close()
+    // Marks whether the document has been closed, used to implement idempotent close()
     private boolean closed = false;
 
 
@@ -96,40 +102,36 @@ public class PDFBoxDocumentAdaptor implements IDocument {
     }
 
     /**
-     * Merges the given page into this document by appending the page's own
-     * {@link PDDocument} via {@link PDFMergerUtility}.
+     * Buffers the given page's {@link PDDocument} for deferred merging.
      *
-     * <p>Duplicate page numbers are rejected immediately. The single-page document owned
-     * by the supplied {@link PDFBoxPageAdaptor} is closed after the merge regardless of
-     * success or failure.</p>
+     * <p>This method is <strong>thread-safe</strong>. The single-page document owned by the
+     * supplied {@link PDFBoxPageAdaptor} is placed into an internal {@link ConcurrentHashMap}
+     * via {@link ConcurrentHashMap#putIfAbsent}, which provides atomic duplicate detection.
+     * If a page with the same number already exists in the buffer, the incoming
+     * {@code singlePageDoc} is closed before the exception is thrown to prevent resource
+     * leaks. Actual merging into the underlying {@link PDDocument} is deferred until
+     * {@link #save} is called.</p>
      *
-     * @param page the page to add; must not be {@code null} and must be a
+     * @param page the page to buffer; must not be {@code null} and must be a
      *             {@link PDFBoxPageAdaptor}
      * @throws IllegalArgumentException if {@code page} is {@code null} or if a page
      *                                  with the same page number has already been added
-     * @throws RuntimeException         if the merge operation fails
      */
     @Override
     public void addPage(IPage page) {
         if (page == null)
             throw new IllegalArgumentException("page==null");
 
-        if (addedPageNumbers.contains(page.getPageNumber()))
-            throw new IllegalArgumentException("page number " + page.getPageNumber() + " already exists");
-
         PDFBoxPageAdaptor p = (PDFBoxPageAdaptor) page;
         PDDocument singlePageDoc = p.getOwnDocument();
-        try {
-            new PDFMergerUtility().appendDocument(document, singlePageDoc);
-            addedPageNumbers.add(page.getPageNumber());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
+        PDDocument existing = pageBuffer.putIfAbsent(page.getPageNumber(), singlePageDoc);
+        if (existing != null) {
             try {
                 singlePageDoc.close();
-            } catch (IOException e) {
-                // ignore
+            } catch (IOException ignored) {
+                // ignore close failure on duplicate
             }
+            throw new IllegalArgumentException("page number " + page.getPageNumber() + " already exists");
         }
     }
 
@@ -138,6 +140,10 @@ public class PDFBoxDocumentAdaptor implements IDocument {
      *
      * <p>Before writing, this method:</p>
      * <ol>
+     *   <li>Drains all buffered pages in page-number order, merging each into the underlying
+     *       {@link PDDocument} via {@link PDFMergerUtility}. Each buffered
+     *       {@link PDDocument} is closed after merging. The buffer is cleared afterwards to
+     *       prevent double-processing if {@link #close()} is called later.</li>
      *   <li>Optionally applies 128-bit AES encryption if configured.</li>
      *   <li>Optionally sets document metadata (title, author, etc.) if configured.</li>
      * </ol>
@@ -154,6 +160,26 @@ public class PDFBoxDocumentAdaptor implements IDocument {
     public void save(OutputStream outputStream) throws IOException {
         if (closed)
             throw new IllegalStateException("Document has already been closed");
+
+        // Drain the page buffer in sorted order before saving;
+        // pageBuffer.clear() is guaranteed to run so close() never double-processes entries
+        try {
+            pageBuffer.entrySet().stream()
+                    .sorted(Map.Entry.comparingByKey())
+                    .forEach(entry -> {
+                        PDDocument singlePageDoc = entry.getValue();
+                        try {
+                            new PDFMergerUtility().appendDocument(document, singlePageDoc);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        } finally {
+                            try { singlePageDoc.close(); } catch (IOException ignored) {}
+                        }
+                    });
+        } finally {
+            // Clear buffer to prevent close() from double-processing already-merged documents
+            pageBuffer.clear();
+        }
 
         if (docArgument.isEncrypted())
             document.protect(
@@ -192,10 +218,13 @@ public class PDFBoxDocumentAdaptor implements IDocument {
     }
 
     /**
-     * Releases the underlying {@link PDDocument} without saving.
+     * Releases the underlying {@link PDDocument} and any remaining buffered
+     * {@link PDDocument} instances without saving.
      *
-     * <p>This method is idempotent: if already closed, subsequent calls return immediately
-     * without effect. Any {@link IOException} thrown by {@link PDDocument#close()} is
+     * <p>Buffered pages that were not yet merged (i.e., {@link #save} was never called or
+     * failed mid-way) are closed individually before clearing the buffer. The main
+     * {@link PDDocument} is then closed. This method is idempotent: if already closed,
+     * subsequent calls return immediately without effect. Any {@link IOException} is
      * silently swallowed. The instance must not be used after this method returns.</p>
      */
     @Override
@@ -203,10 +232,19 @@ public class PDFBoxDocumentAdaptor implements IDocument {
         if (closed)
             return;
         closed = true;
+        // Close any buffered PDDocuments that were not yet merged by save()
+        for (PDDocument buffered : pageBuffer.values()) {
+            try {
+                buffered.close();
+            } catch (IOException ignored) {
+                // Silently ignore to ensure all entries are processed
+            }
+        }
+        pageBuffer.clear();
         try {
             document.close();
         } catch (IOException ignored) {
-            // 釋放資源失敗時靜默忽略，確保冪等語義
+            // Silently ignore resource release failures to ensure idempotent semantics
         }
     }
 
@@ -227,13 +265,14 @@ public class PDFBoxDocumentAdaptor implements IDocument {
     }
 
     /**
-     * Returns the number of pages currently in this document.
+     * Returns the total number of pages: buffered (not yet merged) plus already merged
+     * into the underlying {@link PDDocument}.
      *
-     * @return the page count; zero if no pages have been added yet
+     * @return the combined page count; zero if no pages have been added yet
      */
     @Override
     public int getPageCount() {
-        return document.getNumberOfPages();
+        return pageBuffer.size() + document.getNumberOfPages();
     }
 
     /**
@@ -266,7 +305,7 @@ public class PDFBoxDocumentAdaptor implements IDocument {
      * @return a configured {@link StandardProtectionPolicy}; never {@code null}
      */
     private static StandardProtectionPolicy createProtectionPolicy(String ownerPassword, String userPassword, AccessPermission permission) {
-        // 加密金鑰長度，可選 40 或 128（PDFBox 2.0 支援 256）
+        // Encryption key length; 40 or 128 are valid (PDFBox 2.0 also supports 256)
         int keyLength = 128;
         StandardProtectionPolicy spp = new StandardProtectionPolicy(ownerPassword, userPassword, permission);
         spp.setEncryptionKeyLength(keyLength);
