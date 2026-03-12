@@ -252,23 +252,33 @@ public final class ImageIOReader implements ImageReader {
      * @throws IOException if an I/O error occurs while scanning the JPEG markers
      */
     private static boolean seekJpegExifTiff(ImageInputStream iis) throws IOException {
-        while (true) {
-            int marker = iis.readUnsignedShort();
-            int length = iis.readUnsignedShort();
+        try {
+            while (true) {
+                int marker = iis.readUnsignedShort();
+                int length = iis.readUnsignedShort();
+//                APP1:EXIF
+                if (marker == 0xFFE1) {
+                    byte[] header = new byte[6];
+                    iis.readFully(header);
+                    if (header[0] == 'E' && header[1] == 'x' && header[2] == 'i'
+                            && header[3] == 'f' && header[4] == 0 && header[5] == 0) {
+                        return true;
+                    }
+                    iis.skipBytes(length - 2 - 6);
 
-            if (marker == 0xFFE1) {
-                byte[] header = new byte[6];
-                iis.readFully(header);
-                if (header[0] == 'E' && header[1] == 'x' && header[2] == 'i'
-                        && header[3] == 'f' && header[4] == 0 && header[5] == 0) {
-                    return true;
+//                APP0:JIFF
+                }else if(marker==0xFFE0){
+                    return false;
+                }else if (marker == 0xFFD9 || marker == 0xFFDA) {
+                    // EOI or SOS — EXIF is always in the header before SOS; stop scanning
+                    return false;
+                } else {
+                    iis.skipBytes(length - 2);
                 }
-                iis.skipBytes(length - 2 - 6);
-            } else if (marker == 0xFFD9) {
-                return false;
-            } else {
-                iis.skipBytes(length - 2);
             }
+        } catch (java.io.EOFException e) {
+            // JPEG has no EXIF segment; treat as no orientation
+            return false;
         }
     }
 
