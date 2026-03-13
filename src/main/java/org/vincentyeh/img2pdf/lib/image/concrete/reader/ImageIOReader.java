@@ -114,7 +114,10 @@ public final class ImageIOReader implements ImageReader {
             throw new IllegalArgumentException("image file equals null");
 
         try {
-            BufferedImage rawImage = readImage(Files.newInputStream(file.toPath()));
+            final BufferedImage rawImage;
+            try (InputStream is = Files.newInputStream(file.toPath())) {
+                rawImage = readImage(is);
+            }
             OptionalInt orientationOpt = readExifOrientation(file);
             if (orientationOpt.isPresent()) {
                 double angle = orientationToAngle(orientationOpt.getAsInt());
