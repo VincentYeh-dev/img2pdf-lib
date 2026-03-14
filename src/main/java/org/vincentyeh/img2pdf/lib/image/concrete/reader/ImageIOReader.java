@@ -120,8 +120,7 @@ public final class ImageIOReader implements ImageReader {
             }
             OptionalInt orientationOpt = readExifOrientation(file);
             if (orientationOpt.isPresent()) {
-                double angle = orientationToAngle(orientationOpt.getAsInt());
-                return rotateImage(rawImage, angle);
+                return applyOrientation(rawImage, orientationOpt.getAsInt());
             }
             return rawImage;
         } catch (IOException e) {
@@ -164,6 +163,20 @@ public final class ImageIOReader implements ImageReader {
     }
 
     /**
+     * Returns a safe image type for creating a new {@link BufferedImage}.
+     * If the source image type is {@link BufferedImage#TYPE_CUSTOM} (0),
+     * falls back to {@link BufferedImage#TYPE_INT_ARGB} to avoid
+     * {@link IllegalArgumentException} from the {@code BufferedImage} constructor.
+     *
+     * @param img the source image; must not be {@code null}
+     * @return a valid {@code BufferedImage} type constant
+     */
+    private static int safeImageType(BufferedImage img) {
+        int type = img.getType();
+        return type == BufferedImage.TYPE_CUSTOM ? BufferedImage.TYPE_INT_ARGB : type;
+    }
+
+    /**
      * Rotates the given image by the specified number of degrees clockwise.
      *
      * <p>The resulting image is sized to fully contain the rotated content.
@@ -184,7 +197,7 @@ public final class ImageIOReader implements ImageReader {
         int newWidth = (int) Math.floor(w * cos + h * sin);
         int newHeight = (int) Math.floor(h * cos + w * sin);
 
-        BufferedImage rotated = new BufferedImage(newWidth, newHeight, img.getType());
+        BufferedImage rotated = new BufferedImage(newWidth, newHeight, safeImageType(img));
         Graphics2D g2d = rotated.createGraphics();
         AffineTransform at = new AffineTransform();
         at.translate((newWidth - w) / 2., (newHeight - h) / 2.);
@@ -219,7 +232,10 @@ public final class ImageIOReader implements ImageReader {
 
             Entry entry = ifd0.getEntryById(TIFF.TAG_ORIENTATION);
             if (entry == null) return OptionalInt.empty();
-            return OptionalInt.of(((Number) entry.getValue()).intValue());
+            // Guard against null EXIF value to avoid NPE on cast
+            Object value = entry.getValue();
+            if (value == null) return OptionalInt.empty();
+            return OptionalInt.of(((Number) value).intValue());
         }
     }
 
@@ -258,22 +274,44 @@ public final class ImageIOReader implements ImageReader {
         try {
             while (true) {
                 int marker = iis.readUnsignedShort();
+
+                // Standalone markers (no length field): SOI, EOI, RST0-RST7
+                // These markers must be handled before reading the length field
+                if (marker == 0xFFD8) {
+                    // SOI — skip, continue scanning
+                    continue;
+                }
+                if (marker == 0xFFD9 || marker == 0xFFDA) {
+                    // EOI or SOS — EXIF is always in the header before SOS; stop scanning
+                    return false;
+                }
+                if (marker >= 0xFFD0 && marker <= 0xFFD7) {
+                    // RST0-RST7 — standalone restart markers, no length field
+                    continue;
+                }
+
                 int length = iis.readUnsignedShort();
+
 //                APP1:EXIF
                 if (marker == 0xFFE1) {
+                    // Guard against corrupted APP1 segment: length field must be at least 8
+                    // (2 bytes for length itself + 6 bytes for "Exif\0\0" header)
+                    if (length < 8) {
+                        // Skip the segment body to advance the cursor correctly
+                        if (length > 2) iis.skipBytes(length - 2);
+                        continue;
+                    }
                     byte[] header = new byte[6];
                     iis.readFully(header);
                     if (header[0] == 'E' && header[1] == 'x' && header[2] == 'i'
                             && header[3] == 'f' && header[4] == 0 && header[5] == 0) {
                         return true;
                     }
+                    // Non-EXIF APP1: skip remaining segment body (already read 6 bytes of header)
                     iis.skipBytes(length - 2 - 6);
 
-//                APP0:JIFF
-                }else if(marker==0xFFE0){
-                    return false;
-                }else if (marker == 0xFFD9 || marker == 0xFFDA) {
-                    // EOI or SOS — EXIF is always in the header before SOS; stop scanning
+//                APP0:JFIF
+                } else if (marker == 0xFFE0) {
                     return false;
                 } else {
                     iis.skipBytes(length - 2);
@@ -286,39 +324,75 @@ public final class ImageIOReader implements ImageReader {
     }
 
     /**
-     * Converts an EXIF Orientation value to a clockwise rotation angle in degrees.
+     * Flips the given image either horizontally or vertically using {@link AffineTransform}.
+     *
+     * @param img        the source image to flip; must not be {@code null}
+     * @param horizontal {@code true} to flip left-right (mirror horizontal);
+     *                   {@code false} to flip top-bottom (mirror vertical)
+     * @return the flipped image
+     */
+    private static BufferedImage flipImage(BufferedImage img, boolean horizontal) {
+        int w = img.getWidth();
+        int h = img.getHeight();
+        BufferedImage flipped = new BufferedImage(w, h, safeImageType(img));
+        Graphics2D g2d = flipped.createGraphics();
+        AffineTransform at = new AffineTransform();
+        if (horizontal) {
+            // mirror horizontal: scale x by -1, then translate back
+            at.translate(w, 0);
+            at.scale(-1, 1);
+        } else {
+            // mirror vertical: scale y by -1, then translate back
+            at.translate(0, h);
+            at.scale(1, -1);
+        }
+        g2d.setTransform(at);
+        g2d.drawImage(img, 0, 0, null);
+        g2d.dispose();
+        return flipped;
+    }
+
+    /**
+     * Applies EXIF orientation correction to the given image by handling all 8 standard
+     * EXIF Orientation values via rotation and/or mirroring.
      *
      * <p>Reference: <a href="https://exiftool.org/TagNames/EXIF.html">ExifTool EXIF Tag Names</a></p>
      * <pre>
-     *   1 = Horizontal (normal)
-     *   2 = Mirror horizontal
-     *   3 = Rotate 180
-     *   4 = Mirror vertical
-     *   5 = Mirror horizontal and rotate 270 CW
-     *   6 = Rotate 90 CW
-     *   7 = Mirror horizontal and rotate 90 CW
-     *   8 = Rotate 270 CW
+     *   1 = Horizontal (normal)            → no-op
+     *   2 = Mirror horizontal              → flipImage(img, true)
+     *   3 = Rotate 180                     → rotateImage(img, 180)
+     *   4 = Mirror vertical                → flipImage(img, false)
+     *   5 = Mirror horizontal + Rotate 270 → rotateImage(flipImage(img, true), 270)
+     *   6 = Rotate 90 CW                   → rotateImage(img, 90)
+     *   7 = Mirror horizontal + Rotate 90  → rotateImage(flipImage(img, true), 90)
+     *   8 = Rotate 270 CW                  → rotateImage(img, 270)
+     *   default (including 0)              → no-op (return original)
      * </pre>
      *
-     * <p>TODO: Add support for mirror-based orientation values (2, 4, 5, 7) in IFD0.</p>
-     *
+     * @param img         the source image to correct; must not be {@code null}
      * @param orientation the EXIF orientation value (0–8)
-     * @return the corresponding clockwise rotation angle in degrees
-     * @throws IllegalStateException if the orientation value is not currently supported
+     * @return the corrected image, or the original image for orientation 1 / unknown values
      */
-    private static double orientationToAngle(int orientation) {
+    private static BufferedImage applyOrientation(BufferedImage img, int orientation) {
         switch (orientation) {
-            case 0:
-            case 1: // [Exif IFD0] Orientation - Top, left side (Horizontal / normal)
-                return 0;
-            case 6: // [Exif IFD0] Orientation - Right side, top (Rotate 90 CW)
-                return 90;
-            case 3: // [Exif IFD0] Orientation - Bottom, right side (Rotate 180)
-                return 180;
-            case 8: // [Exif IFD0] Orientation - Left side, bottom (Rotate 270 CW)
-                return 270;
-            default:
-                throw new IllegalStateException("orientation==" + orientation);
+            case 1: // Horizontal (normal) — no-op
+                return img;
+            case 2: // Mirror horizontal
+                return flipImage(img, true);
+            case 3: // Rotate 180
+                return rotateImage(img, 180);
+            case 4: // Mirror vertical
+                return flipImage(img, false);
+            case 5: // Mirror horizontal + Rotate 270 CW
+                return rotateImage(flipImage(img, true), 270);
+            case 6: // Rotate 90 CW
+                return rotateImage(img, 90);
+            case 7: // Mirror horizontal + Rotate 90 CW
+                return rotateImage(flipImage(img, true), 90);
+            case 8: // Rotate 270 CW
+                return rotateImage(img, 270);
+            default: // unknown or 0 — return as-is
+                return img;
         }
     }
 
