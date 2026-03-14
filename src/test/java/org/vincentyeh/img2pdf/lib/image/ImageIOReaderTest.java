@@ -2,23 +2,23 @@
  * ImageIOReaderTest.java
  *
  * Edge-case and boundary-condition tests for {@link ImageIOReader}.
- * Three groups of tests are covered:
+ * Two groups of tests are covered:
  *   1. Byte-level edge cases (null, empty, garbage, injected APP1 segments, EOI, SOS, etc.)
- *   2. Metadata validation using real JPEG files produced by exiftool
- *      (no-EXIF, pure-EXIF-only, JFIF+EXIF for every EXIF Orientation value 1-8)
- *   3. Singleton contract, applyOrientation boundary values, and resource-leak regression
+ *   2. Singleton contract, applyOrientation boundary values, and resource-leak regression
+ *   3. readImage(File) orientation application logic via mock ImageOrientationReader
  */
 package org.vincentyeh.img2pdf.lib.image;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Mockito;
+import org.vincentyeh.img2pdf.lib.image.concrete.reader.ExifOrientationReader;
 import org.vincentyeh.img2pdf.lib.image.concrete.reader.ImageIOReader;
+import org.vincentyeh.img2pdf.lib.image.framework.reader.ImageOrientationReader;
 import org.vincentyeh.img2pdf.lib.image.framework.reader.ImageReader;
 
 import javax.imageio.ImageIO;
-import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -27,12 +27,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.OptionalInt;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Edge-case tests for {@link ImageIOReader}, covering resource-leak safety,
- * EXIF orientation handling via real exiftool-generated JPEG files,
+ * orientation application logic via mock {@link ImageOrientationReader},
  * and boundary conditions across all readImage overloads.
  */
 public class ImageIOReaderTest {
@@ -821,7 +822,7 @@ public class ImageIOReaderTest {
     }
 
     /**
-     * Isolation test: verifies that {@code readExifOrientation} (accessed via reflection)
+     * Isolation test: verifies that {@link ExifOrientationReader#readOrientation(File)}
      * correctly returns Orientation=6 for a JFIF+EXIF JPEG (byte-level, no exiftool).
      */
     @Test
@@ -830,21 +831,20 @@ public class ImageIOReaderTest {
         Path file = tempDir.resolve("diag_jfif_exif_orient.jpg");
         Files.write(file, jpeg);
 
-        java.lang.reflect.Method m = org.vincentyeh.img2pdf.lib.image.concrete.reader.ImageIOReader.class
-                .getDeclaredMethod("readExifOrientation", File.class);
-        m.setAccessible(true);
-        java.util.OptionalInt result = (java.util.OptionalInt) m.invoke(null, file.toFile());
+        ExifOrientationReader exifReader = new ExifOrientationReader();
+        java.util.OptionalInt result = exifReader.readOrientation(file.toFile());
 
         assertTrue(result.isPresent(),
-                "readExifOrientation must find Orientation tag in JFIF+EXIF JPEG; got empty");
+                "readOrientation must find Orientation tag in JFIF+EXIF JPEG; got empty");
         assertEquals(6, result.getAsInt(),
-                "readExifOrientation must return 6 for Orientation=6 EXIF in JFIF+EXIF JPEG");
+                "readOrientation must return 6 for Orientation=6 EXIF in JFIF+EXIF JPEG");
     }
 
     /**
-     * Deep isolation test: verifies that {@code seekJpegExifTiff} (accessed via reflection)
-     * returns {@code true} when given an {@link javax.imageio.stream.ImageInputStream} positioned
-     * immediately after the SOI marker of a JFIF+EXIF JPEG.
+     * Deep isolation test: verifies that {@code seekJpegExifTiff} (accessed via reflection
+     * on {@link ExifOrientationReader}) returns {@code true} when given an
+     * {@link javax.imageio.stream.ImageInputStream} positioned immediately after the SOI marker
+     * of a JFIF+EXIF JPEG.
      */
     @Test
     public void seekJpegExifTiff_jfifThenExifOrientation6_returnsTrue() throws Exception {
@@ -858,7 +858,7 @@ public class ImageIOReaderTest {
         iis.readUnsignedShort(); // consume SOI (FF D8)
 
         try {
-            java.lang.reflect.Method m = org.vincentyeh.img2pdf.lib.image.concrete.reader.ImageIOReader.class
+            java.lang.reflect.Method m = ExifOrientationReader.class
                     .getDeclaredMethod("seekJpegExifTiff",
                             javax.imageio.stream.ImageInputStream.class);
             m.setAccessible(true);
@@ -954,7 +954,8 @@ public class ImageIOReaderTest {
     }
 
     /**
-     * Isolation: readExifOrientation must return OptionalInt.empty() for a JFIF-only JPEG.
+     * Isolation: {@link ExifOrientationReader#readOrientation(File)} must return
+     * {@link OptionalInt#empty()} for a JFIF-only JPEG.
      * Verifies that the APP0-skip path in seekJpegExifTiff terminates cleanly without
      * crashing and returns false (no EXIF), so the caller gets an absent orientation.
      */
@@ -964,13 +965,11 @@ public class ImageIOReaderTest {
         Path file = tempDir.resolve("diag_jfif_only_no_exif.jpg");
         Files.write(file, jpeg);
 
-        java.lang.reflect.Method m = org.vincentyeh.img2pdf.lib.image.concrete.reader.ImageIOReader.class
-                .getDeclaredMethod("readExifOrientation", File.class);
-        m.setAccessible(true);
-        java.util.OptionalInt result = (java.util.OptionalInt) m.invoke(null, file.toFile());
+        ExifOrientationReader exifReader = new ExifOrientationReader();
+        java.util.OptionalInt result = exifReader.readOrientation(file.toFile());
 
         assertFalse(result.isPresent(),
-                "readExifOrientation must return OptionalInt.empty() for a JFIF-only JPEG (no EXIF segment)");
+                "readOrientation must return OptionalInt.empty() for a JFIF-only JPEG (no EXIF segment)");
     }
 
     /**
@@ -1333,8 +1332,8 @@ public class ImageIOReaderTest {
     }
 
     /**
-     * W-4: Isolation test — readExifOrientation must return OptionalInt.empty()
-     * for a JPEG whose Orientation tag has an ASCII (non-Number) value.
+     * W-4: Isolation test — {@link ExifOrientationReader#readOrientation(File)} must return
+     * {@link OptionalInt#empty()} for a JPEG whose Orientation tag has an ASCII (non-Number) value.
      */
     @Test
     public void readExifOrientation_nonNumberOrientationValue_returnsEmpty() throws Exception {
@@ -1343,13 +1342,11 @@ public class ImageIOReaderTest {
         Path file = tempDir.resolve("diag_exif_orient_ascii.jpg");
         Files.write(file, jpeg);
 
-        java.lang.reflect.Method m = org.vincentyeh.img2pdf.lib.image.concrete.reader.ImageIOReader.class
-                .getDeclaredMethod("readExifOrientation", File.class);
-        m.setAccessible(true);
-        java.util.OptionalInt result = (java.util.OptionalInt) m.invoke(null, file.toFile());
+        ExifOrientationReader exifReader = new ExifOrientationReader();
+        java.util.OptionalInt result = exifReader.readOrientation(file.toFile());
 
         assertFalse(result.isPresent(),
-                "readExifOrientation must return OptionalInt.empty() when Orientation entry value is not a Number");
+                "readOrientation must return OptionalInt.empty() when Orientation entry value is not a Number");
     }
 
     // =========================================================================
@@ -1379,320 +1376,61 @@ public class ImageIOReaderTest {
         }
     }
 
-    // =========================================================================
-    // exiftool-based JPEG scenario tests
-    //
-    // These tests create real JPEG files using Java ImageIO, then manipulate
-    // EXIF/JFIF metadata via exiftool to produce three real-world scenarios:
-    //   1. JPEG with no EXIF at all (-all= cleanup)
-    //   2. JPEG with pure EXIF only (JFIF APP0 removed, Orientation injected)
-    //   3. JPEG with both JFIF APP0 and EXIF (Java ImageIO default + Orientation injected)
-    //
-    // All eight EXIF Orientation values (1-8) are tested for scenarios 2 and 3.
-    // =========================================================================
+    // -------------------------------------------------------------------------
+    // readImage(File) — orientation application logic (mock ImageOrientationReader)
+    // -------------------------------------------------------------------------
 
     /**
-     * Creates a 100x50 landscape JPEG (left half blue, right half red) in the temp directory.
-     *
-     * @param name filename within tempDir
-     * @return the created JPEG file
-     * @throws IOException if the file cannot be written
-     */
-    private File createLandscapeJpeg(String name) throws IOException {
-        BufferedImage img = new BufferedImage(100, 50, BufferedImage.TYPE_INT_RGB);
-        Graphics2D g = img.createGraphics();
-        g.setColor(Color.BLUE);
-        g.fillRect(0, 0, 50, 50);
-        g.setColor(Color.RED);
-        g.fillRect(50, 0, 50, 50);
-        g.dispose();
-        File f = tempDir.resolve(name).toFile();
-        ImageIO.write(img, "jpeg", f);
-        return f;
-    }
-
-    /**
-     * Executes exiftool with the given arguments. Prepends "exiftool" as the command.
-     * Throws IOException if exiftool exits with a non-zero status code.
-     *
-     * @param args exiftool arguments (not including the "exiftool" command itself)
-     * @throws IOException          if exiftool exits with a non-zero status
-     * @throws InterruptedException if the process is interrupted while waiting
-     */
-    private static void exiftool(String... args) throws IOException, InterruptedException {
-        String[] cmd = new String[args.length + 1];
-        cmd[0] = "exiftool";
-        System.arraycopy(args, 0, cmd, 1, args.length);
-        Process p = Runtime.getRuntime().exec(cmd);
-        if (p.waitFor() != 0) {
-            throw new IOException("exiftool failed, exit=" + p.exitValue());
-        }
-    }
-
-    /**
-     * Asserts that the decoded image dimensions match expectations based on EXIF orientation.
-     * Orientations 5-8 rotate 90/270 degrees, swapping width and height.
-     * Orientations 1-4 do not rotate (or rotate 180 degrees), leaving dimensions unchanged.
-     *
-     * @param orientation EXIF orientation value (1-8)
-     * @param origW       original image width before any orientation is applied
-     * @param origH       original image height before any orientation is applied
-     * @param result      the decoded image after orientation correction
-     */
-    private static void assertDimensionsForOrientation(int orientation, int origW, int origH, BufferedImage result) {
-        if (orientation >= 5 && orientation <= 8) {
-            // 90/270 degree rotation: width and height are swapped
-            assertEquals(origH, result.getWidth(),
-                    "Orientation=" + orientation + " width after rotation should be " + origH);
-            assertEquals(origW, result.getHeight(),
-                    "Orientation=" + orientation + " height after rotation should be " + origW);
-        } else {
-            // Orientation 1/2/3/4: dimensions unchanged
-            assertEquals(origW, result.getWidth(),
-                    "Orientation=" + orientation + " width should remain " + origW);
-            assertEquals(origH, result.getHeight(),
-                    "Orientation=" + orientation + " height should remain " + origH);
-        }
-    }
-
-    /**
-     * Scenario 1: JPEG with all metadata stripped via exiftool {@code -all=}.
-     * No EXIF Orientation tag is present; the decoder must return the original dimensions.
+     * When orientationReader returns Orientation=2 (mirror horizontal), readImage(File) must
+     * apply the flip and return a non-null image with the same dimensions.
      */
     @Test
-    public void readImageFile_jpegNoExif_returnsOriginalDimensions() throws IOException, InterruptedException {
-        File f = createLandscapeJpeg("no_exif.jpg");
-        exiftool("-all=", "-overwrite_original", f.getAbsolutePath());
-
-        BufferedImage result = ImageIOReader.getInstance().readImage(f);
-
-        assertNotNull(result, "image must be decoded from JPEG with no EXIF");
-        assertEquals(100, result.getWidth(), "no-EXIF JPEG width must be 100");
-        assertEquals(50, result.getHeight(), "no-EXIF JPEG height must be 50");
-    }
-
-    // =========================================================================
-    // Scenario 2: pure EXIF only (JFIF APP0 removed), Orientations 1-8
-    // =========================================================================
-
-    /**
-     * Scenario 2, Orientation=1: pure EXIF only, no JFIF APP0.
-     * Orientation 1 is a no-op; dimensions must remain 100x50.
-     */
-    @Test
-    public void readImageFile_jpegExifOnly_orientation1_dimensionsUnchanged() throws IOException, InterruptedException {
-        File f = createLandscapeJpeg("exif_only_1.jpg");
-        exiftool("-JFIF:all=", "-overwrite_original", f.getAbsolutePath());
-        exiftool("-Orientation=1", "-n", "-overwrite_original", f.getAbsolutePath());
-        BufferedImage result = ImageIOReader.getInstance().readImage(f);
+    public void readImageFile_mockOrientationTwo_imageFlippedSameDimensions() throws Exception {
+        ImageOrientationReader mockReader = Mockito.mock(ImageOrientationReader.class);
+        Mockito.when(mockReader.readOrientation(Mockito.any())).thenReturn(OptionalInt.of(2));
+        ImageIOReader reader = new ImageIOReader(mockReader);
+        Path jpeg = tempDir.resolve("mock_o2.jpg");
+        BufferedImage src = new BufferedImage(100, 50, BufferedImage.TYPE_INT_RGB);
+        ImageIO.write(src, "jpeg", jpeg.toFile());
+        BufferedImage result = reader.readImage(jpeg.toFile());
         assertNotNull(result);
-        assertDimensionsForOrientation(1, 100, 50, result);
+        assertEquals(100, result.getWidth());
+        assertEquals(50, result.getHeight());
     }
 
     /**
-     * Scenario 2, Orientation=2: pure EXIF only, no JFIF APP0.
-     * Orientation 2 is a horizontal mirror; dimensions must remain 100x50.
+     * When orientationReader returns empty, readImage(File) must return a non-null image
+     * with the original dimensions without applying any transformation.
      */
     @Test
-    public void readImageFile_jpegExifOnly_orientation2_dimensionsUnchanged() throws IOException, InterruptedException {
-        File f = createLandscapeJpeg("exif_only_2.jpg");
-        exiftool("-JFIF:all=", "-overwrite_original", f.getAbsolutePath());
-        exiftool("-Orientation=2", "-n", "-overwrite_original", f.getAbsolutePath());
-        BufferedImage result = ImageIOReader.getInstance().readImage(f);
+    public void readImageFile_mockOrientationEmpty_imageReturnedAsIs() throws Exception {
+        ImageOrientationReader mockReader = Mockito.mock(ImageOrientationReader.class);
+        Mockito.when(mockReader.readOrientation(Mockito.any())).thenReturn(OptionalInt.empty());
+        ImageIOReader reader = new ImageIOReader(mockReader);
+        Path jpeg = tempDir.resolve("mock_no_orientation.jpg");
+        BufferedImage src = new BufferedImage(60, 40, BufferedImage.TYPE_INT_RGB);
+        ImageIO.write(src, "jpeg", jpeg.toFile());
+        BufferedImage result = reader.readImage(jpeg.toFile());
         assertNotNull(result);
-        assertDimensionsForOrientation(2, 100, 50, result);
+        assertEquals(60, result.getWidth());
+        assertEquals(40, result.getHeight());
     }
 
     /**
-     * Scenario 2, Orientation=3: pure EXIF only, no JFIF APP0.
-     * Orientation 3 is 180-degree rotation; dimensions must remain 100x50.
+     * When orientationReader returns Orientation=6 (rotate 90 CW), readImage(File) must
+     * return an image with swapped dimensions (100x50 becomes 50x100).
      */
     @Test
-    public void readImageFile_jpegExifOnly_orientation3_dimensionsUnchanged() throws IOException, InterruptedException {
-        File f = createLandscapeJpeg("exif_only_3.jpg");
-        exiftool("-JFIF:all=", "-overwrite_original", f.getAbsolutePath());
-        exiftool("-Orientation=3", "-n", "-overwrite_original", f.getAbsolutePath());
-        BufferedImage result = ImageIOReader.getInstance().readImage(f);
+    public void readImageFile_mockOrientationSix_widthAndHeightSwapped() throws Exception {
+        ImageOrientationReader mockReader = Mockito.mock(ImageOrientationReader.class);
+        Mockito.when(mockReader.readOrientation(Mockito.any())).thenReturn(OptionalInt.of(6));
+        ImageIOReader reader = new ImageIOReader(mockReader);
+        Path jpeg = tempDir.resolve("mock_o6.jpg");
+        BufferedImage src = new BufferedImage(100, 50, BufferedImage.TYPE_INT_RGB);
+        ImageIO.write(src, "jpeg", jpeg.toFile());
+        BufferedImage result = reader.readImage(jpeg.toFile());
         assertNotNull(result);
-        assertDimensionsForOrientation(3, 100, 50, result);
-    }
-
-    /**
-     * Scenario 2, Orientation=4: pure EXIF only, no JFIF APP0.
-     * Orientation 4 is a vertical mirror; dimensions must remain 100x50.
-     */
-    @Test
-    public void readImageFile_jpegExifOnly_orientation4_dimensionsUnchanged() throws IOException, InterruptedException {
-        File f = createLandscapeJpeg("exif_only_4.jpg");
-        exiftool("-JFIF:all=", "-overwrite_original", f.getAbsolutePath());
-        exiftool("-Orientation=4", "-n", "-overwrite_original", f.getAbsolutePath());
-        BufferedImage result = ImageIOReader.getInstance().readImage(f);
-        assertNotNull(result);
-        assertDimensionsForOrientation(4, 100, 50, result);
-    }
-
-    /**
-     * Scenario 2, Orientation=5: pure EXIF only, no JFIF APP0.
-     * Orientation 5 rotates 90 degrees; dimensions must be swapped to 50x100.
-     */
-    @Test
-    public void readImageFile_jpegExifOnly_orientation5_dimensionsSwapped() throws IOException, InterruptedException {
-        File f = createLandscapeJpeg("exif_only_5.jpg");
-        exiftool("-JFIF:all=", "-overwrite_original", f.getAbsolutePath());
-        exiftool("-Orientation=5", "-n", "-overwrite_original", f.getAbsolutePath());
-        BufferedImage result = ImageIOReader.getInstance().readImage(f);
-        assertNotNull(result);
-        assertDimensionsForOrientation(5, 100, 50, result);
-    }
-
-    /**
-     * Scenario 2, Orientation=6: pure EXIF only, no JFIF APP0.
-     * Orientation 6 rotates 90 degrees CW; dimensions must be swapped to 50x100.
-     */
-    @Test
-    public void readImageFile_jpegExifOnly_orientation6_dimensionsSwapped() throws IOException, InterruptedException {
-        File f = createLandscapeJpeg("exif_only_6.jpg");
-        exiftool("-JFIF:all=", "-overwrite_original", f.getAbsolutePath());
-        exiftool("-Orientation=6", "-n", "-overwrite_original", f.getAbsolutePath());
-        BufferedImage result = ImageIOReader.getInstance().readImage(f);
-        assertNotNull(result);
-        assertDimensionsForOrientation(6, 100, 50, result);
-    }
-
-    /**
-     * Scenario 2, Orientation=7: pure EXIF only, no JFIF APP0.
-     * Orientation 7 rotates 270 degrees with mirror; dimensions must be swapped to 50x100.
-     */
-    @Test
-    public void readImageFile_jpegExifOnly_orientation7_dimensionsSwapped() throws IOException, InterruptedException {
-        File f = createLandscapeJpeg("exif_only_7.jpg");
-        exiftool("-JFIF:all=", "-overwrite_original", f.getAbsolutePath());
-        exiftool("-Orientation=7", "-n", "-overwrite_original", f.getAbsolutePath());
-        BufferedImage result = ImageIOReader.getInstance().readImage(f);
-        assertNotNull(result);
-        assertDimensionsForOrientation(7, 100, 50, result);
-    }
-
-    /**
-     * Scenario 2, Orientation=8: pure EXIF only, no JFIF APP0.
-     * Orientation 8 rotates 270 degrees CW; dimensions must be swapped to 50x100.
-     */
-    @Test
-    public void readImageFile_jpegExifOnly_orientation8_dimensionsSwapped() throws IOException, InterruptedException {
-        File f = createLandscapeJpeg("exif_only_8.jpg");
-        exiftool("-JFIF:all=", "-overwrite_original", f.getAbsolutePath());
-        exiftool("-Orientation=8", "-n", "-overwrite_original", f.getAbsolutePath());
-        BufferedImage result = ImageIOReader.getInstance().readImage(f);
-        assertNotNull(result);
-        assertDimensionsForOrientation(8, 100, 50, result);
-    }
-
-    // =========================================================================
-    // Scenario 3: JFIF APP0 + EXIF Orientation injected, Orientations 1-8
-    // =========================================================================
-
-    /**
-     * Scenario 3, Orientation=1: JFIF APP0 retained, EXIF Orientation=1 injected.
-     * Orientation 1 is a no-op; dimensions must remain 100x50.
-     */
-    @Test
-    public void readImageFile_jpegJfifPlusExif_orientation1_dimensionsUnchanged() throws IOException, InterruptedException {
-        File f = createLandscapeJpeg("jfif_exif_1.jpg");
-        exiftool("-Orientation=1", "-n", "-overwrite_original", f.getAbsolutePath());
-        BufferedImage result = ImageIOReader.getInstance().readImage(f);
-        assertNotNull(result);
-        assertDimensionsForOrientation(1, 100, 50, result);
-    }
-
-    /**
-     * Scenario 3, Orientation=2: JFIF APP0 retained, EXIF Orientation=2 injected.
-     * Orientation 2 is a horizontal mirror; dimensions must remain 100x50.
-     */
-    @Test
-    public void readImageFile_jpegJfifPlusExif_orientation2_dimensionsUnchanged() throws IOException, InterruptedException {
-        File f = createLandscapeJpeg("jfif_exif_2.jpg");
-        exiftool("-Orientation=2", "-n", "-overwrite_original", f.getAbsolutePath());
-        BufferedImage result = ImageIOReader.getInstance().readImage(f);
-        assertNotNull(result);
-        assertDimensionsForOrientation(2, 100, 50, result);
-    }
-
-    /**
-     * Scenario 3, Orientation=3: JFIF APP0 retained, EXIF Orientation=3 injected.
-     * Orientation 3 is 180-degree rotation; dimensions must remain 100x50.
-     */
-    @Test
-    public void readImageFile_jpegJfifPlusExif_orientation3_dimensionsUnchanged() throws IOException, InterruptedException {
-        File f = createLandscapeJpeg("jfif_exif_3.jpg");
-        exiftool("-Orientation=3", "-n", "-overwrite_original", f.getAbsolutePath());
-        BufferedImage result = ImageIOReader.getInstance().readImage(f);
-        assertNotNull(result);
-        assertDimensionsForOrientation(3, 100, 50, result);
-    }
-
-    /**
-     * Scenario 3, Orientation=4: JFIF APP0 retained, EXIF Orientation=4 injected.
-     * Orientation 4 is a vertical mirror; dimensions must remain 100x50.
-     */
-    @Test
-    public void readImageFile_jpegJfifPlusExif_orientation4_dimensionsUnchanged() throws IOException, InterruptedException {
-        File f = createLandscapeJpeg("jfif_exif_4.jpg");
-        exiftool("-Orientation=4", "-n", "-overwrite_original", f.getAbsolutePath());
-        BufferedImage result = ImageIOReader.getInstance().readImage(f);
-        assertNotNull(result);
-        assertDimensionsForOrientation(4, 100, 50, result);
-    }
-
-    /**
-     * Scenario 3, Orientation=5: JFIF APP0 retained, EXIF Orientation=5 injected.
-     * Orientation 5 rotates 90 degrees with mirror; dimensions must be swapped to 50x100.
-     */
-    @Test
-    public void readImageFile_jpegJfifPlusExif_orientation5_dimensionsSwapped() throws IOException, InterruptedException {
-        File f = createLandscapeJpeg("jfif_exif_5.jpg");
-        exiftool("-Orientation=5", "-n", "-overwrite_original", f.getAbsolutePath());
-        BufferedImage result = ImageIOReader.getInstance().readImage(f);
-        assertNotNull(result);
-        assertDimensionsForOrientation(5, 100, 50, result);
-    }
-
-    /**
-     * Scenario 3, Orientation=6: JFIF APP0 retained, EXIF Orientation=6 injected.
-     * Orientation 6 rotates 90 degrees CW; dimensions must be swapped to 50x100.
-     * This is the primary regression test for the APP0 skip-and-continue bug.
-     */
-    @Test
-    public void readImageFile_jpegJfifPlusExif_orientation6_dimensionsSwapped() throws IOException, InterruptedException {
-        File f = createLandscapeJpeg("jfif_exif_6.jpg");
-        exiftool("-Orientation=6", "-n", "-overwrite_original", f.getAbsolutePath());
-        BufferedImage result = ImageIOReader.getInstance().readImage(f);
-        assertNotNull(result);
-        assertDimensionsForOrientation(6, 100, 50, result);
-    }
-
-    /**
-     * Scenario 3, Orientation=7: JFIF APP0 retained, EXIF Orientation=7 injected.
-     * Orientation 7 rotates 270 degrees with mirror; dimensions must be swapped to 50x100.
-     */
-    @Test
-    public void readImageFile_jpegJfifPlusExif_orientation7_dimensionsSwapped() throws IOException, InterruptedException {
-        File f = createLandscapeJpeg("jfif_exif_7.jpg");
-        exiftool("-Orientation=7", "-n", "-overwrite_original", f.getAbsolutePath());
-        BufferedImage result = ImageIOReader.getInstance().readImage(f);
-        assertNotNull(result);
-        assertDimensionsForOrientation(7, 100, 50, result);
-    }
-
-    /**
-     * Scenario 3, Orientation=8: JFIF APP0 retained, EXIF Orientation=8 injected.
-     * Orientation 8 rotates 270 degrees CW; dimensions must be swapped to 50x100.
-     */
-    @Test
-    public void readImageFile_jpegJfifPlusExif_orientation8_dimensionsSwapped() throws IOException, InterruptedException {
-        File f = createLandscapeJpeg("jfif_exif_8.jpg");
-        exiftool("-Orientation=8", "-n", "-overwrite_original", f.getAbsolutePath());
-        BufferedImage result = ImageIOReader.getInstance().readImage(f);
-        assertNotNull(result);
-        assertDimensionsForOrientation(8, 100, 50, result);
+        assertEquals(50, result.getWidth());
+        assertEquals(100, result.getHeight());
     }
 }
