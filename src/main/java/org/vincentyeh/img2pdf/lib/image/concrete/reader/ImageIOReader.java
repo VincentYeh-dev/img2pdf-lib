@@ -59,9 +59,13 @@ public final class ImageIOReader implements ImageReader {
      * {@inheritDoc}
      *
      * <p>Delegates directly to {@link ImageIO#read(InputStream)}.</p>
+     *
+     * @throws ImageReadingException if {@code inputStream} is {@code null}
      */
     @Override
     public BufferedImage readImage(InputStream inputStream) throws IOException {
+        if (inputStream == null)
+            throw new ImageReadingException("inputStream must not be null", null);
         return ImageIO.read(inputStream);
     }
 
@@ -70,10 +74,18 @@ public final class ImageIOReader implements ImageReader {
      *
      * <p>Reads the image from the stream, then converts its color space via
      * {@link #convertColorSpace(BufferedImage, ColorType)}.</p>
+     *
+     * @throws ImageReadingException if {@code inputStream} is {@code null}, or if the image
+     *                               format is unsupported and {@link ImageIO#read} returns {@code null}
      */
     @Override
     public BufferedImage readImage(InputStream inputStream, ColorType colorType) throws IOException {
-        return convertColorSpace(readImage(inputStream), colorType);
+        if (inputStream == null)
+            throw new ImageReadingException("inputStream must not be null", null);
+        BufferedImage img = readImage(inputStream);
+        if (img == null)
+            throw new ImageReadingException("Unable to decode image from InputStream: unsupported format", null);
+        return convertColorSpace(img, colorType);
     }
 
     /**
@@ -81,9 +93,13 @@ public final class ImageIOReader implements ImageReader {
      *
      * <p>Wraps the byte array in a {@link ByteArrayInputStream} and delegates to
      * {@link ImageIO#read(InputStream)}.</p>
+     *
+     * @throws ImageReadingException if {@code imageData} is {@code null}
      */
     @Override
     public BufferedImage readImage(byte[] imageData) throws IOException {
+        if (imageData == null)
+            throw new ImageReadingException("imageData must not be null", null);
         ByteArrayInputStream inputStream = new ByteArrayInputStream(imageData);
         return ImageIO.read(inputStream);
     }
@@ -93,10 +109,18 @@ public final class ImageIOReader implements ImageReader {
      *
      * <p>Reads the image from the byte array, then converts its color space via
      * {@link #convertColorSpace(BufferedImage, ColorType)}.</p>
+     *
+     * @throws ImageReadingException if {@code imageData} is {@code null}, or if the image
+     *                               format is unsupported and {@link ImageIO#read} returns {@code null}
      */
     @Override
     public BufferedImage readImage(byte[] imageData, ColorType colorType) throws IOException {
-        return convertColorSpace(readImage(imageData), colorType);
+        if (imageData == null)
+            throw new ImageReadingException("imageData must not be null", null);
+        BufferedImage img = readImage(imageData);
+        if (img == null)
+            throw new ImageReadingException("Unable to decode image from byte[]: unsupported format", null);
+        return convertColorSpace(img, colorType);
     }
 
     /**
@@ -118,6 +142,8 @@ public final class ImageIOReader implements ImageReader {
             try (InputStream is = Files.newInputStream(file.toPath())) {
                 rawImage = readImage(is);
             }
+            if (rawImage == null)
+                throw new ImageReadingException("Unable to read image file: " + file.toPath(), null);
             OptionalInt orientationOpt = readExifOrientation(file);
             if (orientationOpt.isPresent()) {
                 return applyOrientation(rawImage, orientationOpt.getAsInt());
@@ -133,10 +159,16 @@ public final class ImageIOReader implements ImageReader {
      *
      * <p>Reads the image from the file (with EXIF orientation correction), then converts
      * its color space via {@link #convertColorSpace(BufferedImage, ColorType)}.</p>
+     *
+     * @throws ImageReadingException if {@link #readImage(File)} returns {@code null},
+     *                               indicating an unsupported image format
      */
     @Override
     public BufferedImage readImage(File imagePath, ColorType colorType) throws IOException {
-        return convertColorSpace(readImage(imagePath), colorType);
+        BufferedImage img = readImage(imagePath);
+        if (img == null)
+            throw new ImageReadingException("Unable to decode image from file: unsupported format", null);
+        return convertColorSpace(img, colorType);
     }
 
     /**
@@ -230,24 +262,25 @@ public final class ImageIOReader implements ImageReader {
             // Wrap the remaining stream so TIFF data appears to start at position 0,
             // ensuring seek(ifdOffset) lands at the correct position within the TIFF block.
             final ImageInputStream src = iis;
-            ImageInputStream tiffStream = new javax.imageio.stream.MemoryCacheImageInputStream(
+            try (ImageInputStream tiffStream = new javax.imageio.stream.MemoryCacheImageInputStream(
                     new InputStream() {
                         @Override public int read() throws IOException { return src.read(); }
                         @Override public int read(byte[] b, int off, int len) throws IOException {
                             return src.read(b, off, len);
                         }
-                    });
+                    })) {
 
-            Directory dir = new TIFFReader().read(tiffStream);
-            Directory ifd0 = (dir instanceof CompoundDirectory)
-                    ? ((CompoundDirectory) dir).getDirectory(0) : dir;
+                Directory dir = new TIFFReader().read(tiffStream);
+                Directory ifd0 = (dir instanceof CompoundDirectory)
+                        ? ((CompoundDirectory) dir).getDirectory(0) : dir;
 
-            Entry entry = ifd0.getEntryById(TIFF.TAG_ORIENTATION);
-            if (entry == null) return OptionalInt.empty();
-            // Guard against null EXIF value to avoid NPE on cast
-            Object value = entry.getValue();
-            if (value == null) return OptionalInt.empty();
-            return OptionalInt.of(((Number) value).intValue());
+                Entry entry = ifd0.getEntryById(TIFF.TAG_ORIENTATION);
+                if (entry == null) return OptionalInt.empty();
+                // Guard against null or unexpected type to avoid NPE / ClassCastException
+                Object value = entry.getValue();
+                if (!(value instanceof Number)) return OptionalInt.empty();
+                return OptionalInt.of(((Number) value).intValue());
+            }
         }
     }
 
@@ -285,7 +318,20 @@ public final class ImageIOReader implements ImageReader {
     private static boolean seekJpegExifTiff(ImageInputStream iis) throws IOException {
         try {
             while (true) {
-                int marker = iis.readUnsignedShort();
+                // Read marker with padding support: JPEG spec allows any number of 0xFF fill bytes
+                // before the actual marker byte. Consume fill bytes until a non-0xFF byte is found.
+                int b = iis.readUnsignedByte();
+                if (b != 0xFF) {
+                    // Not at a marker boundary; stream is corrupt or misaligned
+                    return false;
+                }
+                // Skip additional 0xFF padding bytes
+                int markerByte;
+                do {
+                    markerByte = iis.readUnsignedByte();
+                } while (markerByte == 0xFF);
+
+                int marker = 0xFF00 | markerByte;
 
                 // Standalone markers (no length field): SOI, EOI, RST0-RST7
                 // These markers must be handled before reading the length field
@@ -308,9 +354,11 @@ public final class ImageIOReader implements ImageReader {
                 if (marker == 0xFFE1) {
                     // Guard against corrupted APP1 segment: length field must be at least 8
                     // (2 bytes for length itself + 6 bytes for "Exif\0\0" header)
+                    // segmentEnd marks the stream position right after this segment's payload.
+                    long segmentEnd = iis.getStreamPosition() + (length - 2);
                     if (length < 8) {
                         // Skip the segment body to advance the cursor correctly
-                        if (length > 2) iis.skipBytes(length - 2);
+                        iis.seek(segmentEnd);
                         continue;
                     }
                     byte[] header = new byte[6];
@@ -319,14 +367,12 @@ public final class ImageIOReader implements ImageReader {
                             && header[3] == 'f' && header[4] == 0 && header[5] == 0) {
                         return true;
                     }
-                    // Non-EXIF APP1: skip remaining segment body (already read 6 bytes of header)
-                    iis.skipBytes(length - 2 - 6);
+                    // Non-EXIF APP1: seek to end of segment (avoids skipBytes partial-skip issue)
+                    iis.seek(segmentEnd);
 
-//                APP0:JFIF — skip and continue; some files have both JFIF + EXIF
-                } else if (marker == 0xFFE0) {
-                    iis.skipBytes(length - 2);
                 } else {
-                    iis.skipBytes(length - 2);
+                    // APP0 (JFIF) and other unknown markers: skip segment and continue
+                    iis.seek(iis.getStreamPosition() + (length - 2));
                 }
             }
         } catch (java.io.EOFException e) {
@@ -403,7 +449,9 @@ public final class ImageIOReader implements ImageReader {
                 return rotateImage(flipImage(img, true), 90);
             case 8: // Rotate 270 CW
                 return rotateImage(img, 270);
-            default: // unknown or 0 — return as-is
+            default: // unknown or out-of-range orientation — log warning and return as-is
+                System.err.println("[ImageIOReader] WARNING: Unrecognized EXIF orientation value: "
+                        + orientation + "; image returned without transformation.");
                 return img;
         }
     }

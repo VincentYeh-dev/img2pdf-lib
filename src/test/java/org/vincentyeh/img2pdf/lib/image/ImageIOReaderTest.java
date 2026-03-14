@@ -63,16 +63,18 @@ public class ImageIOReaderTest {
     }
 
     /**
-     * Verifies that a file containing random garbage bytes does not throw an exception
-     * and returns null. The InputStream must be closed even in this case.
+     * Verifies that a file containing random garbage bytes throws ImageReadingException.
+     * The production code now treats an unrecognized format (ImageIO.read returns null)
+     * as an error condition, so ImageReadingException must be raised rather than
+     * returning null.  The InputStream must still be closed before the exception propagates.
      */
     @Test
-    public void readImageFile_garbageBytes_returnsNull() throws IOException {
+    public void readImageFile_garbageBytes_throwsImageReadingException() throws IOException {
         ImageReader reader = ImageIOReader.getInstance();
         Path corruptFile = tempDir.resolve("corrupt.jpg");
         Files.write(corruptFile, new byte[]{0x00, 0x01, 0x02, 0x03, 0x7F, (byte) 0xFF});
-        BufferedImage result = reader.readImage(corruptFile.toFile());
-        assertNull(result);
+        assertThrows(ImageReadingException.class,
+                () -> reader.readImage(corruptFile.toFile()));
     }
 
     /**
@@ -96,17 +98,19 @@ public class ImageIOReaderTest {
     }
 
     /**
-     * Verifies that a file filled with null bytes (all zeros) does not throw and
-     * returns null. Guards against a regression where the InputStream leaked on
-     * ImageIO.read() returning null.
+     * Verifies that a file filled with all-zero bytes throws ImageReadingException.
+     * The production code now treats an unrecognized format (ImageIO.read returns null)
+     * as an error, raising ImageReadingException instead of returning null.
+     * This also guards against a resource-leak regression: the InputStream must be
+     * closed even when ImageReadingException is thrown.
      */
     @Test
-    public void readImageFile_allZeroBytes_returnsNull() throws IOException {
+    public void readImageFile_allZeroBytes_throwsImageReadingException() throws IOException {
         ImageReader reader = ImageIOReader.getInstance();
         Path zeroFile = tempDir.resolve("zeros.png");
         Files.write(zeroFile, new byte[1024]);
-        BufferedImage result = reader.readImage(zeroFile.toFile());
-        assertNull(result);
+        assertThrows(ImageReadingException.class,
+                () -> reader.readImage(zeroFile.toFile()));
     }
 
     // -------------------------------------------------------------------------
@@ -1306,6 +1310,311 @@ public class ImageIOReaderTest {
         assertTrue(result.getHeight() > result.getWidth(),
                 "APP0+non-EXIF APP1+EXIF Orientation=6 must swap dimensions: expected height > width, got "
                         + result.getWidth() + "x" + result.getHeight());
+    }
+
+    // =========================================================================
+    // W-1: null InputStream / null byte[] — readImage overloads without ColorType
+    // =========================================================================
+
+    /**
+     * W-1: readImage(InputStream) with a null stream must throw ImageReadingException,
+     * not NullPointerException.
+     */
+    @Test
+    public void readImageInputStream_nullStream_throwsImageReadingException() {
+        ImageReader reader = ImageIOReader.getInstance();
+        assertThrows(ImageReadingException.class,
+                () -> reader.readImage((java.io.InputStream) null));
+    }
+
+    /**
+     * W-1: readImage(byte[]) with a null array must throw ImageReadingException,
+     * not NullPointerException.
+     */
+    @Test
+    public void readImageByteArray_nullArray_throwsImageReadingException() {
+        ImageReader reader = ImageIOReader.getInstance();
+        assertThrows(ImageReadingException.class,
+                () -> reader.readImage((byte[]) null));
+    }
+
+    // =========================================================================
+    // W-1: null InputStream / null byte[] — readImage overloads WITH ColorType
+    // =========================================================================
+
+    /**
+     * W-1: readImage(InputStream, ColorType) with a null stream must throw ImageReadingException,
+     * not NullPointerException.
+     */
+    @Test
+    public void readImageInputStreamColorType_nullStream_throwsImageReadingException() {
+        ImageReader reader = ImageIOReader.getInstance();
+        assertThrows(ImageReadingException.class,
+                () -> reader.readImage((java.io.InputStream) null, ColorType.sRGB));
+    }
+
+    /**
+     * W-1: readImage(byte[], ColorType) with a null array must throw ImageReadingException,
+     * not NullPointerException.
+     */
+    @Test
+    public void readImageByteArrayColorType_nullArray_throwsImageReadingException() {
+        ImageReader reader = ImageIOReader.getInstance();
+        assertThrows(ImageReadingException.class,
+                () -> reader.readImage((byte[]) null, ColorType.sRGB));
+    }
+
+    // =========================================================================
+    // W-2 / C-1: unsupported-format file — readImage(File) and readImage(File, ColorType)
+    // must throw ImageReadingException, never NullPointerException
+    // =========================================================================
+
+    /**
+     * W-2: readImage(File) given a file with an unrecognized extension and garbage content
+     * must throw ImageReadingException (not NPE) when ImageIO.read() returns null.
+     */
+    @Test
+    public void readImageFile_unsupportedFormat_throwsImageReadingExceptionNotNpe() throws IOException {
+        ImageReader reader = ImageIOReader.getInstance();
+        Path xyzFile = tempDir.resolve("unsupported.xyz");
+        Files.write(xyzFile, new byte[]{0x00, 0x01, 0x02, 0x03, 0x7F, (byte) 0xAB, (byte) 0xCD});
+        assertThrows(ImageReadingException.class,
+                () -> reader.readImage(xyzFile.toFile()),
+                "readImage(File) must throw ImageReadingException for an unsupported format, not NPE");
+    }
+
+    /**
+     * W-2: readImage(File, ColorType) given an unsupported-format file must throw
+     * ImageReadingException (not NPE) — the null-image guard must fire before any cast.
+     */
+    @Test
+    public void readImageFileColorType_unsupportedFormat_throwsImageReadingExceptionNotNpe() throws IOException {
+        ImageReader reader = ImageIOReader.getInstance();
+        Path xyzFile = tempDir.resolve("unsupported_ct.xyz");
+        Files.write(xyzFile, new byte[]{0x00, 0x01, 0x02, 0x03, 0x7F, (byte) 0xAB, (byte) 0xCD});
+        assertThrows(ImageReadingException.class,
+                () -> reader.readImage(xyzFile.toFile(), ColorType.sRGB),
+                "readImage(File, ColorType) must throw ImageReadingException for an unsupported format, not NPE");
+    }
+
+    /**
+     * W-2: readImage(InputStream, ColorType) with garbage bytes that no decoder recognizes
+     * must throw ImageReadingException because ImageIO.read() returns null.
+     */
+    @Test
+    public void readImageInputStreamColorType_garbageBytes_throwsImageReadingException() {
+        ImageReader reader = ImageIOReader.getInstance();
+        java.io.InputStream garbage = new ByteArrayInputStream(
+                new byte[]{0x00, 0x01, 0x02, 0x03, 0x7F, (byte) 0xFF});
+        assertThrows(ImageReadingException.class,
+                () -> reader.readImage(garbage, ColorType.sRGB),
+                "readImage(InputStream, ColorType) must throw ImageReadingException when format is unrecognized");
+    }
+
+    /**
+     * W-2: readImage(byte[], ColorType) with garbage bytes that no decoder recognizes
+     * must throw ImageReadingException because ImageIO.read() returns null.
+     */
+    @Test
+    public void readImageByteArrayColorType_garbageBytes_throwsImageReadingException() {
+        ImageReader reader = ImageIOReader.getInstance();
+        byte[] garbage = new byte[]{0x00, 0x01, 0x02, 0x03, 0x7F, (byte) 0xFF};
+        assertThrows(ImageReadingException.class,
+                () -> reader.readImage(garbage, ColorType.sRGB),
+                "readImage(byte[], ColorType) must throw ImageReadingException when format is unrecognized");
+    }
+
+    // =========================================================================
+    // W-3: orientation value out of range (9) — applyOrientation must return
+    // the original image unchanged and print a warning to System.err.
+    // Accessed via reflection because applyOrientation is private.
+    // =========================================================================
+
+    /**
+     * W-3: applyOrientation with orientation=9 (out of 1-8 range) must return
+     * the original image instance unchanged without throwing any exception.
+     */
+    @Test
+    public void applyOrientation_orientationNine_returnsOriginalImageWithoutException() throws Exception {
+        java.lang.reflect.Method m = org.vincentyeh.img2pdf.lib.image.concrete.reader.ImageIOReader.class
+                .getDeclaredMethod("applyOrientation", BufferedImage.class, int.class);
+        m.setAccessible(true);
+
+        BufferedImage original = new BufferedImage(4, 4, BufferedImage.TYPE_INT_RGB);
+        // Must not throw; must return the same instance (default/unknown branch is a no-op)
+        BufferedImage result = assertDoesNotThrow(() ->
+                (BufferedImage) m.invoke(null, original, 9));
+        assertSame(original, result,
+                "applyOrientation with out-of-range value 9 must return the original image unchanged");
+    }
+
+    /**
+     * W-3: applyOrientation with orientation=9 must write a warning to System.err.
+     * Redirects System.err temporarily to capture the output.
+     */
+    @Test
+    public void applyOrientation_orientationNine_writesWarningToStderr() throws Exception {
+        java.lang.reflect.Method m = org.vincentyeh.img2pdf.lib.image.concrete.reader.ImageIOReader.class
+                .getDeclaredMethod("applyOrientation", BufferedImage.class, int.class);
+        m.setAccessible(true);
+
+        java.io.PrintStream originalErr = System.err;
+        ByteArrayOutputStream captured = new ByteArrayOutputStream();
+        System.setErr(new java.io.PrintStream(captured));
+        try {
+            m.invoke(null, new BufferedImage(4, 4, BufferedImage.TYPE_INT_RGB), 9);
+        } finally {
+            System.setErr(originalErr);
+        }
+
+        String output = captured.toString();
+        assertTrue(output.contains("9"),
+                "applyOrientation with orientation=9 must print the unrecognized value in the warning; got: "
+                        + output);
+    }
+
+    /**
+     * W-3: applyOrientation with orientation=0 (also out of 1-8 range) must return
+     * the original image without throwing.
+     */
+    @Test
+    public void applyOrientation_orientationZero_returnsOriginalImageWithoutException() throws Exception {
+        java.lang.reflect.Method m = org.vincentyeh.img2pdf.lib.image.concrete.reader.ImageIOReader.class
+                .getDeclaredMethod("applyOrientation", BufferedImage.class, int.class);
+        m.setAccessible(true);
+
+        BufferedImage original = new BufferedImage(4, 4, BufferedImage.TYPE_INT_RGB);
+        BufferedImage result = assertDoesNotThrow(() ->
+                (BufferedImage) m.invoke(null, original, 0));
+        assertSame(original, result,
+                "applyOrientation with orientation=0 must return the original image unchanged");
+    }
+
+    /**
+     * W-3: applyOrientation with a negative orientation value must return
+     * the original image without throwing.
+     */
+    @Test
+    public void applyOrientation_negativeOrientation_returnsOriginalImageWithoutException() throws Exception {
+        java.lang.reflect.Method m = org.vincentyeh.img2pdf.lib.image.concrete.reader.ImageIOReader.class
+                .getDeclaredMethod("applyOrientation", BufferedImage.class, int.class);
+        m.setAccessible(true);
+
+        BufferedImage original = new BufferedImage(4, 4, BufferedImage.TYPE_INT_RGB);
+        BufferedImage result = assertDoesNotThrow(() ->
+                (BufferedImage) m.invoke(null, original, -1));
+        assertSame(original, result,
+                "applyOrientation with negative orientation must return the original image unchanged");
+    }
+
+    // =========================================================================
+    // W-4: EXIF Orientation entry value is a non-Number type — readExifOrientation
+    // must return OptionalInt.empty() instead of throwing ClassCastException.
+    //
+    // Strategy: build a JPEG whose TIFF IFD encodes the Orientation tag with
+    // type=ASCII (2) instead of SHORT (3). TIFFReader may surface the value as a
+    // String rather than a Number. The guard `!(value instanceof Number)` must
+    // catch this and return OptionalInt.empty(), so readImage() returns the
+    // raw decoded image without any orientation transformation.
+    // =========================================================================
+
+    /**
+     * Builds a minimal TIFF block (little-endian) where the Orientation tag
+     * is encoded with type=ASCII (2) and a single-char value "6\0".
+     * This produces a non-Number entry value that would previously trigger a
+     * ClassCastException.
+     *
+     * <pre>
+     *   Offset 0:  II             - byte order: little-endian
+     *   Offset 2:  2A 00          - TIFF magic 42
+     *   Offset 4:  08 00 00 00    - IFD0 offset = 8
+     *   Offset 8:  01 00          - IFD entry count = 1
+     *   Offset 10: 12 01          - tag = 0x0112 (Orientation)
+     *   Offset 12: 02 00          - type = ASCII (2) — deliberately wrong type
+     *   Offset 14: 02 00 00 00    - count = 2 (two chars: '6' + null terminator)
+     *   Offset 18: 1A 00 00 00    - value offset = 26 (points to "6\0" after IFD)
+     *   Offset 22: 00 00 00 00    - next IFD offset = 0
+     *   Offset 26: 36 00          - ASCII data "6\0"
+     * </pre>
+     */
+    private static byte[] buildTiffOrientationAsAscii() {
+        return new byte[]{
+                'I', 'I',                               // byte order: little-endian
+                0x2A, 0x00,                             // TIFF magic 42
+                0x08, 0x00, 0x00, 0x00,                 // IFD0 offset = 8
+                0x01, 0x00,                             // IFD entry count = 1
+                0x12, 0x01,                             // tag = 0x0112 (Orientation)
+                0x02, 0x00,                             // type = ASCII (deliberately non-numeric)
+                0x02, 0x00, 0x00, 0x00,                 // count = 2
+                0x1A, 0x00, 0x00, 0x00,                 // value offset = 26
+                0x00, 0x00, 0x00, 0x00,                 // next IFD offset = 0
+                '6', 0x00                               // ASCII data: "6\0"
+        };
+    }
+
+    /**
+     * W-4: When the EXIF Orientation tag carries a non-Number value (ASCII type),
+     * readExifOrientation must return OptionalInt.empty() and must NOT throw
+     * ClassCastException. The full readImage(File) call must also succeed.
+     */
+    @Test
+    public void readImageFile_exifOrientationTagAsAsciiType_noClassCastException() throws IOException {
+        ImageReader reader = ImageIOReader.getInstance();
+        byte[] jpeg = buildJpegWithAppSegments(
+                buildExifApp1WithTiff(buildTiffOrientationAsAscii()));
+        Path file = tempDir.resolve("exif_orientation_ascii_type.jpg");
+        Files.write(file, jpeg);
+
+        // Must not throw ClassCastException; the non-Number value must be silently ignored
+        assertDoesNotThrow(() -> reader.readImage(file.toFile()),
+                "readImage(File) must not throw ClassCastException when EXIF Orientation is a non-Number type");
+    }
+
+    /**
+     * W-4: Isolation test — readExifOrientation must return OptionalInt.empty()
+     * for a JPEG whose Orientation tag has an ASCII (non-Number) value.
+     */
+    @Test
+    public void readExifOrientation_nonNumberOrientationValue_returnsEmpty() throws Exception {
+        byte[] jpeg = buildJpegWithAppSegments(
+                buildExifApp1WithTiff(buildTiffOrientationAsAscii()));
+        Path file = tempDir.resolve("diag_exif_orient_ascii.jpg");
+        Files.write(file, jpeg);
+
+        java.lang.reflect.Method m = org.vincentyeh.img2pdf.lib.image.concrete.reader.ImageIOReader.class
+                .getDeclaredMethod("readExifOrientation", File.class);
+        m.setAccessible(true);
+        java.util.OptionalInt result = (java.util.OptionalInt) m.invoke(null, file.toFile());
+
+        assertFalse(result.isPresent(),
+                "readExifOrientation must return OptionalInt.empty() when Orientation entry value is not a Number");
+    }
+
+    // =========================================================================
+    // I-3: resource non-leak verification for readExifOrientation
+    //
+    // Strategy: call readImage(File) on a valid JPEG with EXIF many times in a
+    // tight loop and confirm that no FileDescriptor leak causes an exception.
+    // On most JVMs the default ulimit is 1024; 200 iterations is well within
+    // that limit but will fail instantly if a descriptor leaks on every call.
+    // =========================================================================
+
+    /**
+     * I-3: Repeated readImage(File) calls on the same EXIF-bearing JPEG must not
+     * accumulate open file descriptors. If a resource leak were present, later
+     * iterations would throw an IOException ("Too many open files").
+     */
+    @Test
+    public void readImageFile_repeatedCallsWithExif_noFileDescriptorLeak() throws IOException {
+        byte[] jpeg = buildJpegWithAppSegments(buildJfifApp0(), buildExifApp1WithOrientation6());
+        Path file = tempDir.resolve("fd_leak_test.jpg");
+        Files.write(file, jpeg);
+
+        ImageReader reader = ImageIOReader.getInstance();
+        for (int i = 0; i < 200; i++) {
+            BufferedImage result = reader.readImage(file.toFile());
+            assertNotNull(result, "readImage must succeed on iteration " + i);
+        }
     }
 
     /**
