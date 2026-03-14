@@ -226,7 +226,19 @@ public final class ImageIOReader implements ImageReader {
             if (iis == null) return OptionalInt.empty();
             if (!positionAtExifTiff(iis)) return OptionalInt.empty();
 
-            Directory dir = new TIFFReader().read(iis);
+            // TIFFReader interprets IFD offsets as absolute stream positions via seek().
+            // Wrap the remaining stream so TIFF data appears to start at position 0,
+            // ensuring seek(ifdOffset) lands at the correct position within the TIFF block.
+            final ImageInputStream src = iis;
+            ImageInputStream tiffStream = new javax.imageio.stream.MemoryCacheImageInputStream(
+                    new InputStream() {
+                        @Override public int read() throws IOException { return src.read(); }
+                        @Override public int read(byte[] b, int off, int len) throws IOException {
+                            return src.read(b, off, len);
+                        }
+                    });
+
+            Directory dir = new TIFFReader().read(tiffStream);
             Directory ifd0 = (dir instanceof CompoundDirectory)
                     ? ((CompoundDirectory) dir).getDirectory(0) : dir;
 
@@ -310,9 +322,9 @@ public final class ImageIOReader implements ImageReader {
                     // Non-EXIF APP1: skip remaining segment body (already read 6 bytes of header)
                     iis.skipBytes(length - 2 - 6);
 
-//                APP0:JFIF
+//                APP0:JFIF — skip and continue; some files have both JFIF + EXIF
                 } else if (marker == 0xFFE0) {
-                    return false;
+                    iis.skipBytes(length - 2);
                 } else {
                     iis.skipBytes(length - 2);
                 }

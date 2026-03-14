@@ -616,4 +616,738 @@ public class ImageIOReaderTest {
         ImageReader second = ImageIOReader.getInstance();
         assertSame(first, second);
     }
+
+    // =========================================================================
+    // seekJpegExifTiff — APP0(JFIF) skip-and-continue fix
+    //
+    // Bug: APP0 (0xFFE0) previously returned false immediately, causing any
+    // subsequent APP1 EXIF segment to be ignored.  After the fix APP0 is
+    // skipped and scanning continues so that a following APP1 is processed.
+    //
+    // Strategy:
+    //   1. Encode a 2x1 (landscape) BufferedImage to JPEG bytes via ImageIO.write.
+    //   2. Strip the generated APP segment(s) to obtain the raw image data
+    //      (from the DQT/SOF0 marker onward), then prepend custom APP sequences.
+    //   3. For Orientation=6 (90-degree CW rotation) the resulting image must
+    //      have width < height (dimensions swapped from the original 2x1).
+    //   4. For files with no usable EXIF the image dimensions must be unchanged.
+    //
+    // A minimal TIFF block encoding Orientation=6 is embedded in APP1:
+    //   II (LE) + magic 0x002A + IFD offset 8
+    //   IFD entry count: 1
+    //   Orientation entry: tag=0x0112, type=SHORT(3), count=1, value=6
+    //   Next IFD offset: 0
+    // =========================================================================
+
+    /**
+     * Landscape JPEG image bytes (width=2, height=1) generated once for the
+     * JFIF/EXIF fix tests.  This field is populated by {@link #generateLandscapeJpeg()}.
+     */
+    private static byte[] LANDSCAPE_2X1_JPEG;
+
+    /**
+     * Generates {@link #LANDSCAPE_2X1_JPEG} once before any test in this class.
+     * Creates a 2x1 white RGB image and encodes it as JPEG via ImageIO.
+     */
+    @BeforeAll
+    static void generateLandscapeJpeg() throws IOException {
+        BufferedImage img = new BufferedImage(2, 1, BufferedImage.TYPE_INT_RGB);
+        img.setRGB(0, 0, 0xFFFFFF);
+        img.setRGB(1, 0, 0xFFFFFF);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(img, "jpg", baos);
+        LANDSCAPE_2X1_JPEG = baos.toByteArray();
+    }
+
+    /**
+     * Returns the byte offset of the first non-APP JPEG marker (e.g., DQT 0xFFDB)
+     * in {@link #LANDSCAPE_2X1_JPEG}, so that all generated APP segments can be
+     * replaced with custom ones while keeping the raw image data intact.
+     *
+     * <p>Scans forward from byte 2 (after SOI), skipping any APP segment (0xFFE0–0xFFEF)
+     * by reading its length field. Returns the offset of the first marker that is
+     * not an APP segment.</p>
+     *
+     * @return byte offset of the first non-APP marker in {@link #LANDSCAPE_2X1_JPEG}
+     */
+    private static int firstNonAppOffset() {
+        int pos = 2; // skip SOI (FF D8)
+        byte[] data = LANDSCAPE_2X1_JPEG;
+        while (pos + 3 < data.length) {
+            int marker = ((data[pos] & 0xFF) << 8) | (data[pos + 1] & 0xFF);
+            // APP markers: 0xFFE0 .. 0xFFEF
+            if (marker >= 0xFFE0 && marker <= 0xFFEF) {
+                int segLen = ((data[pos + 2] & 0xFF) << 8) | (data[pos + 3] & 0xFF);
+                pos += 2 + segLen; // marker(2) already counted by the length field convention
+                // length includes the 2 length bytes themselves but NOT the 2 marker bytes
+            } else {
+                break;
+            }
+        }
+        return pos;
+    }
+
+    /**
+     * Minimal TIFF block (little-endian) encoding a single IFD0 entry:
+     * Orientation tag (0x0112) with value 6 (Rotate 90 CW).
+     *
+     * <pre>
+     *   Offset 0: 49 49       - byte order "II" (little-endian)
+     *   Offset 2: 2A 00       - TIFF magic 42
+     *   Offset 4: 08 00 00 00 - IFD0 offset = 8
+     *   Offset 8: 01 00       - IFD entry count = 1
+     *   Offset 10: 12 01      - tag = 0x0112 (Orientation)
+     *   Offset 12: 03 00      - type = SHORT (3)
+     *   Offset 14: 01 00 00 00- count = 1
+     *   Offset 18: 06 00 00 00- value = 6 (stored inline, padded to 4 bytes)
+     *   Offset 22: 00 00 00 00- next IFD offset = 0
+     * </pre>
+     */
+    private static final byte[] TIFF_ORIENTATION_6 = new byte[]{
+            'I', 'I',                               // byte order: little-endian
+            0x2A, 0x00,                             // TIFF magic 42
+            0x08, 0x00, 0x00, 0x00,                 // IFD0 offset = 8
+            0x01, 0x00,                             // IFD entry count = 1
+            0x12, 0x01,                             // tag = 0x0112 (Orientation)
+            0x03, 0x00,                             // type = SHORT
+            0x01, 0x00, 0x00, 0x00,                 // count = 1
+            0x06, 0x00, 0x00, 0x00,                 // value = 6 (Rotate 90 CW), inline
+            0x00, 0x00, 0x00, 0x00                  // next IFD offset = 0
+    };
+
+    /**
+     * Builds an APP1 EXIF segment containing {@link #TIFF_ORIENTATION_6}.
+     * Layout: FF E1 | length(2 BE) | "Exif\0\0"(6) | TIFF block.
+     *
+     * @return raw APP1 bytes including marker and length field
+     */
+    private static byte[] buildExifApp1WithOrientation6() throws IOException {
+        // length = 2 (length field) + 6 ("Exif\0\0") + tiff block
+        int length = 2 + 6 + TIFF_ORIENTATION_6.length;
+        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+        buf.write(new byte[]{(byte) 0xFF, (byte) 0xE1});   // APP1 marker
+        buf.write((length >> 8) & 0xFF);
+        buf.write(length & 0xFF);
+        buf.write(new byte[]{'E', 'x', 'i', 'f', 0x00, 0x00});
+        buf.write(TIFF_ORIENTATION_6);
+        return buf.toByteArray();
+    }
+
+    /**
+     * Builds a minimal APP0 JFIF segment.
+     * Payload: "JFIF\0" + version(2) + units(1) + Xdensity(2) + Ydensity(2) + thumbW(1) + thumbH(1).
+     * Total payload = 13 bytes; length field = 13 + 2 = 15 (0x000F).
+     *
+     * @return raw APP0 bytes including marker and length field
+     */
+    private static byte[] buildJfifApp0() {
+        return new byte[]{
+                (byte) 0xFF, (byte) 0xE0,   // APP0 marker
+                0x00, 0x10,                  // length = 16 (14-byte payload + 2)
+                'J', 'F', 'I', 'F', 0x00,   // identifier "JFIF\0"
+                0x01, 0x01,                  // version 1.1
+                0x00,                        // aspect ratio units: 0 = no units
+                0x00, 0x01,                  // Xdensity = 1
+                0x00, 0x01,                  // Ydensity = 1
+                0x00,                        // thumbnail width = 0
+                0x00                         // thumbnail height = 0
+        };
+    }
+
+    /**
+     * Builds a complete JPEG byte array by combining:
+     *   SOI + {@code appSegments} + raw image data from {@link #LANDSCAPE_2X1_JPEG}.
+     *
+     * @param appSegments zero or more APP segment byte arrays to insert after SOI
+     * @return complete JPEG byte array
+     */
+    private static byte[] buildJpegWithAppSegments(byte[]... appSegments) throws IOException {
+        int rawOffset = firstNonAppOffset();
+        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+        buf.write(new byte[]{(byte) 0xFF, (byte) 0xD8}); // SOI
+        for (byte[] seg : appSegments) {
+            buf.write(seg);
+        }
+        buf.write(LANDSCAPE_2X1_JPEG, rawOffset, LANDSCAPE_2X1_JPEG.length - rawOffset);
+        return buf.toByteArray();
+    }
+
+    /**
+     * Test scenario 1: JPEG with APP0 (JFIF) only, no EXIF.
+     * seekJpegExifTiff must skip APP0 and eventually return false (no EXIF found).
+     * The decoded image must have the original landscape dimensions (width >= height).
+     */
+    @Test
+    public void readImageFile_jfifOnlyNoExif_returnsOriginalDimensions() throws Exception {
+        byte[] jpeg = buildJpegWithAppSegments(buildJfifApp0());
+        Path file = tempDir.resolve("jfif_only.jpg");
+        Files.write(file, jpeg);
+
+        BufferedImage result = ImageIOReader.getInstance().readImage(file.toFile());
+
+        assertNotNull(result, "image must be decoded from a JFIF-only JPEG");
+        // Original 2x1 landscape image — no rotation should have been applied
+        assertTrue(result.getWidth() >= result.getHeight(),
+                "JFIF-only JPEG must not apply rotation: expected width >= height, got "
+                        + result.getWidth() + "x" + result.getHeight());
+    }
+
+    /**
+     * Test scenario 2: JPEG with APP1 EXIF only (Orientation=6, no APP0).
+     * seekJpegExifTiff must find the EXIF segment and apply 90-degree CW rotation.
+     * The resulting image must have height > width (dimensions swapped from 2x1 original).
+     */
+    @Test
+    public void readImageFile_exifOnlyOrientation6_dimensionsSwapped() throws Exception {
+        byte[] jpeg = buildJpegWithAppSegments(buildExifApp1WithOrientation6());
+        Path file = tempDir.resolve("exif_only_orientation6.jpg");
+        Files.write(file, jpeg);
+
+        BufferedImage result = ImageIOReader.getInstance().readImage(file.toFile());
+
+        assertNotNull(result, "image must be decoded from EXIF-only JPEG");
+        // Orientation=6 rotates 90 CW: 2x1 becomes 1x2, so height > width
+        assertTrue(result.getHeight() > result.getWidth(),
+                "Orientation=6 must swap dimensions: expected height > width, got "
+                        + result.getWidth() + "x" + result.getHeight());
+    }
+
+    /**
+     * Test scenario 3: JPEG with APP0 (JFIF) followed by APP1 EXIF (Orientation=6).
+     * This is the exact bug scenario: before the fix, APP0 caused seekJpegExifTiff
+     * to return false immediately, silently ignoring the EXIF segment.
+     * After the fix, APP0 is skipped and APP1 is processed correctly.
+     * The resulting image must have height > width (dimensions swapped from 2x1 original).
+     */
+    @Test
+    public void readImageFile_jfifThenExifOrientation6_dimensionsSwappedAfterFix() throws Exception {
+        byte[] jpeg = buildJpegWithAppSegments(buildJfifApp0(), buildExifApp1WithOrientation6());
+        Path file = tempDir.resolve("jfif_then_exif_orientation6.jpg");
+        Files.write(file, jpeg);
+
+        BufferedImage result = ImageIOReader.getInstance().readImage(file.toFile());
+
+        assertNotNull(result, "image must be decoded from JFIF+EXIF JPEG");
+        // Bug scenario: JFIF precedes EXIF; orientation must still be applied
+        assertTrue(result.getHeight() > result.getWidth(),
+                "JFIF+EXIF Orientation=6 must swap dimensions: expected height > width, got "
+                        + result.getWidth() + "x" + result.getHeight());
+    }
+
+    /**
+     * Test scenario 4a: JPEG with multiple APP0 segments followed by APP1 EXIF (Orientation=6).
+     * seekJpegExifTiff must skip every APP0 and eventually process the APP1 segment.
+     * This is an extreme edge case where JPEG producers emit more than one JFIF-style APP0.
+     * The resulting image must have height > width (orientation correction applied).
+     */
+    @Test
+    public void readImageFile_multipleApp0ThenExifOrientation6_dimensionsSwapped() throws Exception {
+        // Three consecutive APP0 segments followed by a single APP1 EXIF with Orientation=6
+        byte[] jpeg = buildJpegWithAppSegments(
+                buildJfifApp0(),
+                buildJfifApp0(),
+                buildJfifApp0(),
+                buildExifApp1WithOrientation6()
+        );
+        Path file = tempDir.resolve("multi_app0_then_exif.jpg");
+        Files.write(file, jpeg);
+
+        BufferedImage result = ImageIOReader.getInstance().readImage(file.toFile());
+
+        assertNotNull(result, "image must be decoded from multi-APP0 + EXIF JPEG");
+        // Orientation=6 rotates 90 CW: 2x1 landscape becomes 1x2, so height > width
+        assertTrue(result.getHeight() > result.getWidth(),
+                "multiple APP0 then EXIF Orientation=6 must swap dimensions: expected height > width, got "
+                        + result.getWidth() + "x" + result.getHeight());
+    }
+
+    /**
+     * Test scenario 4b: JPEG with two APP0 segments, no EXIF at all.
+     * seekJpegExifTiff must skip both APP0 segments and return false (no EXIF found).
+     * Original landscape dimensions must be preserved (no rotation applied).
+     */
+    @Test
+    public void readImageFile_multipleApp0NoExif_returnsOriginalDimensions() throws Exception {
+        byte[] jpeg = buildJpegWithAppSegments(buildJfifApp0(), buildJfifApp0());
+        Path file = tempDir.resolve("multi_app0_no_exif.jpg");
+        Files.write(file, jpeg);
+
+        BufferedImage result = ImageIOReader.getInstance().readImage(file.toFile());
+
+        assertNotNull(result, "image must be decoded from multi-APP0 JPEG with no EXIF");
+        // No rotation — original 2x1 landscape dimensions expected
+        assertTrue(result.getWidth() >= result.getHeight(),
+                "multi-APP0 no-EXIF JPEG must not apply rotation: expected width >= height, got "
+                        + result.getWidth() + "x" + result.getHeight());
+    }
+
+    /**
+     * Test scenario 5: JPEG where seekJpegExifTiff encounters SOS (0xFFDA) as the very
+     * first marker after SOI — no APP segments, just SOI + SOS.
+     * seekJpegExifTiff must recognize SOS and return false immediately without reading
+     * a length field for SOS, since SOS is listed in the early-exit condition alongside EOI.
+     * The outcome (null or ImageReadingException) is acceptable; an unchecked exception must not escape.
+     */
+    @Test
+    public void readImageFile_soiThenSosOnly_sosMarkerHandledWithoutLengthRead() {
+        ImageReader reader = ImageIOReader.getInstance();
+        assertTimeoutPreemptively(Duration.ofSeconds(5), () -> {
+            Path jpeg = tempDir.resolve("soi_sos_only.jpg");
+            // SOI (FF D8) + SOS (FF DA) — 4 bytes total, no length field after SOS
+            Files.write(jpeg, new byte[]{(byte) 0xFF, (byte) 0xD8, (byte) 0xFF, (byte) 0xDA});
+            try {
+                reader.readImage(jpeg.toFile());
+                // null return is acceptable: no decodable image data
+            } catch (ImageReadingException ignored) {
+                // acceptable: ImageIO cannot decode a truncated JPEG
+            }
+            // RuntimeException must NOT escape
+        });
+    }
+
+    /**
+     * Test scenario 4: JPEG with APP0 (JFIF) followed by APP1 whose header is NOT "Exif\0\0".
+     * The non-EXIF APP1 must be skipped; no orientation correction applied.
+     * The decoded image must retain the original landscape dimensions (width >= height).
+     */
+    @Test
+    public void readImageFile_jfifThenNonExifApp1_returnsOriginalDimensions() throws Exception {
+        // Build a non-EXIF APP1 (e.g., XMP data with a non-Exif header)
+        byte[] nonExifPayload = new byte[]{'X', 'M', 'P', ' ', 0x00, 0x00, 0x00, 0x00};
+        int app1Length = 2 + nonExifPayload.length;
+        ByteArrayOutputStream app1Buf = new ByteArrayOutputStream();
+        app1Buf.write(new byte[]{(byte) 0xFF, (byte) 0xE1}); // APP1 marker
+        app1Buf.write((app1Length >> 8) & 0xFF);
+        app1Buf.write(app1Length & 0xFF);
+        app1Buf.write(nonExifPayload);
+        byte[] nonExifApp1 = app1Buf.toByteArray();
+
+        byte[] jpeg = buildJpegWithAppSegments(buildJfifApp0(), nonExifApp1);
+        Path file = tempDir.resolve("jfif_then_non_exif_app1.jpg");
+        Files.write(file, jpeg);
+
+        BufferedImage result = ImageIOReader.getInstance().readImage(file.toFile());
+
+        assertNotNull(result, "image must be decoded from JFIF + non-EXIF APP1 JPEG");
+        // No valid EXIF Orientation tag found — original dimensions must be preserved
+        assertTrue(result.getWidth() >= result.getHeight(),
+                "Non-EXIF APP1 must not trigger rotation: expected width >= height, got "
+                        + result.getWidth() + "x" + result.getHeight());
+    }
+
+    /**
+     * Isolation test: verifies that {@code readExifOrientation} (accessed via reflection)
+     * correctly returns Orientation=6 for a JFIF+EXIF JPEG.
+     *
+     * <p>This test isolates the EXIF-reading step from the full {@code readImage} pipeline.
+     * If this test fails, the bug is in {@code seekJpegExifTiff} or {@code TIFFReader} parsing.
+     * If this passes but {@link #readImageFile_jfifThenExifOrientation6_dimensionsSwappedAfterFix}
+     * fails, the bug is in the {@code applyOrientation} step.</p>
+     */
+    @Test
+    public void readExifOrientation_jfifThenExifOrientation6_returnsOrientationSix() throws Exception {
+        byte[] jpeg = buildJpegWithAppSegments(buildJfifApp0(), buildExifApp1WithOrientation6());
+        Path file = tempDir.resolve("diag_jfif_exif_orient.jpg");
+        Files.write(file, jpeg);
+
+        java.lang.reflect.Method m = org.vincentyeh.img2pdf.lib.image.concrete.reader.ImageIOReader.class
+                .getDeclaredMethod("readExifOrientation", File.class);
+        m.setAccessible(true);
+        java.util.OptionalInt result = (java.util.OptionalInt) m.invoke(null, file.toFile());
+
+        assertTrue(result.isPresent(),
+                "readExifOrientation must find Orientation tag in JFIF+EXIF JPEG; got empty");
+        assertEquals(6, result.getAsInt(),
+                "readExifOrientation must return 6 for Orientation=6 EXIF in JFIF+EXIF JPEG");
+    }
+
+    /**
+     * Deep isolation test: verifies that {@code seekJpegExifTiff} (accessed via reflection)
+     * returns {@code true} when given an {@link javax.imageio.stream.ImageInputStream} positioned
+     * immediately after the SOI marker of a JFIF+EXIF JPEG.
+     *
+     * <p>This test calls the private method directly, bypassing the wrapping in
+     * {@code positionAtExifTiff} and {@code readExifOrientation}, to confirm that
+     * the inner scanning loop correctly skips APP0 and finds the APP1 EXIF header.</p>
+     */
+    @Test
+    public void seekJpegExifTiff_jfifThenExifOrientation6_returnsTrue() throws Exception {
+        byte[] jpeg = buildJpegWithAppSegments(buildJfifApp0(), buildExifApp1WithOrientation6());
+        Path file = tempDir.resolve("seek_diag_jfif_exif.jpg");
+        Files.write(file, jpeg);
+
+        // Obtain a FileImageInputStream positioned at offset 2 (after SOI)
+        javax.imageio.stream.ImageInputStream iis = javax.imageio.ImageIO.createImageInputStream(file.toFile());
+        assertNotNull(iis, "createImageInputStream must not return null for a valid JPEG file");
+        iis.readUnsignedShort(); // consume SOI (FF D8)
+
+        try {
+            java.lang.reflect.Method m = org.vincentyeh.img2pdf.lib.image.concrete.reader.ImageIOReader.class
+                    .getDeclaredMethod("seekJpegExifTiff",
+                            javax.imageio.stream.ImageInputStream.class);
+            m.setAccessible(true);
+            boolean found = (Boolean) m.invoke(null, iis);
+
+            assertTrue(found,
+                    "seekJpegExifTiff must return true for a JPEG with JFIF APP0 followed by EXIF APP1; "
+                            + "got false, which means APP0 still causes early exit or APP1 is misread");
+        } finally {
+            iis.close();
+        }
+    }
+
+    /**
+     * TIFFReader isolation test: verifies that {@link com.twelvemonkeys.imageio.metadata.tiff.TIFFReader}
+     * correctly parses the Orientation tag from the embedded TIFF block in a JFIF+EXIF JPEG.
+     *
+     * <p>TwelveMonkeys {@code TIFFReader} interprets IFD offsets as absolute stream positions
+     * via {@code seek()}. To correctly parse the TIFF block embedded at JPEG offset 30
+     * (SOI(2) + APP0(18) + APP1_marker+len(4) + "Exif\0\0"(6)), the TIFF bytes must be
+     * extracted and wrapped in a new stream starting at position 0, so that
+     * {@code seek(ifdOffset)} lands at the correct position within the TIFF block.</p>
+     */
+    @Test
+    public void tiffReader_jfifExifJpeg_parsesOrientationSix() throws Exception {
+        byte[] jpeg = buildJpegWithAppSegments(buildJfifApp0(), buildExifApp1WithOrientation6());
+        Path file = tempDir.resolve("tiff_reader_diag.jpg");
+        Files.write(file, jpeg);
+
+        // TIFFReader interprets IFD offsets as absolute stream positions.
+        // Extract TIFF bytes from offset 30 and create a stream starting at position 0.
+        // SOI(2) + APP0-marker+len(4) + APP0-payload(14) + APP1-marker+len(4) + "Exif\0\0"(6) = 30
+        byte[] tiffBytes = java.util.Arrays.copyOfRange(jpeg, 30, jpeg.length);
+        javax.imageio.stream.ImageInputStream iis = new javax.imageio.stream.MemoryCacheImageInputStream(
+                new java.io.ByteArrayInputStream(tiffBytes));
+
+        try {
+            com.twelvemonkeys.imageio.metadata.Directory dir =
+                    new com.twelvemonkeys.imageio.metadata.tiff.TIFFReader().read(iis);
+
+            assertNotNull(dir, "TIFFReader must parse a non-null Directory from the TIFF block");
+
+            com.twelvemonkeys.imageio.metadata.Directory ifd0 =
+                    (dir instanceof com.twelvemonkeys.imageio.metadata.CompoundDirectory)
+                            ? ((com.twelvemonkeys.imageio.metadata.CompoundDirectory) dir).getDirectory(0)
+                            : dir;
+
+            assertNotNull(ifd0, "IFD0 directory must not be null");
+
+            // Dump all entries in IFD0 to stderr for diagnostic purposes
+            StringBuilder entryDump = new StringBuilder("IFD0 entries (extracted from JPEG offset 30): count=");
+            entryDump.append(ifd0.size());
+            for (com.twelvemonkeys.imageio.metadata.Entry e : ifd0) {
+                entryDump.append(" [id=").append(e.getIdentifier())
+                        .append(",val=").append(e.getValue()).append("]");
+            }
+            System.err.println(entryDump);
+
+            com.twelvemonkeys.imageio.metadata.Entry entry =
+                    ifd0.getEntryById(com.twelvemonkeys.imageio.metadata.tiff.TIFF.TAG_ORIENTATION);
+
+            assertNotNull(entry, "IFD0 must contain an Orientation entry (extracted from JPEG offset 30)");
+            assertNotNull(entry.getValue(), "Orientation entry value must not be null");
+            assertEquals(6, ((Number) entry.getValue()).intValue(),
+                    "Orientation value must be 6 (Rotate 90 CW)");
+        } finally {
+            iis.close();
+        }
+    }
+
+    // =========================================================================
+    // JFIF+EXIF — additional orientation values (1, 3, 8)
+    //
+    // Orientation=6 already covered above; here we add:
+    //   Orientation=1 → no-op, original landscape dimensions preserved
+    //   Orientation=3 → 180° rotation, dimensions unchanged (2x1 stays 2x1)
+    //   Orientation=8 → 270° CW, dimensions swap (2x1 becomes 1x2)
+    //
+    // Each test builds JFIF APP0 + EXIF APP1 via the same helpers used above,
+    // only the TIFF Orientation value differs.
+    // =========================================================================
+
+    /**
+     * Builds a raw TIFF block (little-endian) with a single Orientation IFD entry
+     * set to the given value.  Same structure as {@link #TIFF_ORIENTATION_6} but
+     * parameterized so other orientation values can be tested.
+     *
+     * @param orientation EXIF orientation value 1-8
+     * @return 26-byte TIFF block encoding the specified orientation
+     */
+    private static byte[] buildTiffOrientation(int orientation) {
+        return new byte[]{
+                'I', 'I',                               // byte order: little-endian
+                0x2A, 0x00,                             // TIFF magic 42
+                0x08, 0x00, 0x00, 0x00,                 // IFD0 offset = 8
+                0x01, 0x00,                             // IFD entry count = 1
+                0x12, 0x01,                             // tag = 0x0112 (Orientation)
+                0x03, 0x00,                             // type = SHORT
+                0x01, 0x00, 0x00, 0x00,                 // count = 1
+                (byte) orientation, 0x00, 0x00, 0x00,   // value inline (little-endian)
+                0x00, 0x00, 0x00, 0x00                  // next IFD offset = 0
+        };
+    }
+
+    /**
+     * Builds an APP1 EXIF segment embedding the given TIFF block.
+     *
+     * @param tiffBlock raw TIFF bytes to embed in the APP1 segment
+     * @return complete APP1 bytes including FF E1 marker and length field
+     */
+    private static byte[] buildExifApp1WithTiff(byte[] tiffBlock) throws IOException {
+        int length = 2 + 6 + tiffBlock.length; // 2 (length field) + 6 ("Exif\0\0") + TIFF
+        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+        buf.write(new byte[]{(byte) 0xFF, (byte) 0xE1}); // APP1 marker
+        buf.write((length >> 8) & 0xFF);
+        buf.write(length & 0xFF);
+        buf.write(new byte[]{'E', 'x', 'i', 'f', 0x00, 0x00});
+        buf.write(tiffBlock);
+        return buf.toByteArray();
+    }
+
+    /**
+     * JFIF+EXIF, Orientation=1 (Horizontal/Normal): no rotation must be applied.
+     * The decoded image must retain its original landscape dimensions (width >= height).
+     */
+    @Test
+    public void readImageFile_jfifThenExifOrientation1_noRotationApplied() throws Exception {
+        byte[] jpeg = buildJpegWithAppSegments(
+                buildJfifApp0(),
+                buildExifApp1WithTiff(buildTiffOrientation(1))
+        );
+        Path file = tempDir.resolve("jfif_exif_orient1.jpg");
+        Files.write(file, jpeg);
+
+        BufferedImage result = assertTimeoutPreemptively(Duration.ofSeconds(5),
+                () -> ImageIOReader.getInstance().readImage(file.toFile()));
+
+        assertNotNull(result, "image must be decoded from JFIF+EXIF(Orientation=1) JPEG");
+        // Orientation=1 is a no-op — 2x1 landscape must stay landscape
+        assertTrue(result.getWidth() >= result.getHeight(),
+                "Orientation=1 must not rotate: expected width >= height, got "
+                        + result.getWidth() + "x" + result.getHeight());
+    }
+
+    /**
+     * JFIF+EXIF, Orientation=3 (Rotate 180°): dimensions must be unchanged
+     * because rotating a 2x1 image by 180° produces another 2x1 image.
+     * This test confirms that Orientation=3 does not crash and returns the same
+     * width/height as the original.
+     */
+    @Test
+    public void readImageFile_jfifThenExifOrientation3_dimensionsUnchanged() throws Exception {
+        byte[] jpeg = buildJpegWithAppSegments(
+                buildJfifApp0(),
+                buildExifApp1WithTiff(buildTiffOrientation(3))
+        );
+        Path file = tempDir.resolve("jfif_exif_orient3.jpg");
+        Files.write(file, jpeg);
+
+        BufferedImage result = assertTimeoutPreemptively(Duration.ofSeconds(5),
+                () -> ImageIOReader.getInstance().readImage(file.toFile()));
+
+        assertNotNull(result, "image must be decoded from JFIF+EXIF(Orientation=3) JPEG");
+        // 180° rotation of a 2x1 image still yields 2x1 — width >= height
+        assertTrue(result.getWidth() >= result.getHeight(),
+                "Orientation=3 (180°) of 2x1 must not change aspect ratio: expected width >= height, got "
+                        + result.getWidth() + "x" + result.getHeight());
+    }
+
+    /**
+     * JFIF+EXIF, Orientation=8 (Rotate 270° CW): dimensions must be swapped.
+     * Rotating a 2x1 landscape image by 270° CW produces a 1x2 portrait image,
+     * so height must exceed width — same observable outcome as Orientation=6.
+     */
+    @Test
+    public void readImageFile_jfifThenExifOrientation8_dimensionsSwapped() throws Exception {
+        byte[] jpeg = buildJpegWithAppSegments(
+                buildJfifApp0(),
+                buildExifApp1WithTiff(buildTiffOrientation(8))
+        );
+        Path file = tempDir.resolve("jfif_exif_orient8.jpg");
+        Files.write(file, jpeg);
+
+        BufferedImage result = assertTimeoutPreemptively(Duration.ofSeconds(5),
+                () -> ImageIOReader.getInstance().readImage(file.toFile()));
+
+        assertNotNull(result, "image must be decoded from JFIF+EXIF(Orientation=8) JPEG");
+        // Orientation=8 rotates 270° CW: 2x1 becomes 1x2, so height > width
+        assertTrue(result.getHeight() > result.getWidth(),
+                "Orientation=8 (270° CW) must swap dimensions: expected height > width, got "
+                        + result.getWidth() + "x" + result.getHeight());
+    }
+
+    // =========================================================================
+    // readExifOrientation isolation — JFIF-only (no EXIF) must return empty
+    // =========================================================================
+
+    /**
+     * Isolation: readExifOrientation must return OptionalInt.empty() for a JFIF-only JPEG.
+     * Verifies that the APP0-skip path in seekJpegExifTiff terminates cleanly without
+     * crashing and returns false (no EXIF), so the caller gets an absent orientation.
+     */
+    @Test
+    public void readExifOrientation_jfifOnly_returnsEmpty() throws Exception {
+        byte[] jpeg = buildJpegWithAppSegments(buildJfifApp0());
+        Path file = tempDir.resolve("diag_jfif_only_no_exif.jpg");
+        Files.write(file, jpeg);
+
+        java.lang.reflect.Method m = org.vincentyeh.img2pdf.lib.image.concrete.reader.ImageIOReader.class
+                .getDeclaredMethod("readExifOrientation", File.class);
+        m.setAccessible(true);
+        java.util.OptionalInt result = (java.util.OptionalInt) m.invoke(null, file.toFile());
+
+        assertFalse(result.isPresent(),
+                "readExifOrientation must return OptionalInt.empty() for a JFIF-only JPEG (no EXIF segment)");
+    }
+
+    // =========================================================================
+    // Large APP0 before EXIF — variable-length APP0 skipBytes path
+    //
+    // The standard JFIF APP0 payload is 14 bytes (total length=16). Here we
+    // use an oversized APP0 (32-byte payload, total length=34) to ensure that
+    // skipBytes(length - 2) in seekJpegExifTiff handles arbitrary large skips
+    // and does not misalign the cursor before the subsequent APP1 EXIF segment.
+    // =========================================================================
+
+    /**
+     * Builds an oversized APP0 segment with a 32-byte payload (total length=34).
+     * The payload starts with "JFIF\0" followed by zeros; this is non-standard
+     * but exercises the general skipBytes path for APP0 in seekJpegExifTiff.
+     *
+     * @return raw oversized APP0 bytes including FF E0 marker and length field
+     */
+    private static byte[] buildOversizedApp0() {
+        // payload = 32 bytes; length field = 32 + 2 = 34 (0x0022)
+        byte[] segment = new byte[2 + 2 + 32]; // marker(2) + length(2) + payload(32)
+        segment[0] = (byte) 0xFF;
+        segment[1] = (byte) 0xE0;
+        segment[2] = 0x00;
+        segment[3] = 0x22; // length = 34 (payload 32 + length-field 2)
+        // payload starts with "JFIF\0" + version + zeros
+        segment[4] = 'J';
+        segment[5] = 'F';
+        segment[6] = 'I';
+        segment[7] = 'F';
+        segment[8] = 0x00;
+        segment[9] = 0x01;
+        segment[10] = 0x01;
+        // bytes 11-35 are zero (thumbnail data etc.)
+        return segment;
+    }
+
+    /**
+     * Large APP0 (32-byte payload) followed by APP1 EXIF Orientation=6.
+     * seekJpegExifTiff must skip the full oversized APP0 body without misaligning
+     * the cursor, then correctly find and process the APP1 EXIF segment.
+     * The result must have height > width (dimensions swapped from the 2x1 original).
+     */
+    @Test
+    public void readImageFile_oversizedApp0ThenExifOrientation6_dimensionsSwapped() throws Exception {
+        byte[] jpeg = buildJpegWithAppSegments(buildOversizedApp0(), buildExifApp1WithOrientation6());
+        Path file = tempDir.resolve("oversized_app0_then_exif.jpg");
+        Files.write(file, jpeg);
+
+        BufferedImage result = assertTimeoutPreemptively(Duration.ofSeconds(5),
+                () -> ImageIOReader.getInstance().readImage(file.toFile()));
+
+        assertNotNull(result, "image must be decoded when preceded by an oversized APP0");
+        // Orientation=6 rotates 90° CW: 2x1 becomes 1x2
+        assertTrue(result.getHeight() > result.getWidth(),
+                "Oversized APP0 + EXIF Orientation=6 must swap dimensions: expected height > width, got "
+                        + result.getWidth() + "x" + result.getHeight());
+    }
+
+    // =========================================================================
+    // APP0 + non-EXIF APP1 + EXIF APP1 — three-segment chain
+    //
+    // Scenario: some cameras write JFIF APP0, then a non-EXIF APP1 (e.g. XMP),
+    // and finally the actual EXIF APP1.  seekJpegExifTiff must skip APP0,
+    // skip the non-EXIF APP1, and find the real EXIF APP1.
+    // =========================================================================
+
+    /**
+     * Builds a non-EXIF APP1 segment (simulating XMP metadata).
+     * Payload header is "http\0\0" (not "Exif\0\0"); total length = 2+6+4 = 12.
+     *
+     * @return raw non-EXIF APP1 bytes including FF E1 marker and length field
+     */
+    private static byte[] buildXmpApp1() throws IOException {
+        // payload: 6-byte non-EXIF header + 4 zero bytes
+        byte[] payload = new byte[]{'h', 't', 't', 'p', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+        int length = 2 + payload.length; // 12
+        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+        buf.write(new byte[]{(byte) 0xFF, (byte) 0xE1}); // APP1 marker
+        buf.write((length >> 8) & 0xFF);
+        buf.write(length & 0xFF);
+        buf.write(payload);
+        return buf.toByteArray();
+    }
+
+    /**
+     * Three-segment chain: APP0 (JFIF) + non-EXIF APP1 (XMP) + EXIF APP1 (Orientation=6).
+     * seekJpegExifTiff must skip both the APP0 and the non-EXIF APP1 and then
+     * correctly parse the real EXIF APP1.  The result must have height > width.
+     */
+    @Test
+    public void readImageFile_app0ThenXmpApp1ThenExifOrientation6_dimensionsSwapped() throws Exception {
+        byte[] jpeg = buildJpegWithAppSegments(
+                buildJfifApp0(),
+                buildXmpApp1(),
+                buildExifApp1WithOrientation6()
+        );
+        Path file = tempDir.resolve("app0_xmp_exif_orient6.jpg");
+        Files.write(file, jpeg);
+
+        BufferedImage result = assertTimeoutPreemptively(Duration.ofSeconds(5),
+                () -> ImageIOReader.getInstance().readImage(file.toFile()));
+
+        assertNotNull(result, "image must be decoded from APP0+XMP-APP1+EXIF-APP1 JPEG");
+        // Orientation=6 rotates 90° CW: 2x1 becomes 1x2
+        assertTrue(result.getHeight() > result.getWidth(),
+                "APP0+non-EXIF APP1+EXIF Orientation=6 must swap dimensions: expected height > width, got "
+                        + result.getWidth() + "x" + result.getHeight());
+    }
+
+    /**
+     * TIFFReader reference test: verifies that {@code TIFFReader} correctly parses
+     * Orientation=6 from the EXIF-only JPEG (no JFIF APP0), where the TIFF data
+     * starts at stream offset 12.
+     *
+     * <p>This serves as a control case for {@link #tiffReader_jfifExifJpeg_parsesOrientationSix()}:
+     * if this passes but the JFIF+EXIF test fails, the issue is that {@code TIFFReader}
+     * behaves differently depending on the stream start offset.</p>
+     */
+    @Test
+    public void tiffReader_exifOnlyJpeg_parsesOrientationSix() throws Exception {
+        byte[] jpeg = buildJpegWithAppSegments(buildExifApp1WithOrientation6());
+        Path file = tempDir.resolve("tiff_reader_exif_only.jpg");
+        Files.write(file, jpeg);
+
+        javax.imageio.stream.ImageInputStream iis = javax.imageio.ImageIO.createImageInputStream(file.toFile());
+        assertNotNull(iis);
+        // SOI(2) + APP1-marker+len(4) + "Exif\0\0"(6) = 12
+        iis.seek(12);
+
+        try {
+            com.twelvemonkeys.imageio.metadata.Directory dir =
+                    new com.twelvemonkeys.imageio.metadata.tiff.TIFFReader().read(iis);
+
+            assertNotNull(dir, "TIFFReader must parse a non-null Directory from the TIFF block");
+
+            com.twelvemonkeys.imageio.metadata.Directory ifd0 =
+                    (dir instanceof com.twelvemonkeys.imageio.metadata.CompoundDirectory)
+                            ? ((com.twelvemonkeys.imageio.metadata.CompoundDirectory) dir).getDirectory(0)
+                            : dir;
+
+            com.twelvemonkeys.imageio.metadata.Entry entry =
+                    ifd0.getEntryById(com.twelvemonkeys.imageio.metadata.tiff.TIFF.TAG_ORIENTATION);
+
+            assertNotNull(entry, "IFD0 must contain an Orientation entry (TIFF at stream offset 12)");
+            assertNotNull(entry.getValue(), "Orientation entry value must not be null");
+            assertEquals(6, ((Number) entry.getValue()).intValue(),
+                    "Orientation value must be 6 (Rotate 90 CW)");
+        } finally {
+            iis.close();
+        }
+    }
 }
