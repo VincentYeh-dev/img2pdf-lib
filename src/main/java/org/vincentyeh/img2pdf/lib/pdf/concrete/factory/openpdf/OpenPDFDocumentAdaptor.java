@@ -126,6 +126,8 @@ public class OpenPDFDocumentAdaptor implements IDocument {
     public void addPage(IPage page) {
         if (page == null)
             throw new IllegalArgumentException("page==null");
+        if (closed)
+            throw new IllegalStateException("Document has already been closed");
 
         OpenPDFPageAdaptor adaptor = (OpenPDFPageAdaptor) page;
         byte[] rawData = adaptor.getPDFBytesContent();

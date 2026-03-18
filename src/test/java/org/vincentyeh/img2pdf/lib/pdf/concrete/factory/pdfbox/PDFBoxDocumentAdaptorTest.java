@@ -433,4 +433,22 @@ public class PDFBoxDocumentAdaptorTest {
                 () -> adaptor.save(new ByteArrayOutputStream()),
                 "save() after close() must throw IllegalStateException");
     }
+
+    // =========================================================================
+    // C-4/C-5 fix: addPage() closed guard
+    // =========================================================================
+
+    /**
+     * After close() has been called, addPage() must throw IllegalStateException
+     * to prevent use-after-close writes via the closed guard added in fix C-5.
+     */
+    @Test
+    void addPage_afterClose_throwsIllegalStateException() {
+        PDFBoxDocumentAdaptor adaptor = new PDFBoxDocumentAdaptor(new DocumentArgument());
+        adaptor.close();
+
+        assertThrows(IllegalStateException.class,
+                () -> adaptor.addPage(page(1)),
+                "addPage() after close() must throw IllegalStateException");
+    }
 }

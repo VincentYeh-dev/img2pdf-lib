@@ -66,7 +66,7 @@ public class PDFBoxDocumentAdaptor implements IDocument {
     private final ConcurrentHashMap<Integer, PDDocument> pageBuffer = new ConcurrentHashMap<>();
     private final DocumentArgument docArgument;
     // Marks whether the document has been closed, used to implement idempotent close()
-    private boolean closed = false;
+    private volatile boolean closed = false;
 
 
     /**
@@ -121,6 +121,8 @@ public class PDFBoxDocumentAdaptor implements IDocument {
     public void addPage(IPage page) {
         if (page == null)
             throw new IllegalArgumentException("page==null");
+        if (closed)
+            throw new IllegalStateException("Document has already been closed");
 
         PDFBoxPageAdaptor p = (PDFBoxPageAdaptor) page;
         PDDocument singlePageDoc = p.getOwnDocument();

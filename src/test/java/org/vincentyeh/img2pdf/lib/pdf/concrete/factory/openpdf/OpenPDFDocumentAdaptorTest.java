@@ -485,6 +485,24 @@ public class OpenPDFDocumentAdaptorTest {
     }
 
     // =========================================================================
+    // C-5 fix: addPage() closed guard — strict IllegalStateException assertion
+    // =========================================================================
+
+    /**
+     * After close() has been called, addPage() must throw IllegalStateException
+     * (not NPE or any other exception) due to the closed guard added in fix C-5.
+     */
+    @Test
+    void addPage_afterClose_throwsIllegalStateException() {
+        OpenPDFDocumentAdaptor adaptor = new OpenPDFDocumentAdaptor(new DocumentArgument());
+        adaptor.close();
+
+        assertThrows(IllegalStateException.class,
+                () -> adaptor.addPage(createMockPage(1)),
+                "addPage() after close() must throw IllegalStateException");
+    }
+
+    // =========================================================================
     // Regression: normal close() is idempotent
     // =========================================================================
 
