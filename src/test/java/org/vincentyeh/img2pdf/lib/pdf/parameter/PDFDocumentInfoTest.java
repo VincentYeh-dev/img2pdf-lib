@@ -3,8 +3,13 @@ package org.vincentyeh.img2pdf.lib.pdf.parameter;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Tests for {@link PDFDocumentInfo}, verifying that public fields can be assigned
+ * and read back with the expected values.
+ */
 class PDFDocumentInfoTest {
 
+    /** Verifies that all public fields of PDFDocumentInfo accept and return assigned string values. */
     @Test
     void testFieldAssignment() {
         PDFDocumentInfo info = new PDFDocumentInfo();
@@ -21,4 +26,3 @@ class PDFDocumentInfoTest {
         assertEquals("subject", info.Subject);
     }
 }
-

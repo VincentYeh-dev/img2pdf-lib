@@ -5,7 +5,7 @@
 
     <groupId>org.vincentyeh</groupId>
     <artifactId>img2pdf.lib</artifactId>
-    <version>8.0.2</version>
+    <version>8.0.3</version>
     <packaging>jar</packaging>
     <developers>
         <developer>
@@ -57,12 +57,6 @@
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
             <version>2.0.24</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.drewnoakes</groupId>
-            <artifactId>metadata-extractor</artifactId>
-            <version>2.18.0</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.twelvemonkeys.imageio/imageio-metadata -->
@@ -151,6 +145,22 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.6.3</version>
+                <configuration>
+                    <source>8</source>
+                    <encoding>UTF-8</encoding>
+                    <charset>UTF-8</charset>
+                    <docencoding>UTF-8</docencoding>
+                    <failOnError>false</failOnError>
+                    <show>protected</show>
+                    <subpackages>org.vincentyeh.img2pdf.lib</subpackages>
+                    <excludePackageNames>org.vincentyeh.img2pdf.lib.test</excludePackageNames>
+                </configuration>
             </plugin>
 
         </plugins>
